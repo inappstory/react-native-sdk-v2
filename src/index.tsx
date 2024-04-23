@@ -8,14 +8,14 @@ import * as React from 'react';
 import { Button, NativeModules, StyleSheet, Text, View } from 'react-native';
 import {
   AppearanceManager as AppearanceManagerV1,
-  ListLoadStatus,
+  type ListLoadStatus,
+  type StoriesListViewModel,
+  type StoryManagerConfig,
   StoriesList,
   StoriesListCardTitlePosition,
   StoriesListCardTitleTextAlign,
   StoriesListCardViewVariant,
-  type StoriesListViewModel,
   StoryManager as StoryManagerV1,
-  StoryManagerConfig,
   StoryReader,
   StoryReaderCloseButtonPosition,
   StoryReaderSwipeStyle,
@@ -43,7 +43,7 @@ export const InappstorySdkView =
       };
 
 export {
-  ListLoadStatus,
+  type ListLoadStatus,
   StoriesList,
   StoriesListCardTitlePosition,
   StoriesListCardTitleTextAlign,
