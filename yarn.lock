@@ -3397,6 +3397,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/react-native-button@npm:^3.0.5":
+  version: 3.0.5
+  resolution: "@types/react-native-button@npm:3.0.5"
+  dependencies:
+    "@types/react": "*"
+    react-native: "*"
+  checksum: 146968f81882f500c76435a3cd979082cf15808a3a3e95c6792ba71e925bca5d9945f585252702db314a0549fb98bca06b40153067d6f3792e71ca07d6f850de
+  languageName: node
+  linkType: hard
+
 "@types/react@npm:^18.2.44":
   version: 18.2.79
   resolution: "@types/react@npm:18.2.79"
@@ -11246,6 +11256,7 @@ __metadata:
     "@react-native/typescript-config": 0.74.81
     "@react-navigation/native": ^6.1.17
     "@react-navigation/native-stack": ^6.9.26
+    "@types/react-native-button": ^3.0.5
     babel-plugin-module-resolver: ^5.0.0
     react: 18.2.0
     react-content-loader: ^7.0.0
@@ -11392,7 +11403,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native@npm:0.74.0":
+"react-native@npm:*, react-native@npm:0.74.0":
   version: 0.74.0
   resolution: "react-native@npm:0.74.0"
   dependencies:
