@@ -6,7 +6,7 @@
 //
 
 import Foundation
-//import InAppStorySDK
+import InAppStorySDK
 
 //import ReactBridge
 
@@ -19,9 +19,9 @@ class RNInAppStorySDKModule: NSObject {
   }
 
   //@ReactMethod
-  //@objc func initWith(apiKey: String) {
-    //InAppStory.shared.initWith(serviceKey: apiKey)
-  //}
+  @objc func initWith(apiKey: String) {
+    InAppStory.shared.initWith(serviceKey: apiKey)
+  }
 
   //@ReactMethod
   //@objc
