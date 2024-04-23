@@ -11,6 +11,7 @@ import Foundation
 //import ReactBridge
 
 //@ReactModule(jsName: "InAppStorySDK")
+@objc(RNInAppStorySDKModule)
 class RNInAppStorySDKModule: NSObject {
   @objc
   func constantsToExport() -> [AnyHashable : Any]! {
