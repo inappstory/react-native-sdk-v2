@@ -8,3 +8,12 @@
 #   http://developer.android.com/guide/developing/tools/proguard.html
 
 # Add any project specific keep options here:
+-keepattributes *Annotation*
+
+-keepclassmembers class fqcn.of.javascript.interface.for.webview {
+    public *;
+}
+
+-keep class com.inappstory.sdk.** {
+ *;
+}

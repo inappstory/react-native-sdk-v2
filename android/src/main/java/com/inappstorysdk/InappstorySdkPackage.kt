@@ -8,7 +8,7 @@ import com.facebook.react.uimanager.ViewManager
 
 class InappstorySdkPackage : ReactPackage {
   override fun createNativeModules(reactContext: ReactApplicationContext): List<NativeModule> {
-    return emptyList()
+    return listOf(InappstorySdkModule(reactContext)).toMutableList()
   }
 
   override fun createViewManagers(reactContext: ReactApplicationContext): List<ViewManager<*, *>> {
