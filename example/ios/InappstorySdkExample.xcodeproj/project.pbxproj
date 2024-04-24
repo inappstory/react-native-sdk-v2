@@ -8,12 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* InappstorySdkExampleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* InappstorySdkExampleTests.m */; };
-		00F4C9568E7A98A61B2A6F8E /* Pods_InappstorySdkExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB407F832DFC42D2CD33F0CB /* Pods_InappstorySdkExample.framework */; };
-		065189B80E80646144138C01 /* Pods_InappstorySdkExample_InappstorySdkExampleTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F391C21BEA7FD8BA9095B1D /* Pods_InappstorySdkExample_InappstorySdkExampleTests.framework */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		9DEAAD2B3D87AA3141409780 /* libPods-InappstorySdkExample-InappstorySdkExampleTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 75B8CCA13C9523FAB6B252DC /* libPods-InappstorySdkExample-InappstorySdkExampleTests.a */; };
+		ADE83FEB5D647A324AA2FC87 /* libPods-InappstorySdkExample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 342D054DFA00162F418369C2 /* libPods-InappstorySdkExample.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -37,13 +37,13 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = InappstorySdkExample/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = InappstorySdkExample/main.m; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = InappstorySdkExample/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		342D054DFA00162F418369C2 /* libPods-InappstorySdkExample.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-InappstorySdkExample.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B4392A12AC88292D35C810B /* Pods-InappstorySdkExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InappstorySdkExample.debug.xcconfig"; path = "Target Support Files/Pods-InappstorySdkExample/Pods-InappstorySdkExample.debug.xcconfig"; sourceTree = "<group>"; };
-		4F391C21BEA7FD8BA9095B1D /* Pods_InappstorySdkExample_InappstorySdkExampleTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_InappstorySdkExample_InappstorySdkExampleTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5709B34CF0A7D63546082F79 /* Pods-InappstorySdkExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InappstorySdkExample.release.xcconfig"; path = "Target Support Files/Pods-InappstorySdkExample/Pods-InappstorySdkExample.release.xcconfig"; sourceTree = "<group>"; };
 		5B7EB9410499542E8C5724F5 /* Pods-InappstorySdkExample-InappstorySdkExampleTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InappstorySdkExample-InappstorySdkExampleTests.debug.xcconfig"; path = "Target Support Files/Pods-InappstorySdkExample-InappstorySdkExampleTests/Pods-InappstorySdkExample-InappstorySdkExampleTests.debug.xcconfig"; sourceTree = "<group>"; };
+		75B8CCA13C9523FAB6B252DC /* libPods-InappstorySdkExample-InappstorySdkExampleTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-InappstorySdkExample-InappstorySdkExampleTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = InappstorySdkExample/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-InappstorySdkExample-InappstorySdkExampleTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InappstorySdkExample-InappstorySdkExampleTests.release.xcconfig"; path = "Target Support Files/Pods-InappstorySdkExample-InappstorySdkExampleTests/Pods-InappstorySdkExample-InappstorySdkExampleTests.release.xcconfig"; sourceTree = "<group>"; };
-		BB407F832DFC42D2CD33F0CB /* Pods_InappstorySdkExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_InappstorySdkExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -52,7 +52,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				065189B80E80646144138C01 /* Pods_InappstorySdkExample_InappstorySdkExampleTests.framework in Frameworks */,
+				9DEAAD2B3D87AA3141409780 /* libPods-InappstorySdkExample-InappstorySdkExampleTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -60,7 +60,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				00F4C9568E7A98A61B2A6F8E /* Pods_InappstorySdkExample.framework in Frameworks */,
+				ADE83FEB5D647A324AA2FC87 /* libPods-InappstorySdkExample.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -102,8 +102,8 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				BB407F832DFC42D2CD33F0CB /* Pods_InappstorySdkExample.framework */,
-				4F391C21BEA7FD8BA9095B1D /* Pods_InappstorySdkExample_InappstorySdkExampleTests.framework */,
+				342D054DFA00162F418369C2 /* libPods-InappstorySdkExample.a */,
+				75B8CCA13C9523FAB6B252DC /* libPods-InappstorySdkExample-InappstorySdkExampleTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
