@@ -11,7 +11,8 @@ import { MainScreen } from './screen/MainScreen';
 import NetworkLogger from 'react-native-network-logger';
 import { RNWelcome } from './screen/RNWelcome';
 
-InAppStorySDK.initWith('api-key');
+InAppStorySDK.initWith('test-key');
+
 export function SDKView() {
   return (
     <View style={styles.container}>

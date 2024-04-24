@@ -23,6 +23,7 @@ import { type StoriesListViewModel } from 'react-native-inappstory-sdk';
 import Toast from 'react-native-simple-toast';
 import { StoryListComponent } from '../components/StoryListComponent';
 import { appearanceManager, storyManager } from '../services/StoryService';
+import InAppStorySDK from 'react-native-inappstory-sdk';
 
 export function MainScreen({
   navigation,
@@ -171,7 +172,17 @@ export function MainScreen({
         >
           Open onboarding
         </Button>
-
+        <View style={styles.pad32} />
+        <Button
+          containerStyle={styles.buttonContainer}
+          style={styles.button}
+          styleDisabled={styles.buttonDisabled}
+          onPress={() => {
+            InAppStorySDK.showGame('2');
+          }}
+        >
+          Open game
+        </Button>
         <View style={styles.pad32} />
         <Button
           containerStyle={styles.buttonContainer}

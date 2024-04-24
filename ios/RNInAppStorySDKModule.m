@@ -9,4 +9,5 @@
 
 @interface RCT_EXTERN_MODULE(RNInAppStorySDKModule, NSObject)
 RCT_EXTERN_METHOD(initWith:(NSString *)apiKey)
+RCT_EXTERN_METHOD(showGame:(NSString *)gameID)
 @end
