@@ -11,11 +11,13 @@ npm install react-native-inappstory-sdk
 ## Usage
 
 ```js
-import { InappstorySdkView } from "react-native-inappstory-sdk";
+import InAppStorySDK from 'react-native-inappstory-sdk';
 
-// ...
+// Init SDK
+InAppStorySDK.initSDK(apiKey, userID);
 
-<InappstorySdkView color="tomato" />
+//Show game by ID
+InAppStorySDK.showGame(gameID);
 ```
 
 ## Contributing
