@@ -19,7 +19,7 @@ class RNInAppStorySDKModule: NSObject {
   }
 
   //@ReactMethod
-  @objc func initWith(_ apiKey: String) {
+  @objc func initWith(_ apiKey: String, userID: String) {
     DispatchQueue.main.async {
       // the parameter is responsible for logging to the XCode console
         InAppStory.shared.isLoggingEnabled = true
@@ -32,7 +32,7 @@ class RNInAppStorySDKModule: NSObject {
         InAppStory.shared.panelSettings = PanelSettings(like: true, favorites: true, share: true)
         // the parameter is responsible for animation of the reader display when you tap on a story cell
         InAppStory.shared.presentationStyle = .zoom
-        InAppStory.shared.initWith(serviceKey: apiKey, settings: Settings(userID: "42"))
+        InAppStory.shared.initWith(serviceKey: apiKey, settings: Settings(userID: userID))
     }
   }
 

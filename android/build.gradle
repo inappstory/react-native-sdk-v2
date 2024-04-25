@@ -5,6 +5,7 @@ buildscript {
   repositories {
     google()
     mavenCentral()
+    maven { url 'https://jitpack.io' }
   }
 
   dependencies {
@@ -90,7 +91,7 @@ dependencies {
   //noinspection GradleDynamicVersion
   implementation "com.facebook.react:react-native:+"
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-  implementation 'com.github.inappstory:android-sdk:1.18.0'
+  implementation 'com.github.inappstory:android-sdk:1.18.1'
   implementation 'androidx.recyclerview:recyclerview:1.2.1'
   implementation 'androidx.webkit:webkit:1.4.0'
 }

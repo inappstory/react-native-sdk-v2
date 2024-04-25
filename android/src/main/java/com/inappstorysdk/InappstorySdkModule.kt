@@ -8,20 +8,22 @@ import com.facebook.react.bridge.ReactMethod
 
 import android.util.Log
 
-class InappstorySdkModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
+import com.inappstory.sdk.InAppStoryManager;
+
+class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
   override fun getName() = "InappstorySdkModule"
   var ias: InAppStoryManager? = null
   @ReactMethod
   fun initWith(apiKey: String, userID: String) {
       Log.d("InappstorySdkModule", "initWith")
-      InAppStoryManager.initSdk(reactContext.getApplicationContext())
+      InAppStoryManager.initSDK(reactContext.getApplicationContext())
       this.ias = this.createInAppStoryManager(apiKey, userID)
   }
 
   @ReactMethod
   fun showGame(gameID: String) {
       Log.d("InappstorySdkModule", "showGame")
-      this.ias.openGame(gameID, reactContext.getApplicationContext())
+      this.ias?.openGame(gameID, reactContext.getApplicationContext())
   }
 
   fun createInAppStoryManager(
