@@ -11,7 +11,7 @@ import android.util.Log
 import com.inappstory.sdk.InAppStoryManager;
 
 class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
-  override fun getName() = "InappstorySdkModule"
+  override fun getName() = "RNInAppStorySDKModule"
   var ias: InAppStoryManager? = null
   @ReactMethod
   fun initWith(apiKey: String, userID: String) {

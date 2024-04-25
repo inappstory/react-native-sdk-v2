@@ -11273,6 +11273,7 @@ __metadata:
     react-native-simple-toast: ^3.3.1
     react-native-svg: ^15.1.0
     react-native-webview: ^13.8.6
+    rn-android-keyboard-adjust: ^2.1.2
   languageName: unknown
   linkType: soft
 
@@ -11973,6 +11974,16 @@ __metadata:
   bin:
     rimraf: ./bin.js
   checksum: 3ea587b981a19016297edb96d1ffe48af7e6af69660e3b371dbfc73722a73a0b0e9be5c88089fbeeb866c389c1098e07f64929c7414290504b855f54f901ab10
+  languageName: node
+  linkType: hard
+
+"rn-android-keyboard-adjust@npm:^2.1.2":
+  version: 2.1.2
+  resolution: "rn-android-keyboard-adjust@npm:2.1.2"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: fdcace7dae7eee94ea9e51626a306b64689d875be7d2f74c04d04ec54897bbf2cf0704958f7638ee4ebb7570ead255530fecca71cd2b03561dcd406a412e370f
   languageName: node
   linkType: hard
 
