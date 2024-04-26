@@ -34,6 +34,82 @@ class RNInAppStorySDKModule: NSObject {
         InAppStory.shared.presentationStyle = .zoom
         InAppStory.shared.initWith(serviceKey: apiKey, settings: Settings(userID: userID))
     }
+    //.storiesLoaded(feed: String? = nil, stories: Array<StoryData>)
+    //.ugcStoriesLoaded(stories: Array<StoryData>)	
+
+    //.clickOnStory(storyData: StoryData)
+    //.showStory(storyData: StoryData, action: ShowStoryAction)	
+    //.closeStory(slideData: SlideData, action: CloseStoryAction)	
+    //.clickOnButton(slideData: SlideData, link: String)	
+    //.showSlide(slideData: SlideData)	
+    //.likeStory(slideData: SlideData, value: Bool)	
+    //.dislikeStory(slideData: SlideData, value: Bool)
+    //.favoriteStory(slideData: SlideData, value: Bool)
+    //.clickOnShareStory(slideData: SlideData)
+    //.storyWidgetEvent(slideData: SlideData?, name: String, data: Dictionary<String, Any>?)	
+
+    //.startGame(gameData: GameStoryData)	
+    //.closeGame(gameData: GameStoryData)	
+    //.finishGame(gameData: GameStoryData, result: Dictionary<String, Any>)	
+    //.gameFailure(gameData: GameStoryData, message: String)	
+
+    //.sessionFailure(message: String)	
+    //.storyFailure(message: String)	
+    //.currentStoryFailure(message: String)	
+    //.networkFailure(message: String)
+    //.requestFailure(message: String, statusCode: Int)	
+  }
+  
+  @objc
+  func setTags(_ tags: [String]) {
+        DispatchQueue.main.async {
+          InAppStory.shared.setTags = tags
+        }
+  }
+
+  @objc
+  func addTags(_ tags: [String]) {
+        DispatchQueue.main.async {
+          InAppStory.shared.setTags = tags
+        }
+  }
+
+  @objc
+  func removeTags(_ tags: [String]) {
+        DispatchQueue.main.async {
+          InAppStory.shared.setTags = tags
+        }
+  }
+  
+  @objc
+  func changeSound(_ soundEnabled: Bool) {
+        DispatchQueue.main.async {
+          InAppStory.shared.muted = soundEnabled
+        }
+  }
+  @objc
+  func closeReader(_) {
+        DispatchQueue.main.async {
+          InAppStory.shared.clearCache()
+        }
+  }
+  @objc
+  func clearCache(_) {
+        DispatchQueue.main.async {
+          InAppStory.shared.clearCache()
+        }
+  }
+  @objc
+  func removeFromFavorite(_ storyID: String) {
+        DispatchQueue.main.async {
+          InAppStory.shared.removeFromFavorite(with: storyID)
+        }
+  }
+  @objc
+  func removeAllFavorites(_) {
+        DispatchQueue.main.async {
+          InAppStory.shared.removeAllFavorites()
+        }
   }
 
   //@ReactMethod
@@ -48,6 +124,28 @@ class RNInAppStorySDKModule: NSObject {
           }
         }
   }
+
+  @objc
+  func showOnboardings(_ feed: String, limit: Int, tags: [String]?) {
+        DispatchQueue.main.async {
+          let vc = UIApplication.shared.firstKeyWindow?.rootViewController
+          InAppStory.shared.showOnboardings(feed: feed,
+                                            limit: limit,
+                                            from: vc,
+                                            with: tags,
+                                            with: InAppStory.shared.panelSettings)        }
+  }
+
+  @objc
+  func showSingle(_ storyID: String) {
+      DispatchQueue.main.async {
+        let vc = UIApplication.shared.firstKeyWindow?.rootViewController
+        InAppStory.shared.showSingle(with: storyID,
+                                    from: vc,
+                                    delegate: vc)
+      }
+  }
+
 
   @objc
   static func requiresMainQueueSetup() -> Bool {

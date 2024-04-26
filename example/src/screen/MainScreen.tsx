@@ -178,10 +178,30 @@ export function MainScreen({
           style={styles.button}
           styleDisabled={styles.buttonDisabled}
           onPress={() => {
+            InAppStorySDK.showGame('1');
+          }}
+        >
+          Open game 1
+        </Button>
+        <Button
+          containerStyle={styles.buttonContainer}
+          style={styles.button}
+          styleDisabled={styles.buttonDisabled}
+          onPress={() => {
             InAppStorySDK.showGame('2');
           }}
         >
-          Open game
+          Open game 2
+        </Button>
+        <Button
+          containerStyle={styles.buttonContainer}
+          style={styles.button}
+          styleDisabled={styles.buttonDisabled}
+          onPress={() => {
+            InAppStorySDK.showGame('3');
+          }}
+        >
+          Open game 3
         </Button>
         <View style={styles.pad32} />
         <Button
