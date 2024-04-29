@@ -63,21 +63,21 @@ class RNInAppStorySDKModule: NSObject {
   @objc
   func setTags(_ tags: [String]) {
         DispatchQueue.main.async {
-          InAppStory.shared.setTags = tags
+          InAppStory.shared.setTags(tags)
         }
   }
 
   @objc
   func addTags(_ tags: [String]) {
         DispatchQueue.main.async {
-          InAppStory.shared.setTags = tags
+          InAppStory.shared.addTags(tags)
         }
   }
 
   @objc
   func removeTags(_ tags: [String]) {
         DispatchQueue.main.async {
-          InAppStory.shared.setTags = tags
+          InAppStory.shared.removeTags(tags)
         }
   }
   
@@ -88,13 +88,13 @@ class RNInAppStorySDKModule: NSObject {
         }
   }
   @objc
-  func closeReader(_) {
+    func closeReader() {
         DispatchQueue.main.async {
           InAppStory.shared.clearCache()
         }
   }
   @objc
-  func clearCache(_) {
+  func clearCache() {
         DispatchQueue.main.async {
           InAppStory.shared.clearCache()
         }
@@ -106,7 +106,7 @@ class RNInAppStorySDKModule: NSObject {
         }
   }
   @objc
-  func removeAllFavorites(_) {
+  func removeAllFavorites() {
         DispatchQueue.main.async {
           InAppStory.shared.removeAllFavorites()
         }
@@ -127,22 +127,26 @@ class RNInAppStorySDKModule: NSObject {
 
   @objc
   func showOnboardings(_ feed: String, limit: Int, tags: [String]?) {
-        DispatchQueue.main.async {
+      DispatchQueue.main.async {
           let vc = UIApplication.shared.firstKeyWindow?.rootViewController
-          InAppStory.shared.showOnboardings(feed: feed,
-                                            limit: limit,
-                                            from: vc,
-                                            with: tags,
-                                            with: InAppStory.shared.panelSettings)        }
+          //InAppStory.shared.showOnboardings(feed: feed,
+          //                                  limit: limit,
+          //                                  from: vc,
+          //                                  with: tags,
+          //                                  with: InAppStory.shared.panelSettings,
+          //complete: <#T##(Bool) -> Void##(Bool) -> Void##(_ show: Bool) -> Void#>)
+      }
   }
 
   @objc
   func showSingle(_ storyID: String) {
       DispatchQueue.main.async {
         let vc = UIApplication.shared.firstKeyWindow?.rootViewController
-        InAppStory.shared.showSingle(with: storyID,
-                                    from: vc,
-                                    delegate: vc)
+          if (vc != nil) {
+              //InAppStory.shared.showSingle(with: storyID,
+              //                                        from: vc,
+              //                                          delegate: vc)
+          }
       }
   }
 
