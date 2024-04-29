@@ -18,6 +18,9 @@ InAppStorySDK.initSDK(apiKey, userID);
 
 //Show game by ID
 InAppStorySDK.showGame(gameID);
+
+//Show story by ID
+InAppStorySDK.showSingle(storyID);
 ```
 
 ## Contributing

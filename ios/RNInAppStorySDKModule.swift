@@ -143,9 +143,12 @@ class RNInAppStorySDKModule: NSObject {
       DispatchQueue.main.async {
         let vc = UIApplication.shared.firstKeyWindow?.rootViewController
           if (vc != nil) {
-              //InAppStory.shared.showSingle(with: storyID,
-              //                                        from: vc,
-              //                                          delegate: vc)
+              InAppStory.shared.showStory(with: storyID,
+                                           from: vc!
+              ) {
+                  opened in
+                  // closure
+              }
           }
       }
   }
