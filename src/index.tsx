@@ -20,8 +20,10 @@ import {
   StoryReaderCloseButtonPosition,
   StoryReaderSwipeStyle,
   useIas,
+  type Option,
 } from 'react-native-ias';
 import InAppStorySDK from 'react-native-inappstory-sdk';
+import type { OnboardingLoadStatus } from 'react-native-ias/types/StoryManager';
 const LINKING_ERROR =
   `The package 'react-native-inappstory-sdk' doesn't seem to be linked. Make sure: \n\n` +
   Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
@@ -82,6 +84,54 @@ export class StoryManager extends StoryManagerV1 {
     super.on(eventName, listener);
     //TODO: implement events
     return this;
+  }
+
+  setTags(tags: [string]) {
+    super.setTags(tags);
+  }
+  setUserId(userId: string | number): void {
+    super.setUserId(userId);
+  }
+  setLang(lang: string): void {
+    super.setLang(lang);
+  }
+  setPlaceholders(placeholders: any): void {
+    super.setPlaceholders(placeholders);
+  }
+  showStory(
+    storyId: string | number,
+    appearanceManager: AppearanceManagerV1
+  ): Promise<{ loaded: boolean }> {
+    return super.showStory(storyId, appearanceManager);
+    /*return new Promise((resolve) => {
+      //if (appearanceManager.commonOptions.hasLike) {
+      InAppStorySDK.setHasLike(appearanceManager.commonOptions.hasLikeButton);
+      InAppStorySDK.setHasDislike(
+        appearanceManager.commonOptions.hasDislikeButton
+      );
+
+      InAppStorySDK.setHasFavorites(
+        appearanceManager.commonOptions.hasFavorite
+      );
+      InAppStorySDK.setHasShare(appearanceManager.commonOptions.hasShare);
+      //}
+      //InAppStorySDK.setAppearance(appearanceManager);
+      //InAppStorySDK.showSingle(storyId);
+      //FIXME: receive load status
+      resolve({ loaded: true });
+    });*/
+  }
+  showOnboardingStories(
+    appearanceManager: AppearanceManagerV1,
+    options?:
+      | {
+          feed?: Option<string>;
+          customTags?: string[] | undefined;
+          limit?: Option<number>;
+        }
+      | undefined
+  ): Promise<OnboardingLoadStatus> {
+    return super.showOnboardingStories(appearanceManager, options);
   }
   //TODO: Implement these events:
   //.on('clickOnStory', (payload) =>
