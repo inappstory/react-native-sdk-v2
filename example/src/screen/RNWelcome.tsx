@@ -3,19 +3,12 @@ import {
   SafeAreaView,
   StatusBar,
   StyleSheet,
-  Text,
   View,
   useColorScheme,
 } from 'react-native';
-import React, { useRef, type ReactNode } from 'react';
+import React, { useRef } from 'react';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+import { Colors, Header } from 'react-native/Libraries/NewAppScreen';
 
 import { StoryListComponent } from '../components/StoryListComponent';
 import Animated, {
@@ -24,40 +17,6 @@ import Animated, {
 } from 'react-native-reanimated';
 import Button from 'react-native-button';
 import { type StoriesListViewModel } from 'react-native-inappstory-sdk';
-
-const Section = ({
-  children,
-  title,
-}: {
-  children: ReactNode;
-  title: string;
-}): React.JSX.Element => {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}
-      >
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}
-      >
-        {children}
-      </Text>
-    </View>
-  );
-};
 
 export function RNWelcome({
   route,
@@ -121,20 +80,6 @@ export function RNWelcome({
           >
             Reload StoriesList
           </Button>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.js</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
         </View>
       </Animated.ScrollView>
     </SafeAreaView>
