@@ -13,6 +13,10 @@ import InAppStorySDK
 //@ReactModule(jsName: "InAppStorySDK")
 @objc(RNInAppStorySDKModule)
 class RNInAppStorySDKModule: NSObject {
+  @objc var hasLike: Bool = true
+  @objc var hasDislike: Bool = true
+  @objc var hasFavorites: Bool = true
+  @objc var hasShare: Bool = true
   @objc
   func constantsToExport() -> [AnyHashable : Any]! {
     return ["count": 1]
@@ -29,7 +33,7 @@ class RNInAppStorySDKModule: NSObject {
         InAppStory.shared.cellBorderColor = UIColor.blue
         // the parameter is responsible for displaying the bottom panel in the story card (likes, favorites and share)
         // additionally should be configured in the console
-        InAppStory.shared.panelSettings = PanelSettings(like: true, favorites: true, share: true)
+        InAppStory.shared.panelSettings = PanelSettings(like: hasLike, favorites: hasFavorites, share: hasShare)
         // the parameter is responsible for animation of the reader display when you tap on a story cell
         InAppStory.shared.presentationStyle = .zoom
         InAppStory.shared.initWith(serviceKey: apiKey, settings: Settings(userID: userID))
@@ -138,7 +142,22 @@ class RNInAppStorySDKModule: NSObject {
           }
         }
   }
-
+  @objc
+  func setHasLike(_ value: Bool) {
+      hasLike = value
+  }
+  @objc
+  func setHasDislike(_ value: Bool) {
+      hasDislike = value
+  }
+  @objc
+  func setHasFavorites(_ value: Bool) {
+      hasFavorites = value
+  }
+  @objc
+  func setHasShare(_ value: Bool) {
+      hasShare = value
+  }
   @objc
   func showOnboardings(_ feed: String, limit: Int, tags: [String]?) {
       DispatchQueue.main.async {

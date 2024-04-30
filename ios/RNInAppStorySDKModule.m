@@ -23,7 +23,12 @@ RCT_EXTERN_METHOD(removeTags:(NSArray<NSString *> *)tags)
 RCT_EXTERN_METHOD(setPlaceholders:(NSDictionary<NSString *, NSString *>))
 RCT_EXTERN_METHOD(setImagesPlaceholders:(NSDictionary<NSString *, NSString *>))
 
-RCT_EXTERN_METHOD(changeSound:(BOOL *)gameID)
+RCT_EXTERN_METHOD(changeSound:(BOOL *)value)
+
+RCT_EXTERN_METHOD(setHasLike:(BOOL *)value)
+RCT_EXTERN_METHOD(setHasFavorites:(BOOL *)value)
+RCT_EXTERN_METHOD(setHasShare:(BOOL *)value)
+
 
 RCT_EXTERN_METHOD(closeReader)
 RCT_EXTERN_METHOD(clearCache)
