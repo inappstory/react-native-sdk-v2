@@ -29,6 +29,8 @@ RCT_EXTERN_METHOD(setHasLike:(BOOL *)value)
 RCT_EXTERN_METHOD(setHasFavorites:(BOOL *)value)
 RCT_EXTERN_METHOD(setHasShare:(BOOL *)value)
 
+RCT_EXTERN_METHOD(setUserID:(NSString *)userID)
+
 
 RCT_EXTERN_METHOD(closeReader)
 RCT_EXTERN_METHOD(clearCache)

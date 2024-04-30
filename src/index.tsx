@@ -88,15 +88,19 @@ export class StoryManager extends StoryManagerV1 {
 
   setTags(tags: [string]) {
     super.setTags(tags);
+    InAppStorySDK.setTags(tags);
   }
   setUserId(userId: string | number): void {
     super.setUserId(userId);
+    InAppStorySDK.setUserID(userId);
   }
   setLang(lang: string): void {
     super.setLang(lang);
+    //InAppStorySDK.setLang(lang);
   }
   setPlaceholders(placeholders: any): void {
     super.setPlaceholders(placeholders);
+    InAppStorySDK.setPlaceholders(placeholders);
   }
   showStory(
     storyId: string | number,

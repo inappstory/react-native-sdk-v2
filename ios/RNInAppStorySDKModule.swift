@@ -17,13 +17,14 @@ class RNInAppStorySDKModule: NSObject {
   @objc var hasDislike: Bool = true
   @objc var hasFavorites: Bool = true
   @objc var hasShare: Bool = true
+  @objc var userID: String = ""
   @objc
   func constantsToExport() -> [AnyHashable : Any]! {
     return ["count": 1]
   }
 
   //@ReactMethod
-  @objc func initWith(_ apiKey: String, userID: String) {
+  @objc func initWith(_ apiKey: String, _userID: String) {
     DispatchQueue.main.async {
       // the parameter is responsible for logging to the XCode console
         InAppStory.shared.isLoggingEnabled = true
@@ -36,7 +37,7 @@ class RNInAppStorySDKModule: NSObject {
         InAppStory.shared.panelSettings = PanelSettings(like: hasLike, favorites: hasFavorites, share: hasShare)
         // the parameter is responsible for animation of the reader display when you tap on a story cell
         InAppStory.shared.presentationStyle = .zoom
-        InAppStory.shared.initWith(serviceKey: apiKey, settings: Settings(userID: userID))
+        InAppStory.shared.initWith(serviceKey: apiKey, settings: Settings(userID: _userID))
     }
     //.storiesLoaded(feed: String? = nil, stories: Array<StoryData>)
     //.ugcStoriesLoaded(stories: Array<StoryData>)	
@@ -64,6 +65,13 @@ class RNInAppStorySDKModule: NSObject {
     //.requestFailure(message: String, statusCode: Int)	
   }
   
+  @objc
+  func setUserID(_ _userID: String) {
+        DispatchQueue.main.async {
+          InAppStory.shared.settings = Settings(userID: _userID)
+        }
+  }
+
   @objc
   func setTags(_ tags: [String]) {
         DispatchQueue.main.async {
