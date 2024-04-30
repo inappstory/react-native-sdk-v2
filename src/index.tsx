@@ -21,7 +21,7 @@ import {
   StoryReaderSwipeStyle,
   useIas,
 } from 'react-native-ias';
-
+import InAppStorySDK from 'react-native-inappstory-sdk';
 const LINKING_ERROR =
   `The package 'react-native-inappstory-sdk' doesn't seem to be linked. Make sure: \n\n` +
   Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
@@ -58,7 +58,19 @@ export {
 export class StoryManager extends StoryManagerV1 {
   constructor(config: StoryManagerConfig) {
     super(config);
-    //TODO: Initialize the API
+    InAppStorySDK.initWith(config.apiKey, config.userId);
+    if (config.tags) {
+      InAppStorySDK.setTags(config.tags);
+    }
+    if (config.placeholders) {
+      InAppStorySDK.setPlaceholders(config.placeholders);
+    }
+    if (config.lang) {
+      //InAppStorySDK.setLang(config.lang);
+    }
+    if (config.defaultMuted) {
+      InAppStorySDK.changeSound(false);
+    }
   }
 }
 export class AppearanceManager extends AppearanceManagerV1 {

@@ -80,6 +80,13 @@ class RNInAppStorySDKModule: NSObject {
           InAppStory.shared.removeTags(tags)
         }
   }
+
+  @objc
+  func setPlaceholders(_ placeholders: <Dictionary<String, String>>) {
+        DispatchQueue.main.async {
+          InAppStory.shared.placeholders = placeholders
+        }
+  }
   
   @objc
   func changeSound(_ soundEnabled: Bool) {

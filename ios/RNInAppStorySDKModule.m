@@ -16,9 +16,12 @@ RCT_EXTERN_METHOD(showSingle:(NSString *)storyID)
 RCT_EXTERN_METHOD(removeFromFavorite:(NSString *)gameID)
 RCT_EXTERN_METHOD(removeAllFavorites)
 
-RCT_EXTERN_METHOD(setTags:([NSArray<NSString *> *])tags)
-RCT_EXTERN_METHOD(addTags:([NSArray<NSString *> *])tags)
-RCT_EXTERN_METHOD(removeTags:([NSArray<NSString *> *])tags)
+RCT_EXTERN_METHOD(setTags:(NSArray<NSString *> *)tags)
+RCT_EXTERN_METHOD(addTags:(NSArray<NSString *> *)tags)
+RCT_EXTERN_METHOD(removeTags:(NSArray<NSString *> *)tags)
+
+RCT_EXTERN_METHOD(setPlaceholders:(NSDictionary<NSString *, NSString *>))
+
 
 RCT_EXTERN_METHOD(changeSound:(BOOL *)gameID)
 
