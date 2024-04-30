@@ -21,7 +21,7 @@ RCT_EXTERN_METHOD(addTags:(NSArray<NSString *> *)tags)
 RCT_EXTERN_METHOD(removeTags:(NSArray<NSString *> *)tags)
 
 RCT_EXTERN_METHOD(setPlaceholders:(NSDictionary<NSString *, NSString *>))
-
+RCT_EXTERN_METHOD(setImagesPlaceholders:(NSDictionary<NSString *, NSString *>))
 
 RCT_EXTERN_METHOD(changeSound:(BOOL *)gameID)
 

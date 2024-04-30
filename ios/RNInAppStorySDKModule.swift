@@ -87,6 +87,13 @@ class RNInAppStorySDKModule: NSObject {
           InAppStory.shared.placeholders = placeholders
         }
   }
+
+  @objc
+  func setImagesPlaceholders(_ imagesPlaceholders: <Dictionary<String, String>>) {
+        DispatchQueue.main.async {
+          InAppStory.shared.imagesPlaceholders = imagesPlaceholders
+        }
+  }
   
   @objc
   func changeSound(_ soundEnabled: Bool) {
