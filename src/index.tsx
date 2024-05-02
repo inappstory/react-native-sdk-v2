@@ -138,39 +138,18 @@ export class StoryManager extends StoryManagerV1 {
     return super.showOnboardingStories(appearanceManager, options);
   }
   //TODO: Implement these events:
-  //.on('clickOnStory', (payload) =>
-  //console.log('clickOnStory', { payload })
+  //clickOnStory
+  //clickOnFavoriteCell
+  //showStory
+  //closeStory
+  //showSlide
+  //clickOnButton
+  //likeStory
+  //dislikeStory
+  //favoriteStory
+  //shareStory
+  //shareStoryWithPath
   //);
-  /*storyManager.on('clickOnFavoriteCell', (payload) =>
-      console.log('clickOnFavoriteCell', { payload })
-    );
-    storyManager.on('showStory', (payload) =>
-      console.log('showStory', { payload })
-    );
-    storyManager.on('closeStory', (payload) =>
-      console.log('closeStory', { payload })
-    );
-    storyManager.on('showSlide', (payload) =>
-      console.log('showSlide', { payload })
-    );
-    storyManager.on('clickOnButton', (payload) =>
-      console.log('clickOnButton', { payload })
-    );
-    storyManager.on('likeStory', (payload) =>
-      console.log('likeStory', { payload })
-    );
-    storyManager.on('dislikeStory', (payload) =>
-      console.log('dislikeStory', { payload })
-    );
-    storyManager.on('favoriteStory', (payload) =>
-      console.log('favoriteStory', { payload })
-    );
-    storyManager.on('shareStory', (payload) =>
-      console.log('shareStory', { payload })
-    );
-    storyManager.on('shareStoryWithPath', (payload) =>
-      console.log('shareStoryWithPath', { payload })
-    );*/
 }
 export class AppearanceManager extends AppearanceManagerV1 {
   //TODO: Migrate the APIs from JS to Native
