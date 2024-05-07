@@ -21,9 +21,14 @@ import {
   StoryReaderSwipeStyle,
   useIas,
   type Option,
+  StoriesListSliderAlign,
 } from 'react-native-ias';
 import InAppStorySDK from 'react-native-inappstory-sdk';
 import type { OnboardingLoadStatus } from 'react-native-ias/types/StoryManager';
+import type {
+  StoriesListFavoriteCardOptions,
+  StoriesListClickEvent,
+} from 'react-native-ias/types/AppearanceManager';
 const LINKING_ERROR =
   `The package 'react-native-inappstory-sdk' doesn't seem to be linked. Make sure: \n\n` +
   Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
@@ -153,6 +158,149 @@ export class StoryManager extends StoryManagerV1 {
 }
 export class AppearanceManager extends AppearanceManagerV1 {
   //TODO: Migrate the APIs from JS to Native
+  setCommonOptions(
+    options: Partial<{
+      hasFavorite: boolean;
+      hasLike: boolean;
+      hasLikeButton: boolean;
+      hasDislikeButton: boolean;
+      hasShare: boolean;
+    }>
+  ) {
+    return super.setCommonOptions(options);
+  }
+  setStoryFavoriteReaderOptions(
+    options: Partial<{
+      title: Partial<{ content: string; font: string; color: string }>;
+    }>
+  ) {
+    return super.setStoryFavoriteReaderOptions(options);
+  }
+  setStoryReaderOptions(
+    options: Partial<{
+      closeButtonPosition: StoryReaderCloseButtonPosition;
+      scrollStyle: StoryReaderSwipeStyle;
+      loader: Partial<{
+        default: Partial<{
+          color: Option<string>;
+          accentColor: Option<string>;
+        }>;
+        custom: Option<string>;
+      }>;
+      slideBorderRadius: number;
+      recycleStoriesList: boolean;
+      closeOnLastSlideByTimer: boolean;
+      closeButton: { svgSrc: { baseState: string } };
+      //dislikeStory
+      //favoriteStory
+      //shareStory
+      //shareStoryWithPath
+      //);
+      likeButton: {
+        //favoriteStory
+        //shareStory
+        //shareStoryWithPath
+        //);
+        svgSrc: {
+          //shareStory
+          //shareStoryWithPath
+          //);
+          baseState: string;
+          activeState: string;
+        };
+      };
+      dislikeButton: { svgSrc: { baseState: string; activeState: string } };
+      favoriteButton: { svgSrc: { baseState: string; activeState: string } };
+      muteButton: { svgSrc: { baseState: string; activeState: string } };
+      shareButton: { svgSrc: { baseState: string } };
+    }>
+  ) {
+    return super.setStoryReaderOptions(options);
+  }
+  setStoriesListOptions(
+    options: Partial<{
+      title: Partial<{
+        content: string;
+        color: string;
+        font: string;
+        marginBottom: number;
+      }>;
+      card: Partial<{
+        title: Partial<{
+          color: string;
+          padding: string | number;
+          font: string;
+          display: boolean;
+          textAlign: StoriesListCardTitleTextAlign;
+          position: StoriesListCardTitlePosition;
+          lineClamp: number;
+        }>;
+        gap: number;
+        height: number;
+        variant: StoriesListCardViewVariant;
+        border: Partial<{
+          radius: number;
+          color: string;
+          width: number;
+          gap: number;
+        }>;
+        boxShadow: Option<string>;
+        dropShadow: Option<string>;
+        opacity: Option<number>;
+        mask: Partial<{ color: Option<string> }>;
+        svgMask: Partial<
+          Option<{
+            cardMask: Option<string>;
+            overlayMask: { mask: Option<string>; background: Option<string> }[];
+          }>
+        >;
+        opened: Partial<{
+          border: Partial<{
+            radius: Option<number>;
+            color: Option<string>;
+            width: Option<number>;
+            gap: Option<number>;
+          }>;
+          boxShadow: Option<string>;
+          dropShadow: Option<string>;
+          opacity: Option<number>;
+          mask: Partial<{ color: Option<string> }>;
+          svgMask: Partial<
+            Option<{
+              cardMask: Option<string>;
+              overlayMask: {
+                mask: Option<string>;
+                background: Option<string>;
+              }[];
+            }>
+          >;
+        }>;
+      }>;
+      favoriteCard: StoriesListFavoriteCardOptions;
+      layout: Partial<{
+        storiesListInnerHeight: number | null;
+        height: number;
+        backgroundColor: string;
+        sliderAlign: StoriesListSliderAlign;
+      }>;
+      sidePadding: number;
+      topPadding: number;
+      bottomPadding: number;
+      bottomMargin: number;
+      navigation: Partial<{
+        showControls: boolean;
+        controlsSize: number;
+        controlsBackgroundColor: string;
+        controlsColor: string;
+      }>;
+      extraCss: string;
+      handleStoryLinkClick: (payload: StoriesListClickEvent) => void;
+      handleStartLoad: (loaderContainer: HTMLElement) => void;
+      handleStopLoad: (loaderContainer: HTMLElement) => void;
+    }>
+  ) {
+    return super.setStoriesListOptions(options);
+  }
 }
 
 export const addOne = (input: number) => input + 1;
