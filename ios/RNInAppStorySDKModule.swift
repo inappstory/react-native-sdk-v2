@@ -38,6 +38,147 @@ class RNInAppStorySDKModule: NSObject {
         // the parameter is responsible for animation of the reader display when you tap on a story cell
         InAppStory.shared.presentationStyle = .zoom
         InAppStory.shared.initWith(serviceKey: apiKey, settings: Settings(userID: userID))
+
+        InAppStory.shared.storyReaderWillShow = {showed in 
+            NSLog("TODO: storyReaderWillShow closure");
+        }
+        
+        InAppStory.shared.storyReaderDidClose = { showed in
+            NSLog("TODO: storyReaderDidClose closure");
+        }
+        InAppStory.shared.storiesEvent = { storiesEvent in
+            NSLog("TODO: storiesEvent");
+            switch storiesEvent {
+                case .storiesLoaded:
+                    NSLog("storiesLoaded")
+                case .ugcStoriesLoaded(stories: let stories):
+                    NSLog("ugcStoriesLoaded")
+                case .clickOnStory(storyData: let storyData):
+                    NSLog("clickOnStory")
+                case .showStory(storyData: let storyData, action: let action):
+                    NSLog("showStory")
+                case .closeStory(slideData: let slideData, action: let action):
+                    NSLog("closeStory")
+                case .clickOnButton(slideData: let slideData, link: let link):
+                    NSLog("clickOnButton")
+                case .showSlide(slideData: let slideData):
+                    NSLog("showSlide")
+                case .likeStory(slideData: let slideData, value: let value):
+                    NSLog("likeStory")
+                case .dislikeStory(slideData: let slideData, value: let value):
+                    NSLog("dislikeStory")
+                case .favoriteStory(slideData: let slideData, value: let value):
+                    NSLog("favoriteStory")
+                case .clickOnShareStory(slideData: let slideData):
+                    NSLog("clickOnShareStory")
+                case .storyWidgetEvent(slideData: let slideData, name: let name, data: let data):
+                    NSLog("storyWidgetEvent")
+                @unknown default:
+                    NSLog("WARNING: unknown storiesEvent")
+            }
+        }
+        InAppStory.shared.gameEvent = { gameEvent in
+            NSLog("TODO: gameEvent");
+            switch gameEvent {
+            case .closeGame:
+                NSLog("closeGame")
+            
+            case .startGame(gameData: let gameData):
+                NSLog("startGame")
+
+            case .finishGame(gameData: let gameData, result: let result):
+                NSLog("finishGame")
+
+            case .eventGame(gameData: let gameData, name: let name, payload: let payload):
+                NSLog("eventGame")
+
+            case .gameFailure(gameData: let gameData, message: let message):
+                NSLog("gameFailure")
+
+            @unknown default:
+                NSLog("WARNING: unknown gameEvent")
+            }
+        }
+        InAppStory.shared.failureEvent = { failureEvent in
+            NSLog("TODO: failureEvent");
+            switch failureEvent {
+            case .sessionFailure(message: let message):
+                NSLog("sessionFailure")
+            case .storyFailure(message: let message):
+                NSLog("storyFailure")
+            case .currentStoryFailure(message: let message):
+                NSLog("currentStoryFailure")
+            case .networkFailure(message: let message):
+                NSLog("networkFailure")
+            case .requestFailure(message: let message, statusCode: let statusCode):
+                NSLog("requestFailure")
+            @unknown default:
+                NSLog("WARNING: unknown failureEvent")
+            }
+        }
+        /*
+        InAppStory.shared.gameReaderWillShow = { showed in
+            NSLog("TODO: gameReaderWillShow closure");
+        }
+        InAppStory.shared.gameReaderDidClose = { showed in
+            NSLog("TODO: gameReaderDidClose closure");
+        }
+         */
+        /*
+        InAppStory.shared.gameComplete = { showed in
+            NSLog("TODO: gameComplete closure");
+        }*/
+        /*InAppStory.shared.customShare = { showed in
+            NSLog("TODO: customShare closure");
+        }
+        
+        InAppStory.shared.storiesDidUpdated = { showed in
+            NSLog("TODO: storiesDidUpdated closure");
+        }
+        InAppStory.shared.onActionWith = { showed in
+            NSLog("TODO: onActionWith closure");
+        }
+        InAppStory.shared.favoriteCellDidSelect = { showed in
+            NSLog("TODO: favoriteCellDidSelect closure");
+        }
+        InAppStory.shared.editorCellDidSelect = { showed in
+            NSLog("TODO: editorCellDidSelect closure");
+        }
+        */
+        /*
+        InAppStory.shared.getGoodsObject = { showed in
+            NSLog("TODO: getGoodsObject closure");
+        }
+        InAppStory.shared.goodItemSelected = { showed in
+            NSLog("TODO: goodItemSelected closure");
+        }
+        */
+        /*
+        InAppStory.shared.sizeForItem = { showed in
+            NSLog("TODO: sizeForItem closure");
+        }
+        InAppStory.shared.insetForSection = { showed in
+            NSLog("TODO: sizeForItem closure");
+        }
+        InAppStory.shared.minimumLineSpacingForSection = { showed in
+            NSLog("TODO: minimumLineSpacingForSection closure");
+        }
+        InAppStory.shared.minimumInteritemSpacingForSection = { showed in
+            NSLog("TODO: minimumInteritemSpacingForSection closure");
+        }
+        InAppStory.shared.goodsSizeForItem = { showed in
+            NSLog("TODO: goodsSizeForItem closure");
+        }
+        InAppStory.shared.goodsInsetForSection = { showed in
+            NSLog("TODO: goodsInsetForSection closure");
+        }
+        InAppStory.shared.goodsMinimumLineSpacingForSection = { showed in
+            NSLog("TODO: goodsMinimumLineSpacingForSection closure");
+        }
+        */
+        /*
+       
+        */
     }
     //.storiesLoaded(feed: String? = nil, stories: Array<StoryData>)
     //.ugcStoriesLoaded(stories: Array<StoryData>)	
@@ -176,9 +317,9 @@ class RNInAppStorySDKModule: NSObject {
   func showOnboardings(_ feed: String, limit: Int, tags: [String]?) {
       DispatchQueue.main.async {
           let vc = UIApplication.shared.firstKeyWindow?.rootViewController
-          InAppStory.shared.showOnboardings(feed: feed, limit: limit, from: vc!) {show in 
+          InAppStory.shared.showOnboardings(feed: feed, limit: limit, from: vc!, with:tags, complete: {show in
               
-          }
+          })
       }
   }
 
