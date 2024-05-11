@@ -32,6 +32,25 @@ RCT_EXTERN_METHOD(setHasShare:(BOOL *)value)
 RCT_EXTERN_METHOD(setUserID:(NSString *)userID)
 
 
+RCT_EXTERN_METHOD(setTimerGradientEnable:(NSString *)value)
+RCT_EXTERN_METHOD(setSwipeToClose:(NSString *)value)
+RCT_EXTERN_METHOD(setOverScrollToClose:(NSString *)value)
+RCT_EXTERN_METHOD(setTimerGradient:(NSString *)value)
+RCT_EXTERN_METHOD(setPlaceholderElementColor:(NSString *)value)
+RCT_EXTERN_METHOD(setPlaceholderBackgroundColor:(NSString *)value)
+RCT_EXTERN_METHOD(setReaderBackgroundColor:(NSString *)value)
+
+RCT_EXTERN_METHOD(setReaderCornerRadius:(NSString *)radius)
+RCT_EXTERN_METHOD(setCoverQuality:(NSString *)value)
+RCT_EXTERN_METHOD(setShowCellTitle:(BOOL *)value)
+RCT_EXTERN_METHOD(setCellGradientEnabled:(BOOL *)value)
+RCT_EXTERN_METHOD(setCellGradientRadius:(NSString *)radius)
+RCT_EXTERN_METHOD(setCellBorderColor:(NSString *)color)
+
+RCT_EXTERN_METHOD(setPresentationStyle:(NSString *)presentationStyle)
+RCT_EXTERN_METHOD(setScrollStyle:(NSString *)scrollStyle)
+RCT_EXTERN_METHOD(setCloseButtonPosition:(NSString *)position)
+
 RCT_EXTERN_METHOD(closeReader)
 RCT_EXTERN_METHOD(clearCache)
 

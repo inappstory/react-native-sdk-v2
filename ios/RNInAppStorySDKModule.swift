@@ -13,11 +13,11 @@ import InAppStorySDK
 //@ReactModule(jsName: "InAppStorySDK")
 @objc(RNInAppStorySDKModule)
 class RNInAppStorySDKModule: NSObject {
-  @objc var hasLike: Bool = true
-  @objc var hasDislike: Bool = true
-  @objc var hasFavorites: Bool = true
-  @objc var hasShare: Bool = true
-  @objc var userID: String = ""
+  @objc private var _hasLike: Bool = true
+  @objc private var _hasDislike: Bool = true
+  @objc private var _hasFavorites: Bool = true
+  @objc private var _hasShare: Bool = true
+  @objc private var _userID: String = ""
   @objc
   func constantsToExport() -> [AnyHashable : Any]! {
     return ["count": 1]
@@ -34,7 +34,7 @@ class RNInAppStorySDKModule: NSObject {
         InAppStory.shared.cellBorderColor = UIColor.blue
         // the parameter is responsible for displaying the bottom panel in the story card (likes, favorites and share)
         // additionally should be configured in the console
-        InAppStory.shared.panelSettings = PanelSettings(like: hasLike, favorites: hasFavorites, share: hasShare)
+        InAppStory.shared.panelSettings = PanelSettings(like: self._hasLike, favorites: self._hasFavorites, share: self._hasShare)
         // the parameter is responsible for animation of the reader display when you tap on a story cell
         InAppStory.shared.presentationStyle = .zoom
         InAppStory.shared.initWith(serviceKey: apiKey, settings: Settings(userID: _userID))
@@ -94,14 +94,14 @@ class RNInAppStorySDKModule: NSObject {
   }
 
   @objc
-  func setPlaceholders(_ placeholders: <Dictionary<String, String>>) {
+  func setPlaceholders(_ placeholders: Dictionary<String, String>) {
         DispatchQueue.main.async {
           InAppStory.shared.placeholders = placeholders
         }
   }
 
   @objc
-  func setImagesPlaceholders(_ imagesPlaceholders: <Dictionary<String, String>>) {
+  func setImagesPlaceholders(_ imagesPlaceholders: Dictionary<String, String>) {
         DispatchQueue.main.async {
           InAppStory.shared.imagesPlaceholders = imagesPlaceholders
         }
@@ -123,6 +123,12 @@ class RNInAppStorySDKModule: NSObject {
   func clearCache() {
         DispatchQueue.main.async {
           InAppStory.shared.clearCache()
+        }
+  }
+  @objc
+  func getFavoritesCount(_ storyID: String) {
+        DispatchQueue.main.async {
+          InAppStory.shared.favoritesCount
         }
   }
   @objc
@@ -152,19 +158,19 @@ class RNInAppStorySDKModule: NSObject {
   }
   @objc
   func setHasLike(_ value: Bool) {
-      hasLike = value
+      _hasLike = value
   }
   @objc
   func setHasDislike(_ value: Bool) {
-      hasDislike = value
+      _hasDislike = value
   }
   @objc
   func setHasFavorites(_ value: Bool) {
-      hasFavorites = value
+      _hasFavorites = value
   }
   @objc
   func setHasShare(_ value: Bool) {
-      hasShare = value
+      _hasShare = value
   }
   @objc
   func showOnboardings(_ feed: String, limit: Int, tags: [String]?) {
@@ -193,6 +199,131 @@ class RNInAppStorySDKModule: NSObject {
           }
       }
   }
+  // MARK: - ReaderStyle
+  @objc
+  func setTimerGradientEnable(_ value: Bool) {
+        DispatchQueue.main.async {
+          InAppStory.shared.timerGradientEnable = value
+        }
+  }
+
+  @objc
+  func setSwipeToClose(_ value: Bool) {
+        DispatchQueue.main.async {
+          InAppStory.shared.swipeToClose = value
+        }
+  }
+
+  @objc
+  func setOverScrollToClose(_ value: Bool) {
+        DispatchQueue.main.async {
+          InAppStory.shared.overScrollToClose = value
+        }
+  }
+  @objc
+  func setTimerGradient(_ value: Bool) {
+        DispatchQueue.main.async {
+          //InAppStory.shared.timerGradient = value
+        }
+  }
+  @objc
+  func setPlaceholderElementColor(_ value: String) {
+        DispatchQueue.main.async {
+            InAppStory.shared.placeholderElementColor = RCTConvert.uiColor(value)
+        }
+  }
+
+  @objc
+  func setPlaceholderBackgroundColor(_ value: String) {
+        DispatchQueue.main.async {
+          InAppStory.shared.placeholderBackgroundColor = RCTConvert.uiColor(value)
+        }
+  }
+
+  @objc
+  func setReaderBackgroundColor(_ value: String) {
+        DispatchQueue.main.async {
+          InAppStory.shared.readerBackgroundColor = RCTConvert.uiColor(value)
+        }
+  }
+
+  @objc
+  func setReaderCornerRadius(_ value: Float) {
+        DispatchQueue.main.async {
+          InAppStory.shared.readerCornerRadius = CGFloat(value)
+        }
+  }
+
+  @objc
+  func setCoverQuality(_ value: String) {
+        DispatchQueue.main.async {
+          //InAppStory.shared.coverQuality = .medium
+        }
+  }
+
+  @objc
+  func setShowCellTitle(_ value: Bool) {
+        DispatchQueue.main.async {
+          InAppStory.shared.showCellTitle = value
+        }
+  }
+
+  @objc
+  func setCellGradientEnabled(_ value: Bool) {
+        DispatchQueue.main.async {
+          InAppStory.shared.cellGradientEnabled = value
+        }
+  }
+
+  @objc
+  func setCellGradientRadius(_ value: Float) {
+        DispatchQueue.main.async {
+          InAppStory.shared.cellBorderRadius = CGFloat(value)
+        }
+  }
+
+  @objc
+  func setCellBorderColor(_ value: String) {
+        DispatchQueue.main.async {
+          InAppStory.shared.cellBorderColor = RCTConvert.uiColor(value)
+        }
+  }
+
+  @objc
+  func setPresentationStyle(_ value: String) {
+        DispatchQueue.main.async {
+          InAppStory.shared.presentationStyle = .crossDissolve
+        }
+  }
+
+  @objc
+  func setScrollStyle(_ value: String) {
+        DispatchQueue.main.async {
+          InAppStory.shared.scrollStyle = .cover
+        }
+  }
+
+  @objc
+  func setCloseButtonPosition(_ value: String) {
+        DispatchQueue.main.async {
+          InAppStory.shared.closeButtonPosition = .right
+        }
+  }
+
+  //likeImage
+  //likeSelectedImage
+  //dislikeImage
+  //dislikeSelectedImage
+  //favoriteImage
+  //favoriteSelectedImag
+  //shareImage
+  //shareSelectedImage
+  //soundmage
+  //soundSelectedImage
+  //closeReaderImage
+  //refreshImage
+  //refreshGoodsImage
+  //goodsCloseImage
 
 
   @objc
