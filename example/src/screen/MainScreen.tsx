@@ -193,6 +193,16 @@ export function MainScreen({
         >
           Show single story (New SDK)
         </Button>
+        <Button
+          containerStyle={styles.buttonContainer}
+          style={styles.button}
+          styleDisabled={styles.buttonDisabled}
+          onPress={() => {
+            InAppStorySDK.showOnboardings('26702', 1, []);
+          }}
+        >
+          Show onboarding story (New SDK)
+        </Button>
         <View style={styles.pad32} />
         <Button
           containerStyle={styles.buttonContainer}
@@ -221,7 +231,7 @@ const styles = StyleSheet.create({
   scrollView: {},
   scrollViewInnerContainer: {
     marginHorizontal: 20,
-    flex: 1,
+    //flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },

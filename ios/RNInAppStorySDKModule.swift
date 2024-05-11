@@ -24,7 +24,7 @@ class RNInAppStorySDKModule: NSObject {
   }
 
   //@ReactMethod
-  @objc func initWith(_ apiKey: String, _userID: String) {
+  @objc func initWith(_ apiKey: String, userID: String) {
     DispatchQueue.main.async {
       // the parameter is responsible for logging to the XCode console
         InAppStory.shared.isLoggingEnabled = true
@@ -37,7 +37,7 @@ class RNInAppStorySDKModule: NSObject {
         InAppStory.shared.panelSettings = PanelSettings(like: self._hasLike, favorites: self._hasFavorites, share: self._hasShare)
         // the parameter is responsible for animation of the reader display when you tap on a story cell
         InAppStory.shared.presentationStyle = .zoom
-        InAppStory.shared.initWith(serviceKey: apiKey, settings: Settings(userID: _userID))
+        InAppStory.shared.initWith(serviceKey: apiKey, settings: Settings(userID: userID))
     }
     //.storiesLoaded(feed: String? = nil, stories: Array<StoryData>)
     //.ugcStoriesLoaded(stories: Array<StoryData>)	
@@ -176,12 +176,9 @@ class RNInAppStorySDKModule: NSObject {
   func showOnboardings(_ feed: String, limit: Int, tags: [String]?) {
       DispatchQueue.main.async {
           let vc = UIApplication.shared.firstKeyWindow?.rootViewController
-          //InAppStory.shared.showOnboardings(feed: feed,
-          //                                  limit: limit,
-          //                                  from: vc,
-          //                                  with: tags,
-          //                                  with: InAppStory.shared.panelSettings,
-          //complete: <#T##(Bool) -> Void##(Bool) -> Void##(_ show: Bool) -> Void#>)
+          InAppStory.shared.showOnboardings(feed: feed, limit: limit, from: vc!) {show in 
+              
+          }
       }
   }
 

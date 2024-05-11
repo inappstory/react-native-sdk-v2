@@ -55,5 +55,6 @@ RCT_EXTERN_METHOD(setCloseButtonPosition:(NSString *)position)
 RCT_EXTERN_METHOD(closeReader)
 RCT_EXTERN_METHOD(clearCache)
 
-//FIXME: RCT_EXTERN_METHOD(showOnboardings:(NSString *)gameID limit:(NSInteger)limit tags:(nullable NSArray<NSString *> *)tags)
+RCT_EXTERN_METHOD(showOnboardings:(NSString *)gameID limit:(NSInteger)limit tags:(nullable NSArray<NSString *> *)tags)
+
 @end
