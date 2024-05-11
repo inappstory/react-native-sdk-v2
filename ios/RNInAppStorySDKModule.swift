@@ -126,9 +126,9 @@ class RNInAppStorySDKModule: NSObject {
         }
   }
   @objc
-  func getFavoritesCount(_ storyID: String) {
+  func getFavoritesCount(_ storyID: String, resolve:@escaping RCTPromiseResolveBlock, reject:@escaping RCTPromiseRejectBlock) {
         DispatchQueue.main.async {
-          InAppStory.shared.favoritesCount
+          resolve(InAppStory.shared.favoritesCount)
         }
   }
   @objc

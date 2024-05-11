@@ -31,6 +31,7 @@ RCT_EXTERN_METHOD(setHasShare:(BOOL *)value)
 
 RCT_EXTERN_METHOD(setUserID:(NSString *)userID)
 
+RCT_EXTERN_METHOD(getFavoritesCount:(NSString *)userID resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 
 RCT_EXTERN_METHOD(setTimerGradientEnable:(NSString *)value)
 RCT_EXTERN_METHOD(setSwipeToClose:(NSString *)value)
