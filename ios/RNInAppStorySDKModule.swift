@@ -317,7 +317,7 @@ class RNInAppStorySDKModule: NSObject {
   func showOnboardings(_ feed: String, limit: Int, tags: [String]?) {
       DispatchQueue.main.async {
           let vc = UIApplication.shared.firstKeyWindow?.rootViewController
-          InAppStory.shared.showOnboardings(feed: feed, limit: limit, from: vc!, with:tags, complete: {show in
+          InAppStory.shared.showOnboardings(feed: feed, limit: limit, from: vc!, with:tags, with: InAppStory.shared.panelSettings, complete: {show in
               
           })
       }

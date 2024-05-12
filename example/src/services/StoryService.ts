@@ -13,7 +13,7 @@ import { Linking } from 'react-native';
 
 const storyManagerConfig: StoryManagerConfig = {
   apiKey: 'test-key',
-  userId: null,
+  userId: '42',
   tags: [],
   placeholders: {
     user: 'Guest',
@@ -25,37 +25,37 @@ const storyManagerConfig: StoryManagerConfig = {
 const createStoryManager = () => {
   const storyManager = new StoryManager(storyManagerConfig);
 
-  storyManager.on('clickOnStory', (payload) =>
+  storyManager.on('clickOnStory', (payload: any) =>
     console.log('clickOnStory', { payload })
   );
-  storyManager.on('clickOnFavoriteCell', (payload) =>
+  storyManager.on('clickOnFavoriteCell', (payload: any) =>
     console.log('clickOnFavoriteCell', { payload })
   );
-  storyManager.on('showStory', (payload) =>
+  storyManager.on('showStory', (payload: any) =>
     console.log('showStory', { payload })
   );
-  storyManager.on('closeStory', (payload) =>
+  storyManager.on('closeStory', (payload: any) =>
     console.log('closeStory', { payload })
   );
-  storyManager.on('showSlide', (payload) =>
+  storyManager.on('showSlide', (payload: any) =>
     console.log('showSlide', { payload })
   );
-  storyManager.on('clickOnButton', (payload) =>
+  storyManager.on('clickOnButton', (payload: any) =>
     console.log('clickOnButton', { payload })
   );
-  storyManager.on('likeStory', (payload) =>
+  storyManager.on('likeStory', (payload: any) =>
     console.log('likeStory', { payload })
   );
-  storyManager.on('dislikeStory', (payload) =>
+  storyManager.on('dislikeStory', (payload: any) =>
     console.log('dislikeStory', { payload })
   );
-  storyManager.on('favoriteStory', (payload) =>
+  storyManager.on('favoriteStory', (payload: any) =>
     console.log('favoriteStory', { payload })
   );
-  storyManager.on('shareStory', (payload) =>
+  storyManager.on('shareStory', (payload: any) =>
     console.log('shareStory', { payload })
   );
-  storyManager.on('shareStoryWithPath', (payload) =>
+  storyManager.on('shareStoryWithPath', (payload: any) =>
     console.log('shareStoryWithPath', { payload })
   );
 

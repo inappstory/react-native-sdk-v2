@@ -198,7 +198,7 @@ export function MainScreen({
           style={styles.button}
           styleDisabled={styles.buttonDisabled}
           onPress={() => {
-            InAppStorySDK.showOnboardings('26702', 1, []);
+            InAppStorySDK.showOnboardings('onboarding', 1, []);
           }}
         >
           Show onboarding story (New SDK)
