@@ -386,7 +386,7 @@ class RNInAppStorySDKModule: NSObject {
   }
 
   @objc
-  func setReaderCornerRadius(_ value: Float) {
+  func setReaderCornerRadius(_ value: Double) {
         DispatchQueue.main.async {
           InAppStory.shared.readerCornerRadius = CGFloat(value)
         }
@@ -395,7 +395,14 @@ class RNInAppStorySDKModule: NSObject {
   @objc
   func setCoverQuality(_ value: String) {
         DispatchQueue.main.async {
-          //InAppStory.shared.coverQuality = .medium
+            switch (value) {
+                case "medium":
+                    InAppStory.shared.coverQuality = .medium
+                case "high":
+                    InAppStory.shared.coverQuality = .high
+                default:
+                    InAppStory.shared.coverQuality = .medium
+            }
         }
   }
 
@@ -414,10 +421,10 @@ class RNInAppStorySDKModule: NSObject {
   }
 
   @objc
-  func setCellGradientRadius(_ value: Float) {
-        DispatchQueue.main.async {
-          InAppStory.shared.cellBorderRadius = CGFloat(value)
-        }
+  func setCellGradientRadius(_ value: Double) {
+      DispatchQueue.main.async {
+        InAppStory.shared.cellBorderRadius = CGFloat(value)
+      }
   }
 
   @objc
@@ -430,21 +437,53 @@ class RNInAppStorySDKModule: NSObject {
   @objc
   func setPresentationStyle(_ value: String) {
         DispatchQueue.main.async {
-          InAppStory.shared.presentationStyle = .crossDissolve
+          
+            switch (value) {
+                case "crossDissolve":
+                    InAppStory.shared.presentationStyle = .crossDissolve
+                case "modal":
+                    InAppStory.shared.presentationStyle = .modal
+                case "zoom":
+                    InAppStory.shared.presentationStyle = .zoom
+                default:
+                    InAppStory.shared.presentationStyle = .crossDissolve
+            }
         }
   }
 
   @objc
   func setScrollStyle(_ value: String) {
         DispatchQueue.main.async {
-          InAppStory.shared.scrollStyle = .cover
+            switch (value) {
+                case "cover":
+                    InAppStory.shared.scrollStyle = .cover
+                case "flat":
+                    InAppStory.shared.scrollStyle = .flat
+                case "cube":
+                  InAppStory.shared.scrollStyle = .cube
+                case "depth":
+                  InAppStory.shared.scrollStyle = .depth
+                default:
+                InAppStory.shared.scrollStyle = .cover
+            }
         }
   }
 
   @objc
   func setCloseButtonPosition(_ value: String) {
         DispatchQueue.main.async {
-          InAppStory.shared.closeButtonPosition = .right
+            switch (value) {
+                case "bottomLeft":
+                  InAppStory.shared.closeButtonPosition = .bottomLeft
+                case "bottomRight":
+                  InAppStory.shared.closeButtonPosition = .bottomRight
+                case "left":
+                  InAppStory.shared.closeButtonPosition = .left
+                case "right":
+                  InAppStory.shared.closeButtonPosition = .right
+                default:
+                  InAppStory.shared.closeButtonPosition = .right
+            }
         }
   }
 
