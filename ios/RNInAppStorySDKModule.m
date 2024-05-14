@@ -32,6 +32,9 @@ RCT_EXTERN_METHOD(setHasShare:(BOOL *)value)
 RCT_EXTERN_METHOD(setUserID:(NSString *)userID)
 
 RCT_EXTERN_METHOD(getFavoritesCount:(NSString *)userID resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(getFrameworkInfo:((RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(getBuildNumber:((RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(getVersion:((RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 
 RCT_EXTERN_METHOD(setTimerGradientEnable:(NSString *)value)
 RCT_EXTERN_METHOD(setSwipeToClose:(NSString *)value)
@@ -48,6 +51,13 @@ RCT_EXTERN_METHOD(setCellGradientEnabled:(BOOL *)value)
 RCT_EXTERN_METHOD(setCellGradientRadius:(double *)radius)
 RCT_EXTERN_METHOD(setCellBorderColor:(NSString *)color)
 
+RCT_EXTERN_METHOD(setGoodsCellImageBackgroundColor:(NSString *)color)
+RCT_EXTERN_METHOD(setGoodsCellImageCornerRadius:(double *)color)
+RCT_EXTERN_METHOD(setGoodsCellMainTextColor:(NSString *)color)
+RCT_EXTERN_METHOD(setGoodsCellOldPriceTextColor:(NSString *)color)
+
+
+
 RCT_EXTERN_METHOD(setPresentationStyle:(NSString *)presentationStyle)
 RCT_EXTERN_METHOD(setScrollStyle:(NSString *)scrollStyle)
 RCT_EXTERN_METHOD(setCloseButtonPosition:(NSString *)position)
@@ -56,5 +66,8 @@ RCT_EXTERN_METHOD(closeReader)
 RCT_EXTERN_METHOD(clearCache)
 
 RCT_EXTERN_METHOD(showOnboardings:(NSString *)gameID limit:(NSInteger)limit tags:(nullable NSArray<NSString *> *)tags)
+
+RCT_EXTERN_METHOD(setLogging:(BOOL *)value)
+RCT_EXTERN_METHOD(useDeviceID:(BOOL *)value)
 
 @end

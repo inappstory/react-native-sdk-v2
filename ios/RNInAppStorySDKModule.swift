@@ -49,30 +49,42 @@ class RNInAppStorySDKModule: NSObject {
         InAppStory.shared.storiesEvent = { storiesEvent in
             NSLog("TODO: storiesEvent");
             switch storiesEvent {
-                case .storiesLoaded:
+                case .storiesLoaded(stories: let stories)::
                     NSLog("storiesLoaded")
+                    print(stories)
                 case .ugcStoriesLoaded(stories: let stories):
                     NSLog("ugcStoriesLoaded")
+                    print(stories)
                 case .clickOnStory(storyData: let storyData):
                     NSLog("clickOnStory")
+                    print(storyData)
                 case .showStory(storyData: let storyData, action: let action):
                     NSLog("showStory")
+                    print(storyData, action)
                 case .closeStory(slideData: let slideData, action: let action):
                     NSLog("closeStory")
+                    print(slideData, action)
                 case .clickOnButton(slideData: let slideData, link: let link):
                     NSLog("clickOnButton")
+                    print(slideData, link)
                 case .showSlide(slideData: let slideData):
                     NSLog("showSlide")
+                    print(slideData)
                 case .likeStory(slideData: let slideData, value: let value):
                     NSLog("likeStory")
+                    print(slideData, value)
                 case .dislikeStory(slideData: let slideData, value: let value):
                     NSLog("dislikeStory")
+                    print(slideData, value)
                 case .favoriteStory(slideData: let slideData, value: let value):
                     NSLog("favoriteStory")
+                    print(slideData, value)
                 case .clickOnShareStory(slideData: let slideData):
                     NSLog("clickOnShareStory")
+                    print(slideData)
                 case .storyWidgetEvent(slideData: let slideData, name: let name, data: let data):
                     NSLog("storyWidgetEvent")
+                    print(slideData, name, data)
                 @unknown default:
                     NSLog("WARNING: unknown storiesEvent")
             }
@@ -80,20 +92,21 @@ class RNInAppStorySDKModule: NSObject {
         InAppStory.shared.gameEvent = { gameEvent in
             NSLog("TODO: gameEvent");
             switch gameEvent {
-            case .closeGame:
+            case .closeGame(gameData: let gameData)::
                 NSLog("closeGame")
-            
+                print(gameData)
             case .startGame(gameData: let gameData):
                 NSLog("startGame")
-
+                print(gameData)
             case .finishGame(gameData: let gameData, result: let result):
                 NSLog("finishGame")
-
+                print(gameData, result)
             case .eventGame(gameData: let gameData, name: let name, payload: let payload):
                 NSLog("eventGame")
-
+                print(gameData, name ,payload)
             case .gameFailure(gameData: let gameData, message: let message):
                 NSLog("gameFailure")
+                print(gameData, message)
 
             @unknown default:
                 NSLog("WARNING: unknown gameEvent")
@@ -104,76 +117,85 @@ class RNInAppStorySDKModule: NSObject {
             switch failureEvent {
             case .sessionFailure(message: let message):
                 NSLog("sessionFailure")
+                print(message)
             case .storyFailure(message: let message):
                 NSLog("storyFailure")
+                print(message)
             case .currentStoryFailure(message: let message):
                 NSLog("currentStoryFailure")
+                print(message)
             case .networkFailure(message: let message):
                 NSLog("networkFailure")
+                print(message)
             case .requestFailure(message: let message, statusCode: let statusCode):
                 NSLog("requestFailure")
+                print(message, statusCode)
             @unknown default:
                 NSLog("WARNING: unknown failureEvent")
             }
         }
-        /*
-        InAppStory.shared.gameReaderWillShow = { showed in
-            NSLog("TODO: gameReaderWillShow closure");
-        }
-        InAppStory.shared.gameReaderDidClose = { showed in
-            NSLog("TODO: gameReaderDidClose closure");
-        }
-         */
-        /*
-        InAppStory.shared.gameComplete = { showed in
-            NSLog("TODO: gameComplete closure");
-        }*/
-        /*InAppStory.shared.customShare = { showed in
-            NSLog("TODO: customShare closure");
-        }
-        
-        InAppStory.shared.storiesDidUpdated = { showed in
+        InAppStory.shared.storiesDidUpdated = { isContent, storyType in
             NSLog("TODO: storiesDidUpdated closure");
         }
-        InAppStory.shared.onActionWith = { showed in
+        InAppStory.shared.gameComplete = { data, result, url in
+            NSLog("TODO: gameComplete closure");
+        }
+        
+        InAppStory.shared.gameReaderWillShow = { 
+            NSLog("TODO: gameReaderWillShow closure");
+        }
+        InAppStory.shared.gameReaderDidClose = {
+            NSLog("TODO: gameReaderDidClose closure");
+        }
+        InAppStory.shared.customShare = { share, fn in
+            NSLog("TODO: customShare closure");
+        }
+        InAppStory.shared.onActionWith = { target, type, storyType in
             NSLog("TODO: onActionWith closure");
         }
-        InAppStory.shared.favoriteCellDidSelect = { showed in
+        InAppStory.shared.favoriteCellDidSelect = {
             NSLog("TODO: favoriteCellDidSelect closure");
         }
-        InAppStory.shared.editorCellDidSelect = { showed in
+        InAppStory.shared.editorCellDidSelect = {
             NSLog("TODO: editorCellDidSelect closure");
         }
-        */
-        /*
-        InAppStory.shared.getGoodsObject = { showed in
+        InAppStory.shared.getGoodsObject = { skus, complete in
             NSLog("TODO: getGoodsObject closure");
         }
-        InAppStory.shared.goodItemSelected = { showed in
+        InAppStory.shared.goodItemSelected = { item, storyType in
             NSLog("TODO: goodItemSelected closure");
         }
-        */
+        InAppStory.shared.stackFeedUpdate = { newFeed in
+            NSLog("TODO: goodItemSelected closure");
+        }
         /*
         InAppStory.shared.sizeForItem = { showed in
             NSLog("TODO: sizeForItem closure");
+            return CGSize
         }
         InAppStory.shared.insetForSection = { showed in
             NSLog("TODO: sizeForItem closure");
+            return UIEdgeInsets
         }
         InAppStory.shared.minimumLineSpacingForSection = { showed in
             NSLog("TODO: minimumLineSpacingForSection closure");
+            return CGFloat
         }
         InAppStory.shared.minimumInteritemSpacingForSection = { showed in
             NSLog("TODO: minimumInteritemSpacingForSection closure");
+            return CGFloat
         }
         InAppStory.shared.goodsSizeForItem = { showed in
             NSLog("TODO: goodsSizeForItem closure");
+            return CGSize
         }
         InAppStory.shared.goodsInsetForSection = { showed in
             NSLog("TODO: goodsInsetForSection closure");
+            return UIEdgeInsets
         }
         InAppStory.shared.goodsMinimumLineSpacingForSection = { showed in
             NSLog("TODO: goodsMinimumLineSpacingForSection closure");
+            return CGFloat
         }
         */
         /*
@@ -242,6 +264,39 @@ class RNInAppStorySDKModule: NSObject {
   }
 
   @objc
+  func isReaderOpen(resolve:@escaping RCTPromiseResolveBlock, reject:@escaping RCTPromiseRejectBlock) {
+        DispatchQueue.main.async {
+          resolve(InAppStory.shared.isReaderOpen)
+        }
+  }
+
+  @objc
+  func isGameOpen(resolve:@escaping RCTPromiseResolveBlock, reject:@escaping RCTPromiseRejectBlock) {
+        DispatchQueue.main.async {
+          resolve(InAppStory.shared.isGameOpen)
+        }
+  }
+
+  @objc
+  func getFrameworkInfo(resolve:@escaping RCTPromiseResolveBlock, reject:@escaping RCTPromiseRejectBlock) {
+        DispatchQueue.main.async {
+          resolve(InAppStory.shared.frameworkInfo)
+        }
+  }
+  @objc
+  func getBuildNumber(resolve:@escaping RCTPromiseResolveBlock, reject:@escaping RCTPromiseRejectBlock) {
+        DispatchQueue.main.async {
+          resolve(InAppStory.shared.BuildSDK)
+        }
+  }
+  @objc
+  func getVersion(resolve:@escaping RCTPromiseResolveBlock, reject:@escaping RCTPromiseRejectBlock) {
+        DispatchQueue.main.async {
+          resolve(InAppStory.shared.VersionSDK)
+        }
+  }
+
+  @objc
   func setImagesPlaceholders(_ imagesPlaceholders: Dictionary<String, String>) {
         DispatchQueue.main.async {
           InAppStory.shared.imagesPlaceholders = imagesPlaceholders
@@ -254,6 +309,21 @@ class RNInAppStorySDKModule: NSObject {
           InAppStory.shared.muted = soundEnabled
         }
   }
+
+  @objc
+  func setLogging(_ loggingEnabled: Bool) {
+        DispatchQueue.main.async {
+          InAppStory.shared.isLoggingEnabled = loggingEnabled
+        }
+  }
+
+  @objc
+  func useDeviceID(_ useDeviceID: Bool) {
+        DispatchQueue.main.async {
+          InAppStory.shared.isDeviceIDEnabled = useDeviceID
+        }
+  }
+
   @objc
     func closeReader() {
         DispatchQueue.main.async {
@@ -300,18 +370,22 @@ class RNInAppStorySDKModule: NSObject {
   @objc
   func setHasLike(_ value: Bool) {
       _hasLike = value
+      InAppStory.shared.panelSettings = PanelSettings(like: self._hasLike, favorites: self._hasFavorites, share: self._hasShare)
   }
   @objc
   func setHasDislike(_ value: Bool) {
       _hasDislike = value
+      InAppStory.shared.panelSettings = PanelSettings(like: self._hasLike, favorites: self._hasFavorites, share: self._hasShare)
   }
   @objc
   func setHasFavorites(_ value: Bool) {
       _hasFavorites = value
+      InAppStory.shared.panelSettings = PanelSettings(like: self._hasLike, favorites: self._hasFavorites, share: self._hasShare)
   }
   @objc
   func setHasShare(_ value: Bool) {
       _hasShare = value
+      InAppStory.shared.panelSettings = PanelSettings(like: self._hasLike, favorites: self._hasFavorites, share: self._hasShare)
   }
   @objc
   func showOnboardings(_ feed: String, limit: Int, tags: [String]?) {
@@ -435,6 +509,41 @@ class RNInAppStorySDKModule: NSObject {
   }
 
   @objc
+  func setGoodsCellImageBackgroundColor(_ value: String) {
+        DispatchQueue.main.async {
+          InAppStory.shared.goodsCellImageBackgroundColor = RCTConvert.uiColor(value)
+        }
+  }
+
+  @objc
+  func setGoodsCellImageCornerRadius(_ value: Double) {
+        DispatchQueue.main.async {
+          InAppStory.shared.goodsCellImageCornerRadius = CGFloat(value)
+        }
+  }
+
+  @objc
+  func setGoodsCellMainTextColor(_ value: String) {
+        DispatchQueue.main.async {
+          InAppStory.shared.goodsCellMainTextColor = RCTConvert.uiColor(value)
+        }
+  }
+
+  @objc
+  func setGoodsCellOldPriceTextColor(_ value: String) {
+        DispatchQueue.main.async {
+          InAppStory.shared.goodsCellOldPriceTextColor = RCTConvert.uiColor(value)
+        }
+  }
+/*
+  @objc
+  func setCellFont(_ value: String) {
+        DispatchQueue.main.async {
+          InAppStory.shared.cellFont = RCTConvert.uiColor(value)
+        }
+  }
+*/
+  @objc
   func setPresentationStyle(_ value: String) {
         DispatchQueue.main.async {
           
@@ -486,7 +595,7 @@ class RNInAppStorySDKModule: NSObject {
             }
         }
   }
-
+  //TODO:
   //likeImage
   //likeSelectedImage
   //dislikeImage
