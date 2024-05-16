@@ -11,7 +11,6 @@ import {
   type ListLoadStatus,
   type StoriesListViewModel,
   type StoryManagerConfig,
-  StoriesList,
   StoriesListCardTitlePosition,
   StoriesListCardTitleTextAlign,
   StoriesListCardViewVariant,
@@ -29,6 +28,7 @@ import type {
   StoriesListFavoriteCardOptions,
   StoriesListClickEvent,
 } from 'react-native-ias/types/AppearanceManager';
+import { StoriesList } from './stories/StoriesList';
 const LINKING_ERROR =
   `The package 'react-native-inappstory-sdk' doesn't seem to be linked. Make sure: \n\n` +
   Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
@@ -36,8 +36,8 @@ const LINKING_ERROR =
   '- You are not using Expo Go\n';
 
 type InappstorySdkProps = {
-  color: string;
-  style: ViewStyle;
+  color?: string;
+  style?: ViewStyle;
 };
 
 const ComponentName = 'InappstorySdkView';
@@ -51,26 +51,80 @@ export const InappstorySdkView =
 
 export {
   type ListLoadStatus,
-  StoriesList,
   StoriesListCardTitlePosition,
   StoriesListCardTitleTextAlign,
   StoriesListCardViewVariant,
   type StoriesListViewModel,
   type StoryManagerConfig,
   StoryReader,
+  StoriesList,
   StoryReaderCloseButtonPosition,
   StoryReaderSwipeStyle,
   useIas,
 };
+
+const createSession = async (apiKey: string, userId: any) => {
+  const openSession = await fetch(
+    'https://api.inappstory.ru/v2/session/open?expand=cache&fields=session%2Cserver_timestamp%2Cplaceholders%2Cimage_placeholders%2Cis_allow_profiling%2Cis_allow_statistic_v1%2Cis_allow_statistic_v2%2Cis_allow_ugc%2Ccache%2Cpreview_aspect_ratio&format=json',
+    {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        platform: Platform.OS,
+        features:
+          'animation,data,deeplink,webp,placeholder,resetTimers,gameReader,swipeUpItems,sendApi,imgPlaceholder',
+        user_id: userId,
+      }),
+    }
+  );
+  const sessionData = await openSession.json();
+  return sessionData.session.id;
+};
+
+const fetchFeed = async (
+  apiKey: string,
+  sessionId: string,
+  userId: any,
+  feed: string
+) => {
+  const getFeed = await fetch(
+    `https://api.inappstory.ru/v2/feed/${feed}?format=json`,
+    {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+        'Auth-Session-id': `${sessionId}}`,
+        'X-User-id': `${userId}}`,
+      },
+    }
+  );
+  const feedData = await getFeed.json();
+  return feedData;
+};
+
 export class StoryManager extends StoryManagerV1 {
+  sessionId: string = '';
+  apiKey: string = '';
+  userId: any = '';
   constructor(config: StoryManagerConfig) {
     super(config);
     InAppStorySDK.initWith(config.apiKey, config.userId);
+    this.apiKey = config.apiKey;
+    this.userId = config.userId;
+    createSession(config.apiKey, config.userId).then((sessionId) => {
+      this.sessionId = sessionId;
+    });
     if (config.tags) {
       InAppStorySDK.setTags(config.tags);
     }
     if (config.placeholders) {
-      InAppStorySDK.setPlaceholders(config.placeholders);
+      //InAppStorySDK.setPlaceholders(config.placeholders);
     }
     if (config.lang) {
       //InAppStorySDK.setLang(config.lang);
@@ -79,7 +133,14 @@ export class StoryManager extends StoryManagerV1 {
       InAppStorySDK.changeSound(false);
     }
   }
-
+  async fetchFeed(feed: string) {
+    if (this.sessionId) {
+      return await fetchFeed(this.apiKey, this.sessionId, this.userId, feed);
+    } else {
+      this.sessionId = await createSession(this.apiKey, this.userId);
+      return await fetchFeed(this.apiKey, this.sessionId, this.userId, feed);
+    }
+  }
   on(eventName: string | symbol, listener: any) {
     super.on(eventName, listener);
     //TODO: implement events
@@ -321,7 +382,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    height: 200,
+    height: 500,
   },
 });
 

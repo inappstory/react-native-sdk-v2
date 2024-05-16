@@ -11203,12 +11203,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-device-info@npm:^10.13.2":
-  version: 10.13.2
-  resolution: "react-native-device-info@npm:10.13.2"
+"react-native-device-info@npm:^11.1.0":
+  version: 11.1.0
+  resolution: "react-native-device-info@npm:11.1.0"
   peerDependencies:
     react-native: "*"
-  checksum: ef0d9aa4587d7909df5139b07d9792970006d1b886538d88f3e4d0a673e04e0a15eac8131b7999a0fed12600a05667379fe22fe1d5b1a5a12adffa226b1ec7e2
+  checksum: 272cab82573933a1f3a9bc394b82a387ccbdf9fbef131fc1f04b8ff78b36f581931b5c643f5aa278f28577cbc320ef2ac588cafdb73292e9b0cf4427d54c44ce
   languageName: node
   linkType: hard
 
@@ -11262,7 +11262,7 @@ __metadata:
     react-content-loader: ^7.0.0
     react-native: 0.74.0
     react-native-button: ^3.1.0
-    react-native-device-info: ^10.13.2
+    react-native-device-info: ^11.1.0
     react-native-get-random-values: ^1.11.0
     react-native-ias: ^0.3.17
     react-native-network-logger: ^1.16.1
@@ -11272,6 +11272,7 @@ __metadata:
     react-native-share: ^10.1.0
     react-native-simple-toast: ^3.3.1
     react-native-svg: ^15.1.0
+    react-native-video: ^6.0.0
     react-native-webview: ^13.8.6
     rn-android-keyboard-adjust: ^2.1.2
   languageName: unknown
@@ -11388,6 +11389,16 @@ __metadata:
     react: "*"
     react-native: "*"
   checksum: a3694b74097e56a810a9142c9480532b63fb9cac0ff8b74c038478172d09acdb4077d93cfa53a8bb31e7ec1a9fc9f6e81a95b028c64af5370b5b3534c99aee0b
+  languageName: node
+  linkType: hard
+
+"react-native-video@npm:^6.0.0":
+  version: 6.0.0
+  resolution: "react-native-video@npm:6.0.0"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: 3320cf9b5d5845dd72d6fef3cf7d8d5cf543f6bcb78d8d1ea5a8eb6bb90d62bd43e467aa14f6d6e1b2170e3a95c3f739556c26deebe0239f1d45be152eb719a2
   languageName: node
   linkType: hard
 

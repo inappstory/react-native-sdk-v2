@@ -17,7 +17,7 @@
     "react-content-loader": "^7.0.0",
     "react-native": "0.74.0",
     "react-native-button": "^3.1.0",
-    "react-native-device-info": "^10.13.2",
+    "react-native-device-info": "^11.1.0",
     "react-native-get-random-values": "^1.11.0",
     "react-native-ias": "^0.3.17",
     "react-native-network-logger": "^1.16.1",
@@ -27,6 +27,7 @@
     "react-native-share": "^10.1.0",
     "react-native-simple-toast": "^3.3.1",
     "react-native-svg": "^15.1.0",
+    "react-native-video": "^6.0.0",
     "react-native-webview": "^13.8.6",
     "rn-android-keyboard-adjust": "^2.1.2"
   },

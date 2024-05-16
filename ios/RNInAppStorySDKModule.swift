@@ -49,7 +49,7 @@ class RNInAppStorySDKModule: NSObject {
         InAppStory.shared.storiesEvent = { storiesEvent in
             NSLog("TODO: storiesEvent");
             switch storiesEvent {
-                case .storiesLoaded(stories: let stories)::
+                case .storiesLoaded(stories: let stories):
                     NSLog("storiesLoaded")
                     print(stories)
                 case .ugcStoriesLoaded(stories: let stories):
@@ -92,7 +92,7 @@ class RNInAppStorySDKModule: NSObject {
         InAppStory.shared.gameEvent = { gameEvent in
             NSLog("TODO: gameEvent");
             switch gameEvent {
-            case .closeGame(gameData: let gameData)::
+            case .closeGame(gameData: let gameData):
                 NSLog("closeGame")
                 print(gameData)
             case .startGame(gameData: let gameData):
@@ -280,19 +280,19 @@ class RNInAppStorySDKModule: NSObject {
   @objc
   func getFrameworkInfo(resolve:@escaping RCTPromiseResolveBlock, reject:@escaping RCTPromiseRejectBlock) {
         DispatchQueue.main.async {
-          resolve(InAppStory.shared.frameworkInfo)
+          resolve(InAppStory.frameworkInfo)
         }
   }
   @objc
   func getBuildNumber(resolve:@escaping RCTPromiseResolveBlock, reject:@escaping RCTPromiseRejectBlock) {
         DispatchQueue.main.async {
-          resolve(InAppStory.shared.BuildSDK)
+            resolve(InAppStory.BuildSDK)
         }
   }
   @objc
   func getVersion(resolve:@escaping RCTPromiseResolveBlock, reject:@escaping RCTPromiseRejectBlock) {
         DispatchQueue.main.async {
-          resolve(InAppStory.shared.VersionSDK)
+            resolve(InAppStory.VersionSDK)
         }
   }
 
