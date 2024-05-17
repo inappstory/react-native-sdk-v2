@@ -9,15 +9,234 @@ import com.facebook.react.bridge.ReactMethod
 import android.util.Log
 
 import com.inappstory.sdk.InAppStoryManager;
+import com.inappstory.sdk.AppearanceManager;
+import com.inappstory.sdk.stories.outercallbacks.common.errors.ErrorCallback;
+import com.inappstory.sdk.stories.outercallbacks.common.gamereader.GameReaderCallback;
+import com.inappstory.sdk.game.reader.GameStoryData;
+import com.inappstory.sdk.stories.outercallbacks.common.reader.StoryWidgetCallback;
+import com.inappstory.sdk.stories.outercallbacks.common.reader.SlideData;
+import com.inappstory.sdk.stories.outercallbacks.common.single.SingleLoadCallback;
+import com.inappstory.sdk.stories.outercallbacks.common.reader.StoryData;
+import com.inappstory.sdk.stories.outercallbacks.common.onboarding.OnboardingLoadCallback;
+import com.inappstory.sdk.stories.outercallbacks.common.reader.ClickOnShareStoryCallback;
+import com.inappstory.sdk.stories.outercallbacks.common.reader.LikeDislikeStoryCallback;
+import com.inappstory.sdk.stories.outercallbacks.common.reader.FavoriteStoryCallback;
+
+import com.inappstory.sdk.stories.outercallbacks.common.reader.CallToActionCallback;
+
+import com.inappstory.sdk.stories.outercallbacks.common.reader.ClickAction;
+import android.content.Context;
+import com.inappstory.sdk.stories.outercallbacks.common.reader.CloseStoryCallback;
+import com.inappstory.sdk.stories.outercallbacks.common.reader.ShowStoryCallback;
+import com.inappstory.sdk.stories.outercallbacks.common.reader.ShowSlideCallback;
+import com.inappstory.sdk.stories.outercallbacks.common.reader.ShowStoryAction;
+import com.inappstory.sdk.stories.outercallbacks.common.reader.CloseReader;
+
+/*
+idgetEventName,
+                     Map<String, String> widgetData,
+                     int storyId,
+                     String storyTitle,
+                     String feed,
+                     int slidesCount,
+                     int slideIndex,
+                     String tags) */
 
 class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
   override fun getName() = "RNInAppStorySDKModule"
   var ias: InAppStoryManager? = null
+  var appearanceManager: AppearanceManager? = null;
+
   @ReactMethod
   fun initWith(apiKey: String, userID: String) {
       Log.d("InappstorySdkModule", "initWith")
       InAppStoryManager.initSDK(reactContext.getApplicationContext())
       this.ias = this.createInAppStoryManager(apiKey, userID)
+      this.appearanceManager = AppearanceManager()
+      this.ias?.setShowStoryCallback(
+        object : ShowStoryCallback {
+            override fun showStory(
+                story: StoryData?,
+                showStoryAction: ShowStoryAction?
+            ) {
+                TODO("Not yet implemented")
+            }
+        }
+    )
+      this.ias?.setShowSlideCallback(
+        object : ShowSlideCallback {
+            override fun showSlide(
+                slide: SlideData?
+            ) {
+                TODO("Not yet implemented")
+            }
+        }
+    )
+      this.ias?.setCloseStoryCallback(
+        object : CloseStoryCallback {
+            override fun closeStory(
+                slide: SlideData?,
+                action: CloseReader?
+            ) {
+                TODO("Not yet implemented")
+            }
+        }
+    )
+      this.ias?.setCallToActionCallback(
+        object : CallToActionCallback {
+            override fun callToAction(
+                context: Context?, //Here context of story reader or context of storiesList if it calls from it's deeplinks
+                slide: SlideData?,
+                url: String?,
+                action: ClickAction
+            ) {
+                TODO("Not yet implemented")
+            }
+        }
+    )
+      this.ias?.setFavoriteStoryCallback(
+        object : FavoriteStoryCallback {
+            override fun favoriteStory(
+                slide: SlideData?,
+                value: Boolean
+            ) {
+                TODO("Not yet implemented")
+            }
+        }
+    )
+      this.ias?.setLikeDislikeStoryCallback(
+        object : LikeDislikeStoryCallback {
+            override fun likeStory(
+                slide: SlideData?,
+                value: Boolean
+            ) {
+                TODO("Not yet implemented")
+            }
+
+            override fun dislikeStory(
+                slide: SlideData?,
+                value: Boolean
+            ) {
+                TODO("Not yet implemented")
+            }
+        }
+    )
+      this.ias?.setClickOnShareStoryCallback(
+        object : ClickOnShareStoryCallback {
+            override fun shareClick(
+                slide: SlideData?
+            ) {
+                TODO("Not yet implemented")
+            }
+        }
+    )
+      this.ias?.setOnboardingLoadCallback(
+        object : OnboardingLoadCallback {
+            override fun onboardingLoad(count: Int, feed: String?) {
+                TODO("Not yet implemented")
+            }
+        }
+    )
+      this.ias?.setSingleLoadCallback(
+        object : SingleLoadCallback {
+            override fun singleLoad(story: StoryData?) {
+                TODO("Not yet implemented")
+            }
+        }
+    )
+      this.ias?.setStoryWidgetCallback(
+        object : StoryWidgetCallback {
+            override fun widgetEvent(
+                slideData: SlideData?,
+                widgetEventName: String?,
+                widgetData: Map<String, String?>?,
+                //feed: String?
+            ) {
+                TODO("Not yet implemented")
+            }
+        }
+    )
+      this.ias?.setGameReaderCallback(
+        object : GameReaderCallback {
+            override fun startGame(
+                gameStoryData: GameStoryData?,
+                id: String?
+            ) {
+                TODO("Not yet implemented")
+            }
+
+            override fun finishGame(
+                gameStoryData: GameStoryData?,
+                result: String?,
+                id: String?
+            ) {
+                TODO("Not yet implemented")
+            }
+
+            override fun closeGame(
+                gameStoryData: GameStoryData?,
+                id: String?
+            ) {
+                TODO("Not yet implemented")
+            }
+            override fun gameLoadError(
+                gameStoryData: GameStoryData?,
+                id: String?
+            ) {
+                TODO("Not yet implemented")
+            }
+            override fun gameOpenError(
+              gameStoryData: GameStoryData?,
+              id: String?
+          ) {
+              TODO("Not yet implemented")
+          }
+            override fun eventGame(
+                gameStoryData: GameStoryData?,
+                id: String?,
+                id2: String?,
+                id3: String?
+            ) {
+                TODO("Not yet implemented")
+            }
+        }
+    )
+      this.ias?.setErrorCallback(
+        object : ErrorCallback {
+            override fun loadListError(feed: String?) {
+                TODO("Not yet implemented")
+            }
+
+            override fun loadOnboardingError(feed: String?) {
+                TODO("Not yet implemented")
+            }
+
+            override fun loadSingleError() {
+                TODO("Not yet implemented")
+            }
+
+            override fun cacheError() {
+                TODO("Not yet implemented")
+            }
+
+            override fun readerError() {
+                TODO("Not yet implemented")
+            }
+
+            override fun emptyLinkError() {
+                TODO("Not yet implemented")
+            }
+
+            override fun sessionError() {
+                TODO("Not yet implemented")
+            }
+
+            override fun noConnection() {
+                TODO("Not yet implemented")
+            }
+
+        }
+    )
   }
 
   @ReactMethod
@@ -28,8 +247,8 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
 
   @ReactMethod
   fun showSingle(storyID: String) {
-      Log.d("InappstorySdkModule", "storyID")
-      this.ias?.showSingle(storyID, reactContext.getApplicationContext())
+      Log.d("InappstorySdkModule", "showSingle")
+      this.ias?.showStory(storyID, reactContext.getApplicationContext(), this.appearanceManager)
   }
 
   @ReactMethod
@@ -47,55 +266,55 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
   @ReactMethod
   fun setTags() {
       Log.d("InappstorySdkModule", "setTags")
-      //TODO
+      //this.ias?.setTags(tags)
   }
 
   @ReactMethod
   fun addTags() {
       Log.d("InappstorySdkModule", "addTags")
-      //TODO
+      //this.ias?.addTags(tags)
   }
 
   @ReactMethod
   fun removeTags() {
       Log.d("InappstorySdkModule", "removeTags")
-      //TODO
+      ///this.ias?.removeTags(tags)
   }
 
   @ReactMethod
   fun setPlaceholders() {
       Log.d("InappstorySdkModule", "setPlaceholders")
-      //TODO
+      //this.ias?.setPlaceholders(tags)
   }
 
   @ReactMethod
   fun setImagesPlaceholders() {
       Log.d("InappstorySdkModule", "setImagesPlaceholders")
-      //TODO
+      //this.ias?.setImagePlaceholders(tags)
   }
 
   @ReactMethod
-  fun changeSound() {
+  fun changeSound(value: Boolean) {
       Log.d("InappstorySdkModule", "changeSound")
-      //TODO
+      this.ias?.soundOn(value)
   }
 
   @ReactMethod
   fun setHasLike() {
       Log.d("InappstorySdkModule", "setHasLike")
-      //TODO
+      //appearanceManager.csHasLike(settings.hasLike);
   }
 
   @ReactMethod
   fun setHasFavorites() {
       Log.d("InappstorySdkModule", "setHasFavorites")
-      //TODO
+      //appearanceManager.csHasFavorite(settings.hasFavorite);
   }
 
   @ReactMethod
   fun setHasShare() {
       Log.d("InappstorySdkModule", "setHasShare")
-      //TODO
+      //appearanceManager.csHasShare(settings.hasShare);
   }
 
   @ReactMethod
@@ -257,19 +476,20 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
   @ReactMethod
   fun clearCache() {
       Log.d("InappstorySdkModule", "clearCache")
-      //TODO
+      this.ias?.clearCache()
   }
 
   @ReactMethod
-  fun showOnboardings() {
+  fun showOnboardings(feed: String) {
       Log.d("InappstorySdkModule", "showOnboardings")
-      //TODO
+      this.ias?.showOnboardingStories(feed, reactContext.getApplicationContext(), this.appearanceManager)
   }
 
   @ReactMethod
-  fun setLogging() {
+  fun setLogging(value: Boolean) {
       Log.d("InappstorySdkModule", "setLogging")
-      //TODO
+
+    //this.ias.enableLogging = value
   }
 
   @ReactMethod
@@ -288,3 +508,19 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
       .create()
   }
 }
+
+/*
+appearanceManager.csClosePosition(settings.closePosition);
+appearanceManager.csCloseOnOverscroll(settings.closeOnOverscroll);
+appearanceManager.csCloseOnSwipe(settings.closeOnSwipe);
+appearanceManager.csIsDraggable(true);
+appearanceManager.csTimerGradientEnable(settings.timerGradientEnable);
+appearanceManager.csStoryReaderAnimation(settings.readerAnimation);
+appearanceManager.csCloseIcon(settings.closeIcon);
+appearanceManager.csDislikeIcon(settings.dislikeIcon);
+appearanceManager.csLikeIcon(settings.likeIcon);
+appearanceManager.csRefreshIcon(settings.refreshIcon);
+appearanceManager.csFavoriteIcon(settings.favoriteIcon);
+appearanceManager.csShareIcon(settings.shareIcon);
+appearanceManager.csSoundIcon(settings.soundIcon);
+  */
