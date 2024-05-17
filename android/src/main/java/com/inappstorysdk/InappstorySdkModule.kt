@@ -53,7 +53,10 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
       InAppStoryManager.initSDK(reactContext.getApplicationContext())
       this.ias = this.createInAppStoryManager(apiKey, userID)
       this.appearanceManager = AppearanceManager()
-      this.ias?.setShowStoryCallback(
+  }
+
+  fun setupListeners() {
+    this.ias?.setShowStoryCallback(
         object : ShowStoryCallback {
             override fun showStory(
                 story: StoryData?,
@@ -248,9 +251,9 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
   @ReactMethod
   fun showSingle(storyID: String) {
       Log.d("InappstorySdkModule", "showSingle")
-      this.ias?.showStory(storyID, reactContext.getApplicationContext(), this.appearanceManager)
+      this.ias?.showStory(storyID, getCurrentActivity(), this.appearanceManager)
   }
-
+/*
   @ReactMethod
   fun removeFromFavorite(storyID: String) {
       Log.d("InappstorySdkModule", "removeFromFavorite")
@@ -264,7 +267,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
   }
 
   @ReactMethod
-  fun setTags() {
+  fun setTags(tags: String) {
       Log.d("InappstorySdkModule", "setTags")
       //this.ias?.setTags(tags)
   }
@@ -497,7 +500,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
       Log.d("InappstorySdkModule", "useDeviceID")
       //TODO
   }
-
+*/
   fun createInAppStoryManager(
     apiKey: String,
     userId: String

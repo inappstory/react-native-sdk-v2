@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { StoriesCarousel } from './StoriesCarousel';
-import { StoriesList as StoriesListV1 } from 'react-native-ias';
 export const StoriesList = ({
   storyManager,
   appearanceManager,
@@ -10,11 +9,24 @@ export const StoriesList = ({
   viewModelExporter,
 }) => {
   const [feedData, setFeedData] = React.useState();
-  React.useEffect(() => {
+  const fetchFeed = React.useCallback(() => {
+    onLoadStart();
     storyManager.fetchFeed(feed).then((_feedData) => {
       setFeedData(_feedData);
+      onLoadEnd({ defaultListLength: _feedData?.stories.length, feed });
     });
-  }, [feed, storyManager]);
+  }, [feed, onLoadEnd, onLoadStart, storyManager]);
+  React.useEffect(() => {
+    viewModelExporter({
+      reload: () => {
+        fetchFeed();
+      },
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  React.useEffect(() => {
+    fetchFeed();
+  }, [feed, storyManager, fetchFeed]);
   React.useEffect(() => {
     console.error('feed stories = ', feedData?.stories);
   }, [feedData]);
@@ -24,14 +36,6 @@ export const StoriesList = ({
         stories={feedData?.stories}
         storyManager={storyManager}
         appearanceManager={appearanceManager}
-      />
-      <StoriesListV1
-        storyManager={storyManager}
-        appearanceManager={appearanceManager}
-        feed={feed}
-        onLoadStart={onLoadStart}
-        onLoadEnd={onLoadEnd}
-        viewModelExporter={viewModelExporter}
       />
     </>
   );

@@ -1,17 +1,12 @@
 import * as React from 'react';
 
-import InAppStorySDK, { InappstorySdkView } from 'react-native-inappstory-sdk';
-
+import { InappstorySdkView } from 'react-native-inappstory-sdk';
 import { StyleSheet, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { StoryReader } from 'react-native-inappstory-sdk';
-import { storyManager } from './services/StoryService';
 import { MainScreen } from './screen/MainScreen';
 import NetworkLogger from 'react-native-network-logger';
 import { RNWelcome } from './screen/RNWelcome';
-
-InAppStorySDK.initWith('test-key', 'apk_test');
 
 export function SDKView() {
   return (
@@ -64,7 +59,6 @@ export default function App() {
 
         <Stack.Screen name="RNWelcome" component={RNWelcome} />
       </Stack.Navigator>
-      <StoryReader storyManager={storyManager} />
     </NavigationContainer>
   );
 }

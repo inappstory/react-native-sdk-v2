@@ -36,9 +36,13 @@ export const StoryComponent = ({ story, appearanceManager }) => {
     <View style={[styles.video, { borderRadius }]}>
       <Video
         source={{ uri: story?.video_cover[0].url }}
-        style={[styles.video, { borderRadius, overflow: 'hidden' }]}
+        style={[
+          styles.video,
+          { borderRadius, overflow: 'hidden', resizeMode: 'cover' },
+        ]}
         repeat={true}
         volume={0}
+        resizeMode={'cover'}
       />
     </View>
   ) : story.image ? (
