@@ -6,6 +6,7 @@ export const StoriesCarousel = ({
   stories,
   storyManager,
   appearanceManager,
+  onPress,
 }) => {
   if (typeof stories === 'undefined') return;
   return (
@@ -13,9 +14,11 @@ export const StoriesCarousel = ({
       {stories.map((story: any) => {
         return (
           <StoryComponent
+            key={story.id}
             story={story}
             storyManager={storyManager}
             appearanceManager={appearanceManager}
+            onPress={onPress}
           />
         );
       })}

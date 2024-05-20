@@ -1,9 +1,4 @@
-import {
-  requireNativeComponent,
-  UIManager,
-  Platform,
-  type ViewStyle,
-} from 'react-native';
+import { Platform } from 'react-native';
 import * as React from 'react';
 import { Button, NativeModules, StyleSheet, Text, View } from 'react-native';
 import {
@@ -29,26 +24,6 @@ import type {
   StoriesListClickEvent,
 } from 'react-native-ias/types/AppearanceManager';
 import { StoriesList } from './stories/StoriesList';
-const LINKING_ERROR =
-  `The package 'react-native-inappstory-sdk' doesn't seem to be linked. Make sure: \n\n` +
-  Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
-  '- You rebuilt the app after installing the package\n' +
-  '- You are not using Expo Go\n';
-
-type InappstorySdkProps = {
-  color?: string;
-  style?: ViewStyle;
-};
-
-const ComponentName = 'InappstorySdkView';
-
-export const InappstorySdkView =
-  UIManager.getViewManagerConfig(ComponentName) != null
-    ? requireNativeComponent<InappstorySdkProps>(ComponentName)
-    : () => {
-        throw new Error(LINKING_ERROR);
-      };
-
 export {
   type ListLoadStatus,
   StoriesListCardTitlePosition,
@@ -121,7 +96,7 @@ export class StoryManager extends StoryManagerV1 {
       this.sessionId = sessionId;
     });
     if (config.tags) {
-      InAppStorySDK.setTags(config.tags);
+      //InAppStorySDK.setTags(config.tags);
     }
     if (config.placeholders) {
       //InAppStorySDK.setPlaceholders(config.placeholders);
@@ -130,7 +105,7 @@ export class StoryManager extends StoryManagerV1 {
       //InAppStorySDK.setLang(config.lang);
     }
     if (config.defaultMuted) {
-      InAppStorySDK.changeSound(false);
+      //InAppStorySDK.changeSound(false);
     }
   }
   async fetchFeed(feed: string) {

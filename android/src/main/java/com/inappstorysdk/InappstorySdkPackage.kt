@@ -12,6 +12,6 @@ class InappstorySdkPackage : ReactPackage {
   }
 
   override fun createViewManagers(reactContext: ReactApplicationContext): List<ViewManager<*, *>> {
-    return listOf(InappstorySdkViewManager())
+    return listOf(InappstorySdkViewManager(reactContext))
   }
 }

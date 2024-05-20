@@ -13,7 +13,7 @@ RCT_EXTERN_METHOD(showGame:(NSString *)gameID)
 
 RCT_EXTERN_METHOD(showSingle:(NSString *)storyID)
 
-RCT_EXTERN_METHOD(removeFromFavorite:(NSString *)gameID)
+RCT_EXTERN_METHOD(removeFromFavorite:(NSString *)storyID)
 RCT_EXTERN_METHOD(removeAllFavorites)
 
 RCT_EXTERN_METHOD(setTags:(NSArray<NSString *> *)tags)

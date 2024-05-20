@@ -1,9 +1,8 @@
 import * as React from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
-import InAppStorySDK from 'react-native-inappstory-sdk';
 import Video from 'react-native-video';
 
-export const StoryComponent = ({ story, appearanceManager }) => {
+export const StoryComponent = ({ story, appearanceManager, onPress }) => {
   const borderRadius =
     appearanceManager?.storiesListOptions.card.variant === 'circle'
       ? appearanceManager?.storiesListOptions.card.height
@@ -51,13 +50,7 @@ export const StoryComponent = ({ story, appearanceManager }) => {
       style={[styles.image, { borderRadius }]}
     />
   ) : null;
-  const onPress = React.useCallback(() => {
-    //FIXME: fire clickOnStory event {"payload": {"feed": "default", "id": 55507, "index": 0, "isDeeplink": false, "slidesCount": 5, "source": "list", "tags": [], "title": "Добавляем виджеты"}}
-    console.error('onPress', story.id);
-    InAppStorySDK.showSingle(String(story.id));
-  }, [story]);
 
-  console.error('color = ', appearanceManager?.storiesListOptions.card);
   return (
     <Pressable
       style={{
@@ -67,7 +60,7 @@ export const StoryComponent = ({ story, appearanceManager }) => {
         paddingTop: appearanceManager?.storiesListOptions.topPadding,
         paddingBottom: appearanceManager?.storiesListOptions.bottomPadding,
       }}
-      onPress={onPress}
+      onPress={() => onPress(story)}
     >
       <View
         style={{

@@ -32,6 +32,9 @@ import com.inappstory.sdk.stories.outercallbacks.common.reader.ShowSlideCallback
 import com.inappstory.sdk.stories.outercallbacks.common.reader.ShowStoryAction;
 import com.inappstory.sdk.stories.outercallbacks.common.reader.CloseReader;
 
+import com.facebook.react.bridge.ReadableArray;
+
+
 /*
 idgetEventName,
                      Map<String, String> widgetData,
@@ -50,7 +53,6 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
   @ReactMethod
   fun initWith(apiKey: String, userID: String) {
       Log.d("InappstorySdkModule", "initWith")
-      InAppStoryManager.initSDK(reactContext.getApplicationContext())
       this.ias = this.createInAppStoryManager(apiKey, userID)
       this.appearanceManager = AppearanceManager()
   }
@@ -483,12 +485,6 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
   }
 
   @ReactMethod
-  fun showOnboardings(feed: String) {
-      Log.d("InappstorySdkModule", "showOnboardings")
-      this.ias?.showOnboardingStories(feed, reactContext.getApplicationContext(), this.appearanceManager)
-  }
-
-  @ReactMethod
   fun setLogging(value: Boolean) {
       Log.d("InappstorySdkModule", "setLogging")
 
@@ -501,10 +497,22 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
       //TODO
   }
 */
+    @ReactMethod
+    fun showOnboardings(feed: String, steps: ReadableArray) {
+        var limit: Int? = null;
+        var tags: List<String>? = null; //FIXME
+        Log.d("InappstorySdkModule", "showOnboardings")
+        if (limit != null) {
+            this.ias?.showOnboardingStories(limit, feed, tags, reactContext.currentActivity, this.appearanceManager)
+        } else {
+            this.ias?.showOnboardingStories(feed, tags, reactContext.currentActivity, this.appearanceManager)
+        }
+    }
   fun createInAppStoryManager(
     apiKey: String,
     userId: String
   ): InAppStoryManager {
+      Log.d("InAppStoryManager", "createInAppStoryManager");
       return InAppStoryManager.Builder()
       .apiKey(apiKey)
       .userId(userId)
