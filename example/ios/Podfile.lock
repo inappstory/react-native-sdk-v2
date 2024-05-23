@@ -1258,6 +1258,8 @@ PODS:
     - React-utils (= 0.74.0)
   - RNCAsyncStorage (1.23.1):
     - React-Core
+  - RNCPicker (2.7.6):
+    - React-Core
   - RNDeviceInfo (11.1.0):
     - React-Core
   - RNReanimated (3.9.0-rc.1):
@@ -1308,6 +1310,12 @@ PODS:
     - React-Core
   - SocketRocket (0.7.0)
   - Toast (4.1.1)
+  - VisionCamera (4.0.5):
+    - VisionCamera/Core (= 4.0.5)
+    - VisionCamera/React (= 4.0.5)
+  - VisionCamera/Core (4.0.5)
+  - VisionCamera/React (4.0.5):
+    - React-Core
   - Yoga (0.0.0)
 
 DEPENDENCIES:
@@ -1374,11 +1382,13 @@ DEPENDENCIES:
   - React-utils (from `../node_modules/react-native/ReactCommon/react/utils`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
+  - "RNCPicker (from `../node_modules/@react-native-picker/picker`)"
   - RNDeviceInfo (from `../node_modules/react-native-device-info`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNShare (from `../node_modules/react-native-share`)
   - RNSVG (from `../node_modules/react-native-svg`)
+  - VisionCamera (from `../node_modules/react-native-vision-camera`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -1511,6 +1521,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   RNCAsyncStorage:
     :path: "../node_modules/@react-native-async-storage/async-storage"
+  RNCPicker:
+    :path: "../node_modules/@react-native-picker/picker"
   RNDeviceInfo:
     :path: "../node_modules/react-native-device-info"
   RNReanimated:
@@ -1521,6 +1533,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-share"
   RNSVG:
     :path: "../node_modules/react-native-svg"
+  VisionCamera:
+    :path: "../node_modules/react-native-vision-camera"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -1591,6 +1605,7 @@ SPEC CHECKSUMS:
   React-utils: f013537c3371270d2095bff1d594d00d4bc9261b
   ReactCommon: 2cde697fd80bd31da1d6448d25a5803088585219
   RNCAsyncStorage: 826b603ae9c0f88b5ac4e956801f755109fa4d5c
+  RNCPicker: f58e790450cb0a74c09dd1c677bd1de41a5741b9
   RNDeviceInfo: b899ce37a403a4dea52b7cb85e16e49c04a5b88e
   RNReanimated: a921c27a898be3a706f18c8be992db53f3b033d9
   RNScreens: 8bb05c5faaea985cd18e4a668f6cc324c56b9d85
@@ -1598,6 +1613,7 @@ SPEC CHECKSUMS:
   RNSVG: 50cf2c7018e57cf5d3522d98d0a3a4dd6bf9d093
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
   Toast: 1f5ea13423a1e6674c4abdac5be53587ae481c4e
+  VisionCamera: 59949b04a51c00a52a6d7125425d01664792c9bd
   Yoga: ff1d575b119f510a5de23c22a794872562078ccf
 
 PODFILE CHECKSUM: 4b0554a8a41b2430e77e1fd0e9eac925c4ddfb07

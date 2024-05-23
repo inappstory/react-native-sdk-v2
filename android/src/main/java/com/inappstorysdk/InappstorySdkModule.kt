@@ -34,6 +34,8 @@ import com.inappstory.sdk.stories.outercallbacks.common.reader.CloseReader;
 
 import com.facebook.react.bridge.ReadableArray;
 
+import com.facebook.react.bridge.Promise;
+
 
 /*
 idgetEventName,
@@ -56,6 +58,12 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
       this.ias = this.createInAppStoryManager(apiKey, userID)
       this.appearanceManager = AppearanceManager()
   }
+
+  @ReactMethod
+  fun setUserID(userId: String) {
+      Log.d("InappstorySdkModule", "setUserID")
+      this.ias?.setUserId(userId)
+    }
 
   fun setupListeners() {
     this.ias?.setShowStoryCallback(
@@ -245,16 +253,45 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
   }
 
   @ReactMethod
-  fun showGame(gameID: String) {
+  fun showGame(gameID: String, promise: Promise) {
       Log.d("InappstorySdkModule", "showGame")
-      this.ias?.openGame(gameID, reactContext.getApplicationContext())
+      try {
+        this.ias?.openGame(gameID, getCurrentActivity() as Context)
+        promise.resolve(gameID)
+      } catch (e: Throwable) {
+        promise.reject("showGame error", e)
+      }
   }
 
   @ReactMethod
-  fun showSingle(storyID: String) {
+  fun showSingle(storyID: String, promise: Promise) {
       Log.d("InappstorySdkModule", "showSingle")
-      this.ias?.showStory(storyID, getCurrentActivity(), this.appearanceManager)
+      try {
+        this.ias?.showStory(storyID, getCurrentActivity(), this.appearanceManager)
+        promise.resolve(storyID)
+      } catch (e: Throwable) {
+        promise.reject("showGame error", e)
+      }
   }
+
+  @ReactMethod
+  fun setTags(tags: ReadableArray) {
+      Log.d("InappstorySdkModule", "setTags")
+      this.ias?.setTags(tags)
+  }
+  
+  @ReactMethod
+  fun setPlaceholders(placeholders: ReadableArray) {
+      Log.d("InappstorySdkModule", "setPlaceholders")
+      this.ias?.setPlaceholders(placeholders)
+  }
+
+  @ReactMethod
+  fun setImagesPlaceholders(imagePlaceholders: ReadableArray) {
+      Log.d("InappstorySdkModule", "setImagesPlaceholders")
+      this.ias?.setImagePlaceholders(imagePlaceholders)
+  }
+
 /*
   @ReactMethod
   fun removeFromFavorite(storyID: String) {
@@ -269,12 +306,6 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
   }
 
   @ReactMethod
-  fun setTags(tags: String) {
-      Log.d("InappstorySdkModule", "setTags")
-      //this.ias?.setTags(tags)
-  }
-
-  @ReactMethod
   fun addTags() {
       Log.d("InappstorySdkModule", "addTags")
       //this.ias?.addTags(tags)
@@ -284,18 +315,6 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
   fun removeTags() {
       Log.d("InappstorySdkModule", "removeTags")
       ///this.ias?.removeTags(tags)
-  }
-
-  @ReactMethod
-  fun setPlaceholders() {
-      Log.d("InappstorySdkModule", "setPlaceholders")
-      //this.ias?.setPlaceholders(tags)
-  }
-
-  @ReactMethod
-  fun setImagesPlaceholders() {
-      Log.d("InappstorySdkModule", "setImagesPlaceholders")
-      //this.ias?.setImagePlaceholders(tags)
   }
 
   @ReactMethod
@@ -322,11 +341,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
       //appearanceManager.csHasShare(settings.hasShare);
   }
 
-  @ReactMethod
-  fun setUserID() {
-      Log.d("InappstorySdkModule", "setUserID")
-      //TODO
-  }
+  
 
   @ReactMethod
   fun getFavoritesCount() {
@@ -498,8 +513,9 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
   }
 */
     @ReactMethod
-    fun showOnboardings(feed: String, steps: ReadableArray) {
+    fun showOnboardings(feed: String, tags: ReadableArray, promise: Promise) {
         var limit: Int? = null;
+        var success: Boolean = true;
         var tags: List<String>? = null; //FIXME
         Log.d("InappstorySdkModule", "showOnboardings")
         if (limit != null) {
@@ -507,6 +523,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
         } else {
             this.ias?.showOnboardingStories(feed, tags, reactContext.currentActivity, this.appearanceManager)
         }
+        promise.resolve(feed)
     }
   fun createInAppStoryManager(
     apiKey: String,
@@ -534,4 +551,4 @@ appearanceManager.csRefreshIcon(settings.refreshIcon);
 appearanceManager.csFavoriteIcon(settings.favoriteIcon);
 appearanceManager.csShareIcon(settings.shareIcon);
 appearanceManager.csSoundIcon(settings.soundIcon);
-  */
+  :*/

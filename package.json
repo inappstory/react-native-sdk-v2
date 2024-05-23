@@ -80,9 +80,9 @@
   "peerDependencies": {
     "react": "*",
     "react-native": "*",
+    "react-native-device-info": "*",
     "react-native-ias": "*",
-    "react-native-video": "*",
-    "react-native-device-info": "*"
+    "react-native-video": "*"
   },
   "workspaces": [
     "example"

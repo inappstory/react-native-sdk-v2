@@ -23,6 +23,21 @@ class RNInAppStorySDKModule: NSObject {
     return ["count": 1]
   }
 
+  @objc func getStories(resolve:@escaping RCTPromiseResolveBlock, reject:@escaping RCTPromiseRejectBlock) {
+    // TODO
+    resolve(nil)
+  }
+
+  @objc func getFavoriteStories(resolve:@escaping RCTPromiseResolveBlock, reject:@escaping RCTPromiseRejectBlock) {
+    // TODO
+    resolve(nil)
+  }
+
+   @objc func sliderEvent(resolve:@escaping RCTPromiseResolveBlock, reject:@escaping RCTPromiseRejectBlock) {
+    // TODO
+    resolve(nil)
+  }
+
   //@ReactMethod
   @objc func initWith(_ apiKey: String, userID: String) {
     DispatchQueue.main.async {

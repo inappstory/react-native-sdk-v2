@@ -2369,6 +2369,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@miblanchard/react-native-slider@npm:^2.6.0":
+  version: 2.6.0
+  resolution: "@miblanchard/react-native-slider@npm:2.6.0"
+  peerDependencies:
+    react: ">=16.8"
+    react-native: ">=0.59"
+  checksum: cdaaca314e94133e87a623cfe59dac950aeb6ba09946fb89f03d4c2a0cd131db80b368c320c34e5c126a10041026a83e00df3182d2346857e7b51aed96632748
+  languageName: node
+  linkType: hard
+
 "@nicolo-ribaudo/eslint-scope-5-internals@npm:5.1.1-v1":
   version: 5.1.1-v1
   resolution: "@nicolo-ribaudo/eslint-scope-5-internals@npm:5.1.1-v1"
@@ -2802,6 +2812,16 @@ __metadata:
   bin:
     react-native: build/bin.js
   checksum: fd450d26be7de6950d25112184e645e0e5eacee2883869c2521f8dfe5be3225dfa5753531f847c5d2d489b55993b048338fbce0a6da99784e269d6283d695cc2
+  languageName: node
+  linkType: hard
+
+"@react-native-picker/picker@npm:^2.7.6":
+  version: 2.7.6
+  resolution: "@react-native-picker/picker@npm:2.7.6"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: 8a4ca200a771467107fb82cfc64d7c8dfc6e8bd68768833addce3d1cc1d194126fea7df2f8464ca646a73006f1d5e7b9c138196f1b33e42c2e7231174db523a2
   languageName: node
   linkType: hard
 
@@ -11212,6 +11232,28 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-dropdown-picker@npm:^5.4.6":
+  version: 5.4.6
+  resolution: "react-native-dropdown-picker@npm:5.4.6"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: d81ee3d68c17107a4d21dbdf9c2fe2ffe4bf4398973d10113139aadc0674221ce5038b945299fba2abc796930ec5e6d5f84291945bf903344493a15b8e2fca43
+  languageName: node
+  linkType: hard
+
+"react-native-element-dropdown@npm:^2.12.0":
+  version: 2.12.0
+  resolution: "react-native-element-dropdown@npm:2.12.0"
+  dependencies:
+    lodash: ^4.17.21
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: 116841290b58ecbee2e3134219f83e82236290b48e52c0cb26719844514702d0240d6dcf958847ff003b2e6a50de005787a6999a3ddffaf3b760ac01f9ca7d3f
+  languageName: node
+  linkType: hard
+
 "react-native-get-random-values@npm:^1.11.0":
   version: 1.11.0
   resolution: "react-native-get-random-values@npm:1.11.0"
@@ -11250,7 +11292,9 @@ __metadata:
     "@babel/core": ^7.20.0
     "@babel/preset-env": ^7.20.0
     "@babel/runtime": ^7.20.0
+    "@miblanchard/react-native-slider": ^2.6.0
     "@react-native-async-storage/async-storage": ^1.23.1
+    "@react-native-picker/picker": ^2.7.6
     "@react-native/babel-preset": 0.74.81
     "@react-native/metro-config": 0.74.81
     "@react-native/typescript-config": 0.74.81
@@ -11263,6 +11307,8 @@ __metadata:
     react-native: 0.74.0
     react-native-button: ^3.1.0
     react-native-device-info: ^11.1.0
+    react-native-dropdown-picker: ^5.4.6
+    react-native-element-dropdown: ^2.12.0
     react-native-get-random-values: ^1.11.0
     react-native-ias: ^0.3.17
     react-native-network-logger: ^1.16.1
@@ -11273,6 +11319,7 @@ __metadata:
     react-native-simple-toast: ^3.3.1
     react-native-svg: ^15.1.0
     react-native-video: ^6.0.0
+    react-native-vision-camera: ^4.0.5
     react-native-webview: ^13.8.6
     rn-android-keyboard-adjust: ^2.1.2
   languageName: unknown
@@ -11305,7 +11352,9 @@ __metadata:
   peerDependencies:
     react: "*"
     react-native: "*"
+    react-native-device-info: "*"
     react-native-ias: "*"
+    react-native-video: "*"
   languageName: unknown
   linkType: soft
 
@@ -11399,6 +11448,26 @@ __metadata:
     react: "*"
     react-native: "*"
   checksum: 3320cf9b5d5845dd72d6fef3cf7d8d5cf543f6bcb78d8d1ea5a8eb6bb90d62bd43e467aa14f6d6e1b2170e3a95c3f739556c26deebe0239f1d45be152eb719a2
+  languageName: node
+  linkType: hard
+
+"react-native-vision-camera@npm:^4.0.5":
+  version: 4.0.5
+  resolution: "react-native-vision-camera@npm:4.0.5"
+  peerDependencies:
+    "@shopify/react-native-skia": "*"
+    react: "*"
+    react-native: "*"
+    react-native-reanimated: "*"
+    react-native-worklets-core: "*"
+  peerDependenciesMeta:
+    "@shopify/react-native-skia":
+      optional: true
+    react-native-reanimated:
+      optional: true
+    react-native-worklets-core:
+      optional: true
+  checksum: 1ff423482c0df8732119aaf481b024477ce377217a430a1249cd6375c043deb5ae02a072019746ebd215a931fe541ee7cdb5fbaae01002d462d3a2861e4abe0f
   languageName: node
   linkType: hard
 

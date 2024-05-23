@@ -7,6 +7,10 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { MainScreen } from './screen/MainScreen';
 import NetworkLogger from 'react-native-network-logger';
 import { RNWelcome } from './screen/RNWelcome';
+import { SettingsScreen } from './screen/SettingsScreen';
+import { FavoritesScreen } from './screen/FavoritesScreen';
+import { EventsScreen } from './screen/EventsScreen';
+import { ProjectSettingsScreen } from './screen/ProjectSettingsScreen';
 
 export function SDKView() {
   return (
@@ -58,6 +62,13 @@ export default function App() {
         <Stack.Screen name="NetworkLogger" component={NetworkLogger} />
 
         <Stack.Screen name="RNWelcome" component={RNWelcome} />
+        <Stack.Screen name="SettingsScreen" component={SettingsScreen} />
+        <Stack.Screen name="EventsScreen" component={EventsScreen} />
+        <Stack.Screen name="FavoritesScreen" component={FavoritesScreen} />
+        <Stack.Screen
+          name="ProjectSettingsScreen"
+          component={ProjectSettingsScreen}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

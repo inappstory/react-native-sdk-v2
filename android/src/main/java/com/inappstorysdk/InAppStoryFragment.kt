@@ -12,7 +12,7 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.uimanager.ThemedReactContext
 
 import com.inappstory.sdk.stories.ui.list.StoriesList;
-import com.inappstorysdk.CustomView
+
 class InAppStoryFragment(activity: Activity) : Fragment() {
   var activity = activity;
   private lateinit var storiesList: StoriesList
