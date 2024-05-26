@@ -268,7 +268,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
       Log.d("InappstorySdkModule", "showSingle")
       try {
         this.ias?.showStory(storyID, getCurrentActivity(), this.appearanceManager)
-        promise.resolve(storyID)
+        promise.resolve(true)
       } catch (e: Throwable) {
         promise.reject("showGame error", e)
       }
@@ -290,6 +290,106 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
   fun setImagesPlaceholders(imagePlaceholders: ReadableArray) {
       Log.d("InappstorySdkModule", "setImagesPlaceholders")
       this.ias?.setImagePlaceholders(imagePlaceholders)
+  }
+
+  @ReactMethod
+  fun changeSound(value: Boolean) {
+      Log.d("InappstorySdkModule", "changeSound")
+      this.ias?.soundOn(value)
+  }
+
+  @ReactMethod
+  fun setHasLike(value: Boolean) {
+      Log.d("InappstorySdkModule", "setHasLike")
+      this.appearanceManager.csHasLike(value);
+  }
+
+  @ReactMethod
+  fun setHasFavorites(value: Boolean) {
+      Log.d("InappstorySdkModule", "setHasFavorites")
+      this.appearanceManager.csHasFavorite(value);
+  }
+
+  @ReactMethod
+  fun setHasShare(value: Boolean) {
+      Log.d("InappstorySdkModule", "setHasShare")
+      this.appearanceManager.csHasShare(value);
+  }
+
+  @ReactMethod
+  fun setPresentationStyle(style: String) {
+      Log.d("InappstorySdkModule", "setPresentationStyle")
+      if (style == "zoom") {
+        this.appearanceManager.csStoryReaderPresentationStyle(0)
+      }
+      if (style == "fade") {
+        this.appearanceManager.csStoryReaderPresentationStyle(1)
+      }
+      if (style == "popup") {
+        this.appearanceManager.csStoryReaderPresentationStyle(2)
+      }
+      if (style == "disable") {
+        this.appearanceManager.csStoryReaderPresentationStyle(-1)
+      }
+  }
+
+  @ReactMethod
+  fun setScrollStyle(scrollStyle: String) {
+      Log.d("InappstorySdkModule", "setScrollStyle")
+      if (scrollStyle == "depth") {
+        this.appearanceManager.csStoryReaderAnimation(1)
+      }
+      if (scrollStyle == "cube") {
+        this.appearanceManager.csStoryReaderAnimation(2)
+      }
+      if (scrollStyle == "cover") {
+        this.appearanceManager.csStoryReaderAnimation(3)
+      }
+      if (scrollStyle == "flat") {
+        this.appearanceManager.csStoryReaderAnimation(4)
+      }
+  }
+
+  @ReactMethod
+  fun setSwipeToClose(value: Boolean) {
+      Log.d("InappstorySdkModule", "setSwipeToClose")
+      this.appearanceManager.csCloseOnSwipe(value)
+  }
+
+  @ReactMethod
+  fun setOverScrollToClose(value: Boolean) {
+      Log.d("InappstorySdkModule", "setOverScrollToClose")
+      this.appearanceManager.csCloseOnOverscroll(value)
+  }
+
+  @ReactMethod
+  fun setCloseButtonPosition(value: String) {
+      Log.d("InappstorySdkModule", "setCloseButtonPosition")
+      if (value == "left") {
+        this.appearanceManager.csClosePosition(1)
+      }
+      if (value == "right") {
+        this.appearanceManager.csClosePosition(2)
+      }
+      if (value == "bottomLeft") {
+        this.appearanceManager.csClosePosition(3)
+      }
+      if (value == "bottomRight") {
+        this.appearanceManager.csClosePosition(4)
+      }
+      
+  }
+
+  @ReactMethod
+  fun setReaderCornerRadius(radius: Float) {
+      Log.d("InappstorySdkModule", "setReaderCornerRadius")
+      this.appearanceManager.csReaderRadius(radius);
+  }
+
+  @ReactMethod
+  fun setReaderBackgroundColor(color: String) {
+      Log.d("InappstorySdkModule", "setReaderBackgroundColor")
+      //TODO
   }
 
 /*
@@ -315,30 +415,6 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
   fun removeTags() {
       Log.d("InappstorySdkModule", "removeTags")
       ///this.ias?.removeTags(tags)
-  }
-
-  @ReactMethod
-  fun changeSound(value: Boolean) {
-      Log.d("InappstorySdkModule", "changeSound")
-      this.ias?.soundOn(value)
-  }
-
-  @ReactMethod
-  fun setHasLike() {
-      Log.d("InappstorySdkModule", "setHasLike")
-      //appearanceManager.csHasLike(settings.hasLike);
-  }
-
-  @ReactMethod
-  fun setHasFavorites() {
-      Log.d("InappstorySdkModule", "setHasFavorites")
-      //appearanceManager.csHasFavorite(settings.hasFavorite);
-  }
-
-  @ReactMethod
-  fun setHasShare() {
-      Log.d("InappstorySdkModule", "setHasShare")
-      //appearanceManager.csHasShare(settings.hasShare);
   }
 
   
@@ -374,18 +450,6 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
   }
 
   @ReactMethod
-  fun setSwipeToClose() {
-      Log.d("InappstorySdkModule", "setSwipeToClose")
-      //TODO
-  }
-
-  @ReactMethod
-  fun setOverScrollToClose() {
-      Log.d("InappstorySdkModule", "setOverScrollToClose")
-      //TODO
-  }
-
-  @ReactMethod
   fun setTimerGradient() {
       Log.d("InappstorySdkModule", "setTimerGradient")
       //TODO
@@ -403,17 +467,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
       //TODO
   }
 
-  @ReactMethod
-  fun setReaderBackgroundColor() {
-      Log.d("InappstorySdkModule", "setReaderBackgroundColor")
-      //TODO
-  }
-
-  @ReactMethod
-  fun setReaderCornerRadius() {
-      Log.d("InappstorySdkModule", "setReaderCornerRadius")
-      //TODO
-  }
+  
 
   @ReactMethod
   fun setCoverQuality() {
@@ -469,23 +523,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
       //TODO
   }
 
-  @ReactMethod
-  fun setPresentationStyle() {
-      Log.d("InappstorySdkModule", "setPresentationStyle")
-      //TODO
-  }
-
-  @ReactMethod
-  fun setScrollStyle() {
-      Log.d("InappstorySdkModule", "setScrollStyle")
-      //TODO
-  }
-
-  @ReactMethod
-  fun setCloseButtonPosition() {
-      Log.d("InappstorySdkModule", "setCloseButtonPosition")
-      //TODO
-  }
+  
 
   @ReactMethod
   fun closeReader() {

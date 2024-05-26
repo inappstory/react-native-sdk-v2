@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { PixelRatio, UIManager, findNodeHandle } from 'react-native';
+import { PixelRatio, Platform, UIManager, findNodeHandle } from 'react-native';
 import { InappstorySdkViewManager } from './ViewManager';
 
 const createFragment = (viewId) =>
@@ -10,27 +10,15 @@ const createFragment = (viewId) =>
     [viewId]
   );
 
-/*const createClick = (viewId) =>
-  UIManager.dispatchViewManagerCommand(
-    viewId,
-    // we are calling the 'create' command
-    UIManager.InappstorySdkView.Commands.click.toString(),
-    [viewId]
-  );*/
-
-export const StoriesWidget = ({ _clickAt }) => {
+export const StoriesWidget = ({ onViewLoaded }) => {
   const ref = useRef(null);
   useEffect(() => {
     const viewId = findNodeHandle(ref.current);
-    createFragment(viewId);
-  }, []);
-  useEffect(() => {
-    setTimeout(() => {
-      //const viewId = findNodeHandle(ref.current);
-      //console.error('clicking');
-      //createClick(viewId);
-    }, 5000);
-  }, []);
+    if (Platform.OS == 'android') {
+      createFragment(viewId);
+    }
+    onViewLoaded(viewId);
+  }, [onViewLoaded]);
 
   return (
     <InappstorySdkViewManager

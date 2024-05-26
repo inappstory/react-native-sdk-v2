@@ -20,9 +20,8 @@ import Button from 'react-native-button';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { type StoriesListViewModel } from 'react-native-inappstory-sdk';
 
-import Toast from 'react-native-simple-toast';
 import { StoryListComponent } from '../components/StoryListComponent';
-import { appearanceManager, storyManager } from '../services/StoryService';
+import { storyManager } from '../services/StoryService';
 import InAppStorySDK from 'react-native-inappstory-sdk';
 
 export function MainScreen({
@@ -84,7 +83,7 @@ export function MainScreen({
         }
       >
         <StoryListComponent
-          feedId="rniasdemo"
+          feedId="default"
           backgroundColor="transparent"
           viewModelExporter={viewModelExporter}
         />
@@ -100,58 +99,31 @@ export function MainScreen({
         >
           Reload StoriesList
         </Button>
-        <View style={styles.pad32} />
         <Button
           containerStyle={styles.buttonContainer}
           style={styles.button}
           styleDisabled={styles.buttonDisabled}
-          onPress={() =>
-            navigation.navigate('RNWelcome', { storyFeedId: 'default' })
-          }
-        >
-          Success loading (default)
-        </Button>
-        <View style={styles.pad32} />
-        <Button
-          containerStyle={styles.buttonContainer}
-          style={styles.button}
-          styleDisabled={styles.buttonDisabled}
-          onPress={() =>
-            navigation.navigate('RNWelcome', { storyFeedId: 'undefinedFeed' })
-          }
-        >
-          Fail loading
-        </Button>
-        <View style={styles.pad32} />
-        <Button
-          containerStyle={styles.buttonContainer}
-          style={styles.button}
-          styleDisabled={styles.buttonDisabled}
-          onPress={() => {
-            storyManager.showStory(26702, appearanceManager).then((res) => {
-              console.log({ res });
-              res.loaded === false && Toast.show('Failed to load story', 2000);
-            });
+          onPress={async () => {
+            storyManager.setTags(['tag1', 'tag2']);
+            if (storiesListViewModel.current) {
+              console.log(await storiesListViewModel.current.reload());
+            }
           }}
         >
-          Open one story(success)
+          Add tags
         </Button>
-        <View style={styles.pad32} />
         <Button
           containerStyle={styles.buttonContainer}
           style={styles.button}
           styleDisabled={styles.buttonDisabled}
-          onPress={() => {
-            storyManager
-              .showStory('undefinedId', appearanceManager)
-              .then((res) => {
-                console.log({ res });
-                res.loaded === false &&
-                  Toast.show('Failed to load story', 2000);
-              });
+          onPress={async () => {
+            storyManager.setTags([]);
+            if (storiesListViewModel.current) {
+              console.log(await storiesListViewModel.current.reload());
+            }
           }}
         >
-          Open one story(fail)
+          Remove tags
         </Button>
         <View style={styles.pad32} />
         <Button
@@ -159,18 +131,20 @@ export function MainScreen({
           style={styles.button}
           styleDisabled={styles.buttonDisabled}
           onPress={() => {
-            storyManager
-              .showOnboardingStories(appearanceManager)
-              .then((res) => {
-                let onboardingOpened = false;
-                if (res.success && res.defaultListLength > 0) {
-                  onboardingOpened = true;
-                }
-                console.log({ onboardingOpened });
-              });
+            navigation.navigate('SettingsScreen');
           }}
         >
-          Open onboarding
+          Reader Settings
+        </Button>
+        <Button
+          containerStyle={styles.buttonContainer}
+          style={styles.button}
+          styleDisabled={styles.buttonDisabled}
+          onPress={() => {
+            navigation.navigate('ProjectSettingsScreen');
+          }}
+        >
+          Project Settings
         </Button>
         <View style={styles.pad32} />
         <Button
@@ -178,30 +152,33 @@ export function MainScreen({
           style={styles.button}
           styleDisabled={styles.buttonDisabled}
           onPress={() => {
-            InAppStorySDK.showGame('2');
+            InAppStorySDK.showSingle('55512');
+          }}
+        >
+          Show single story
+        </Button>
+
+        <View style={styles.pad32} />
+        <Button
+          containerStyle={styles.buttonContainer}
+          style={styles.button}
+          styleDisabled={styles.buttonDisabled}
+          onPress={() => {
+            InAppStorySDK.showOnboardings('onboarding', 10, []);
+          }}
+        >
+          Show onboarding stories
+        </Button>
+        <View style={styles.pad32} />
+        <Button
+          containerStyle={styles.buttonContainer}
+          style={styles.button}
+          styleDisabled={styles.buttonDisabled}
+          onPress={() => {
+            InAppStorySDK.showGame('263');
           }}
         >
           Open game
-        </Button>
-        <Button
-          containerStyle={styles.buttonContainer}
-          style={styles.button}
-          styleDisabled={styles.buttonDisabled}
-          onPress={() => {
-            InAppStorySDK.showSingle('26702');
-          }}
-        >
-          Show single story (New SDK)
-        </Button>
-        <Button
-          containerStyle={styles.buttonContainer}
-          style={styles.button}
-          styleDisabled={styles.buttonDisabled}
-          onPress={() => {
-            InAppStorySDK.showOnboardings('onboarding', 1, []);
-          }}
-        >
-          Show onboarding story (New SDK)
         </Button>
         <View style={styles.pad32} />
         <Button
@@ -228,7 +205,9 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: StatusBar.currentHeight,
   },
-  scrollView: {},
+  scrollView: {
+    flex: 1,
+  },
   scrollViewInnerContainer: {
     marginHorizontal: 20,
     //flex: 1,

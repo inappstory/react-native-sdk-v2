@@ -45,7 +45,7 @@ RCT_EXTERN_METHOD(getVersion:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromis
 
 RCT_EXTERN_METHOD(setTimerGradientEnable:(NSString *)value)
 RCT_EXTERN_METHOD(setSwipeToClose:(NSString *)value)
-RCT_EXTERN_METHOD(setOverScrollToClose:(NSString *)value)
+RCT_EXTERN_METHOD(setOverScrollToClose:(BOOL *)value)
 RCT_EXTERN_METHOD(setTimerGradient:(NSString *)value)
 RCT_EXTERN_METHOD(setReaderBackgroundColor:(NSString *)value)
 RCT_EXTERN_METHOD(setReaderCornerRadius:(double *)radius)

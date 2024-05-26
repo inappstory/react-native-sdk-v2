@@ -57,6 +57,7 @@ const createSession = async (apiKey: string, userId: any) => {
     }
   );
   const sessionData = await openSession.json();
+  console.error('session = ', sessionData);
   return sessionData.session.id;
 };
 
@@ -64,10 +65,11 @@ const fetchFeed = async (
   apiKey: string,
   sessionId: string,
   userId: any,
-  feed: string
+  feed: string,
+  tags: string[]
 ) => {
   const getFeed = await fetch(
-    `https://api.inappstory.ru/v2/feed/${feed}?format=json`,
+    `https://api.inappstory.ru/v2/feed/${feed}?format=json${tags ? '&' + tags.map((t) => `tags=${t}`).join('&') : ''}`,
     {
       method: 'GET',
       headers: {
@@ -87,6 +89,11 @@ export class StoryManager extends StoryManagerV1 {
   sessionId: string = '';
   apiKey: string = '';
   userId: any = '';
+  tags: string[] = [];
+  placeholders: any = '';
+  imagePlaceholders: any = '';
+  lang: string = '';
+  soundEnabled: boolean = true;
   constructor(config: StoryManagerConfig) {
     super(config);
     InAppStorySDK.initWith(config.apiKey, config.userId);
@@ -96,24 +103,49 @@ export class StoryManager extends StoryManagerV1 {
       this.sessionId = sessionId;
     });
     if (config.tags) {
-      //InAppStorySDK.setTags(config.tags);
+      this.tags = config.tags;
+      InAppStorySDK.setTags(config.tags);
     }
     if (config.placeholders) {
-      //InAppStorySDK.setPlaceholders(config.placeholders);
+      this.placeholders = config.placeholders;
+      //InAppStorySDK.setPlaceholders(JSON.stringify(config.placeholders));
     }
     if (config.lang) {
+      this.lang = config.lang;
+      //FIXME
       //InAppStorySDK.setLang(config.lang);
     }
     if (config.defaultMuted) {
-      //InAppStorySDK.changeSound(false);
+      this.soundEnabled = false;
+      InAppStorySDK.changeSound(false);
     }
+  }
+  setApiKey(apiKey: string): void {
+    this.apiKey = apiKey;
+    InAppStorySDK.initWith(this.apiKey, this.userId);
+    /*this.sessionId = '';
+    createSession(this.apiKey, this.userId).then((sessionId) => {
+      this.sessionId = sessionId;
+    });*/
   }
   async fetchFeed(feed: string) {
     if (this.sessionId) {
-      return await fetchFeed(this.apiKey, this.sessionId, this.userId, feed);
+      return await fetchFeed(
+        this.apiKey,
+        this.sessionId,
+        this.userId,
+        feed,
+        this.tags
+      );
     } else {
       this.sessionId = await createSession(this.apiKey, this.userId);
-      return await fetchFeed(this.apiKey, this.sessionId, this.userId, feed);
+      return await fetchFeed(
+        this.apiKey,
+        this.sessionId,
+        this.userId,
+        feed,
+        this.tags
+      );
     }
   }
   on(eventName: string | symbol, listener: any) {
@@ -127,44 +159,51 @@ export class StoryManager extends StoryManagerV1 {
     return this;
   }
 
-  setTags(tags: [string]) {
+  setTags(tags: string[]) {
     super.setTags(tags);
+    this.tags = tags;
     InAppStorySDK.setTags(tags);
   }
   setUserId(userId: string | number): void {
     super.setUserId(userId);
+    this.userId = userId;
     InAppStorySDK.setUserID(userId);
   }
   setLang(lang: string): void {
     super.setLang(lang);
+    this.lang = lang;
     //InAppStorySDK.setLang(lang);
   }
   setPlaceholders(placeholders: any): void {
     super.setPlaceholders(placeholders);
+    this.placeholders = placeholders;
     InAppStorySDK.setPlaceholders(placeholders);
   }
   showStory(
     storyId: string | number,
     appearanceManager: AppearanceManagerV1
   ): Promise<{ loaded: boolean }> {
-    return super.showStory(storyId, appearanceManager);
-    /*return new Promise((resolve) => {
-      //if (appearanceManager.commonOptions.hasLike) {
-      InAppStorySDK.setHasLike(appearanceManager.commonOptions.hasLikeButton);
-      InAppStorySDK.setHasDislike(
-        appearanceManager.commonOptions.hasDislikeButton
-      );
+    return new Promise((resolve, reject) => {
+      if (appearanceManager.commonOptions.hasLike) {
+        InAppStorySDK.setHasLike(appearanceManager.commonOptions.hasLikeButton);
+        InAppStorySDK.setHasDislike(
+          appearanceManager.commonOptions.hasDislikeButton
+        );
 
-      InAppStorySDK.setHasFavorites(
-        appearanceManager.commonOptions.hasFavorite
-      );
-      InAppStorySDK.setHasShare(appearanceManager.commonOptions.hasShare);
-      //}
+        InAppStorySDK.setHasFavorites(
+          appearanceManager.commonOptions.hasFavorite
+        );
+        InAppStorySDK.setHasShare(appearanceManager.commonOptions.hasShare);
+      }
       //InAppStorySDK.setAppearance(appearanceManager);
-      //InAppStorySDK.showSingle(storyId);
-      //FIXME: receive load status
-      resolve({ loaded: true });
-    });*/
+      InAppStorySDK.showSingle(storyId).then((success: boolean) => {
+        if (success) {
+          resolve({ loaded: true });
+        } else {
+          reject({ loaded: false });
+        }
+      });
+    });
   }
   showOnboardingStories(
     appearanceManager: AppearanceManagerV1,
@@ -176,7 +215,19 @@ export class StoryManager extends StoryManagerV1 {
         }
       | undefined
   ): Promise<OnboardingLoadStatus> {
-    return super.showOnboardingStories(appearanceManager, options);
+    return new Promise((resolve, reject) => {
+      InAppStorySDK.showOnboardingStories(
+        options?.limit,
+        options?.feed,
+        options?.customTags
+      ).then((success) => {
+        if (success) {
+          resolve(success);
+        } else {
+          reject(null);
+        }
+      });
+    });
   }
   //TODO: Implement these events:
   //clickOnStory
@@ -193,6 +244,10 @@ export class StoryManager extends StoryManagerV1 {
   //);
 }
 export class AppearanceManager extends AppearanceManagerV1 {
+  hasLike = true;
+  hasDislike = true;
+  hasFavorites = true;
+  hasShare = true;
   //TODO: Migrate the APIs from JS to Native
   setCommonOptions(
     options: Partial<{
@@ -203,6 +258,10 @@ export class AppearanceManager extends AppearanceManagerV1 {
       hasShare: boolean;
     }>
   ) {
+    InAppStorySDK.setHasLike(options.hasLike);
+    InAppStorySDK.setHasDislike(options.hasDislikeButton);
+    InAppStorySDK.setHasFavorites(options.hasFavorite);
+    InAppStorySDK.setHasShare(options.hasShare);
     return super.setCommonOptions(options);
   }
   setStoryFavoriteReaderOptions(
@@ -251,6 +310,10 @@ export class AppearanceManager extends AppearanceManagerV1 {
       shareButton: { svgSrc: { baseState: string } };
     }>
   ) {
+    InAppStorySDK.setCloseButtonPosition(
+      options.closeButtonPosition || 'right'
+    );
+    InAppStorySDK.setScrollStyle(options.scrollStyle || 'cover');
     return super.setStoryReaderOptions(options);
   }
   setStoriesListOptions(
