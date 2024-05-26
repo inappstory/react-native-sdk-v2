@@ -186,6 +186,17 @@ export function MainScreen({
           style={styles.button}
           styleDisabled={styles.buttonDisabled}
           onPress={() => {
+            InAppStorySDK.showEditor();
+          }}
+        >
+          Open editor
+        </Button>
+        <View style={styles.pad32} />
+        <Button
+          containerStyle={styles.buttonContainer}
+          style={styles.button}
+          styleDisabled={styles.buttonDisabled}
+          onPress={() => {
             navigation.navigate('NetworkLogger');
           }}
         >

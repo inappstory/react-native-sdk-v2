@@ -55,5 +55,9 @@
 	<false/>
 	<key>NSCameraUsageDescription</key>
 	<string>$(PRODUCT_NAME) needs access to your Camera.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Description shown in the system permission window</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Description shown in the system permission window</string>
 </dict>
 </plist>

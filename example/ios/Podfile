@@ -16,7 +16,10 @@ end
 
 target 'InappstorySdkExample' do
   config = use_native_modules!
-  pod 'InAppStory', :git => 'https://github.com/inappstory/ios-sdk.git', :tag => '1.23.2'
+  pod 'InAppStory', :git => 'https://github.com/inappstory/ios-sdk.git', :tag => '1.23.3'
+  pod 'InAppStoryUGC', :git => 'https://github.com/inappstory/ios-ugc-sdk.git', :tag => '1.3.1'
+  pod 'IASFilePicker', :git => 'https://github.com/inappstory/ios-filepicker.git', :tag => '0.1.0'
+
   use_react_native!(
     :path => config[:reactNativePath],
     # An absolute path to your application root.

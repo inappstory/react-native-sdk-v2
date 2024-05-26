@@ -7,6 +7,7 @@
 
 import Foundation
 import InAppStorySDK
+import InAppStoryUGC
 
 //import ReactBridge
 
@@ -246,7 +247,14 @@ class RNInAppStorySDKModule: NSObject {
   @objc
   func setUserID(_ _userID: String) {
         DispatchQueue.main.async {
-          InAppStory.shared.settings = Settings(userID: _userID)
+            InAppStory.shared.settings?.userID = _userID
+        }
+  }
+
+  @objc
+  func setLang(_ lang: String) {
+        DispatchQueue.main.async {
+          InAppStory.shared.settings = Settings(lang: lang)
         }
   }
 
@@ -411,7 +419,15 @@ class RNInAppStorySDKModule: NSObject {
           })
       }
   }
+  @objc
+  func showEditor() {
+    DispatchQueue.main.async {
+      let vc = UIApplication.shared.firstKeyWindow?.rootViewController
+      InAppStoryEditor.shared.showEditor(payload: nil, from: vc!) {show in
 
+      }
+    }
+  }
   @objc
   func showSingle(_ storyID: String) {
       DispatchQueue.main.async {

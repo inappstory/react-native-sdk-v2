@@ -112,8 +112,7 @@ export class StoryManager extends StoryManagerV1 {
     }
     if (config.lang) {
       this.lang = config.lang;
-      //FIXME
-      //InAppStorySDK.setLang(config.lang);
+      InAppStorySDK.setLang(config.lang);
     }
     if (config.defaultMuted) {
       this.soundEnabled = false;
@@ -172,7 +171,7 @@ export class StoryManager extends StoryManagerV1 {
   setLang(lang: string): void {
     super.setLang(lang);
     this.lang = lang;
-    //InAppStorySDK.setLang(lang);
+    InAppStorySDK.setLang(lang);
   }
   setPlaceholders(placeholders: any): void {
     super.setPlaceholders(placeholders);
@@ -186,9 +185,9 @@ export class StoryManager extends StoryManagerV1 {
     return new Promise((resolve, reject) => {
       if (appearanceManager.commonOptions.hasLike) {
         InAppStorySDK.setHasLike(appearanceManager.commonOptions.hasLikeButton);
-        InAppStorySDK.setHasDislike(
+        /*InAppStorySDK.setHasDislike(
           appearanceManager.commonOptions.hasDislikeButton
-        );
+        );*/
 
         InAppStorySDK.setHasFavorites(
           appearanceManager.commonOptions.hasFavorite
@@ -259,7 +258,7 @@ export class AppearanceManager extends AppearanceManagerV1 {
     }>
   ) {
     InAppStorySDK.setHasLike(options.hasLike);
-    InAppStorySDK.setHasDislike(options.hasDislikeButton);
+    //InAppStorySDK.setHasDislike(options.hasDislikeButton);
     InAppStorySDK.setHasFavorites(options.hasFavorite);
     InAppStorySDK.setHasShare(options.hasShare);
     return super.setCommonOptions(options);

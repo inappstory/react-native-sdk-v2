@@ -63,6 +63,11 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
   fun setUserID(userId: String) {
       Log.d("InappstorySdkModule", "setUserID")
       this.ias?.setUserId(userId)
+  }
+  @ReactMethod
+  fun setLang(lang: String) {
+      Log.d("InappstorySdkModule", "setLang")
+      this.ias?.setLang(lang)
     }
 
   fun setupListeners() {

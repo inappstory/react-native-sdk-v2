@@ -19,6 +19,8 @@ RCT_EXTERN_METHOD(sliderEvent:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromi
 RCT_EXTERN_METHOD(showGame:(NSString *)gameID)
 RCT_EXTERN_METHOD(showOnboardings:(NSString *)feed limit:(NSInteger)limit tags:(nullable NSArray<NSString *> *)tags)
 RCT_EXTERN_METHOD(showSingle:(NSString *)storyID)
+RCT_EXTERN_METHOD(showEditor)
+
 
 RCT_EXTERN_METHOD(removeFromFavorite:(NSString *)storyID)
 RCT_EXTERN_METHOD(removeAllFavorites)
@@ -36,6 +38,8 @@ RCT_EXTERN_METHOD(setHasFavorites:(BOOL *)value)
 RCT_EXTERN_METHOD(setHasShare:(BOOL *)value)
 
 RCT_EXTERN_METHOD(setUserID:(NSString *)userID)
+RCT_EXTERN_METHOD(setLang:(NSString *)lang)
+
 
 RCT_EXTERN_METHOD(getFavoritesCount:(NSString *)userID resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 

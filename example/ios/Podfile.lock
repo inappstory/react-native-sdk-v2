@@ -7,7 +7,9 @@ PODS:
   - hermes-engine (0.74.0):
     - hermes-engine/Pre-built (= 0.74.0)
   - hermes-engine/Pre-built (0.74.0)
-  - InAppStory (1.23.2)
+  - IASFilePicker (0.1.0)
+  - InAppStory (1.23.3)
+  - InAppStoryUGC (1.3.1)
   - RCT-Folly (2024.01.01.00):
     - boost
     - DoubleConversion
@@ -1325,7 +1327,9 @@ DEPENDENCIES:
   - fmt (from `../node_modules/react-native/third-party-podspecs/fmt.podspec`)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
-  - InAppStory (from `https://github.com/inappstory/ios-sdk.git`, tag `1.23.2`)
+  - IASFilePicker (from `https://github.com/inappstory/ios-filepicker.git`, tag `0.1.0`)
+  - InAppStory (from `https://github.com/inappstory/ios-sdk.git`, tag `1.23.3`)
+  - InAppStoryUGC (from `https://github.com/inappstory/ios-ugc-sdk.git`, tag `1.3.1`)
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCT-Folly/Fabric (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCTDeprecation (from `../node_modules/react-native/ReactApple/Libraries/RCTFoundation/RCTDeprecation`)
@@ -1410,9 +1414,15 @@ EXTERNAL SOURCES:
   hermes-engine:
     :podspec: "../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec"
     :tag: hermes-2024-02-20-RNv0.74.0-999cfd9979b5f57b1269119679ab8cdf60897de9
+  IASFilePicker:
+    :git: https://github.com/inappstory/ios-filepicker.git
+    :tag: 0.1.0
   InAppStory:
     :git: https://github.com/inappstory/ios-sdk.git
-    :tag: 1.23.2
+    :tag: 1.23.3
+  InAppStoryUGC:
+    :git: https://github.com/inappstory/ios-ugc-sdk.git
+    :tag: 1.3.1
   RCT-Folly:
     :podspec: "../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec"
   RCTDeprecation:
@@ -1539,9 +1549,15 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 CHECKOUT OPTIONS:
+  IASFilePicker:
+    :git: https://github.com/inappstory/ios-filepicker.git
+    :tag: 0.1.0
   InAppStory:
     :git: https://github.com/inappstory/ios-sdk.git
-    :tag: 1.23.2
+    :tag: 1.23.3
+  InAppStoryUGC:
+    :git: https://github.com/inappstory/ios-ugc-sdk.git
+    :tag: 1.3.1
 
 SPEC CHECKSUMS:
   boost: d3f49c53809116a5d38da093a8aa78bf551aed09
@@ -1550,7 +1566,9 @@ SPEC CHECKSUMS:
   fmt: 4c2741a687cc09f0634a2e2c72a838b99f1ff120
   glog: c5d68082e772fa1c511173d6b30a9de2c05a69a2
   hermes-engine: 6eae7edb2f563ee41d7c1f91f4f2e57c26d8a5c3
-  InAppStory: a378018e315e457aa241206a205ef9ee1f1de551
+  IASFilePicker: ad25941d7bd2cbd63ad6491f8d3ebe8b95618e58
+  InAppStory: 47fd2921df344243293d5704cfcc9fe61e9ebbf8
+  InAppStoryUGC: e3cefdf3e5a24930b369bfbfdcc87b15afc3bfc3
   RCT-Folly: 045d6ecaa59d826c5736dfba0b2f4083ff8d79df
   RCTDeprecation: 3ca8b6c36bfb302e1895b72cfe7db0de0c92cd47
   RCTRequired: 9fc183af555fd0c89a366c34c1ae70b7e03b1dc5
@@ -1616,6 +1634,6 @@ SPEC CHECKSUMS:
   VisionCamera: 59949b04a51c00a52a6d7125425d01664792c9bd
   Yoga: ff1d575b119f510a5de23c22a794872562078ccf
 
-PODFILE CHECKSUM: 4b0554a8a41b2430e77e1fd0e9eac925c4ddfb07
+PODFILE CHECKSUM: 12711c5637c5670d80285184084e8ec563ac23dc
 
 COCOAPODS: 1.14.3
