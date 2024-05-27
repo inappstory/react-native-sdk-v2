@@ -6,7 +6,12 @@ import {
 } from 'react-native';
 type InappstorySdkProps = {
   color?: string;
+  tags?: string[];
+  placeholders?: string[];
+  imagePlaceholders?: string[];
+  userID?: string;
   style?: ViewStyle;
+  feed?: string;
   ref?: any;
 };
 const LINKING_ERROR =

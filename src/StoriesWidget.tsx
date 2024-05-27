@@ -10,7 +10,14 @@ const createFragment = (viewId) =>
     [viewId]
   );
 
-export const StoriesWidget = ({ onViewLoaded }) => {
+export const StoriesWidget = ({
+  onViewLoaded,
+  tags,
+  placeholders,
+  imagePlaceholders,
+  userID,
+  feed,
+}) => {
   const ref = useRef(null);
   useEffect(() => {
     const viewId = findNodeHandle(ref.current);
@@ -19,16 +26,20 @@ export const StoriesWidget = ({ onViewLoaded }) => {
     }
     onViewLoaded(viewId);
   }, [onViewLoaded]);
-
   return (
     <InappstorySdkViewManager
       style={{
         // converts dpi to px, provide desired height
-        height: PixelRatio.getPixelSizeForLayoutSize(100),
+        height: PixelRatio.getPixelSizeForLayoutSize(120),
         // converts dpi to px, provide desired width
-        width: PixelRatio.getPixelSizeForLayoutSize(400),
+        width: PixelRatio.getPixelSizeForLayoutSize(170),
       }}
+      tags={tags}
       ref={ref}
+      placeholders={placeholders}
+      imagePlaceholders={imagePlaceholders}
+      userID={userID}
+      feed={feed}
     />
   );
 };

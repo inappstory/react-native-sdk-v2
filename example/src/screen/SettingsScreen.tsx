@@ -167,7 +167,6 @@ export function SettingsScreen(): React.ReactNode {
               label={'Select Position'}
               onValueChange={(itemValue, _itemIndex) => {
                 setCloseButtonPosition(itemValue);
-                console.error('closebutton = ', itemValue);
                 InAppStorySDK.setCloseButtonPosition(itemValue);
               }}
               items={[

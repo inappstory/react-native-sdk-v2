@@ -70,7 +70,11 @@ export function MainScreen({
     await storiesListViewModel.current?.reload();
     setRefreshing(false);
   }, []);
-
+  useFocusEffect(
+    React.useCallback(() => {
+      onRefresh();
+    }, [onRefresh])
+  );
   return (
     <SafeAreaView style={[styles.container, backgroundStyle]}>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
@@ -125,6 +129,7 @@ export function MainScreen({
         >
           Remove tags
         </Button>
+
         <View style={styles.pad32} />
         <Button
           containerStyle={styles.buttonContainer}

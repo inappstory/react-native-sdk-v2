@@ -4,7 +4,7 @@ import InAppStorySDK
 class InappstorySdkViewManager: RCTViewManager {
   var storyView: StoryView!
   override func view() -> (InappstorySdkView) {
-    let rect = CGRect(x: 0, y: 0, width: 300, height: 300);
+    let rect = CGRect(x: 0, y: 0, width: 300, height: 150);
     let v = InappstorySdkView()
     storyView = StoryView(frame: rect, feed: "default", favorite: false)
     storyView.target = {
@@ -49,6 +49,32 @@ class InappstorySdkView : UIView {
   @objc var color: String = "" {
     didSet {
       self.backgroundColor = hexStringToUIColor(hexColor: color)
+    }
+  }
+  @objc var userID: String = "" {
+    didSet {
+      let storyview = self.subviews.first(where: { $0 is StoryView }) as! StoryView
+      storyview.refresh()
+    }
+  }
+  @objc var tags: [String] = [""] {
+    didSet {
+      let storyview = self.subviews.first(where: { $0 is StoryView }) as! StoryView
+      storyview.refresh(newTags: tags)
+    }
+  }
+
+  @objc var placeholders: [String] = [""] {
+    didSet {
+      let storyview = self.subviews.first(where: { $0 is StoryView }) as! StoryView
+      storyview.refresh()
+    }
+  }
+
+  @objc var imagePlaceholders: [String] = [""] {
+    didSet {
+      let storyview = self.subviews.first(where: { $0 is StoryView }) as! StoryView
+      storyview.refresh()
     }
   }
 

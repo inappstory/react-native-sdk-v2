@@ -19,24 +19,12 @@ class RNInAppStorySDKModule: NSObject {
   @objc private var _hasFavorites: Bool = true
   @objc private var _hasShare: Bool = true
   @objc private var _userID: String = ""
+  @objc private var _lang: String = ""
+  @objc private var _tags: [String] = [""]
+      
   @objc
   func constantsToExport() -> [AnyHashable : Any]! {
     return ["count": 1]
-  }
-
-  @objc func getStories(resolve:@escaping RCTPromiseResolveBlock, reject:@escaping RCTPromiseRejectBlock) {
-    // TODO
-    resolve(nil)
-  }
-
-  @objc func getFavoriteStories(resolve:@escaping RCTPromiseResolveBlock, reject:@escaping RCTPromiseRejectBlock) {
-    // TODO
-    resolve(nil)
-  }
-
-   @objc func sliderEvent(resolve:@escaping RCTPromiseResolveBlock, reject:@escaping RCTPromiseRejectBlock) {
-    // TODO
-    resolve(nil)
   }
 
   //@ReactMethod
@@ -54,14 +42,38 @@ class RNInAppStorySDKModule: NSObject {
         // the parameter is responsible for animation of the reader display when you tap on a story cell
         InAppStory.shared.presentationStyle = .zoom
         InAppStory.shared.initWith(serviceKey: apiKey, settings: Settings(userID: userID))
-
-        InAppStory.shared.storyReaderWillShow = {showed in 
+        
+        InAppStory.shared.storyReaderWillShow = {showed in
             NSLog("TODO: storyReaderWillShow closure");
         }
         
         InAppStory.shared.storyReaderDidClose = { showed in
             NSLog("TODO: storyReaderDidClose closure");
         }
+        InAppStory.shared.gameEvent = { gameEvent in
+            NSLog("TODO: gameEvent");
+            switch gameEvent {
+            case .closeGame(gameData: let gameData):
+                NSLog("closeGame")
+                print(gameData)
+            case .startGame(gameData: let gameData):
+                NSLog("startGame")
+                print(gameData)
+            case .finishGame(gameData: let gameData, result: let result):
+                NSLog("finishGame")
+                print(gameData, result)
+            case .eventGame(gameData: let gameData, name: let name, payload: let payload):
+                NSLog("eventGame")
+                print(gameData, name ,payload)
+            case .gameFailure(gameData: let gameData, message: let message):
+                NSLog("gameFailure")
+                print(gameData, message)
+
+            @unknown default:
+                NSLog("WARNING: unknown gameEvent")
+            }
+        }
+        /*
         InAppStory.shared.storiesEvent = { storiesEvent in
             NSLog("TODO: storiesEvent");
             switch storiesEvent {
@@ -105,29 +117,7 @@ class RNInAppStorySDKModule: NSObject {
                     NSLog("WARNING: unknown storiesEvent")
             }
         }
-        InAppStory.shared.gameEvent = { gameEvent in
-            NSLog("TODO: gameEvent");
-            switch gameEvent {
-            case .closeGame(gameData: let gameData):
-                NSLog("closeGame")
-                print(gameData)
-            case .startGame(gameData: let gameData):
-                NSLog("startGame")
-                print(gameData)
-            case .finishGame(gameData: let gameData, result: let result):
-                NSLog("finishGame")
-                print(gameData, result)
-            case .eventGame(gameData: let gameData, name: let name, payload: let payload):
-                NSLog("eventGame")
-                print(gameData, name ,payload)
-            case .gameFailure(gameData: let gameData, message: let message):
-                NSLog("gameFailure")
-                print(gameData, message)
-
-            @unknown default:
-                NSLog("WARNING: unknown gameEvent")
-            }
-        }
+        
         InAppStory.shared.failureEvent = { failureEvent in
             NSLog("TODO: failureEvent");
             switch failureEvent {
@@ -184,6 +174,7 @@ class RNInAppStorySDKModule: NSObject {
         InAppStory.shared.stackFeedUpdate = { newFeed in
             NSLog("TODO: goodItemSelected closure");
         }
+         */
         /*
         InAppStory.shared.sizeForItem = { showed in
             NSLog("TODO: sizeForItem closure");
@@ -243,10 +234,20 @@ class RNInAppStorySDKModule: NSObject {
     //.networkFailure(message: String)
     //.requestFailure(message: String, statusCode: Int)	
   }
-  
+  @objc
+  func showEditor() {
+    DispatchQueue.main.async {
+      let vc = UIApplication.shared.firstKeyWindow?.rootViewController
+      InAppStoryEditor.shared.showEditor(payload: nil, from: vc!) {show in
+
+      }
+    }
+  }
   @objc
   func setUserID(_ _userID: String) {
         DispatchQueue.main.async {
+           NSLog("setUserID")
+            self._userID = _userID
             InAppStory.shared.settings?.userID = _userID
         }
   }
@@ -254,13 +255,19 @@ class RNInAppStorySDKModule: NSObject {
   @objc
   func setLang(_ lang: String) {
         DispatchQueue.main.async {
-          InAppStory.shared.settings = Settings(lang: lang)
+          NSLog("setLang")
+            self._lang = lang;
+            InAppStory.shared.settings = Settings(userID:self._userID, tags: self._tags, lang: lang)
         }
   }
 
   @objc
   func setTags(_ tags: [String]) {
         DispatchQueue.main.async {
+          NSLog("setTags")
+            self._tags = tags
+            InAppStory.shared.settings = Settings(userID:self._userID,tags: self._tags, lang: self._lang)
+            InAppStory.shared.settings?.tags = tags
           InAppStory.shared.setTags(tags)
         }
   }
@@ -275,6 +282,9 @@ class RNInAppStorySDKModule: NSObject {
   @objc
   func removeTags(_ tags: [String]) {
         DispatchQueue.main.async {
+            NSLog("removeTags")
+            print(tags)
+          InAppStory.shared.settings = Settings(userID:self._userID,tags: ["tag3"], lang: self._lang)
           InAppStory.shared.removeTags(tags)
         }
   }
@@ -419,15 +429,7 @@ class RNInAppStorySDKModule: NSObject {
           })
       }
   }
-  @objc
-  func showEditor() {
-    DispatchQueue.main.async {
-      let vc = UIApplication.shared.firstKeyWindow?.rootViewController
-      InAppStoryEditor.shared.showEditor(payload: nil, from: vc!) {show in
 
-      }
-    }
-  }
   @objc
   func showSingle(_ storyID: String) {
       DispatchQueue.main.async {

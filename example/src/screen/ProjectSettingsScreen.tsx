@@ -68,7 +68,12 @@ export function ProjectSettingsScreen({
     storyManager.imagePlaceholders
   );
   const [APIKey, setAPIKey] = useState(storyManager.apiKey);
-
+  React.useEffect(() => {
+    setTags(storyManager.tags);
+  }, []);
+  React.useEffect(() => {
+    storyManager.setTags(tags);
+  }, [tags]);
   React.useEffect(() => {
     if (!hasPermission) {
       requestPermission();
@@ -84,7 +89,6 @@ export function ProjectSettingsScreen({
         var url = codes[0]?.value;
         if (url) {
           const params = extractParamsFromQR(url);
-          console.error(('params = ', params.api_key));
           setAPIKey(params.api_key);
           if (params.api_key) {
             storyManager.setApiKey(params.api_key);
@@ -112,7 +116,7 @@ export function ProjectSettingsScreen({
     },
   });
   useEffect(() => {
-    InAppStorySDK.setTags(['tag1']);
+    InAppStorySDK.setTags(tags);
   }, [tags]);
   useEffect(() => {
     //InAppStorySDK.setPlaceholders({ username: 'User1' });
@@ -141,7 +145,10 @@ export function ProjectSettingsScreen({
         >
           <Button onPress={changeUserID}>Change user</Button>
           <Text>Tags:</Text>
-          <TextInput onChangeText={(value) => setTags(value)} value={tags} />
+          <TextInput
+            onChangeText={(value) => setTags(value.split(','))}
+            value={tags.join(',')}
+          />
           <Text>Placeholders</Text>
           <TextInput onChangeText={setPlaceholders} value={placeholders} />
           <Text>Image Placeholders</Text>
