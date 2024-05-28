@@ -487,21 +487,23 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   @objc
   func setPlaceholderElementColor(_ value: String) {
         DispatchQueue.main.async {
-            InAppStory.shared.placeholderElementColor = RCTConvert.uiColor(value)
+            InAppStory.shared.placeholderElementColor = UIColor(hex: value)!
         }
   }
 
   @objc
   func setPlaceholderBackgroundColor(_ value: String) {
         DispatchQueue.main.async {
-          InAppStory.shared.placeholderBackgroundColor = RCTConvert.uiColor(value)
+          InAppStory.shared.placeholderBackgroundColor = UIColor(hex: value)!
         }
   }
 
   @objc
   func setReaderBackgroundColor(_ value: String) {
         DispatchQueue.main.async {
-          InAppStory.shared.readerBackgroundColor = RCTConvert.uiColor(value)
+          NSLog("setReaderBackgroundColor");
+          print(value)
+            InAppStory.shared.readerBackgroundColor = UIColor(hex: value)!
         }
   }
 
@@ -550,14 +552,14 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   @objc
   func setCellBorderColor(_ value: String) {
         DispatchQueue.main.async {
-          InAppStory.shared.cellBorderColor = RCTConvert.uiColor(value)
+            InAppStory.shared.cellBorderColor = UIColor(hex: value)!
         }
   }
 
   @objc
   func setGoodsCellImageBackgroundColor(_ value: String) {
         DispatchQueue.main.async {
-          InAppStory.shared.goodsCellImageBackgroundColor = RCTConvert.uiColor(value)
+          InAppStory.shared.goodsCellImageBackgroundColor = UIColor(hex: value)!
         }
   }
 
@@ -571,14 +573,14 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   @objc
   func setGoodsCellMainTextColor(_ value: String) {
         DispatchQueue.main.async {
-          InAppStory.shared.goodsCellMainTextColor = RCTConvert.uiColor(value)
+          InAppStory.shared.goodsCellMainTextColor = UIColor(hex: value)!
         }
   }
 
   @objc
   func setGoodsCellOldPriceTextColor(_ value: String) {
         DispatchQueue.main.async {
-          InAppStory.shared.goodsCellOldPriceTextColor = RCTConvert.uiColor(value)
+          InAppStory.shared.goodsCellOldPriceTextColor = UIColor(hex: value)!
         }
   }
 /*
@@ -680,5 +682,47 @@ extension UIApplication {
                         .first(where: \.isKeyWindow)
         }
 
+    }
+}
+
+extension UIColor {
+    public convenience init?(hex: String) {
+        let r, g, b, a: CGFloat
+
+        if hex.hasPrefix("#") {
+            let start = hex.index(hex.startIndex, offsetBy: 1)
+            let hexColor = String(hex[start...])
+
+            if hexColor.count == 6 {
+                let scanner = Scanner(string: hexColor)
+                var hexNumber: UInt64 = 0
+
+                if scanner.scanHexInt64(&hexNumber) {
+                    r = CGFloat((hexNumber & 0xff000000) >> 24) / 255
+                    g = CGFloat((hexNumber & 0x00ff0000) >> 16) / 255
+                    b = CGFloat((hexNumber & 0x0000ff00) >> 8) / 255
+                    a = 1
+
+                    self.init(red: r, green: g, blue: b, alpha: a)
+                    return
+                }
+            }
+            if hexColor.count == 8 {
+                let scanner = Scanner(string: hexColor)
+                var hexNumber: UInt64 = 0
+
+                if scanner.scanHexInt64(&hexNumber) {
+                    r = CGFloat((hexNumber & 0xff000000) >> 24) / 255
+                    g = CGFloat((hexNumber & 0x00ff0000) >> 16) / 255
+                    b = CGFloat((hexNumber & 0x0000ff00) >> 8) / 255
+                    a = CGFloat(hexNumber & 0x000000ff) / 255
+
+                    self.init(red: r, green: g, blue: b, alpha: a)
+                    return
+                }
+            }
+        }
+
+        return nil
     }
 }

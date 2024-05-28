@@ -17,7 +17,7 @@ import Animated, {
   useAnimatedScrollHandler,
 } from 'react-native-reanimated';
 import { Slider } from '@miblanchard/react-native-slider';
-
+import ColorPicker from 'react-native-wheel-color-picker';
 //import DropDownPicker from 'react-native-dropdown-picker';
 import InAppStorySDK from 'react-native-inappstory-sdk';
 import SelectDropdown from 'react-native-select-dropdown';
@@ -295,10 +295,29 @@ export function SettingsScreen(): React.ReactNode {
             />
           </View>
           {/*<Text>FIXME: Timer gradient</Text>*/}
-          {/*<View style={styles.settingContainer}>
+          <View style={styles.settingContainer}>
             <Text>Reader background color</Text>
-            <Button onPress={setReaderBackgroundColor} />
-            </View>*/}
+
+            <ColorPicker
+              //color={this.state.currentColor}
+              swatchesOnly={true}
+              onColorChangeComplete={(color) => {
+                console.error(typeof color, color);
+                InAppStorySDK.setReaderBackgroundColor(color + 'ff');
+              }}
+              thumbSize={40}
+              sliderSize={40}
+              noSnap={true}
+              row={false}
+              //swatchesLast={this.state.swatchesLast}
+              swatches={true}
+              discrete={true}
+              //wheelLodingIndicator={<ActivityIndicator size={40} />}
+              //sliderLodingIndicator={<ActivityIndicator size={20} />}
+              //useNativeDriver={false}
+              //useNativeLayout={false}
+            />
+          </View>
           <View style={styles.settingContainer}>
             <Text>Reader Corner Radius</Text>
             <Slider

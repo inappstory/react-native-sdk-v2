@@ -78,6 +78,7 @@ export const useEvents = () => {
 };
 
 const createSession = async (apiKey: string, userId: any) => {
+  console.error(apiKey);
   const openSession = await fetch(
     'https://api.inappstory.ru/v2/session/open?expand=cache&fields=session%2Cserver_timestamp%2Cplaceholders%2Cimage_placeholders%2Cis_allow_profiling%2Cis_allow_statistic_v1%2Cis_allow_statistic_v2%2Cis_allow_ugc%2Ccache%2Cpreview_aspect_ratio&format=json',
     {
@@ -86,6 +87,7 @@ const createSession = async (apiKey: string, userId: any) => {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`,
+        'X-App-Package-Id': 'com.inappstory.ios',
       },
       body: JSON.stringify({
         platform: Platform.OS,
@@ -116,6 +118,7 @@ const fetchFeed = async (
         'Authorization': `Bearer ${apiKey}`,
         'Auth-Session-id': `${sessionId}}`,
         'X-User-id': `${userId}}`,
+        'X-App-Package-Id': 'com.inappstory.ios',
       },
     }
   );
@@ -239,7 +242,7 @@ export class StoryManager extends StoryManagerV1 {
     }
     if (config.placeholders) {
       this.placeholders = config.placeholders;
-      //InAppStorySDK.setPlaceholders(JSON.stringify(config.placeholders));
+      InAppStorySDK.setPlaceholders({ username: 'User1' });
     }
     if (config.lang) {
       this.lang = config.lang;
@@ -253,11 +256,10 @@ export class StoryManager extends StoryManagerV1 {
   setApiKey(apiKey: string): void {
     this.apiKey = apiKey;
     InAppStorySDK.initWith(this.apiKey, this.userId);
-
-    /*this.sessionId = '';
+    this.sessionId = '';
     createSession(this.apiKey, this.userId).then((sessionId) => {
       this.sessionId = sessionId;
-    });*/
+    });
   }
   async fetchFeed(feed: string) {
     if (this.sessionId) {
