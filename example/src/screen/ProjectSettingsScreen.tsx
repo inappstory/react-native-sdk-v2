@@ -50,7 +50,14 @@ function randomUserId(length: number) {
   }
   return result;
 }
-
+function isJsonString(str) {
+  try {
+    var j = JSON.parse(str);
+    return j;
+  } catch (e) {
+    return false;
+  }
+}
 export function ProjectSettingsScreen({
   navigation,
 }: {
@@ -63,17 +70,32 @@ export function ProjectSettingsScreen({
   const [QREnabled, setQREnabled] = useState(false);
 
   const [tags, setTags] = useState(storyManager.tags);
-  const [placeholders, setPlaceholders] = useState(storyManager.placeholders);
+  const [placeholders, setPlaceholders] = useState(
+    JSON.stringify(storyManager.placeholders)
+  );
   const [imagePlaceholders, setImagePlaceholders] = useState(
     storyManager.imagePlaceholders
   );
   const [APIKey, setAPIKey] = useState(storyManager.apiKey);
-  React.useEffect(() => {
+  useEffect(() => {
     setTags(storyManager.tags);
   }, []);
-  React.useEffect(() => {
+  useEffect(() => {
     storyManager.setTags(tags);
   }, [tags]);
+
+  useEffect(() => {
+    const json = isJsonString(imagePlaceholders);
+    if (json !== false) {
+      storyManager.setImagePlaceholders(json);
+    }
+  }, [imagePlaceholders]);
+  React.useEffect(() => {
+    const json = isJsonString(placeholders);
+    if (json !== false) {
+      storyManager.setPlaceholders(json);
+    }
+  }, [placeholders]);
   React.useEffect(() => {
     if (!hasPermission) {
       requestPermission();
@@ -115,16 +137,6 @@ export function ProjectSettingsScreen({
       scrollY.value = e.contentOffset.y;
     },
   });
-  useEffect(() => {
-    InAppStorySDK.setTags(tags);
-  }, [tags]);
-  useEffect(() => {
-    //InAppStorySDK.setPlaceholders({ username: 'User1' });
-  }, [placeholders]);
-
-  useEffect(() => {
-    //InAppStorySDK.setImagePlaceholders({ username: 'User1' });
-  }, [imagePlaceholders]);
 
   return (
     <SafeAreaView style={backgroundStyle}>
