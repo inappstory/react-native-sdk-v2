@@ -8,12 +8,17 @@
 import Foundation
 import InAppStorySDK
 import InAppStoryUGC
+import React
 
 //import ReactBridge
 
 //@ReactModule(jsName: "InAppStorySDK")
 @objc(RNInAppStorySDKModule)
-class RNInAppStorySDKModule: NSObject {
+class RNInAppStorySDKModule: RCTEventEmitter {
+  public static var emitter: RCTEventEmitter!
+  open override func supportedEvents() -> [String] {
+    ["startGame", "finishGame", "closeGame", "eventGame", "gameFailure"]      // etc. 
+  }
   @objc private var _hasLike: Bool = true
   @objc private var _hasDislike: Bool = true
   @objc private var _hasFavorites: Bool = true
@@ -23,10 +28,13 @@ class RNInAppStorySDKModule: NSObject {
   @objc private var _tags: [String] = [""]
       
   @objc
-  func constantsToExport() -> [AnyHashable : Any]! {
+  override func constantsToExport() -> [AnyHashable : Any]! {
     return ["count": 1]
   }
-
+  override init() {
+    super.init()
+    RNInAppStorySDKModule.emitter = self
+  }
   //@ReactMethod
   @objc func initWith(_ apiKey: String, userID: String) {
     DispatchQueue.main.async {
@@ -55,18 +63,23 @@ class RNInAppStorySDKModule: NSObject {
             switch gameEvent {
             case .closeGame(gameData: let gameData):
                 NSLog("closeGame")
+                RNInAppStorySDKModule.emitter.sendEvent(withName: "closeGame", body: [])
                 print(gameData)
             case .startGame(gameData: let gameData):
                 NSLog("startGame")
+                RNInAppStorySDKModule.emitter.sendEvent(withName: "startGame", body: [])
                 print(gameData)
             case .finishGame(gameData: let gameData, result: let result):
                 NSLog("finishGame")
+                RNInAppStorySDKModule.emitter.sendEvent(withName: "finishGame", body: [])
                 print(gameData, result)
             case .eventGame(gameData: let gameData, name: let name, payload: let payload):
                 NSLog("eventGame")
+                RNInAppStorySDKModule.emitter.sendEvent(withName: "eventGame", body: [])
                 print(gameData, name ,payload)
             case .gameFailure(gameData: let gameData, message: let message):
                 NSLog("gameFailure")
+                RNInAppStorySDKModule.emitter.sendEvent(withName: "gameFailure", body: [])
                 print(gameData, message)
 
             @unknown default:
@@ -646,7 +659,7 @@ class RNInAppStorySDKModule: NSObject {
 
 
   @objc
-  static func requiresMainQueueSetup() -> Bool {
+  override static func requiresMainQueueSetup() -> Bool {
     return true
   }
 }

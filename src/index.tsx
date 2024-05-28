@@ -1,4 +1,4 @@
-import { Platform } from 'react-native';
+import { NativeEventEmitter, Platform } from 'react-native';
 import * as React from 'react';
 import { Button, NativeModules, StyleSheet, Text, View } from 'react-native';
 import {
@@ -36,6 +36,45 @@ export {
   StoryReaderCloseButtonPosition,
   StoryReaderSwipeStyle,
   useIas,
+};
+
+export const useEvents = () => {
+  const [events, setEvents] = React.useState<any>([]);
+  React.useEffect(() => {
+    const eventEmitter = new NativeEventEmitter(
+      NativeModules.RNInAppStorySDKModule
+    );
+    let eventListeners = [];
+    //console.error(NativeModules.RNInAppStorySDKModule)
+    const gameEvents = [
+      'startGame',
+      'finishGame',
+      'closeGame',
+      'eventGame',
+      'gameFailure',
+    ];
+    gameEvents.forEach((eventName) => {
+      eventListeners.push(
+        eventEmitter.addListener(eventName, (event) => {
+          console.log('JS event = ' + eventName, event);
+          setEvents((_events) => {
+            _events.push({
+              event: eventName,
+              data: event,
+            });
+            return _events;
+          });
+        })
+      );
+    });
+    // Removes the listener once unmounted
+    return () => {
+      eventListeners.forEach((eventListener) => {
+        eventListener.remove();
+      });
+    };
+  }, []);
+  return events;
 };
 
 const createSession = async (apiKey: string, userId: any) => {
@@ -214,6 +253,7 @@ export class StoryManager extends StoryManagerV1 {
   setApiKey(apiKey: string): void {
     this.apiKey = apiKey;
     InAppStorySDK.initWith(this.apiKey, this.userId);
+
     /*this.sessionId = '';
     createSession(this.apiKey, this.userId).then((sessionId) => {
       this.sessionId = sessionId;

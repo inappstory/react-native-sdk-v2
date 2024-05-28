@@ -6,8 +6,9 @@
 //
 
 #import <React/RCTBridgeModule.h>
+#import <React/RCTEventEmitter.h>
 
-@interface RCT_EXTERN_MODULE(RNInAppStorySDKModule, NSObject)
+@interface RCT_EXTERN_MODULE(RNInAppStorySDKModule, RCTEventEmitter)
 
 RCT_EXTERN_METHOD(initWith:(NSString *)apiKey userID:(NSString *)userID)
 
@@ -77,6 +78,21 @@ RCT_EXTERN_METHOD(setGoodsCellImageBackgroundColor:(NSString *)color)
 RCT_EXTERN_METHOD(setGoodsCellImageCornerRadius:(double *)color)
 RCT_EXTERN_METHOD(setGoodsCellMainTextColor:(NSString *)color)
 RCT_EXTERN_METHOD(setGoodsCellOldPriceTextColor:(NSString *)color)
+
+RCT_EXTERN_METHOD(setLikeImage:(NSString *)color)
+RCT_EXTERN_METHOD(setLikeSelectedImage:(NSString *)color)
+RCT_EXTERN_METHOD(setDislikeImage:(NSString *)color)
+RCT_EXTERN_METHOD(setDislikeSelectedImage:(NSString *)color)
+RCT_EXTERN_METHOD(setFavoriteImage:(NSString *)color)
+RCT_EXTERN_METHOD(setFavoriteSelectedImag:(NSString *)color)
+RCT_EXTERN_METHOD(setShareImage:(NSString *)color)
+RCT_EXTERN_METHOD(setShareSelectedImage:(NSString *)color)
+RCT_EXTERN_METHOD(setsoundmage:(NSString *)color)
+RCT_EXTERN_METHOD(setSoundSelectedImage:(NSString *)color)
+RCT_EXTERN_METHOD(setCloseReaderImage:(NSString *)color)
+RCT_EXTERN_METHOD(setRefreshImage:(NSString *)color)
+RCT_EXTERN_METHOD(setRefreshGoodsImage:(NSString *)color)
+RCT_EXTERN_METHOD(setGoodsCloseImage:(NSString *)color)
 
 
 
