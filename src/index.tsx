@@ -24,6 +24,7 @@ import type {
   StoriesListClickEvent,
 } from 'react-native-ias/types/AppearanceManager';
 import { StoriesList } from './stories/StoriesList';
+import { storyManager } from '../example/src/services/StoryService';
 export {
   type ListLoadStatus,
   StoriesListCardTitlePosition,
@@ -37,6 +38,7 @@ export {
   StoryReaderSwipeStyle,
   useIas,
 };
+//import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const useEvents = () => {
   const [events, setEvents] = React.useState<any>([]);
@@ -52,11 +54,15 @@ export const useEvents = () => {
       'closeGame',
       'eventGame',
       'gameFailure',
+      'getGoodsObject',
     ];
     gameEvents.forEach((eventName) => {
       eventListeners.push(
         eventEmitter.addListener(eventName, (event) => {
-          console.log('JS event = ' + eventName, event);
+          if (eventName == 'getGoodsObject') {
+            storyManager.fetchGoods(event);
+          }
+          console.error('new event', eventName, event);
           setEvents((_events) => {
             _events.push({
               event: eventName,
@@ -78,7 +84,6 @@ export const useEvents = () => {
 };
 
 const createSession = async (apiKey: string, userId: any) => {
-  console.error(apiKey);
   const openSession = await fetch(
     'https://api.inappstory.ru/v2/session/open?expand=cache&fields=session%2Cserver_timestamp%2Cplaceholders%2Cimage_placeholders%2Cis_allow_profiling%2Cis_allow_statistic_v1%2Cis_allow_statistic_v2%2Cis_allow_ugc%2Ccache%2Cpreview_aspect_ratio&format=json',
     {
@@ -135,6 +140,7 @@ export class StoryManager extends StoryManagerV1 {
   imagePlaceholders: any = '';
   lang: string = '';
   soundEnabled: boolean = true;
+  getGoodsCallback: Function = () => {};
   constructor(config: StoryManagerConfig) {
     super(config);
     InAppStorySDK.initWith(config.apiKey, config.userId);
@@ -242,7 +248,7 @@ export class StoryManager extends StoryManagerV1 {
     }
     if (config.placeholders) {
       this.placeholders = config.placeholders;
-      InAppStorySDK.setPlaceholders({ username: 'User1' });
+      //InAppStorySDK.setPlaceholders(config.placeholders);
     }
     if (config.lang) {
       this.lang = config.lang;
@@ -252,6 +258,17 @@ export class StoryManager extends StoryManagerV1 {
       this.soundEnabled = false;
       InAppStorySDK.changeSound(false);
     }
+  }
+  async fetchGoods(_skus: string[]) {
+    //AsyncStorage.setItem('IAS_GOODS_LOADING', '1');
+    /*const goods = await this.getGoodsCallback(skus);
+    goods.map((good) => {
+      // AsyncStorage.setItem('IAS_GOODS_' + good.sku, JSON.stringify(good));
+    });*/
+    //AsyncStorage.setItem('IAS_GOODS_LOADING', '0');
+  }
+  getGoodsObject(callback: any) {
+    this.getGoodsCallback = callback;
   }
   setApiKey(apiKey: string): void {
     this.apiKey = apiKey;
@@ -316,6 +333,11 @@ export class StoryManager extends StoryManagerV1 {
     super.setPlaceholders(placeholders);
     this.placeholders = placeholders;
     InAppStorySDK.setPlaceholders(placeholders);
+  }
+  setImagePlaceholders(placeholders: any): void {
+    //super.setImagePlaceholders(placeholders);
+    this.imagePlaceholders = placeholders;
+    InAppStorySDK.setImagesPlaceholders(placeholders);
   }
   showStory(
     storyId: string | number,
@@ -448,10 +470,10 @@ export class AppearanceManager extends AppearanceManagerV1 {
       shareButton: { svgSrc: { baseState: string } };
     }>
   ) {
-    InAppStorySDK.setCloseButtonPosition(
+    /*InAppStorySDK.setCloseButtonPosition(
       options.closeButtonPosition || 'right'
     );
-    InAppStorySDK.setScrollStyle(options.scrollStyle || 'cover');
+    InAppStorySDK.setScrollStyle(options.scrollStyle || 'cover');*/
     return super.setStoryReaderOptions(options);
   }
   setStoriesListOptions(

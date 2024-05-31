@@ -10,6 +10,8 @@ import android.util.Log
 
 import com.inappstory.sdk.InAppStoryManager;
 import com.inappstory.sdk.AppearanceManager;
+import com.inappstory.sdk.ugc.UGCInAppStoryManager;
+
 import com.inappstory.sdk.stories.outercallbacks.common.errors.ErrorCallback;
 import com.inappstory.sdk.stories.outercallbacks.common.gamereader.GameReaderCallback;
 import com.inappstory.sdk.game.reader.GameStoryData;
@@ -32,10 +34,21 @@ import com.inappstory.sdk.stories.outercallbacks.common.reader.ShowSlideCallback
 import com.inappstory.sdk.stories.outercallbacks.common.reader.ShowStoryAction;
 import com.inappstory.sdk.stories.outercallbacks.common.reader.CloseReader;
 
+import com.inappstory.sdk.stories.ui.views.goodswidget.ICustomGoodsItem;
+import com.inappstory.sdk.stories.ui.views.goodswidget.ICustomGoodsWidget;
+
 import com.facebook.react.bridge.ReadableArray;
 
 import com.facebook.react.bridge.Promise;
+import com.inappstory.sdk.stories.ui.views.goodswidget.GetGoodsDataCallback;
+import com.inappstory.sdk.stories.ui.views.goodswidget.GoodsItemData;
+import com.inappstory.sdk.stories.ui.views.goodswidget.IGoodsWidgetAppearance;
+import com.facebook.react.modules.core.DeviceEventManagerModule
+import androidx.recyclerview.widget.RecyclerView
 
+import java.util.Locale
+import android.view.View
+import com.facebook.react.bridge.WritableMap;
 
 /*
 idgetEventName,
@@ -90,10 +103,53 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
   @ReactMethod
   fun setLang(lang: String) {
       Log.d("InappstorySdkModule", "setLang")
-      this.ias?.setLang(lang)
+      this.ias?.setLang(Locale.forLanguageTag("en-US"))
     }
 
   fun setupListeners() {
+    //Goods widget
+    this.appearanceManager?.csCustomGoodsWidget(object : ICustomGoodsWidget {
+        override fun getWidgetView(context: Context): View? {
+            return null;
+        }
+
+        override fun getItem(): ICustomGoodsItem? {
+            return null;
+        }
+
+        override fun getWidgetAppearance(): IGoodsWidgetAppearance? {
+            return null;
+        }
+
+        override fun getDecoration(): RecyclerView.ItemDecoration? {
+            return null;
+        }
+
+        public override fun getSkus(skus: ArrayList<String>, callback: GetGoodsDataCallback) {
+            val goodsItemData: ArrayList<GoodsItemData> = ArrayList<GoodsItemData>()
+            for (sku: String in skus) {
+                val data = GoodsItemData(
+                    sku,
+                    "title_$sku",
+                    "desc_$sku",
+                    "https://media.istockphoto.com/photos/big-and-small-picture-id172759822",
+                    "10",
+                    "20",
+                    sku
+                )
+                goodsItemData.add(data)
+            }
+            callback.onSuccess(goodsItemData)
+        }
+
+        override fun onItemClick(
+            goodsItemView: View,
+            goodsItemData: GoodsItemData,
+            callback: GetGoodsDataCallback
+        ) {
+            return;
+        }
+    });
     this.ias?.setShowStoryCallback(
         object : ShowStoryCallback {
             override fun showStory(
@@ -304,20 +360,21 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
 
   @ReactMethod
   fun setTags(tags: ReadableArray) {
-      Log.d("InappstorySdkModule", "setTags")
-      this.ias?.setTags(tags)
+    Log.d("InappstorySdkModule", "setTags")
+    val list: ArrayList<String> = tags.toArrayList() as ArrayList<String>
+    this.ias?.setTags(list)
   }
   
   @ReactMethod
   fun setPlaceholders(placeholders: ReadableArray) {
       Log.d("InappstorySdkModule", "setPlaceholders")
-      this.ias?.setPlaceholders(placeholders)
+      //FIXME: this.ias?.setPlaceholders(placeholders)
   }
 
   @ReactMethod
   fun setImagesPlaceholders(imagePlaceholders: ReadableArray) {
       Log.d("InappstorySdkModule", "setImagesPlaceholders")
-      this.ias?.setImagePlaceholders(imagePlaceholders)
+      //FIXME: this.ias?.setImagePlaceholders(imagePlaceholders)
   }
 
   @ReactMethod
@@ -329,35 +386,35 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
   @ReactMethod
   fun setHasLike(value: Boolean) {
       Log.d("InappstorySdkModule", "setHasLike")
-      this.appearanceManager.csHasLike(value);
+      this.appearanceManager?.csHasLike(value);
   }
 
   @ReactMethod
   fun setHasFavorites(value: Boolean) {
       Log.d("InappstorySdkModule", "setHasFavorites")
-      this.appearanceManager.csHasFavorite(value);
+      this.appearanceManager?.csHasFavorite(value);
   }
 
   @ReactMethod
   fun setHasShare(value: Boolean) {
       Log.d("InappstorySdkModule", "setHasShare")
-      this.appearanceManager.csHasShare(value);
+      this.appearanceManager?.csHasShare(value);
   }
 
   @ReactMethod
   fun setPresentationStyle(style: String) {
       Log.d("InappstorySdkModule", "setPresentationStyle")
       if (style == "zoom") {
-        this.appearanceManager.csStoryReaderPresentationStyle(0)
+        this.appearanceManager?.csStoryReaderPresentationStyle(0)
       }
       if (style == "fade") {
-        this.appearanceManager.csStoryReaderPresentationStyle(1)
+        this.appearanceManager?.csStoryReaderPresentationStyle(1)
       }
       if (style == "popup") {
-        this.appearanceManager.csStoryReaderPresentationStyle(2)
+        this.appearanceManager?.csStoryReaderPresentationStyle(2)
       }
       if (style == "disable") {
-        this.appearanceManager.csStoryReaderPresentationStyle(-1)
+        this.appearanceManager?.csStoryReaderPresentationStyle(-1)
       }
   }
 
@@ -365,53 +422,53 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
   fun setScrollStyle(scrollStyle: String) {
       Log.d("InappstorySdkModule", "setScrollStyle")
       if (scrollStyle == "depth") {
-        this.appearanceManager.csStoryReaderAnimation(1)
+        this.appearanceManager?.csStoryReaderAnimation(1)
       }
       if (scrollStyle == "cube") {
-        this.appearanceManager.csStoryReaderAnimation(2)
+        this.appearanceManager?.csStoryReaderAnimation(2)
       }
       if (scrollStyle == "cover") {
-        this.appearanceManager.csStoryReaderAnimation(3)
+        this.appearanceManager?.csStoryReaderAnimation(3)
       }
       if (scrollStyle == "flat") {
-        this.appearanceManager.csStoryReaderAnimation(4)
+        this.appearanceManager?.csStoryReaderAnimation(4)
       }
   }
 
   @ReactMethod
   fun setSwipeToClose(value: Boolean) {
       Log.d("InappstorySdkModule", "setSwipeToClose")
-      this.appearanceManager.csCloseOnSwipe(value)
+      this.appearanceManager?.csCloseOnSwipe(value)
   }
 
   @ReactMethod
   fun setOverScrollToClose(value: Boolean) {
       Log.d("InappstorySdkModule", "setOverScrollToClose")
-      this.appearanceManager.csCloseOnOverscroll(value)
+      this.appearanceManager?.csCloseOnOverscroll(value)
   }
 
   @ReactMethod
   fun setCloseButtonPosition(value: String) {
       Log.d("InappstorySdkModule", "setCloseButtonPosition")
       if (value == "left") {
-        this.appearanceManager.csClosePosition(1)
+        this.appearanceManager?.csClosePosition(1)
       }
       if (value == "right") {
-        this.appearanceManager.csClosePosition(2)
+        this.appearanceManager?.csClosePosition(2)
       }
       if (value == "bottomLeft") {
-        this.appearanceManager.csClosePosition(3)
+        this.appearanceManager?.csClosePosition(3)
       }
       if (value == "bottomRight") {
-        this.appearanceManager.csClosePosition(4)
+        this.appearanceManager?.csClosePosition(4)
       }
       
   }
 
   @ReactMethod
-  fun setReaderCornerRadius(radius: Float) {
+  fun setReaderCornerRadius(radius: Int) {
       Log.d("InappstorySdkModule", "setReaderCornerRadius")
-      this.appearanceManager.csReaderRadius(radius);
+      this.appearanceManager?.csReaderRadius(radius);
   }
 
   @ReactMethod
@@ -419,6 +476,13 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
       Log.d("InappstorySdkModule", "setReaderBackgroundColor")
       //TODO
   }
+
+  @ReactMethod
+  fun setTimerGradientEnable(value: Boolean) {
+      Log.d("InappstorySdkModule", "setTimerGradientEnable")
+      this.appearanceManager?.csTimerGradientEnable(value)
+  }
+
 
 /*
   @ReactMethod
@@ -471,12 +535,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
       //TODO
   }
 
-  @ReactMethod
-  fun setTimerGradientEnable() {
-      Log.d("InappstorySdkModule", "setTimerGradientEnable")
-      //TODO
-  }
-
+  
   @ReactMethod
   fun setTimerGradient() {
       Log.d("InappstorySdkModule", "setTimerGradient")
@@ -590,6 +649,12 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
             this.ias?.showOnboardingStories(feed, tags, reactContext.currentActivity, this.appearanceManager)
         }
         promise.resolve(feed)
+    }
+    @ReactMethod
+    fun showEditor() {
+        this.appearanceManager?.csHasUGC(true)
+        UGCInAppStoryManager.openEditor(reactContext)
+        //promise.resolve(true)
     }
   fun createInAppStoryManager(
     apiKey: String,

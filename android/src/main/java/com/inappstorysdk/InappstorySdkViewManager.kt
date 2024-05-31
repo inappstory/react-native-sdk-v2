@@ -54,11 +54,13 @@ class InappstorySdkViewManager(
   }
 
   fun createClick(root: FrameLayout, reactNativeViewId: Int, args: ReadableArray) {
-    Log.d("InAppStoryManager","createFragment");
+    Log.d("InAppStoryManager","createClick");
+    val storyIndex = requireNotNull(args).getInt(1)
+    Log.d("InAppStoryManager","createClick storyIndex")
     val parentView = root.findViewById<ViewGroup>(reactNativeViewId)
-    val (clickDown, clickUp)= this.simulateClickAtCoordinates(30.0f, 30.0f)
+    val (clickDown, clickUp)= this.simulateClickAtCoordinates(storyIndex * 30.0f + 30.0f, 30.0f)
     parentView.dispatchTouchEvent(clickDown)
-    parentView.dispatchTouchEvent(clickUp) 
+    parentView.dispatchTouchEvent(clickUp)
   }
   
   fun clickAt(x: Float, y: Float) {

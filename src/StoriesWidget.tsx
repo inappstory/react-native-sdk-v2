@@ -32,7 +32,7 @@ export const StoriesWidget = ({
         // converts dpi to px, provide desired height
         height: PixelRatio.getPixelSizeForLayoutSize(120),
         // converts dpi to px, provide desired width
-        width: PixelRatio.getPixelSizeForLayoutSize(170),
+        width: PixelRatio.getPixelSizeForLayoutSize(370),
       }}
       tags={tags}
       ref={ref}

@@ -17,7 +17,9 @@ import React
 class RNInAppStorySDKModule: RCTEventEmitter {
   public static var emitter: RCTEventEmitter!
   open override func supportedEvents() -> [String] {
-    ["startGame", "finishGame", "closeGame", "eventGame", "gameFailure"]      // etc. 
+    ["startGame", "finishGame", "closeGame", "eventGame", "gameFailure",
+     "getGoodsObject"
+    ]      // etc. 
   }
   @objc private var _hasLike: Bool = true
   @objc private var _hasDislike: Bool = true
@@ -85,6 +87,32 @@ class RNInAppStorySDKModule: RCTEventEmitter {
             @unknown default:
                 NSLog("WARNING: unknown gameEvent")
             }
+        }
+        InAppStory.shared.getGoodsObject = { skus, complete in
+              RNInAppStorySDKModule.emitter.sendEvent(withName: "getGoodsObject", body: ["skus":skus])
+              Timer.scheduledTimer(withTimeInterval: 0.25, repeats: true) { timer in
+              let randomNumber = Int.random(in: 1...20)
+              print("Number: \(randomNumber)")
+              //FIXME: Get data from async storage?
+              if randomNumber == 10 {
+                  timer.invalidate()
+                  var goodsArray: Array<GoodObject> = []
+
+                  for sku in skus {
+                      let goodObject = GoodObject(sku: sku, //item sku
+                                                  title:"title1", //item title for cell
+                                                  subtitle: "subtitle1", //item subtitle for cell
+                                                  imageURL: URL(string: "https://images-na.ssl-images-amazon.com/images/G/01/AMAZON_FASHION/2022/SITE_FLIPS/SPR_22/GW/DQC/DQC_APR_TBYB_W_SHOES_2x._SY232_CB624172947_.jpg"), //image url for cell
+                                                  price: "100", //price value for cell
+                                                  oldPrice: "99.99") //discount value for cell
+                      goodsArray.append(goodObject)
+                  }
+
+                  complete(.success(goodsArray))
+                  //if the list could not be retrieved or a network error occurred while retrieving,
+                  //you must call complete(.failure(.close or .refresh))
+              }
+          }
         }
         /*
         InAppStory.shared.storiesEvent = { storiesEvent in
@@ -178,9 +206,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
         InAppStory.shared.editorCellDidSelect = {
             NSLog("TODO: editorCellDidSelect closure");
         }
-        InAppStory.shared.getGoodsObject = { skus, complete in
-            NSLog("TODO: getGoodsObject closure");
-        }
+        
         InAppStory.shared.goodItemSelected = { item, storyType in
             NSLog("TODO: goodItemSelected closure");
         }
@@ -218,9 +244,6 @@ class RNInAppStorySDKModule: RCTEventEmitter {
             return CGFloat
         }
         */
-        /*
-       
-        */
     }
     //.storiesLoaded(feed: String? = nil, stories: Array<StoryData>)
     //.ugcStoriesLoaded(stories: Array<StoryData>)	
@@ -236,16 +259,26 @@ class RNInAppStorySDKModule: RCTEventEmitter {
     //.clickOnShareStory(slideData: SlideData)
     //.storyWidgetEvent(slideData: SlideData?, name: String, data: Dictionary<String, Any>?)	
 
-    //.startGame(gameData: GameStoryData)	
-    //.closeGame(gameData: GameStoryData)	
-    //.finishGame(gameData: GameStoryData, result: Dictionary<String, Any>)	
-    //.gameFailure(gameData: GameStoryData, message: String)	
+     // customization of appearance
+     //FIXME: customization of goods cell
+    /*InAppStory.shared.goodsCellMainTextColor: UIColor     = .black //color of cell labels
+    InAppStory.shared.goodsCellDiscountTextColor: UIColor = .red //color of discount label
 
-    //.sessionFailure(message: String)	
-    //.storyFailure(message: String)	
-    //.currentStoryFailure(message: String)	
-    //.networkFailure(message: String)
-    //.requestFailure(message: String, statusCode: Int)	
+    //fonts of cell's labels
+    InAppStory.shared.goodCellTitleFont: UIFont    = UIFont.systemFont(ofSize: 14.0, weight: .medium)
+    InAppStory.shared.goodCellSubtitleFont: UIFont = UIFont.systemFont(ofSize: 12.0)
+    InAppStory.shared.goodCellPriceFont: UIFont    = UIFont.systemFont(ofSize: 14.0, weight: .medium)
+    InAppStory.shared.goodCellDiscountFont: UIFont = UIFont.systemFont(ofSize: 14.0, weight: .medium)
+
+    //background color of close button
+    InAppStory.shared.goodsCloseBackgroundColor: UIColor  = .white
+    //goods list background color
+    InAppStory.shared.goodsSubstrateColor: UIColor        = .white
+
+    //image for refresh button
+    InAppStory.shared.refreshGoodsImage: UIImage = UIImage(named: "refreshIcon")!
+    //image for close button
+    InAppStory.shared.goodsCloseImage: UIImage   = UIImage(named: "goodsClose")!*/
   }
   @objc
   func showEditor() {

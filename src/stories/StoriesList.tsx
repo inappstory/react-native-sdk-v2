@@ -1,9 +1,9 @@
 import React, { useRef } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, Linking } from 'react-native';
 
 import { StoriesCarousel } from './StoriesCarousel';
 import { StoriesWidget } from '../StoriesWidget';
-
+import InAppStorySDK from 'react-native-inappstory-sdk';
 /*const createClick = (viewId, storyIndex) =>
   UIManager.dispatchViewManagerCommand(
     viewId,
@@ -50,17 +50,16 @@ export const StoriesList = ({
   };
   const onPress = React.useCallback((story) => {
     //FIXME: fire clickOnStory event {"payload": {"feed": "default", "id": 55507, "index": 0, "isDeeplink": false, "slidesCount": 5, "source": "list", "tags": [], "title": "Добавляем виджеты"}}
-    console.error('onPress', story.id);
-    //InAppStorySDK.showSingle(String(story.id));
-    console.error('TODO: generate click');
-    /*createClick(
-        ref.current,
-        feedData?.stories.findIndex((st) => st.id == story.id)
-      );*/
+    if (story.game_instance?.id) {
+      InAppStorySDK.showGame(story.game_instance.id);
+    } else if (story.deeplink) {
+      Linking.openURL(story.deeplink);
+    } else {
+      InAppStorySDK.showSingle(String(story.id));
+    }
   }, []);
-  //console.error(userID, tags);
   return (
-    <View tags={tags} userID={userID}>
+    <View tags={tags} userID={userID} style={{ height: 600 }}>
       <Text>User ID: {userID}</Text>
       <StoriesWidget
         feed={'default'}
