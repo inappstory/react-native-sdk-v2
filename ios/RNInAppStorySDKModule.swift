@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import InAppStorySDK
+@_spi(IAS_API) import InAppStorySDK
 import InAppStoryUGC
 import React
 
@@ -60,6 +60,8 @@ class RNInAppStorySDKModule: RCTEventEmitter {
         InAppStory.shared.storyReaderDidClose = { showed in
             NSLog("TODO: storyReaderDidClose closure");
         }
+        print("Getting stories")
+        self.getStories()
         InAppStory.shared.gameEvent = { gameEvent in
             NSLog("TODO: gameEvent");
             switch gameEvent {
@@ -279,6 +281,25 @@ class RNInAppStorySDKModule: RCTEventEmitter {
     InAppStory.shared.refreshGoodsImage: UIImage = UIImage(named: "refreshIcon")!
     //image for close button
     InAppStory.shared.goodsCloseImage: UIImage   = UIImage(named: "goodsClose")!*/
+  }
+
+  @objc
+  func getStories() {
+      DispatchQueue.main.async {
+          print("StoryListAPI");
+          let storiesAPI = StoryListAPI.init(feed:"default",isFavorite: false)
+          storiesAPI.storyUpdate = {storyData in
+              print("Story data = ", storyData);
+              print(storyData)
+          }
+          storiesAPI.storyListUpdate = {storiesList,isFavorite in
+              print("Stories list = ")
+              print(storiesList);
+              print("is favorite?")
+              print(isFavorite ?? "??")
+          }
+          storiesAPI.getStoriesList()
+      }
   }
   @objc
   func showEditor() {

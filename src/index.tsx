@@ -248,7 +248,7 @@ export class StoryManager extends StoryManagerV1 {
     }
     if (config.placeholders) {
       this.placeholders = config.placeholders;
-      //InAppStorySDK.setPlaceholders(config.placeholders);
+      InAppStorySDK.setPlaceholders(config.placeholders);
     }
     if (config.lang) {
       this.lang = config.lang;

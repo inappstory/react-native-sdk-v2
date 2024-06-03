@@ -64,14 +64,14 @@ class InappstorySdkView : UIView {
     }
   }
 
-  @objc var placeholders: [String] = [""] {
+  @objc var placeholders: NSDictionary? = nil {
     didSet {
       let storyview = self.subviews.first(where: { $0 is StoryView }) as! StoryView
       storyview.refresh()
     }
   }
 
-  @objc var imagePlaceholders: [String] = [""] {
+  @objc var imagePlaceholders: NSDictionary? = nil {
     didSet {
       let storyview = self.subviews.first(where: { $0 is StoryView }) as! StoryView
       storyview.refresh()
