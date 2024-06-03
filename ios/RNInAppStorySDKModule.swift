@@ -18,7 +18,8 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   public static var emitter: RCTEventEmitter!
   open override func supportedEvents() -> [String] {
     ["startGame", "finishGame", "closeGame", "eventGame", "gameFailure",
-     "getGoodsObject"
+     "getGoodsObject",
+     "storyListUpdate", "storyUpdate"
     ]      // etc. 
   }
   @objc private var _hasLike: Bool = true
@@ -28,7 +29,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   @objc private var _userID: String = ""
   @objc private var _lang: String = ""
   @objc private var _tags: [String] = [""]
-      
+  var storiesAPI = StoryListAPI()
   @objc
   override func constantsToExport() -> [AnyHashable : Any]! {
     return ["count": 1]
@@ -61,7 +62,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
             NSLog("TODO: storyReaderDidClose closure");
         }
         print("Getting stories")
-        self.getStories()
+        //self.getStories()
         InAppStory.shared.gameEvent = { gameEvent in
             NSLog("TODO: gameEvent");
             switch gameEvent {
@@ -116,6 +117,29 @@ class RNInAppStorySDKModule: RCTEventEmitter {
               }
           }
         }
+
+        InAppStory.shared.failureEvent = { failureEvent in
+            NSLog("TODO: failureEvent");
+            switch failureEvent {
+            case .sessionFailure(message: let message):
+                NSLog("sessionFailure")
+                print(message)
+            case .storyFailure(message: let message):
+                NSLog("storyFailure")
+                print(message)
+            case .currentStoryFailure(message: let message):
+                NSLog("currentStoryFailure")
+                print(message)
+            case .networkFailure(message: let message):
+                NSLog("networkFailure")
+                print(message)
+            case .requestFailure(message: let message, statusCode: let statusCode):
+                NSLog("requestFailure")
+                print(message, statusCode)
+            @unknown default:
+                NSLog("WARNING: unknown failureEvent")
+            }
+        }
         /*
         InAppStory.shared.storiesEvent = { storiesEvent in
             NSLog("TODO: storiesEvent");
@@ -161,28 +185,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
             }
         }
         
-        InAppStory.shared.failureEvent = { failureEvent in
-            NSLog("TODO: failureEvent");
-            switch failureEvent {
-            case .sessionFailure(message: let message):
-                NSLog("sessionFailure")
-                print(message)
-            case .storyFailure(message: let message):
-                NSLog("storyFailure")
-                print(message)
-            case .currentStoryFailure(message: let message):
-                NSLog("currentStoryFailure")
-                print(message)
-            case .networkFailure(message: let message):
-                NSLog("networkFailure")
-                print(message)
-            case .requestFailure(message: let message, statusCode: let statusCode):
-                NSLog("requestFailure")
-                print(message, statusCode)
-            @unknown default:
-                NSLog("WARNING: unknown failureEvent")
-            }
-        }
+        
         InAppStory.shared.storiesDidUpdated = { isContent, storyType in
             NSLog("TODO: storiesDidUpdated closure");
         }
@@ -284,23 +287,51 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   }
 
   @objc
-  func getStories() {
+  func getStories(_ resolve:@escaping RCTPromiseResolveBlock,rejecter reject:@escaping RCTPromiseRejectBlock) {
       DispatchQueue.main.async {
-          print("StoryListAPI");
-          let storiesAPI = StoryListAPI.init(feed:"default",isFavorite: false)
-          storiesAPI.storyUpdate = {storyData in
-              print("Story data = ", storyData);
-              print(storyData)
+          self.storiesAPI.storyListUpdate = {storiesList,isFavorite in
+              RNInAppStorySDKModule.emitter.sendEvent(withName: "storyListUpdate", body: storiesList.map { [
+                "storyID": $0.storyID,
+                "storyData": $0.storyData,
+                "title": $0.title,
+                "coverImagePath": $0.coverImagePath,
+                "coverVideoPath": $0.coverVideoPath,
+                "backgroundColor": $0.backgroundColor,
+                "titleColor": $0.titleColor,
+                "opened": $0.opened,
+                "hasAudio": $0.hasAudio
+              ] })
           }
-          storiesAPI.storyListUpdate = {storiesList,isFavorite in
-              print("Stories list = ")
-              print(storiesList);
-              print("is favorite?")
-              print(isFavorite ?? "??")
+          self.storiesAPI.storyUpdate = {storyData in
+              RNInAppStorySDKModule.emitter.sendEvent(withName: "storyUpdate", body: [
+                "storyID": storyData.storyID,
+                "storyData": storyData.storyData,
+                "title": storyData.title,
+                "coverImagePath": storyData.coverImagePath,
+                "coverVideoPath": storyData.coverVideoPath,
+                "backgroundColor": storyData.backgroundColor,
+                "titleColor": storyData.titleColor,
+                "opened": storyData.opened,
+                "hasAudio": storyData.hasAudio
+              ])
           }
-          storiesAPI.getStoriesList()
+          self.storiesAPI.getStoriesList()
       }
   }
+
+  @objc
+  func selectStoryCellWith(_ storyID: String) {
+     DispatchQueue.main.async {
+      self.storiesAPI.selectStoryCellWith(id: storyID);
+     }
+  }
+
+  @objc func setVisibleWith(_ storyIDs: [String]) {
+    DispatchQueue.main.async {
+      self.storiesAPI.setVisibleWith(storyIDs: storyIDs);
+     }
+  }
+
   @objc
   func showEditor() {
     DispatchQueue.main.async {

@@ -50,6 +50,8 @@ import java.util.Locale
 import android.view.View
 import com.facebook.react.bridge.WritableMap;
 
+import com.inappstory.sdk.externalapi.InAppStoryAPI;
+
 /*
 idgetEventName,
                      Map<String, String> widgetData,
@@ -64,6 +66,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
   override fun getName() = "RNInAppStorySDKModule"
   var ias: InAppStoryManager? = null
   var appearanceManager: AppearanceManager? = null;
+  var api:InAppStoryAPI?  = null;
     private fun sendEvent(reactContext: ReactContext, eventName: String, params: WritableMap?) {
         reactContext
         .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
@@ -93,6 +96,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
       Log.d("InappstorySdkModule", "initWith")
       this.ias = this.createInAppStoryManager(apiKey, userID)
       this.appearanceManager = AppearanceManager()
+      this.api = InAppStoryAPI().init(reactContext.getApplicationContext());
   }
 
   @ReactMethod
@@ -655,6 +659,62 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
         this.appearanceManager?.csHasUGC(true)
         UGCInAppStoryManager.openEditor(reactContext)
         //promise.resolve(true)
+    }
+    fun subscribeLists(inAppStoryAPI: InAppStoryAPI) {
+/*
+        inAppStoryAPI.addSubscriber(new InAppStoryAPIListSubscriber(uniqueId1) {
+            @Override
+            public void updateFavoriteItemData(List<StoryFavoriteItemAPIData> favorites) {
+                Log.e(TAG, getUniqueId() + " updateFavoriteItemData: " + favorites);
+            }
+
+            @Override
+            public void updateStoryData(StoryAPIData story) {
+                Log.e(TAG, getUniqueId() + " updateStoryData: " + story);
+            }
+
+            @Override
+            public void updateStoriesData(List<StoryAPIData> stories) {
+                Log.e(TAG, getUniqueId() + " updateStoriesData: " + stories);
+                MainActivity.this.stories.clear();
+                MainActivity.this.stories.addAll(stories);
+                List<Integer> ids = new ArrayList<>();
+                for (StoryAPIData storyAPIData : stories) {
+                    ids.add(storyAPIData.id);
+                }
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        inAppStoryAPI.storyList.updateVisiblePreviews(ids, getUniqueId());
+                        inAppStoryAPI.storyList.showFavoriteItem(getUniqueId());
+                    }
+                });
+
+            }
+
+            @Override
+            public void storyIsOpened(int storyId) {
+                Log.e(TAG, getUniqueId() + " storyIsOpened: " + storyId);
+            }
+
+            @Override
+            public void readerIsClosed() {
+                Log.e(TAG, getUniqueId() + " readerIsClosed");
+            }
+
+            @Override
+            public void readerIsOpened() {
+                Log.e(TAG, getUniqueId() + " readerIsOpened");
+            }
+        });
+        inAppStoryAPI.storyList.load(
+                "extrafeed",
+                uniqueId1,
+                true,
+                false,
+                new ArrayList<>()
+        );
+         */
     }
   fun createInAppStoryManager(
     apiKey: String,

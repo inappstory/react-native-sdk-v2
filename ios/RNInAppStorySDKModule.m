@@ -26,6 +26,9 @@ RCT_EXTERN_METHOD(showEditor)
 RCT_EXTERN_METHOD(removeFromFavorite:(NSString *)storyID)
 RCT_EXTERN_METHOD(removeAllFavorites)
 
+RCT_EXTERN_METHOD(selectStoryCellWith:(NSString *)storyID)
+RCT_EXTERN_METHOD(setVisibleWith:(NSArray<NSString *> *)storyIDs)
+
 RCT_EXTERN_METHOD(setTags:(NSArray<NSString *> *)tags)
 RCT_EXTERN_METHOD(addTags:(NSArray<NSString *> *)tags)
 RCT_EXTERN_METHOD(removeTags:(NSArray<NSString *> *)tags)

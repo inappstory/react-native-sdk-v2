@@ -47,7 +47,6 @@ export const useEvents = () => {
       NativeModules.RNInAppStorySDKModule
     );
     let eventListeners = [];
-    //console.error(NativeModules.RNInAppStorySDKModule)
     const gameEvents = [
       'startGame',
       'finishGame',
@@ -56,6 +55,12 @@ export const useEvents = () => {
       'gameFailure',
       'getGoodsObject',
     ];
+    const storyListEvents = ['storyListUpdate', 'storyUpdate'];
+    storyListEvents.forEach((eventName) => {
+      eventEmitter.addListener(eventName, (event) => {
+        console.error('new event', eventName, event);
+      });
+    });
     gameEvents.forEach((eventName) => {
       eventListeners.push(
         eventEmitter.addListener(eventName, (event) => {
@@ -258,6 +263,7 @@ export class StoryManager extends StoryManagerV1 {
       this.soundEnabled = false;
       InAppStorySDK.changeSound(false);
     }
+    InAppStorySDK.getStories();
   }
   async fetchGoods(_skus: string[]) {
     //AsyncStorage.setItem('IAS_GOODS_LOADING', '1');
