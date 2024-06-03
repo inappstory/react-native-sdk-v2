@@ -2,7 +2,12 @@ import * as React from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import Video from 'react-native-video';
 
-export const StoryComponent = ({ story, appearanceManager, onPress }) => {
+export const StoryComponent = ({
+  story,
+  appearanceManager,
+  storyManager,
+  onPress,
+}) => {
   const borderRadius =
     appearanceManager?.storiesListOptions.card.variant === 'circle'
       ? appearanceManager?.storiesListOptions.card.height
@@ -50,7 +55,16 @@ export const StoryComponent = ({ story, appearanceManager, onPress }) => {
       style={[styles.image, { borderRadius }]}
     />
   ) : null;
-
+  let title = story.title;
+  if (storyManager.placeholders) {
+    //console.error(storyManager.placeholders);
+    Object.keys(storyManager.placeholders).map((placeholder) => {
+      title = title.replace(
+        `%${placeholder}%`,
+        storyManager.placeholders[placeholder]
+      );
+    });
+  }
   return (
     <Pressable
       style={{
@@ -87,7 +101,7 @@ export const StoryComponent = ({ story, appearanceManager, onPress }) => {
           { color: appearanceManager?.storiesListOptions.card.title.color },
         ]}
       >
-        {story.title}
+        {title}
       </Text>
     </Pressable>
   );

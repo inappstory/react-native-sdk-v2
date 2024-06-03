@@ -37,11 +37,11 @@ export const StoriesCarousel = ({
   };
   return (
     <FlatList
-      style={{ width: 100 }}
       horizontal
       data={stories}
       renderItem={(item) => renderItem(item)}
       onViewableItemsChanged={onViewableItemsChanged}
+      showsHorizontalScrollIndicator={false}
       //keyExtractor={(item, index) => index}
     />
   );

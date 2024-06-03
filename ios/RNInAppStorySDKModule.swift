@@ -55,16 +55,18 @@ class RNInAppStorySDKModule: RCTEventEmitter {
         InAppStory.shared.initWith(serviceKey: apiKey, settings: Settings(userID: userID))
         
         InAppStory.shared.storyReaderWillShow = {showed in
-            NSLog("TODO: storyReaderWillShow closure");
+          NSLog("TODO: storyReaderWillShow closure");
+          RNInAppStorySDKModule.emitter.sendEvent(withName: "storyReaderWillShow", body: [])
         }
         
         InAppStory.shared.storyReaderDidClose = { showed in
             NSLog("TODO: storyReaderDidClose closure");
+            RNInAppStorySDKModule.emitter.sendEvent(withName: "storyReaderDidClose", body: [])
         }
         print("Getting stories")
         //self.getStories()
         InAppStory.shared.gameEvent = { gameEvent in
-            NSLog("TODO: gameEvent");
+            NSLog("gameEvent");
             switch gameEvent {
             case .closeGame(gameData: let gameData):
                 NSLog("closeGame")
@@ -119,65 +121,101 @@ class RNInAppStorySDKModule: RCTEventEmitter {
         }
 
         InAppStory.shared.failureEvent = { failureEvent in
-            NSLog("TODO: failureEvent");
+            NSLog("failureEvent");
             switch failureEvent {
             case .sessionFailure(message: let message):
+                RNInAppStorySDKModule.emitter.sendEvent(withName: "sessionFailure", body: [])
                 NSLog("sessionFailure")
                 print(message)
             case .storyFailure(message: let message):
+                RNInAppStorySDKModule.emitter.sendEvent(withName: "storyFailure", body: [])
                 NSLog("storyFailure")
                 print(message)
             case .currentStoryFailure(message: let message):
+                RNInAppStorySDKModule.emitter.sendEvent(withName: "currentStoryFailure", body: [])
                 NSLog("currentStoryFailure")
                 print(message)
             case .networkFailure(message: let message):
+                RNInAppStorySDKModule.emitter.sendEvent(withName: "networkFailure", body: [])
                 NSLog("networkFailure")
                 print(message)
             case .requestFailure(message: let message, statusCode: let statusCode):
+                RNInAppStorySDKModule.emitter.sendEvent(withName: "requestFailure", body: [])
                 NSLog("requestFailure")
                 print(message, statusCode)
             @unknown default:
                 NSLog("WARNING: unknown failureEvent")
             }
         }
+        InAppStory.shared.gameReaderWillShow = { 
+          RNInAppStorySDKModule.emitter.sendEvent(withName: "gameReaderWillShow", body: [])
+        }
+        InAppStory.shared.gameReaderDidClose = {
+          RNInAppStorySDKModule.emitter.sendEvent(withName: "gameReaderDidClose", body: [])
+        }
+        InAppStory.shared.gameComplete = { data, result, url in
+            NSLog("TODO: gameComplete closure");
+            RNInAppStorySDKModule.emitter.sendEvent(withName: "gameComplete", body: [])
+        }
+
+        InAppStory.shared.favoriteCellDidSelect = {
+          NSLog("TODO: favoriteCellDidSelect closure");
+          RNInAppStorySDKModule.emitter.sendEvent(withName: "favoriteCellDidSelect", body: [])
+        }
+        InAppStory.shared.editorCellDidSelect = {
+          NSLog("TODO: editorCellDidSelect closure");
+          RNInAppStorySDKModule.emitter.sendEvent(withName: "editorCellDidSelect", body: [])
+        }
         /*
         InAppStory.shared.storiesEvent = { storiesEvent in
             NSLog("TODO: storiesEvent");
             switch storiesEvent {
                 case .storiesLoaded(stories: let stories):
+                    RNInAppStorySDKModule.emitter.sendEvent(withName: "storiesLoaded", body: [])
                     NSLog("storiesLoaded")
                     print(stories)
                 case .ugcStoriesLoaded(stories: let stories):
+                    RNInAppStorySDKModule.emitter.sendEvent(withName: "ugcStoriesLoaded", body: [])
                     NSLog("ugcStoriesLoaded")
                     print(stories)
                 case .clickOnStory(storyData: let storyData):
+                    RNInAppStorySDKModule.emitter.sendEvent(withName: "clickOnStory", body: [])
                     NSLog("clickOnStory")
                     print(storyData)
                 case .showStory(storyData: let storyData, action: let action):
+                    RNInAppStorySDKModule.emitter.sendEvent(withName: "showStory", body: [])
                     NSLog("showStory")
                     print(storyData, action)
                 case .closeStory(slideData: let slideData, action: let action):
+                    RNInAppStorySDKModule.emitter.sendEvent(withName: "closeStory", body: [])
                     NSLog("closeStory")
                     print(slideData, action)
                 case .clickOnButton(slideData: let slideData, link: let link):
+                    RNInAppStorySDKModule.emitter.sendEvent(withName: "clickOnButton", body: [])
                     NSLog("clickOnButton")
                     print(slideData, link)
                 case .showSlide(slideData: let slideData):
+                    RNInAppStorySDKModule.emitter.sendEvent(withName: "showSlide", body: [])
                     NSLog("showSlide")
                     print(slideData)
                 case .likeStory(slideData: let slideData, value: let value):
+                    RNInAppStorySDKModule.emitter.sendEvent(withName: "likeStory", body: [])
                     NSLog("likeStory")
                     print(slideData, value)
                 case .dislikeStory(slideData: let slideData, value: let value):
+                    RNInAppStorySDKModule.emitter.sendEvent(withName: "dislikeStory", body: [])
                     NSLog("dislikeStory")
                     print(slideData, value)
                 case .favoriteStory(slideData: let slideData, value: let value):
+                    RNInAppStorySDKModule.emitter.sendEvent(withName: "favoriteStory", body: [])
                     NSLog("favoriteStory")
                     print(slideData, value)
                 case .clickOnShareStory(slideData: let slideData):
+                    RNInAppStorySDKModule.emitter.sendEvent(withName: "clickOnShareStory", body: [])
                     NSLog("clickOnShareStory")
                     print(slideData)
                 case .storyWidgetEvent(slideData: let slideData, name: let name, data: let data):
+                    RNInAppStorySDKModule.emitter.sendEvent(withName: "storyWidgetEvent", body: [])
                     NSLog("storyWidgetEvent")
                     print(slideData, name, data)
                 @unknown default:
@@ -189,28 +227,16 @@ class RNInAppStorySDKModule: RCTEventEmitter {
         InAppStory.shared.storiesDidUpdated = { isContent, storyType in
             NSLog("TODO: storiesDidUpdated closure");
         }
-        InAppStory.shared.gameComplete = { data, result, url in
-            NSLog("TODO: gameComplete closure");
-        }
         
-        InAppStory.shared.gameReaderWillShow = { 
-            NSLog("TODO: gameReaderWillShow closure");
-        }
-        InAppStory.shared.gameReaderDidClose = {
-            NSLog("TODO: gameReaderDidClose closure");
-        }
+        
+        
         InAppStory.shared.customShare = { share, fn in
             NSLog("TODO: customShare closure");
         }
         InAppStory.shared.onActionWith = { target, type, storyType in
             NSLog("TODO: onActionWith closure");
         }
-        InAppStory.shared.favoriteCellDidSelect = {
-            NSLog("TODO: favoriteCellDidSelect closure");
-        }
-        InAppStory.shared.editorCellDidSelect = {
-            NSLog("TODO: editorCellDidSelect closure");
-        }
+        
         
         InAppStory.shared.goodItemSelected = { item, storyType in
             NSLog("TODO: goodItemSelected closure");
@@ -250,19 +276,6 @@ class RNInAppStorySDKModule: RCTEventEmitter {
         }
         */
     }
-    //.storiesLoaded(feed: String? = nil, stories: Array<StoryData>)
-    //.ugcStoriesLoaded(stories: Array<StoryData>)	
-
-    //.clickOnStory(storyData: StoryData)
-    //.showStory(storyData: StoryData, action: ShowStoryAction)	
-    //.closeStory(slideData: SlideData, action: CloseStoryAction)	
-    //.clickOnButton(slideData: SlideData, link: String)	
-    //.showSlide(slideData: SlideData)	
-    //.likeStory(slideData: SlideData, value: Bool)	
-    //.dislikeStory(slideData: SlideData, value: Bool)
-    //.favoriteStory(slideData: SlideData, value: Bool)
-    //.clickOnShareStory(slideData: SlideData)
-    //.storyWidgetEvent(slideData: SlideData?, name: String, data: Dictionary<String, Any>?)	
 
      // customization of appearance
      //FIXME: customization of goods cell

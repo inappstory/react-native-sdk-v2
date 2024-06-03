@@ -47,21 +47,50 @@ export const useEvents = () => {
       NativeModules.RNInAppStorySDKModule
     );
     let eventListeners = [];
+    const storiesEvents = [
+      'storiesLoaded',
+      'ugcStoriesLoaded',
+      'clickOnStory',
+      'showStory',
+      'closeStory',
+      'clickOnButton',
+      'showSlide',
+      'likeStory',
+      'dislikeStory',
+      'favoriteStory',
+      'clickOnShareStory',
+      'storyWidgetEvent',
+    ];
     const gameEvents = [
       'startGame',
       'finishGame',
       'closeGame',
       'eventGame',
       'gameFailure',
-      'getGoodsObject',
+      'gameReaderWillShow',
+      'gameReaderDidClose',
+      'gameComplete',
     ];
     const storyListEvents = ['storyListUpdate', 'storyUpdate'];
-    storyListEvents.forEach((eventName) => {
-      eventEmitter.addListener(eventName, (event) => {
-        console.error('new event', eventName, event);
-      });
-    });
-    gameEvents.forEach((eventName) => {
+    const goodsEvents = ['getGoodsObject'];
+    const systemEvents = [
+      'storyReaderWillShow',
+      'storyReaderDidClose',
+      'sessionFailure',
+      'storyFailure',
+      'currentStoryFailure',
+      'networkFailure',
+      'requestFailure',
+      'favoriteCellDidSelect',
+      'editorCellDidSelect',
+    ];
+    [
+      ...storiesEvents,
+      ...gameEvents,
+      ...storyListEvents,
+      ...goodsEvents,
+      ...systemEvents,
+    ].forEach((eventName) => {
       eventListeners.push(
         eventEmitter.addListener(eventName, (event) => {
           if (eventName == 'getGoodsObject') {
@@ -253,6 +282,7 @@ export class StoryManager extends StoryManagerV1 {
     }
     if (config.placeholders) {
       this.placeholders = config.placeholders;
+      console.error('setting placeholders', config.placeholders);
       InAppStorySDK.setPlaceholders(config.placeholders);
     }
     if (config.lang) {
