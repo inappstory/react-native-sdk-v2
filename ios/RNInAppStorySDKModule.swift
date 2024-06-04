@@ -17,9 +17,13 @@ import React
 class RNInAppStorySDKModule: RCTEventEmitter {
   public static var emitter: RCTEventEmitter!
   open override func supportedEvents() -> [String] {
-    ["startGame", "finishGame", "closeGame", "eventGame", "gameFailure",
+    [
+     "storiesLoaded","ugcStoriesLoaded","clickOnStory","showStory","closeStory","clickOnButton","showSlide","likeStory","dislikeStory","favoriteStory","clickOnShareStory","storyWidgetEvent",
+     "startGame", "finishGame", "closeGame", "eventGame", "gameFailure","gameReaderWillShow","gameReaderDidClose","gameComplete",
      "getGoodsObject",
-     "storyListUpdate", "storyUpdate"
+     "storyListUpdate", "storyUpdate",
+     "favoritesUpdate",
+     "storyReaderWillShow","storyReaderDidClose","sessionFailure","storyFailure","currentStoryFailure","networkFailure","requestFailure","favoriteCellDidSelect","editorCellDidSelect"
     ]      // etc. 
   }
   @objc private var _hasLike: Bool = true
@@ -30,6 +34,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   @objc private var _lang: String = ""
   @objc private var _tags: [String] = [""]
   var storiesAPI = StoryListAPI()
+  var favoriteStoriesAPI = StoryListAPI(isFavorite: true)
   @objc
   override func constantsToExport() -> [AnyHashable : Any]! {
     return ["count": 1]
@@ -63,8 +68,6 @@ class RNInAppStorySDKModule: RCTEventEmitter {
             NSLog("TODO: storyReaderDidClose closure");
             RNInAppStorySDKModule.emitter.sendEvent(withName: "storyReaderDidClose", body: [])
         }
-        print("Getting stories")
-        //self.getStories()
         InAppStory.shared.gameEvent = { gameEvent in
             NSLog("gameEvent");
             switch gameEvent {
@@ -300,7 +303,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   }
 
   @objc
-  func getStories(_ resolve:@escaping RCTPromiseResolveBlock,rejecter reject:@escaping RCTPromiseRejectBlock) {
+  func getStories(_ feed:String) {
       DispatchQueue.main.async {
           self.storiesAPI.storyListUpdate = {storiesList,isFavorite in
               RNInAppStorySDKModule.emitter.sendEvent(withName: "storyListUpdate", body: storiesList.map { [
@@ -312,7 +315,8 @@ class RNInAppStorySDKModule: RCTEventEmitter {
                 "backgroundColor": $0.backgroundColor,
                 "titleColor": $0.titleColor,
                 "opened": $0.opened,
-                "hasAudio": $0.hasAudio
+                "hasAudio": $0.hasAudio,
+                "list": "feed",
               ] })
           }
           self.storiesAPI.storyUpdate = {storyData in
@@ -325,10 +329,46 @@ class RNInAppStorySDKModule: RCTEventEmitter {
                 "backgroundColor": storyData.backgroundColor,
                 "titleColor": storyData.titleColor,
                 "opened": storyData.opened,
-                "hasAudio": storyData.hasAudio
+                "hasAudio": storyData.hasAudio,
+                "list": "feed",
               ])
           }
           self.storiesAPI.getStoriesList()
+      }
+  }
+
+  @objc
+  func getFavoriteStories(_ feed:String) {
+      DispatchQueue.main.async {
+          self.favoriteStoriesAPI.storyListUpdate = {storiesList,isFavorite in
+              RNInAppStorySDKModule.emitter.sendEvent(withName: "storyListUpdate", body: storiesList.map { [
+                "storyID": $0.storyID,
+                "storyData": $0.storyData,
+                "title": $0.title,
+                "coverImagePath": $0.coverImagePath,
+                "coverVideoPath": $0.coverVideoPath,
+                "backgroundColor": $0.backgroundColor,
+                "titleColor": $0.titleColor,
+                "opened": $0.opened,
+                "hasAudio": $0.hasAudio,
+                "list": "favorites",
+              ] })
+          }
+          self.favoriteStoriesAPI.storyUpdate = {storyData in
+              RNInAppStorySDKModule.emitter.sendEvent(withName: "storyUpdate", body: [
+                "storyID": storyData.storyID,
+                "storyData": storyData.storyData,
+                "title": storyData.title,
+                "coverImagePath": storyData.coverImagePath,
+                "coverVideoPath": storyData.coverVideoPath,
+                "backgroundColor": storyData.backgroundColor,
+                "titleColor": storyData.titleColor,
+                "opened": storyData.opened,
+                "hasAudio": storyData.hasAudio,
+                "list": "favorites",
+              ])
+          }
+          self.favoriteStoriesAPI.getStoriesList()
       }
   }
 
