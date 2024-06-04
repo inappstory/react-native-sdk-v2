@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { View, Text, Linking } from 'react-native';
+import { View } from 'react-native';
 
 import { StoriesCarousel } from './StoriesCarousel';
 import { StoriesWidget } from '../StoriesWidget';
@@ -49,32 +49,30 @@ export const StoriesList = ({
     ref.current = refId;
   };
   const onPress = React.useCallback((story) => {
-    //FIXME: fire clickOnStory event {"payload": {"feed": "default", "id": 55507, "index": 0, "isDeeplink": false, "slidesCount": 5, "source": "list", "tags": [], "title": "Добавляем виджеты"}}
-    if (story.game_instance?.id) {
-      InAppStorySDK.showGame(story.game_instance.id);
-    } else if (story.deeplink) {
-      Linking.openURL(story.deeplink);
-    } else {
-      InAppStorySDK.showSingle(String(story.id));
-    }
+    InAppStorySDK.selectStoryCellWith(String(story.id));
   }, []);
+  const customFeed = false;
+  const customizedCells = false;
   return (
-    <View tags={tags} userID={userID} style={{ height: 600 }}>
-      <Text>User ID: {userID}</Text>
-      <StoriesWidget
-        feed={'default'}
-        onViewLoaded={onViewLoaded}
-        tags={tags}
-        placeholders={placeholders}
-        imagePlaceholders={imagePlaceholders}
-        userID={userID}
-      />
-      <StoriesCarousel
-        stories={feedData?.stories}
-        storyManager={storyManager}
-        appearanceManager={appearanceManager}
-        onPress={onPress}
-      />
+    <View userID={userID}>
+      {!customFeed && customizedCells && (
+        <StoriesCarousel
+          stories={feedData?.stories}
+          storyManager={storyManager}
+          appearanceManager={appearanceManager}
+          onPress={onPress}
+        />
+      )}
+      {!customFeed && !customizedCells && (
+        <StoriesWidget
+          feed={feed}
+          onViewLoaded={onViewLoaded}
+          tags={tags}
+          placeholders={placeholders}
+          imagePlaceholders={imagePlaceholders}
+          userID={userID}
+        />
+      )}
     </View>
   );
 };

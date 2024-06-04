@@ -1,4 +1,3 @@
-import { NativeEventEmitter, Platform } from 'react-native';
 import * as React from 'react';
 import { Button, NativeModules, StyleSheet, Text, View } from 'react-native';
 import {
@@ -24,7 +23,6 @@ import type {
   StoriesListClickEvent,
 } from 'react-native-ias/types/AppearanceManager';
 import { StoriesList } from './stories/StoriesList';
-import { storyManager } from '../example/src/services/StoryService';
 export {
   type ListLoadStatus,
   StoriesListCardTitlePosition,
@@ -39,131 +37,6 @@ export {
   useIas,
 };
 //import AsyncStorage from '@react-native-async-storage/async-storage';
-
-export const useEvents = () => {
-  const [events, setEvents] = React.useState<any>([]);
-  React.useEffect(() => {
-    const eventEmitter = new NativeEventEmitter(
-      NativeModules.RNInAppStorySDKModule
-    );
-    let eventListeners = [];
-    const storiesEvents = [
-      'storiesLoaded',
-      'ugcStoriesLoaded',
-      'clickOnStory',
-      'showStory',
-      'closeStory',
-      'clickOnButton',
-      'showSlide',
-      'likeStory',
-      'dislikeStory',
-      'favoriteStory',
-      'clickOnShareStory',
-      'storyWidgetEvent',
-    ];
-    const gameEvents = [
-      'startGame',
-      'finishGame',
-      'closeGame',
-      'eventGame',
-      'gameFailure',
-      'gameReaderWillShow',
-      'gameReaderDidClose',
-      'gameComplete',
-    ];
-    const storyListEvents = ['storyListUpdate', 'storyUpdate'];
-    const goodsEvents = ['getGoodsObject'];
-    const systemEvents = [
-      'storyReaderWillShow',
-      'storyReaderDidClose',
-      'sessionFailure',
-      'storyFailure',
-      'currentStoryFailure',
-      'networkFailure',
-      'requestFailure',
-      'favoriteCellDidSelect',
-      'editorCellDidSelect',
-    ];
-    [
-      ...storiesEvents,
-      ...gameEvents,
-      ...storyListEvents,
-      ...goodsEvents,
-      ...systemEvents,
-    ].forEach((eventName) => {
-      eventListeners.push(
-        eventEmitter.addListener(eventName, (event) => {
-          if (eventName == 'getGoodsObject') {
-            storyManager.fetchGoods(event);
-          }
-          console.error('new event', eventName, event);
-          setEvents((_events) => {
-            _events.push({
-              event: eventName,
-              data: event,
-            });
-            return _events;
-          });
-        })
-      );
-    });
-    // Removes the listener once unmounted
-    return () => {
-      eventListeners.forEach((eventListener) => {
-        eventListener.remove();
-      });
-    };
-  }, []);
-  return events;
-};
-
-const createSession = async (apiKey: string, userId: any) => {
-  const openSession = await fetch(
-    'https://api.inappstory.ru/v2/session/open?expand=cache&fields=session%2Cserver_timestamp%2Cplaceholders%2Cimage_placeholders%2Cis_allow_profiling%2Cis_allow_statistic_v1%2Cis_allow_statistic_v2%2Cis_allow_ugc%2Ccache%2Cpreview_aspect_ratio&format=json',
-    {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-        'X-App-Package-Id': 'com.inappstory.ios',
-      },
-      body: JSON.stringify({
-        platform: Platform.OS,
-        features:
-          'animation,data,deeplink,webp,placeholder,resetTimers,gameReader,swipeUpItems,sendApi,imgPlaceholder',
-        user_id: userId,
-      }),
-    }
-  );
-  const sessionData = await openSession.json();
-  return sessionData.session.id;
-};
-
-const fetchFeed = async (
-  apiKey: string,
-  sessionId: string,
-  userId: any,
-  feed: string,
-  tags: string[]
-) => {
-  const getFeed = await fetch(
-    `https://api.inappstory.ru/v2/feed/${feed}?format=json${tags ? '&' + tags.map((t) => `tags=${t}`).join('&') : ''}`,
-    {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-        'Auth-Session-id': `${sessionId}}`,
-        'X-User-id': `${userId}}`,
-        'X-App-Package-Id': 'com.inappstory.ios',
-      },
-    }
-  );
-  const feedData = await getFeed.json();
-  return feedData;
-};
 
 export class StoryManager extends StoryManagerV1 {
   sessionId: string = '';
@@ -272,10 +145,7 @@ export class StoryManager extends StoryManagerV1 {
     </svg>`);
     */
     this.apiKey = config.apiKey;
-    this.userId = config.userId;
-    createSession(config.apiKey, config.userId).then((sessionId) => {
-      this.sessionId = sessionId;
-    });
+    this.userId = String(config.userId);
     if (config.tags) {
       this.tags = config.tags;
       InAppStorySDK.setTags(config.tags);
@@ -293,7 +163,8 @@ export class StoryManager extends StoryManagerV1 {
       this.soundEnabled = false;
       InAppStorySDK.changeSound(false);
     }
-    InAppStorySDK.getStories();
+    InAppStorySDK.getStories('default');
+    InAppStorySDK.getFavoriteStories('default');
   }
   async fetchGoods(_skus: string[]) {
     //AsyncStorage.setItem('IAS_GOODS_LOADING', '1');
@@ -310,29 +181,10 @@ export class StoryManager extends StoryManagerV1 {
     this.apiKey = apiKey;
     InAppStorySDK.initWith(this.apiKey, this.userId);
     this.sessionId = '';
-    createSession(this.apiKey, this.userId).then((sessionId) => {
-      this.sessionId = sessionId;
-    });
+    //FIXME: create new session?
   }
   async fetchFeed(feed: string) {
-    if (this.sessionId) {
-      return await fetchFeed(
-        this.apiKey,
-        this.sessionId,
-        this.userId,
-        feed,
-        this.tags
-      );
-    } else {
-      this.sessionId = await createSession(this.apiKey, this.userId);
-      return await fetchFeed(
-        this.apiKey,
-        this.sessionId,
-        this.userId,
-        feed,
-        this.tags
-      );
-    }
+    console.log('FIXME: get feed', feed);
   }
   on(eventName: string | symbol, listener: any) {
     super.on(eventName, listener);
@@ -425,19 +277,6 @@ export class StoryManager extends StoryManagerV1 {
       });
     });
   }
-  //TODO: Implement these events:
-  //clickOnStory
-  //clickOnFavoriteCell
-  //showStory
-  //closeStory
-  //showSlide
-  //clickOnButton
-  //likeStory
-  //dislikeStory
-  //favoriteStory
-  //shareStory
-  //shareStoryWithPath
-  //);
 }
 export class AppearanceManager extends AppearanceManagerV1 {
   hasLike = true;

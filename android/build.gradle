@@ -91,7 +91,7 @@ dependencies {
   //noinspection GradleDynamicVersion
   implementation "com.facebook.react:react-native:+"
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-  implementation 'com.github.inappstory:android-sdk:1.18.2'
+  implementation 'com.github.inappstory:android-sdk:36a6fcf1fac594463417ef85c776cc9cdc861c50'
   implementation "com.github.inappstory.android-sdk-utils:iasfilepicker:1.0.0"
   implementation 'androidx.recyclerview:recyclerview:1.2.1'
   implementation 'androidx.webkit:webkit:1.4.0'

@@ -11,7 +11,7 @@ import { SettingsScreen } from './screen/SettingsScreen';
 import { FavoritesScreen } from './screen/FavoritesScreen';
 import { EventsScreen } from './screen/EventsScreen';
 import { ProjectSettingsScreen } from './screen/ProjectSettingsScreen';
-import { EventsContext } from './context/EventsContext';
+import { InAppStoryProvider } from '../../src/context/InAppStoryContext';
 
 export function SDKView() {
   return (
@@ -36,9 +36,8 @@ const styles = StyleSheet.create({
 const Stack = createNativeStackNavigator();
 
 export default function App() {
-  const [events, setEvents] = React.useState([]);
   return (
-    <EventsContext.Provider value={{ events, setEvents }}>
+    <InAppStoryProvider>
       <NavigationContainer>
         <Stack.Navigator
           initialRouteName="Home"
@@ -74,7 +73,7 @@ export default function App() {
           />
         </Stack.Navigator>
       </NavigationContainer>
-    </EventsContext.Provider>
+    </InAppStoryProvider>
   );
 }
 
