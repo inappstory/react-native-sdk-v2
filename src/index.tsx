@@ -1,5 +1,4 @@
-import * as React from 'react';
-import { Button, NativeModules, StyleSheet, Text, View } from 'react-native';
+import { NativeModules } from 'react-native';
 import {
   AppearanceManager as AppearanceManagerV1,
   type ListLoadStatus,
@@ -23,6 +22,7 @@ import type {
   StoriesListClickEvent,
 } from 'react-native-ias/types/AppearanceManager';
 import { StoriesList } from './stories/StoriesList';
+import { useInAppStory } from './context/InAppStoryContext';
 export {
   type ListLoadStatus,
   StoriesListCardTitlePosition,
@@ -35,6 +35,7 @@ export {
   StoryReaderCloseButtonPosition,
   StoryReaderSwipeStyle,
   useIas,
+  useInAppStory,
 };
 //import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -51,6 +52,7 @@ export class StoryManager extends StoryManagerV1 {
   constructor(config: StoryManagerConfig) {
     super(config);
     InAppStorySDK.initWith(config.apiKey, config.userId);
+    InAppStorySDK.setUserID(config.userId);
     /*InAppStorySDK.setLikeImage(`<?xml version="1.0" encoding="utf-8"?>
 
     <!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
@@ -152,7 +154,7 @@ export class StoryManager extends StoryManagerV1 {
     }
     if (config.placeholders) {
       this.placeholders = config.placeholders;
-      console.error('setting placeholders', config.placeholders);
+      console.log('setting placeholders', config.placeholders);
       InAppStorySDK.setPlaceholders(config.placeholders);
     }
     if (config.lang) {
@@ -163,8 +165,6 @@ export class StoryManager extends StoryManagerV1 {
       this.soundEnabled = false;
       InAppStorySDK.changeSound(false);
     }
-    InAppStorySDK.getStories('default');
-    InAppStorySDK.getFavoriteStories('default');
   }
   async fetchGoods(_skus: string[]) {
     //AsyncStorage.setItem('IAS_GOODS_LOADING', '1');
@@ -184,7 +184,9 @@ export class StoryManager extends StoryManagerV1 {
     //FIXME: create new session?
   }
   async fetchFeed(feed: string) {
-    console.log('FIXME: get feed', feed);
+    console.log('getStories & getFavorites');
+    InAppStorySDK.getStories(feed);
+    InAppStorySDK.getFavoriteStories(feed);
   }
   on(eventName: string | symbol, listener: any) {
     super.on(eventName, listener);
@@ -211,6 +213,7 @@ export class StoryManager extends StoryManagerV1 {
     super.setUserId(userId);
     this.userId = userId;
     InAppStorySDK.setUserID(userId);
+    console.log('set User ID', userId);
   }
   setLang(lang: string): void {
     super.setLang(lang);
@@ -436,27 +439,5 @@ export class AppearanceManager extends AppearanceManagerV1 {
     return super.setStoriesListOptions(options);
   }
 }
-
-export const addOne = (input: number) => input + 1;
-
-export const Counter = () => {
-  const [count, setCount] = React.useState(0);
-
-  return (
-    <View style={styles.container}>
-      <Text>You pressed {count} times</Text>
-      <Button onPress={() => setCount(addOne(count))} title="Press Me" />
-    </View>
-  );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 500,
-  },
-});
 
 export default NativeModules.RNInAppStorySDKModule;

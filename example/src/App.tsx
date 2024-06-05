@@ -1,7 +1,5 @@
 import * as React from 'react';
 
-import { InappstorySdkView } from 'react-native-inappstory-sdk';
-import { StyleSheet, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { MainScreen } from './screen/MainScreen';
@@ -13,26 +11,6 @@ import { EventsScreen } from './screen/EventsScreen';
 import { ProjectSettingsScreen } from './screen/ProjectSettingsScreen';
 import { InAppStoryProvider } from '../../src/context/InAppStoryContext';
 
-export function SDKView() {
-  return (
-    <View style={styles.container}>
-      <InappstorySdkView color="#32a852" style={styles.box} />
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  box: {
-    width: 60,
-    height: 60,
-    marginVertical: 20,
-  },
-});
 const Stack = createNativeStackNavigator();
 
 export default function App() {

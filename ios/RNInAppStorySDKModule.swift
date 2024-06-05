@@ -23,7 +23,8 @@ class RNInAppStorySDKModule: RCTEventEmitter {
      "getGoodsObject",
      "storyListUpdate", "storyUpdate",
      "favoritesUpdate",
-     "storyReaderWillShow","storyReaderDidClose","sessionFailure","storyFailure","currentStoryFailure","networkFailure","requestFailure","favoriteCellDidSelect","editorCellDidSelect"
+     "storyReaderWillShow","storyReaderDidClose","sessionFailure","storyFailure","currentStoryFailure","networkFailure","requestFailure","favoriteCellDidSelect","editorCellDidSelect",
+     "customShare", "onActionWith","storiesDidUpdated","goodItemSelected",
     ]      // etc. 
   }
   @objc private var _hasLike: Bool = true
@@ -169,85 +170,84 @@ class RNInAppStorySDKModule: RCTEventEmitter {
           NSLog("TODO: editorCellDidSelect closure");
           RNInAppStorySDKModule.emitter.sendEvent(withName: "editorCellDidSelect", body: [])
         }
-        /*
+
+        InAppStory.shared.customShare = { share, fn in
+          RNInAppStorySDKModule.emitter.sendEvent(withName: "customShare", body: [])
+          NSLog("TODO: customShare closure");
+        }
+        
+        InAppStory.shared.onActionWith = { target, type, storyType in
+          RNInAppStorySDKModule.emitter.sendEvent(withName: "onActionWith", body: [])
+          NSLog("TODO: onActionWith closure");
+        }
+
+        InAppStory.shared.storiesDidUpdated = { isContent, storyType in
+          NSLog("TODO: storiesDidUpdated closure");
+          RNInAppStorySDKModule.emitter.sendEvent(withName: "storiesDidUpdated", body: [])
+          NSLog("TODO: onActionWith closure");
+        }
+
+        InAppStory.shared.goodItemSelected = { item, storyType in
+          NSLog("TODO: goodItemSelected closure");
+          RNInAppStorySDKModule.emitter.sendEvent(withName: "goodItemSelected", body: [])
+        }
+
+        InAppStory.shared.stackFeedUpdate = { newFeed in
+            NSLog("TODO: stackFeedUpdate closure");
+        }
+        
+        
         InAppStory.shared.storiesEvent = { storiesEvent in
             NSLog("TODO: storiesEvent");
-            switch storiesEvent {
+             RNInAppStorySDKModule.emitter.sendEvent(withName: "storiesLoaded", body: [])
+             switch storiesEvent {
                 case .storiesLoaded(stories: let stories):
                     RNInAppStorySDKModule.emitter.sendEvent(withName: "storiesLoaded", body: [])
                     NSLog("storiesLoaded")
                     print(stories)
-                case .ugcStoriesLoaded(stories: let stories):
-                    RNInAppStorySDKModule.emitter.sendEvent(withName: "ugcStoriesLoaded", body: [])
-                    NSLog("ugcStoriesLoaded")
-                    print(stories)
                 case .clickOnStory(storyData: let storyData):
                     RNInAppStorySDKModule.emitter.sendEvent(withName: "clickOnStory", body: [])
                     NSLog("clickOnStory")
-                    print(storyData)
                 case .showStory(storyData: let storyData, action: let action):
                     RNInAppStorySDKModule.emitter.sendEvent(withName: "showStory", body: [])
                     NSLog("showStory")
-                    print(storyData, action)
                 case .closeStory(slideData: let slideData, action: let action):
                     RNInAppStorySDKModule.emitter.sendEvent(withName: "closeStory", body: [])
-                    NSLog("closeStory")
-                    print(slideData, action)
+                NSLog("closeStory")
                 case .clickOnButton(slideData: let slideData, link: let link):
                     RNInAppStorySDKModule.emitter.sendEvent(withName: "clickOnButton", body: [])
                     NSLog("clickOnButton")
-                    print(slideData, link)
+                    
                 case .showSlide(slideData: let slideData):
                     RNInAppStorySDKModule.emitter.sendEvent(withName: "showSlide", body: [])
                     NSLog("showSlide")
-                    print(slideData)
+                    
                 case .likeStory(slideData: let slideData, value: let value):
                     RNInAppStorySDKModule.emitter.sendEvent(withName: "likeStory", body: [])
                     NSLog("likeStory")
-                    print(slideData, value)
+                    
                 case .dislikeStory(slideData: let slideData, value: let value):
                     RNInAppStorySDKModule.emitter.sendEvent(withName: "dislikeStory", body: [])
                     NSLog("dislikeStory")
-                    print(slideData, value)
+                    
                 case .favoriteStory(slideData: let slideData, value: let value):
                     RNInAppStorySDKModule.emitter.sendEvent(withName: "favoriteStory", body: [])
                     NSLog("favoriteStory")
-                    print(slideData, value)
                 case .clickOnShareStory(slideData: let slideData):
                     RNInAppStorySDKModule.emitter.sendEvent(withName: "clickOnShareStory", body: [])
                     NSLog("clickOnShareStory")
-                    print(slideData)
                 case .storyWidgetEvent(slideData: let slideData, name: let name, data: let data):
                     RNInAppStorySDKModule.emitter.sendEvent(withName: "storyWidgetEvent", body: [])
                     NSLog("storyWidgetEvent")
-                    print(slideData, name, data)
+                case .ugcStoriesLoaded(stories: let stories):
+                    RNInAppStorySDKModule.emitter.sendEvent(withName: "ugcStoriesLoaded", body: [])
+                    NSLog("ugcStoriesLoaded")
                 @unknown default:
-                    NSLog("WARNING: unknown storiesEvent")
-            }
+                     NSLog("WARNING: unknown storiesEvent")
+                            
+             }
         }
-        
-        
-        InAppStory.shared.storiesDidUpdated = { isContent, storyType in
-            NSLog("TODO: storiesDidUpdated closure");
-        }
-        
-        
-        
-        InAppStory.shared.customShare = { share, fn in
-            NSLog("TODO: customShare closure");
-        }
-        InAppStory.shared.onActionWith = { target, type, storyType in
-            NSLog("TODO: onActionWith closure");
-        }
-        
-        
-        InAppStory.shared.goodItemSelected = { item, storyType in
-            NSLog("TODO: goodItemSelected closure");
-        }
-        InAppStory.shared.stackFeedUpdate = { newFeed in
-            NSLog("TODO: goodItemSelected closure");
-        }
-         */
+      
         /*
         InAppStory.shared.sizeForItem = { showed in
             NSLog("TODO: sizeForItem closure");
@@ -317,6 +317,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
                 "opened": $0.opened,
                 "hasAudio": $0.hasAudio,
                 "list": "feed",
+                "feed": feed,
               ] })
           }
           self.storiesAPI.storyUpdate = {storyData in
@@ -331,6 +332,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
                 "opened": storyData.opened,
                 "hasAudio": storyData.hasAudio,
                 "list": "feed",
+                "feed": feed,
               ])
           }
           self.storiesAPI.getStoriesList()
@@ -352,6 +354,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
                 "opened": $0.opened,
                 "hasAudio": $0.hasAudio,
                 "list": "favorites",
+                "feed": feed,
               ] })
           }
           self.favoriteStoriesAPI.storyUpdate = {storyData in
@@ -366,6 +369,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
                 "opened": storyData.opened,
                 "hasAudio": storyData.hasAudio,
                 "list": "favorites",
+                "feed": feed,
               ])
           }
           self.favoriteStoriesAPI.getStoriesList()

@@ -19,15 +19,12 @@ export const useInAppStoryContext = function (props) {
   const [lang, setLang] = useState('en_US');
   const [userID, setUserID] = useState('en_US');
   const [apiKey, setApiKey] = useState('en_US');
-
-  const events = useEvents();
   const toggleTest = useCallback(() => {
     setTest((_test) => (_test === 'Hi' ? 'You are awesome' : 'Hi'));
   }, []);
 
   return {
     test,
-    events,
     tags,
     placeholders,
     imagePlaceholders,
@@ -46,9 +43,17 @@ export const useInAppStoryContext = function (props) {
 
 export const InAppStoryProvider = ({ children, ...props }) => {
   const context = useInAppStoryContext(props);
+
+  const { events, feeds } = useEvents();
   return (
-    <InAppStoryContext.Provider value={context}>
+    <InAppStoryContext.Provider value={{ ...context, events, feeds }}>
       {children}
     </InAppStoryContext.Provider>
   );
 };
+
+export function useInAppStory() {
+  const context = React.useContext(InAppStoryContext);
+  if (!context) throw new Error('Use app context within provider!');
+  return context;
+}

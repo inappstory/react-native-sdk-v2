@@ -12,7 +12,7 @@ export const StoryComponent = ({
     appearanceManager?.storiesListOptions.card.variant === 'circle'
       ? appearanceManager?.storiesListOptions.card.height
       : 10;
-  const cardOpenedStyles = story.is_opened
+  const cardOpenedStyles = story.opened
     ? appearanceManager?.storiesListOptions.card.opened
     : appearanceManager?.storiesListOptions.card;
   const styles = StyleSheet.create({
@@ -36,10 +36,10 @@ export const StoryComponent = ({
     },
   });
 
-  const cover = story.video_cover ? (
+  const cover = story.coverVideoPath ? (
     <View style={[styles.video, { borderRadius }]}>
       <Video
-        source={{ uri: story?.video_cover[0].url }}
+        source={{ uri: story?.coverVideoPath }}
         style={[
           styles.video,
           { borderRadius, overflow: 'hidden', resizeMode: 'cover' },
@@ -49,15 +49,14 @@ export const StoryComponent = ({
         resizeMode={'cover'}
       />
     </View>
-  ) : story.image ? (
+  ) : story.coverImagePath ? (
     <Image
-      source={{ uri: story?.image[0].url }}
+      source={{ uri: story?.coverImagePath }}
       style={[styles.image, { borderRadius }]}
     />
   ) : null;
   let title = story.title;
   if (storyManager.placeholders) {
-    //console.error(storyManager.placeholders);
     Object.keys(storyManager.placeholders).map((placeholder) => {
       title = title.replace(
         `%${placeholder}%`,

@@ -7,8 +7,8 @@ import {
 } from 'react-native';
 import React from 'react';
 
-import { Colors, Header } from 'react-native/Libraries/NewAppScreen';
-
+import { Colors } from 'react-native/Libraries/NewAppScreen';
+import { useInAppStory } from 'react-native-inappstory-sdk';
 import Animated, {
   useSharedValue,
   useAnimatedScrollHandler,
@@ -16,7 +16,7 @@ import Animated, {
 
 export function EventsScreen(): React.ReactNode {
   const isDarkMode = useColorScheme() === 'dark';
-
+  const { events } = useInAppStory();
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
@@ -38,7 +38,6 @@ export function EventsScreen(): React.ReactNode {
         onScroll={scrollHandler}
         scrollEventThrottle={1}
       >
-        <Header />
         <View
           // eslint-disable-next-line react-native/no-inline-styles
           style={{
@@ -46,7 +45,9 @@ export function EventsScreen(): React.ReactNode {
             flex: 1,
           }}
         >
-          <Text>TODO: load event list</Text>
+          {events.map((event) => {
+            return <Text>{event.event}</Text>;
+          })}
         </View>
       </Animated.ScrollView>
     </SafeAreaView>

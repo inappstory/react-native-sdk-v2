@@ -10,7 +10,6 @@ import {
   StatusBar,
   StyleSheet,
   useColorScheme,
-  View,
   ScrollView,
   RefreshControl,
 } from 'react-native';
@@ -70,11 +69,6 @@ export function MainScreen({
     await storiesListViewModel.current?.reload();
     setRefreshing(false);
   }, []);
-  useFocusEffect(
-    React.useCallback(() => {
-      onRefresh();
-    }, [onRefresh])
-  );
   return (
     <SafeAreaView style={[styles.container, backgroundStyle]}>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
@@ -97,7 +91,7 @@ export function MainScreen({
           styleDisabled={styles.buttonDisabled}
           onPress={async () => {
             if (storiesListViewModel.current) {
-              console.log(await storiesListViewModel.current.reload());
+              await storiesListViewModel.current.reload();
             }
           }}
         >
@@ -110,7 +104,7 @@ export function MainScreen({
           onPress={async () => {
             storyManager.setTags(['tag1', 'tag2']);
             if (storiesListViewModel.current) {
-              console.log(await storiesListViewModel.current.reload());
+              await storiesListViewModel.current.reload();
             }
           }}
         >
@@ -123,14 +117,12 @@ export function MainScreen({
           onPress={async () => {
             storyManager.setTags([]);
             if (storiesListViewModel.current) {
-              console.log(await storiesListViewModel.current.reload());
+              await storiesListViewModel.current.reload();
             }
           }}
         >
           Remove tags
         </Button>
-
-        <View style={styles.pad32} />
         <Button
           containerStyle={styles.buttonContainer}
           style={styles.button}
@@ -151,7 +143,6 @@ export function MainScreen({
         >
           Project Settings
         </Button>
-        <View style={styles.pad32} />
         <Button
           containerStyle={styles.buttonContainer}
           style={styles.button}
@@ -162,8 +153,6 @@ export function MainScreen({
         >
           Show single story
         </Button>
-
-        <View style={styles.pad32} />
         <Button
           containerStyle={styles.buttonContainer}
           style={styles.button}
@@ -174,7 +163,6 @@ export function MainScreen({
         >
           Show onboarding stories
         </Button>
-        <View style={styles.pad32} />
         <Button
           containerStyle={styles.buttonContainer}
           style={styles.button}
@@ -185,7 +173,6 @@ export function MainScreen({
         >
           Open game
         </Button>
-        <View style={styles.pad32} />
         <Button
           containerStyle={styles.buttonContainer}
           style={styles.button}
@@ -196,19 +183,16 @@ export function MainScreen({
         >
           Open editor
         </Button>
-        <View style={styles.pad32} />
         <Button
           containerStyle={styles.buttonContainer}
           style={styles.button}
           styleDisabled={styles.buttonDisabled}
           onPress={() => {
-            navigation.navigate('NetworkLogger');
+            navigation.navigate('EventsScreen');
           }}
         >
-          NetworkLogger
+          Events Log
         </Button>
-
-        <View style={styles.pad32} />
         {/*</View>*/}
       </ScrollView>
     </SafeAreaView>
@@ -241,6 +225,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderRadius: 6,
     backgroundColor: '#0c62f3',
+    marginVertical: 10,
   },
   buttonDisabled: { color: 'red' },
   pad32: { height: 32 },

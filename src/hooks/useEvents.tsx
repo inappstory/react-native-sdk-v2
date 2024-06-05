@@ -4,7 +4,10 @@ import { NativeEventEmitter, NativeModules } from 'react-native';
 
 export const useEvents = () => {
   const [events, setEvents] = React.useState<any>([]);
+  //const [loading, setLoading] = React.useState(false);
+  const [_feeds, setFeeds] = React.useState<any>({});
   React.useEffect(() => {
+    console.log('set Listeners');
     const eventEmitter = new NativeEventEmitter(
       NativeModules.RNInAppStorySDKModule
     );
@@ -49,6 +52,10 @@ export const useEvents = () => {
       'requestFailure',
       'favoriteCellDidSelect',
       'editorCellDidSelect',
+      'customShare',
+      'onActionWith',
+      'storiesDidUpdated',
+      'goodItemSelected',
     ];
     [
       ...storiesEvents,
@@ -59,8 +66,43 @@ export const useEvents = () => {
     ].forEach((eventName) => {
       eventListeners.push(
         eventEmitter.addListener(eventName, (event) => {
+          console.log('event:', eventName);
+          //setLoading(true)
           if (eventName == 'getGoodsObject') {
             //FIXME: storyManager.fetchGoods(event);
+          }
+          if (eventName == 'storyListUpdate') {
+            setFeeds((feeds) => {
+              const feedName = event[0].feed + '_' + event[0].list;
+              console.log('feedName', feedName);
+              feeds[feedName] = [];
+              event.map((story) => {
+                if (
+                  feeds[feedName].findIndex(
+                    (s) => s.storyID == story.storyID
+                  ) === -1
+                ) {
+                  feeds[feedName].push(story);
+                }
+              });
+              return { ...feeds };
+            });
+          }
+          if (eventName == 'storyUpdate') {
+            const feedName = event.feed + '_' + event.list;
+            setFeeds((feeds) => {
+              if (feeds[feedName]) console.log('A?', feedName);
+              const eventIdx = feeds[feedName].findIndex(
+                (s) => s.storyID == event.storyID
+              );
+              if (eventIdx === -1) {
+                feeds[feedName].push(event);
+              } else {
+                feeds[feedName][eventIdx] = event;
+              }
+              //console.error('event index = ', eventIdx, event);
+              return { ...feeds };
+            });
           }
           setEvents((_events) => {
             _events.push({
@@ -79,5 +121,5 @@ export const useEvents = () => {
       });
     };
   }, []);
-  return events;
+  return { events, feeds: _feeds };
 };

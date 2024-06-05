@@ -5,6 +5,8 @@ import {
   useColorScheme,
   Text,
   TextInput,
+  Switch,
+  StyleSheet,
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
 
@@ -68,7 +70,7 @@ export function ProjectSettingsScreen({
   const { hasPermission, requestPermission } = useCameraPermission();
   const device = useCameraDevice('back');
   const [QREnabled, setQREnabled] = useState(false);
-
+  const [customStoryView, setCustomStoryView] = useState(false);
   const [tags, setTags] = useState(storyManager.tags);
   const [placeholders, setPlaceholders] = useState(
     JSON.stringify(storyManager.placeholders)
@@ -127,6 +129,7 @@ export function ProjectSettingsScreen({
   });
   const changeUserID = () => {
     storyManager.setUserId(randomUserId(8));
+    navigation.goBack();
   };
   const startQR = () => {
     setQREnabled(true);
@@ -155,7 +158,14 @@ export function ProjectSettingsScreen({
             flex: 1,
           }}
         >
-          <Button onPress={changeUserID}>Change user</Button>
+          <Button
+            containerStyle={styles.buttonContainer}
+            style={styles.button}
+            styleDisabled={styles.buttonDisabled}
+            onPress={changeUserID}
+          >
+            Change user
+          </Button>
           <Text>Tags:</Text>
           <TextInput
             onChangeText={(value) => setTags(value.split(','))}
@@ -170,12 +180,72 @@ export function ProjectSettingsScreen({
           />
           <Text>API Key</Text>
           <TextInput onChangeText={setAPIKey} value={APIKey} />
-          <Button onPress={startQR}>QR Scanner</Button>
-          {QREnabled && device && (
-            <Camera codeScanner={codeScanner} device={device} isActive={true} />
+          <Text>Custom story view</Text>
+          <Switch
+            trackColor={{ false: '#767577', true: '#81b0ff' }}
+            thumbColor={customStoryView ? '#f5dd4b' : '#f4f3f4'}
+            ios_backgroundColor="#3e3e3e"
+            onValueChange={() => {
+              setCustomStoryView((csv) => !csv);
+            }}
+            value={customStoryView}
+          />
+          {!QREnabled && (
+            <Button
+              containerStyle={styles.buttonContainer}
+              style={styles.button}
+              styleDisabled={styles.buttonDisabled}
+              onPress={startQR}
+            >
+              QR Scanner
+            </Button>
           )}
+
+          {QREnabled && device && (
+            <>
+              <Text>Point your camera at the QR code</Text>
+              <Camera
+                codeScanner={codeScanner}
+                device={device}
+                isActive={true}
+              />
+            </>
+          )}
+          {QREnabled && !device && <Text>Failed to access camera</Text>}
         </View>
       </Animated.ScrollView>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  // container: { flex: 1, justifyContent: "center", alignItems: "center" },
+  container: {
+    flex: 1,
+    paddingTop: StatusBar.currentHeight,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollViewInnerContainer: {
+    marginHorizontal: 20,
+    //flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  text: {
+    fontSize: 42,
+  },
+  button: { fontSize: 18, color: 'white' },
+  buttonContainer: {
+    padding: 10,
+    height: 'auto',
+    width: '100%',
+    overflow: 'hidden',
+    borderRadius: 6,
+    backgroundColor: '#0c62f3',
+    marginVertical: 10,
+  },
+  buttonDisabled: { color: 'red' },
+  pad32: { height: 32 },
+});
