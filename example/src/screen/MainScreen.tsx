@@ -67,10 +67,16 @@ export function MainScreen({
 
   const [refreshing, setRefreshing] = React.useState(false);
   const { readerOpen } = useInAppStory();
+  const [feed, setFeed] = React.useState('default');
   const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
     await storiesListViewModel.current?.reload();
     setRefreshing(false);
+  }, []);
+  const onFeedChangePress = React.useCallback(() => {
+    setFeed((feed) => {
+      return feed == 'default' ? 'test' : 'default';
+    });
   }, []);
   return (
     <SafeAreaView style={[styles.container, backgroundStyle]}>
@@ -87,7 +93,7 @@ export function MainScreen({
         }
       >
         <StoryListComponent
-          feedId="default"
+          feedId={feed}
           backgroundColor="transparent"
           viewModelExporter={viewModelExporter}
         />
@@ -102,6 +108,14 @@ export function MainScreen({
           }}
         >
           Reload StoriesList
+        </Button>
+        <Button
+          containerStyle={styles.buttonContainer}
+          style={styles.button}
+          styleDisabled={styles.buttonDisabled}
+          onPress={onFeedChangePress}
+        >
+          Change feed
         </Button>
         <Button
           containerStyle={styles.buttonContainer}
