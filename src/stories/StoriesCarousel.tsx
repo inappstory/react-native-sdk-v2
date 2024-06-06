@@ -1,9 +1,10 @@
 import * as React from 'react';
 import { StoryComponent } from './StoryComponent';
-import { FlatList } from 'react-native';
+import { FlatList, Pressable } from 'react-native';
 import InAppStorySDK from 'react-native-inappstory-sdk';
 
 export const StoriesCarousel = ({
+  feed,
   stories,
   storyManager,
   appearanceManager,
@@ -11,6 +12,7 @@ export const StoriesCarousel = ({
   showFavorites,
   favoriteStories,
   onFavoritePress,
+  favoritesOnly,
 }) => {
   const visibleIds = React.useRef([]);
   if (typeof stories === 'undefined') return;
@@ -23,21 +25,39 @@ export const StoriesCarousel = ({
           story={story}
           storyManager={storyManager}
           appearanceManager={appearanceManager}
-          onPress={onPress}
+          onPress={!favoritesOnly ? onPress : onFavoritePress}
         />
       );
     } else {
-      return story.favorites.map((story) => {
-        return (
-          <StoryComponent
-            key={story.id}
-            story={story}
-            storyManager={storyManager}
-            appearanceManager={appearanceManager}
-            onPress={onFavoritePress}
-          />
-        );
-      });
+      return (
+        <Pressable
+          style={{
+            width: appearanceManager?.storiesListOptions.card.height + 30,
+            height: appearanceManager?.storiesListOptions.card.height * 2,
+            paddingTop: appearanceManager?.storiesListOptions.topPadding,
+            flexWrap: 'wrap',
+            flexDirection: 'row',
+            flex: 1,
+            alignSelf: 'baseline',
+            top: -5,
+          }}
+          onPress={() => onFavoritePress(feed)}
+        >
+          {story.favorites.map((story) => {
+            return (
+              <StoryComponent
+                key={story.id}
+                story={story}
+                storyManager={storyManager}
+                appearanceManager={appearanceManager}
+                onPress={() => onFavoritePress(feed)}
+                cellSize={appearanceManager?.storiesListOptions.card.height / 2}
+                hideTitle={true}
+              />
+            );
+          })}
+        </Pressable>
+      );
     }
   };
   const onViewableItemsChanged = (items) => {
@@ -57,9 +77,11 @@ export const StoriesCarousel = ({
       <FlatList
         horizontal
         data={
-          !showFavorites || !favoriteStories.length
-            ? stories
-            : [...stories, { favorites: favoriteStories }]
+          !favoritesOnly
+            ? !showFavorites || !favoriteStories.length
+              ? stories
+              : [...stories, { favorites: favoriteStories }]
+            : favoriteStories
         }
         renderItem={(item) => renderItem(item)}
         onViewableItemsChanged={onViewableItemsChanged}

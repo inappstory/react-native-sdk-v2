@@ -1,7 +1,10 @@
 import * as React from 'react';
 import { useState, useCallback, createContext } from 'react';
 import { useEvents } from '../hooks/useEvents';
-
+import { View } from 'react-native';
+import BottomSheet, { BottomSheetMethods } from '@devvie/bottom-sheet';
+import { StoriesList } from '../stories/StoriesList';
+import type { StoriesListViewModel } from 'react-native-ias';
 export const InAppStoryContext = createContext({
   events: [],
   tags: [],
@@ -48,13 +51,44 @@ export const useInAppStoryContext = function (props) {
   };
 };
 
-export const InAppStoryProvider = ({ children, ...props }) => {
+export const InAppStoryProvider = ({
+  children,
+  storyManager,
+  appearanceManager,
+  ...props
+}) => {
   const context = useInAppStoryContext(props);
-
-  const { events, feeds } = useEvents();
+  const onFavoriteCell = () => {
+    sheetRef.current.open();
+  };
+  const sheetRef = React.useRef<BottomSheetMethods>({ open: () => {} });
+  const onLoadEnd = () => {};
+  const onLoadStart = () => {};
+  const storiesListViewModel = React.useRef<StoriesListViewModel>();
+  const viewModelExporter = useCallback(
+    (viewModel: StoriesListViewModel) =>
+      (storiesListViewModel.current = viewModel),
+    []
+  );
+  const { events, feeds, readerOpen } = useEvents({ onFavoriteCell });
   return (
-    <InAppStoryContext.Provider value={{ ...context, events, feeds }}>
+    <InAppStoryContext.Provider
+      value={{ ...context, events, feeds, readerOpen, onFavoriteCell }}
+    >
       {children}
+      <BottomSheet ref={sheetRef}>
+        <View style={{ paddingHorizontal: 10 }}>
+          <StoriesList
+            feed={'default'}
+            favoritesOnly={true}
+            storyManager={storyManager}
+            appearanceManager={appearanceManager}
+            onLoadEnd={onLoadEnd}
+            onLoadStart={onLoadStart}
+            viewModelExporter={viewModelExporter}
+          />
+        </View>
+      </BottomSheet>
     </InAppStoryContext.Provider>
   );
 };

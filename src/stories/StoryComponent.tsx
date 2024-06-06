@@ -7,30 +7,29 @@ export const StoryComponent = ({
   appearanceManager,
   storyManager,
   onPress,
+  cellSize,
+  hideTitle,
 }) => {
+  const size = cellSize || appearanceManager?.storiesListOptions.card.height;
   const borderRadius =
-    appearanceManager?.storiesListOptions.card.variant === 'circle'
-      ? appearanceManager?.storiesListOptions.card.height
-      : 10;
+    appearanceManager?.storiesListOptions.card.variant === 'circle' ? size : 10;
   const cardOpenedStyles = story.opened
     ? appearanceManager?.storiesListOptions.card.opened
     : appearanceManager?.storiesListOptions.card;
   const styles = StyleSheet.create({
     image: {
-      width: appearanceManager?.storiesListOptions.card.height,
-      height: appearanceManager?.storiesListOptions.card.height,
-      borderRadius: appearanceManager?.storiesListOptions.card.height,
+      width: size,
+      height: size,
+      borderRadius: borderRadius,
     },
     video: {
-      width: appearanceManager?.storiesListOptions.card.height,
-      height: appearanceManager?.storiesListOptions.card.height,
+      width: size,
+      height: size,
       borderRadius: borderRadius,
     },
     title: {
       maxWidth:
-        appearanceManager?.storiesListOptions.card.height +
-        cardOpenedStyles.border.gap * 2 +
-        cardOpenedStyles.border.width,
+        size + cardOpenedStyles.border.gap * 2 + cardOpenedStyles.border.width,
       textAlign:
         appearanceManager?.storiesListOptions.card.title.textAlign || 'center',
     },
@@ -68,10 +67,16 @@ export const StoryComponent = ({
     <Pressable
       style={{
         flexDirection: 'column',
-        paddingHorizontal: appearanceManager?.storiesListOptions.sidePadding,
+        paddingHorizontal: !cellSize
+          ? appearanceManager?.storiesListOptions.sidePadding
+          : 2,
         opacity: cardOpenedStyles.opacity || 1,
-        paddingTop: appearanceManager?.storiesListOptions.topPadding,
-        paddingBottom: appearanceManager?.storiesListOptions.bottomPadding,
+        paddingTop: !cellSize
+          ? appearanceManager?.storiesListOptions.topPadding
+          : 2,
+        paddingBottom: !cellSize
+          ? appearanceManager?.storiesListOptions.bottomPadding
+          : 2,
       }}
       onPress={() => onPress(story)}
     >
@@ -80,11 +85,11 @@ export const StoryComponent = ({
           borderWidth: cardOpenedStyles.border.width,
           borderColor: cardOpenedStyles.border.color,
           width:
-            appearanceManager?.storiesListOptions.card.height +
+            size +
             cardOpenedStyles.border.gap * 2 +
             cardOpenedStyles.border.width,
           height:
-            appearanceManager?.storiesListOptions.card.height +
+            size +
             cardOpenedStyles.border.gap * 2 +
             cardOpenedStyles.border.width,
           borderRadius: borderRadius + cardOpenedStyles.border.gap,
@@ -94,14 +99,16 @@ export const StoryComponent = ({
       >
         {cover}
       </View>
-      <Text
-        style={[
-          styles.title,
-          { color: appearanceManager?.storiesListOptions.card.title.color },
-        ]}
-      >
-        {title}
-      </Text>
+      {!hideTitle && (
+        <Text
+          style={[
+            styles.title,
+            { color: appearanceManager?.storiesListOptions.card.title.color },
+          ]}
+        >
+          {title}
+        </Text>
+      )}
     </Pressable>
   );
 };

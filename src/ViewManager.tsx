@@ -27,3 +27,9 @@ export const InappstorySdkViewManager =
     : () => {
         throw new Error(LINKING_ERROR);
       };
+export const InAppStoryFavorites =
+  UIManager.getViewManagerConfig('InAppStoryFavorites') != null
+    ? requireNativeComponent<InappstorySdkProps>('InAppStoryFavorites')
+    : () => {
+        throw new Error(LINKING_ERROR);
+      };

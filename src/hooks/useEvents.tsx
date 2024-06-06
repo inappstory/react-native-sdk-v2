@@ -2,10 +2,12 @@ import * as React from 'react';
 
 import { NativeEventEmitter, NativeModules } from 'react-native';
 
-export const useEvents = () => {
+export const useEvents = ({ onFavoriteCell }) => {
+  //console.error('sheet', sheetRef.open);
   const [events, setEvents] = React.useState<any>([]);
   //const [loading, setLoading] = React.useState(false);
   const [_feeds, setFeeds] = React.useState<any>({});
+  const [readerOpen, setReaderOpen] = React.useState<any>(false);
   React.useEffect(() => {
     console.log('set Listeners');
     const eventEmitter = new NativeEventEmitter(
@@ -70,20 +72,27 @@ export const useEvents = () => {
         eventEmitter.addListener(eventName, (event) => {
           console.log('event:', eventName);
           //if (!event.length) return;
+          if (eventName == 'storyReaderWillShow') {
+            setReaderOpen(true);
+          }
+          if (eventName == 'storyReaderDidClose' || eventName == 'closeStory') {
+            setReaderOpen(false);
+          }
           if (eventName == 'getGoodsObject') {
             //setLoading(true)
             //FIXME: storyManager.fetchGoods(event);
           }
           if (eventName == 'favoriteCellDidSelect') {
+            onFavoriteCell();
+            //sheetRef.open();
             //FIXME: navigate to favorites list
           }
           if (eventName == 'storyListUpdate') {
+            const feedName = event.feed + '_' + event.list;
+            console.error('slu', feedName, event.stories.length);
             setFeeds((feeds) => {
-              if (!event.length) return feeds;
-              const feedName = event[0].feed + '_' + event[0].list;
-              console.log('feedName', feedName);
               feeds[feedName] = [];
-              event.map((story) => {
+              event.stories.map((story) => {
                 if (
                   feeds[feedName].findIndex(
                     (s) => s.storyID == story.storyID
@@ -128,6 +137,6 @@ export const useEvents = () => {
         eventListener.remove();
       });
     };
-  }, []);
-  return { events, feeds: _feeds };
+  }, [onFavoriteCell]);
+  return { events, feeds: _feeds, readerOpen, onFavoriteCell };
 };

@@ -315,20 +315,23 @@ class RNInAppStorySDKModule: RCTEventEmitter {
       DispatchQueue.main.async {
         self.storiesAPI = StoryListAPI(feed: feed, isFavorite: false)
         self.storiesAPI.storyListUpdate = {storiesList,isFavorite in
-            RNInAppStorySDKModule.emitter.sendEvent(withName: "storyListUpdate", body: storiesList.map { [
-              "storyID": $0.storyID,
-              "storyData": $0.storyData,
-              "title": $0.title,
-              "coverImagePath": $0.coverImagePath,
-              "coverVideoPath": $0.coverVideoPath,
-              "backgroundColor": $0.backgroundColor,
-              "titleColor": $0.titleColor,
-              "opened": $0.opened,
-              "hasAudio": $0.hasAudio,
-              "list": "feed",
-              "feed": feed,
-            ] })
-        }
+            RNInAppStorySDKModule.emitter.sendEvent(withName: "storyListUpdate", body: [
+              "stories": storiesList.map { [
+                "storyID": $0.storyID,
+                "storyData": $0.storyData,
+                "title": $0.title,
+                "coverImagePath": $0.coverImagePath,
+                "coverVideoPath": $0.coverVideoPath,
+                "backgroundColor": $0.backgroundColor,
+                "titleColor": $0.titleColor,
+                "opened": $0.opened,
+                "hasAudio": $0.hasAudio,
+                "list": "feed",
+                "feed": feed,
+              ]},
+                "feed": feed,
+                "list": "feed", 
+            ])}
         self.storiesAPI.storyUpdate = {storyData in
             RNInAppStorySDKModule.emitter.sendEvent(withName: "storyUpdate", body: [
               "storyID": storyData.storyID,
@@ -353,20 +356,24 @@ class RNInAppStorySDKModule: RCTEventEmitter {
       DispatchQueue.main.async {
         self.favoriteStoriesAPI = StoryListAPI(feed: feed, isFavorite: true)
         self.favoriteStoriesAPI.storyListUpdate = {storiesList,isFavorite in
-            RNInAppStorySDKModule.emitter.sendEvent(withName: "storyListUpdate", body: storiesList.map { [
-              "storyID": $0.storyID,
-              "storyData": $0.storyData,
-              "title": $0.title,
-              "coverImagePath": $0.coverImagePath,
-              "coverVideoPath": $0.coverVideoPath,
-              "backgroundColor": $0.backgroundColor,
-              "titleColor": $0.titleColor,
-              "opened": $0.opened,
-              "hasAudio": $0.hasAudio,
-              "list": "favorites",
-              "feed": feed,
-            ] })
-        }
+            
+            RNInAppStorySDKModule.emitter.sendEvent(withName: "storyListUpdate", body: [
+              "stories": storiesList.map { [
+                "storyID": $0.storyID,
+                "storyData": $0.storyData,
+                "title": $0.title,
+                "coverImagePath": $0.coverImagePath,
+                "coverVideoPath": $0.coverVideoPath,
+                "backgroundColor": $0.backgroundColor,
+                "titleColor": $0.titleColor,
+                "opened": $0.opened,
+                "hasAudio": $0.hasAudio,
+                "list": "favorites",
+                "feed": feed,
+              ]},
+                "feed": feed,
+                "list": "favorites",
+            ])}
         self.favoriteStoriesAPI.storyUpdate = {storyData in
             RNInAppStorySDKModule.emitter.sendEvent(withName: "storyUpdate", body: [
               "storyID": storyData.storyID,

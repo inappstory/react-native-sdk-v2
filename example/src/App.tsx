@@ -11,12 +11,16 @@ import { EventsScreen } from './screen/EventsScreen';
 import { ProjectSettingsScreen } from './screen/ProjectSettingsScreen';
 import { InAppStoryProvider } from '../../src/context/InAppStoryContext';
 import { AppearanceSettingsScreen } from './screen/AppearanceSettings';
+import { appearanceManager, storyManager } from './services/StoryService';
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
-    <InAppStoryProvider>
+    <InAppStoryProvider
+      storyManager={storyManager}
+      appearanceManager={appearanceManager}
+    >
       <NavigationContainer>
         <Stack.Navigator
           initialRouteName="Home"

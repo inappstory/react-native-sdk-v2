@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { PixelRatio, Platform, UIManager, findNodeHandle } from 'react-native';
-import { InappstorySdkViewManager } from './ViewManager';
+import { InAppStoryFavorites, InappstorySdkViewManager } from './ViewManager';
 
 const createFragment = (viewId) =>
   UIManager.dispatchViewManagerCommand(
@@ -17,6 +17,7 @@ export const StoriesWidget = ({
   imagePlaceholders,
   userID,
   feed,
+  favoritesOnly,
 }) => {
   const ref = useRef(null);
   useEffect(() => {
@@ -26,7 +27,7 @@ export const StoriesWidget = ({
     }
     onViewLoaded(viewId);
   }, [onViewLoaded]);
-  return (
+  return !favoritesOnly ? (
     <InappstorySdkViewManager
       style={{
         // converts dpi to px, provide desired height
@@ -41,5 +42,22 @@ export const StoriesWidget = ({
       userID={userID}
       feed={feed}
     />
+  ) : (
+    <>
+      <InAppStoryFavorites
+        style={{
+          // converts dpi to px, provide desired height
+          height: PixelRatio.getPixelSizeForLayoutSize(120),
+          // converts dpi to px, provide desired width
+          width: PixelRatio.getPixelSizeForLayoutSize(370),
+        }}
+        tags={tags}
+        ref={ref}
+        placeholders={placeholders}
+        imagePlaceholders={imagePlaceholders}
+        userID={userID}
+        feed={feed}
+      />
+    </>
   );
 };

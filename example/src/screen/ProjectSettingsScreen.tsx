@@ -5,7 +5,6 @@ import {
   useColorScheme,
   Text,
   TextInput,
-  Switch,
   StyleSheet,
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
@@ -70,7 +69,6 @@ export function ProjectSettingsScreen({
   const { hasPermission, requestPermission } = useCameraPermission();
   const device = useCameraDevice('back');
   const [QREnabled, setQREnabled] = useState(false);
-  const [customStoryView, setCustomStoryView] = useState(false);
   const [tags, setTags] = useState(storyManager.tags);
   const [placeholders, setPlaceholders] = useState(
     JSON.stringify(storyManager.placeholders)
@@ -180,16 +178,6 @@ export function ProjectSettingsScreen({
           />
           <Text>API Key</Text>
           <TextInput onChangeText={setAPIKey} value={APIKey} />
-          <Text>Custom story view</Text>
-          <Switch
-            trackColor={{ false: '#767577', true: '#81b0ff' }}
-            thumbColor={customStoryView ? '#f5dd4b' : '#f4f3f4'}
-            ios_backgroundColor="#3e3e3e"
-            onValueChange={() => {
-              setCustomStoryView((csv) => !csv);
-            }}
-            value={customStoryView}
-          />
           {!QREnabled && (
             <Button
               containerStyle={styles.buttonContainer}

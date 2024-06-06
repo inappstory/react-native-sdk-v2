@@ -20,8 +20,10 @@ export const StoriesList = ({
   onLoadStart,
   onLoadEnd,
   viewModelExporter,
+  favoritesOnly,
 }) => {
-  const { customStoryView, showFavorites, feeds } = useInAppStory();
+  const { customStoryView, showFavorites, feeds, onFavoriteCell } =
+    useInAppStory();
   const tags = storyManager.tags;
   const placeholders = storyManager.placeholders;
   const imagePlaceholders = storyManager.imagePlaceholders;
@@ -64,15 +66,24 @@ export const StoriesList = ({
   const onPress = React.useCallback((story) => {
     InAppStorySDK.selectStoryCellWith(String(story.storyID));
   }, []);
-  const onFavoritePress = React.useCallback((story) => {
-    InAppStorySDK.selectFavoriteStoryCellWith(String(story.storyID));
-  }, []);
+  const onFavoritePress = React.useCallback(
+    (story) => {
+      if (typeof story == 'string') {
+        onFavoriteCell();
+      } else {
+        InAppStorySDK.selectFavoriteStoryCellWith(String(story.storyID));
+      }
+    },
+    [onFavoriteCell]
+  );
+
   const customFeed = false;
   return (
     <View userID={userID}>
       {!customFeed && customStoryView && (
         <>
           <StoriesCarousel
+            feed={feed}
             stories={feeds[feed + '_feed']}
             showFavorites={showFavorites}
             favoriteStories={feeds[feed + '_favorites']}
@@ -80,6 +91,7 @@ export const StoriesList = ({
             appearanceManager={appearanceManager}
             onPress={onPress}
             onFavoritePress={onFavoritePress}
+            favoritesOnly={favoritesOnly}
           />
         </>
       )}
@@ -91,6 +103,7 @@ export const StoriesList = ({
           placeholders={placeholders}
           imagePlaceholders={imagePlaceholders}
           userID={userID}
+          favoritesOnly={favoritesOnly}
         />
       )}
     </View>

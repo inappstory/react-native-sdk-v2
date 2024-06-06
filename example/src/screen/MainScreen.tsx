@@ -17,7 +17,10 @@ import React, { useCallback, useRef } from 'react';
 import Button from 'react-native-button';
 
 import { Colors } from 'react-native/Libraries/NewAppScreen';
-import { type StoriesListViewModel } from 'react-native-inappstory-sdk';
+import {
+  useInAppStory,
+  type StoriesListViewModel,
+} from 'react-native-inappstory-sdk';
 
 import { StoryListComponent } from '../components/StoryListComponent';
 import { storyManager } from '../services/StoryService';
@@ -63,7 +66,7 @@ export function MainScreen({
   );
 
   const [refreshing, setRefreshing] = React.useState(false);
-
+  const { readerOpen } = useInAppStory();
   const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
     await storiesListViewModel.current?.reload();
@@ -71,7 +74,10 @@ export function MainScreen({
   }, []);
   return (
     <SafeAreaView style={[styles.container, backgroundStyle]}>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+      <StatusBar
+        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+        hidden={readerOpen}
+      />
 
       <ScrollView
         style={styles.scrollView}
