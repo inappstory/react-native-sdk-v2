@@ -22,7 +22,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
      "startGame", "finishGame", "closeGame", "eventGame", "gameFailure","gameReaderWillShow","gameReaderDidClose","gameComplete",
      "getGoodsObject",
      "storyListUpdate", "storyUpdate",
-     "favoritesUpdate",
+     "favoritesUpdate","scrollUpdate",
      "storyReaderWillShow","storyReaderDidClose","sessionFailure","storyFailure","currentStoryFailure","networkFailure","requestFailure","favoriteCellDidSelect","editorCellDidSelect",
      "customShare", "onActionWith","storiesDidUpdated","goodItemSelected",
     ]      // etc. 
@@ -68,6 +68,14 @@ class RNInAppStorySDKModule: RCTEventEmitter {
         InAppStory.shared.storyReaderDidClose = { showed in
             NSLog("TODO: storyReaderDidClose closure");
             RNInAppStorySDKModule.emitter.sendEvent(withName: "storyReaderDidClose", body: [])
+        }
+        self.storiesAPI.favoritesUpdate = { showed in
+            NSLog("TODO: favoritesUpdate closure");
+            RNInAppStorySDKModule.emitter.sendEvent(withName: "favoritesUpdate", body: [])
+        }
+        self.storiesAPI.scrollUpdate = { showed in
+            NSLog("TODO: scrollUpdate closure");
+            RNInAppStorySDKModule.emitter.sendEvent(withName: "scrollUpdate", body: [])
         }
         InAppStory.shared.gameEvent = { gameEvent in
             NSLog("gameEvent");
@@ -176,10 +184,10 @@ class RNInAppStorySDKModule: RCTEventEmitter {
           NSLog("TODO: customShare closure");
         }
         
-        InAppStory.shared.onActionWith = { target, type, storyType in
+        /*InAppStory.shared.onActionWith = { target, type, storyType in
           RNInAppStorySDKModule.emitter.sendEvent(withName: "onActionWith", body: [])
           NSLog("TODO: onActionWith closure");
-        }
+        }*/
 
         InAppStory.shared.storiesDidUpdated = { isContent, storyType in
           NSLog("TODO: storiesDidUpdated closure");
@@ -305,35 +313,36 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   @objc
   func getStories(_ feed:String) {
       DispatchQueue.main.async {
-          self.storiesAPI.storyListUpdate = {storiesList,isFavorite in
-              RNInAppStorySDKModule.emitter.sendEvent(withName: "storyListUpdate", body: storiesList.map { [
-                "storyID": $0.storyID,
-                "storyData": $0.storyData,
-                "title": $0.title,
-                "coverImagePath": $0.coverImagePath,
-                "coverVideoPath": $0.coverVideoPath,
-                "backgroundColor": $0.backgroundColor,
-                "titleColor": $0.titleColor,
-                "opened": $0.opened,
-                "hasAudio": $0.hasAudio,
-                "list": "feed",
-                "feed": feed,
-              ] })
-          }
-          self.storiesAPI.storyUpdate = {storyData in
-              RNInAppStorySDKModule.emitter.sendEvent(withName: "storyUpdate", body: [
-                "storyID": storyData.storyID,
-                "storyData": storyData.storyData,
-                "title": storyData.title,
-                "coverImagePath": storyData.coverImagePath,
-                "coverVideoPath": storyData.coverVideoPath,
-                "backgroundColor": storyData.backgroundColor,
-                "titleColor": storyData.titleColor,
-                "opened": storyData.opened,
-                "hasAudio": storyData.hasAudio,
-                "list": "feed",
-                "feed": feed,
-              ])
+        self.storiesAPI = StoryListAPI(feed: feed, isFavorite: false)
+        self.storiesAPI.storyListUpdate = {storiesList,isFavorite in
+            RNInAppStorySDKModule.emitter.sendEvent(withName: "storyListUpdate", body: storiesList.map { [
+              "storyID": $0.storyID,
+              "storyData": $0.storyData,
+              "title": $0.title,
+              "coverImagePath": $0.coverImagePath,
+              "coverVideoPath": $0.coverVideoPath,
+              "backgroundColor": $0.backgroundColor,
+              "titleColor": $0.titleColor,
+              "opened": $0.opened,
+              "hasAudio": $0.hasAudio,
+              "list": "feed",
+              "feed": feed,
+            ] })
+        }
+        self.storiesAPI.storyUpdate = {storyData in
+            RNInAppStorySDKModule.emitter.sendEvent(withName: "storyUpdate", body: [
+              "storyID": storyData.storyID,
+              "storyData": storyData.storyData,
+              "title": storyData.title,
+              "coverImagePath": storyData.coverImagePath,
+              "coverVideoPath": storyData.coverVideoPath,
+              "backgroundColor": storyData.backgroundColor,
+              "titleColor": storyData.titleColor,
+              "opened": storyData.opened,
+              "hasAudio": storyData.hasAudio,
+              "list": "feed",
+              "feed": feed,
+            ])
           }
           self.storiesAPI.getStoriesList()
       }
@@ -342,35 +351,36 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   @objc
   func getFavoriteStories(_ feed:String) {
       DispatchQueue.main.async {
-          self.favoriteStoriesAPI.storyListUpdate = {storiesList,isFavorite in
-              RNInAppStorySDKModule.emitter.sendEvent(withName: "storyListUpdate", body: storiesList.map { [
-                "storyID": $0.storyID,
-                "storyData": $0.storyData,
-                "title": $0.title,
-                "coverImagePath": $0.coverImagePath,
-                "coverVideoPath": $0.coverVideoPath,
-                "backgroundColor": $0.backgroundColor,
-                "titleColor": $0.titleColor,
-                "opened": $0.opened,
-                "hasAudio": $0.hasAudio,
-                "list": "favorites",
-                "feed": feed,
-              ] })
-          }
-          self.favoriteStoriesAPI.storyUpdate = {storyData in
-              RNInAppStorySDKModule.emitter.sendEvent(withName: "storyUpdate", body: [
-                "storyID": storyData.storyID,
-                "storyData": storyData.storyData,
-                "title": storyData.title,
-                "coverImagePath": storyData.coverImagePath,
-                "coverVideoPath": storyData.coverVideoPath,
-                "backgroundColor": storyData.backgroundColor,
-                "titleColor": storyData.titleColor,
-                "opened": storyData.opened,
-                "hasAudio": storyData.hasAudio,
-                "list": "favorites",
-                "feed": feed,
-              ])
+        self.favoriteStoriesAPI = StoryListAPI(feed: feed, isFavorite: true)
+        self.favoriteStoriesAPI.storyListUpdate = {storiesList,isFavorite in
+            RNInAppStorySDKModule.emitter.sendEvent(withName: "storyListUpdate", body: storiesList.map { [
+              "storyID": $0.storyID,
+              "storyData": $0.storyData,
+              "title": $0.title,
+              "coverImagePath": $0.coverImagePath,
+              "coverVideoPath": $0.coverVideoPath,
+              "backgroundColor": $0.backgroundColor,
+              "titleColor": $0.titleColor,
+              "opened": $0.opened,
+              "hasAudio": $0.hasAudio,
+              "list": "favorites",
+              "feed": feed,
+            ] })
+        }
+        self.favoriteStoriesAPI.storyUpdate = {storyData in
+            RNInAppStorySDKModule.emitter.sendEvent(withName: "storyUpdate", body: [
+              "storyID": storyData.storyID,
+              "storyData": storyData.storyData,
+              "title": storyData.title,
+              "coverImagePath": storyData.coverImagePath,
+              "coverVideoPath": storyData.coverVideoPath,
+              "backgroundColor": storyData.backgroundColor,
+              "titleColor": storyData.titleColor,
+              "opened": storyData.opened,
+              "hasAudio": storyData.hasAudio,
+              "list": "favorites",
+              "feed": feed,
+            ])
           }
           self.favoriteStoriesAPI.getStoriesList()
       }
@@ -380,6 +390,13 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   func selectStoryCellWith(_ storyID: String) {
      DispatchQueue.main.async {
       self.storiesAPI.selectStoryCellWith(id: storyID);
+     }
+  }
+
+  @objc
+  func selectFavoriteStoryCellWith(_ storyID: String) {
+     DispatchQueue.main.async {
+      self.favoriteStoriesAPI.selectStoryCellWith(id: storyID);
      }
   }
 

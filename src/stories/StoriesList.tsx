@@ -21,7 +21,7 @@ export const StoriesList = ({
   onLoadEnd,
   viewModelExporter,
 }) => {
-  const ias = useInAppStory();
+  const { customStoryView, showFavorites, feeds } = useInAppStory();
   const tags = storyManager.tags;
   const placeholders = storyManager.placeholders;
   const imagePlaceholders = storyManager.imagePlaceholders;
@@ -34,16 +34,16 @@ export const StoriesList = ({
   }, [feed, storyManager]);
   React.useEffect(() => {
     onLoadStart();
-    if (ias?.feeds[feed + '_feed']?.length) {
+    if (feeds[feed + '_feed']?.length) {
       onLoadEnd({
-        defaultListLength: ias.feeds[feed + '_feed'].length || 0,
+        defaultListLength: feeds[feed + '_feed'].length || 0,
         feed,
         list: 'feed',
       });
     } else {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ias.feeds]);
+  }, [feeds]);
   React.useEffect(() => {
     viewModelExporter({
       reload: () => {
@@ -64,19 +64,26 @@ export const StoriesList = ({
   const onPress = React.useCallback((story) => {
     InAppStorySDK.selectStoryCellWith(String(story.storyID));
   }, []);
+  const onFavoritePress = React.useCallback((story) => {
+    InAppStorySDK.selectFavoriteStoryCellWith(String(story.storyID));
+  }, []);
   const customFeed = false;
-  const customizedCells = true;
   return (
     <View userID={userID}>
-      {!customFeed && customizedCells && (
-        <StoriesCarousel
-          stories={ias.feeds[feed + '_feed']}
-          storyManager={storyManager}
-          appearanceManager={appearanceManager}
-          onPress={onPress}
-        />
+      {!customFeed && customStoryView && (
+        <>
+          <StoriesCarousel
+            stories={feeds[feed + '_feed']}
+            showFavorites={showFavorites}
+            favoriteStories={feeds[feed + '_favorites']}
+            storyManager={storyManager}
+            appearanceManager={appearanceManager}
+            onPress={onPress}
+            onFavoritePress={onFavoritePress}
+          />
+        </>
       )}
-      {!customFeed && !customizedCells && (
+      {!customFeed && !customStoryView && (
         <StoriesWidget
           feed={feed}
           onViewLoaded={onViewLoaded}

@@ -10,6 +10,7 @@ import { FavoritesScreen } from './screen/FavoritesScreen';
 import { EventsScreen } from './screen/EventsScreen';
 import { ProjectSettingsScreen } from './screen/ProjectSettingsScreen';
 import { InAppStoryProvider } from '../../src/context/InAppStoryContext';
+import { AppearanceSettingsScreen } from './screen/AppearanceSettings';
 
 const Stack = createNativeStackNavigator();
 
@@ -48,6 +49,10 @@ export default function App() {
           <Stack.Screen
             name="ProjectSettingsScreen"
             component={ProjectSettingsScreen}
+          />
+          <Stack.Screen
+            name="AppearanceSettingsScreen"
+            component={AppearanceSettingsScreen}
           />
         </Stack.Navigator>
       </NavigationContainer>

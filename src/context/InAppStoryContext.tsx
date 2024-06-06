@@ -19,6 +19,9 @@ export const useInAppStoryContext = function (props) {
   const [lang, setLang] = useState('en_US');
   const [userID, setUserID] = useState('en_US');
   const [apiKey, setApiKey] = useState('en_US');
+  const [customStoryView, setCustomStoryView] = useState(true);
+  const [showFavorites, setShowFavorites] = useState(false);
+
   const toggleTest = useCallback(() => {
     setTest((_test) => (_test === 'Hi' ? 'You are awesome' : 'Hi'));
   }, []);
@@ -38,6 +41,10 @@ export const useInAppStoryContext = function (props) {
     setUserID,
     setApiKey,
     toggleTest,
+    customStoryView,
+    setCustomStoryView,
+    showFavorites,
+    setShowFavorites,
   };
 };
 

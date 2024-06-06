@@ -8,20 +8,37 @@ export const StoriesCarousel = ({
   storyManager,
   appearanceManager,
   onPress,
+  showFavorites,
+  favoriteStories,
+  onFavoritePress,
 }) => {
   const visibleIds = React.useRef([]);
   if (typeof stories === 'undefined') return;
   const renderItem = (item) => {
     const story = item.item;
-    return (
-      <StoryComponent
-        key={story.id}
-        story={story}
-        storyManager={storyManager}
-        appearanceManager={appearanceManager}
-        onPress={onPress}
-      />
-    );
+    if (!story.favorites) {
+      return (
+        <StoryComponent
+          key={story.id}
+          story={story}
+          storyManager={storyManager}
+          appearanceManager={appearanceManager}
+          onPress={onPress}
+        />
+      );
+    } else {
+      return story.favorites.map((story) => {
+        return (
+          <StoryComponent
+            key={story.id}
+            story={story}
+            storyManager={storyManager}
+            appearanceManager={appearanceManager}
+            onPress={onFavoritePress}
+          />
+        );
+      });
+    }
   };
   const onViewableItemsChanged = (items) => {
     const newIDs = items.changed
@@ -39,7 +56,11 @@ export const StoriesCarousel = ({
     <>
       <FlatList
         horizontal
-        data={stories}
+        data={
+          !showFavorites || !favoriteStories.length
+            ? stories
+            : [...stories, { favorites: favoriteStories }]
+        }
         renderItem={(item) => renderItem(item)}
         onViewableItemsChanged={onViewableItemsChanged}
         showsHorizontalScrollIndicator={false}

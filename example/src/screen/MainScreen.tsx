@@ -148,6 +148,16 @@ export function MainScreen({
           style={styles.button}
           styleDisabled={styles.buttonDisabled}
           onPress={() => {
+            navigation.navigate('AppearanceSettingsScreen');
+          }}
+        >
+          Appearance Settings
+        </Button>
+        <Button
+          containerStyle={styles.buttonContainer}
+          style={styles.button}
+          styleDisabled={styles.buttonDisabled}
+          onPress={() => {
             InAppStorySDK.showSingle('55512');
           }}
         >

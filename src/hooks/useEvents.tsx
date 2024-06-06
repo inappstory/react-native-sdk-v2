@@ -56,6 +56,8 @@ export const useEvents = () => {
       'onActionWith',
       'storiesDidUpdated',
       'goodItemSelected',
+      'favoritesUpdate',
+      'scrollUpdate',
     ];
     [
       ...storiesEvents,
@@ -67,12 +69,17 @@ export const useEvents = () => {
       eventListeners.push(
         eventEmitter.addListener(eventName, (event) => {
           console.log('event:', eventName);
-          //setLoading(true)
+          //if (!event.length) return;
           if (eventName == 'getGoodsObject') {
+            //setLoading(true)
             //FIXME: storyManager.fetchGoods(event);
+          }
+          if (eventName == 'favoriteCellDidSelect') {
+            //FIXME: navigate to favorites list
           }
           if (eventName == 'storyListUpdate') {
             setFeeds((feeds) => {
+              if (!event.length) return feeds;
               const feedName = event[0].feed + '_' + event[0].list;
               console.log('feedName', feedName);
               feeds[feedName] = [];
@@ -108,6 +115,7 @@ export const useEvents = () => {
             _events.push({
               event: eventName,
               data: event,
+              time: +Date.now(),
             });
             return _events;
           });
