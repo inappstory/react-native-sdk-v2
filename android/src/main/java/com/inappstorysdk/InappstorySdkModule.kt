@@ -80,10 +80,10 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
     var ias: InAppStoryManager? = null
     var appearanceManager: AppearanceManager? = null;
     var api:InAppStoryAPI?  = null;
+    var favoritesApi:InAppStoryAPI?  = null;
     var TAG:String = "IAS_SDK_API";
 
     var stories: ArrayList<String>? = null;
-    var uniqueId1 = "list1";
     private var listenerCount = 0
 
     @ReactMethod
@@ -91,7 +91,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
         Log.d("InappstorySdkModule", "getStories");
         this.api?.storyList?.load(
             feed,
-            uniqueId1,
+            "feed",
             true,
             false,
             this.ias?.getTags()
@@ -101,9 +101,9 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
     @ReactMethod
     fun getFavoriteStories(feed: String) {
         Log.d("InappstorySdkModule", "getFavoriteStories");
-        this.api?.storyList?.load(
+        this.favoritesApi?.storyList?.load(
             feed,
-            uniqueId1,
+            "favorites",
             true,
             true,
             this.ias?.getTags()
@@ -131,8 +131,11 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
       //this.ias = this.createInAppStoryManager(apiKey, userID)
       this.appearanceManager = AppearanceManager()
       this.api = InAppStoryAPI()
+      this.favoritesApi = InAppStoryAPI()
       this.createManager(apiKey, userID, this.api as InAppStoryAPI)
-      this.subscribeLists(this.api as InAppStoryAPI)
+      this.createManager(apiKey, userID, this.favoritesApi as InAppStoryAPI)
+      this.subscribeLists(this.api as InAppStoryAPI, "feed")
+      this.subscribeLists(this.favoritesApi as InAppStoryAPI, "favorites")
   }
 
   @ReactMethod
@@ -697,14 +700,14 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
         val stringIds: ArrayList<String> = storyIDs.toArrayList() as ArrayList<String>
         var ids: List<Int> = stringIds.map{it.toInt()}
         Log.d("InappstorySdkModule", "ids: $ids")
-        this.api?.storyList?.updateVisiblePreviews(ids, "list1")
+        this.api?.storyList?.updateVisiblePreviews(ids, "feed")
     }
     @ReactMethod
     fun selectStoryCellWith(storyID: String) {
         Log.d("InappstorySdkModule", "selectStoryCellWith")
         this.api?.storyList?.openStoryReader(
             reactContext.currentActivity,
-            "list1",
+            "feed",
             storyID.toInt(),
             this.appearanceManager
         );
@@ -730,14 +733,14 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
             true
         )
     }
-    fun subscribeLists(inAppStoryAPI: InAppStoryAPI) {
-        inAppStoryAPI.addSubscriber(object : InAppStoryAPIListSubscriber(uniqueId1) {
+    fun subscribeLists(inAppStoryAPI: InAppStoryAPI, feed: String) {
+        inAppStoryAPI.addSubscriber(object : InAppStoryAPIListSubscriber(feed) {
             override fun updateFavoriteItemData(favorites: List<StoryFavoriteItemAPIData>) {
-                Log.e(TAG, "$uniqueId1 updateFavoriteItemData: $favorites")
+                Log.e(TAG, "$feed updateFavoriteItemData: $favorites")
             }
 
             override fun updateStoryData(story: StoryAPIData) {
-                Log.e(TAG, "$uniqueId1 updateStoryData: $story")
+                Log.e(TAG, "$feed updateStoryData: $story")
                 var storyData = Arguments.makeNativeMap(
                         mutableMapOf(
                             "storyID" to story.id,
@@ -749,7 +752,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                             "titleColor" to story.titleColor,
                             "opened" to story.opened,
                             "hasAudio" to false, //FIXME
-                            "list" to "feed",
+                            "list" to feed,
                             "feed" to story.storyData.feed,
                         ) as Map<String, Any>)
                     Log.e(TAG, "Item = $story")
@@ -757,7 +760,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
             }
 
             override fun updateStoriesData(stories: List<StoryAPIData>) {
-                Log.e(TAG, "$uniqueId1 updateStoriesData: $stories")
+                Log.e(TAG, "$feed updateStoriesData: $stories")
                 val storiesList = ArrayList<WritableNativeMap>()
                 val iterator = stories.listIterator()
                 for (item in iterator) {
@@ -772,7 +775,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                             "titleColor" to item.titleColor,
                             "opened" to item.opened,
                             "hasAudio" to false, //FIXME
-                            "list" to "feed",
+                            "list" to feed,
                             "feed" to item.storyData.feed,
                         ) as Map<String, Any>)
                     Log.e(TAG, "Item = $item")
@@ -794,7 +797,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                 val map:WritableMap = Arguments.createMap()
                 map.putArray("stories", Arguments.makeNativeArray(storiesList));
                 map.putString("feed", "default")
-                map.putString("list", "feed")
+                map.putString("list", feed)
                 //map.putString("key1", "Value1");
                 sendEvent(reactContext,"storyListUpdate", map)
                 //stories.clear()
@@ -806,15 +809,15 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
             }
 
             override fun storyIsOpened(storyId: Int) {
-                Log.e(TAG, "$uniqueId1 storyIsOpened: $storyId")
+                Log.e(TAG, "$feed storyIsOpened: $storyId")
             }
 
             override fun readerIsClosed() {
-                Log.e(TAG, "$uniqueId1 readerIsClosed")
+                Log.e(TAG, "$feed readerIsClosed")
             }
 
             override fun readerIsOpened() {
-                Log.e(TAG, "$uniqueId1 readerIsOpened")
+                Log.e(TAG, "$feed readerIsOpened")
             }
         })
     }
