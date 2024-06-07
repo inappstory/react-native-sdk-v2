@@ -14,6 +14,8 @@ RCT_EXTERN_METHOD(initWith:(NSString *)apiKey userID:(NSString *)userID)
 
 RCT_EXTERN_METHOD(getStories:(NSString *)feed)
 RCT_EXTERN_METHOD(getFavoriteStories:(NSString *)feed)
+RCT_EXTERN_METHOD(getCellRatio:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+
 
 RCT_EXTERN_METHOD(sliderEvent:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 

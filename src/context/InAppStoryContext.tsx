@@ -23,7 +23,7 @@ export const useInAppStoryContext = function (props) {
   const [userID, setUserID] = useState('en_US');
   const [apiKey, setApiKey] = useState('en_US');
   const [customStoryView, setCustomStoryView] = useState(true);
-  const [showFavorites, setShowFavorites] = useState(false);
+  const [showFavorites, setShowFavorites] = useState(true);
 
   const toggleTest = useCallback(() => {
     setTest((_test) => (_test === 'Hi' ? 'You are awesome' : 'Hi'));

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import * as React from 'react';
 
 import { NativeEventEmitter, NativeModules } from 'react-native';
@@ -83,8 +84,6 @@ export const useEvents = ({ onFavoriteCell }) => {
           }
           if (eventName == 'favoriteCellDidSelect') {
             onFavoriteCell();
-            //sheetRef.open();
-            //FIXME: navigate to favorites list
           }
           if (eventName == 'storyListUpdate') {
             const feedName = event.feed + '_' + event.list;
@@ -134,6 +133,6 @@ export const useEvents = ({ onFavoriteCell }) => {
         eventListener.remove();
       });
     };
-  }, [onFavoriteCell]);
+  }, []);
   return { events, feeds: _feeds, readerOpen, onFavoriteCell };
 };

@@ -40,7 +40,6 @@ export {
 //import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export class StoryManager extends StoryManagerV1 {
-  sessionId: string = '';
   apiKey: string = '';
   userId: string | number = '';
   tags: string[] = [];
@@ -180,8 +179,6 @@ export class StoryManager extends StoryManagerV1 {
   setApiKey(apiKey: string): void {
     this.apiKey = apiKey;
     InAppStorySDK.initWith(this.apiKey, this.userId);
-    this.sessionId = '';
-    //FIXME: create new session?
   }
   async fetchFeed(feed: string) {
     console.log('getStories & getFavorites');

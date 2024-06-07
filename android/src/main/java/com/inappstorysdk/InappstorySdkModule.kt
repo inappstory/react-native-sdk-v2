@@ -96,7 +96,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
       Log.d("InappstorySdkModule", "initWith")
       this.ias = this.createInAppStoryManager(apiKey, userID)
       this.appearanceManager = AppearanceManager()
-      this.api = InAppStoryAPI().init(reactContext.getApplicationContext());
+      this.api = InAppStoryAPI()
   }
 
   @ReactMethod
