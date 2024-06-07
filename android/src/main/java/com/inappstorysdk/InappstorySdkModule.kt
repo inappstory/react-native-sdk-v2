@@ -128,10 +128,10 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
   @ReactMethod
   fun initWith(apiKey: String, userID: String) {
       Log.d("InappstorySdkModule", "initWith")
-      this.ias = this.createInAppStoryManager(apiKey, userID)
+      //this.ias = this.createInAppStoryManager(apiKey, userID)
       this.appearanceManager = AppearanceManager()
       this.api = InAppStoryAPI()
-      this.createManager(this.api as InAppStoryAPI)
+      this.createManager(apiKey, userID, this.api as InAppStoryAPI)
       this.subscribeLists(this.api as InAppStoryAPI)
   }
 
@@ -694,8 +694,10 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
     @ReactMethod
     fun setVisibleWith(storyIDs: ReadableArray) {
         Log.d("InappstorySdkModule", "setVisibleWith")
-        val ids: ArrayList<Int> = storyIDs.toArrayList() as ArrayList<Int>
-        this.api?.storyList?.updateVisiblePreviews(ids.toList(), "list1")
+        val stringIds: ArrayList<String> = storyIDs.toArrayList() as ArrayList<String>
+        var ids: List<Int> = stringIds.map{it.toInt()}
+        Log.d("InappstorySdkModule", "ids: $ids")
+        this.api?.storyList?.updateVisiblePreviews(ids, "list1")
     }
     @ReactMethod
     fun selectStoryCellWith(storyID: String) {
@@ -713,10 +715,10 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
         UGCInAppStoryManager.openEditor(reactContext)
         //promise.resolve(true)
     }
-    private fun createManager(inAppStoryAPI: InAppStoryAPI) {
-        inAppStoryAPI.inAppStoryManager.create(
-            "HDGXt7z1WVQoaN_IzLv8KdRl5f_Ghxdo",
-            "testuser231",
+    private fun createManager(apiKey: String, userID: String, inAppStoryAPI: InAppStoryAPI) {
+        this.ias = inAppStoryAPI.inAppStoryManager.create(
+            apiKey,
+            userID,
             null,
             null,
             null,
@@ -736,26 +738,26 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
 
             override fun updateStoryData(story: StoryAPIData) {
                 Log.e(TAG, "$uniqueId1 updateStoryData: $story")
+                var storyData = Arguments.makeNativeMap(
+                        mutableMapOf(
+                            "storyID" to story.id,
+                            //"storyData" to item.storyData,
+                            "title" to story.title,
+                            "coverImagePath" to story.imageFilePath,
+                            "coverVideoPath" to story.videoFilePath,
+                            "backgroundColor" to story.backgroundColor,
+                            "titleColor" to story.titleColor,
+                            "opened" to story.opened,
+                            "hasAudio" to false, //FIXME
+                            "list" to "feed",
+                            "feed" to story.storyData.feed,
+                        ) as Map<String, Any>)
+                    Log.e(TAG, "Item = $story")
+                sendEvent(reactContext,"storyUpdate", storyData)
             }
 
             override fun updateStoriesData(stories: List<StoryAPIData>) {
                 Log.e(TAG, "$uniqueId1 updateStoriesData: $stories")
-
-                /*
-                //var stories: ReadableArray()
-                "storyID": storyData.storyID,
-                "storyData": storyData.storyData,
-                "title": storyData.title,
-                "coverImagePath": storyData.coverImagePath,
-                "coverVideoPath": storyData.coverVideoPath,
-                "backgroundColor": storyData.backgroundColor,
-                "titleColor": storyData.titleColor,
-                "opened": storyData.opened,
-                "hasAudio": storyData.hasAudio,
-                "list": "favorites",
-                "feed": storyData.storyData.feed,
- */
-                
                 val storiesList = ArrayList<WritableNativeMap>()
                 val iterator = stories.listIterator()
                 for (item in iterator) {
@@ -772,7 +774,6 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                             "hasAudio" to false, //FIXME
                             "list" to "feed",
                             "feed" to item.storyData.feed,
-                            "type" to "AUTHENTICATION_URL",
                         ) as Map<String, Any>)
                     Log.e(TAG, "Item = $item")
                     
@@ -790,7 +791,6 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                 val array = Array(stories.size) { index ->
                     stories[index]
                 }*/
-                val ids = stories.map { it.id }
                 val map:WritableMap = Arguments.createMap()
                 map.putArray("stories", Arguments.makeNativeArray(storiesList));
                 map.putString("feed", "default")
