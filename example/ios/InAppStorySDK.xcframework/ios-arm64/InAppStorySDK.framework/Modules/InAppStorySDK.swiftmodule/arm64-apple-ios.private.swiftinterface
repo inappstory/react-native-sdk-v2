@@ -419,7 +419,7 @@ extension CoreFoundation.CGRect {
   public var storiesEvent: (InAppStorySDK.IASEvent.Story) -> Swift.Void
   public var gameEvent: (InAppStorySDK.IASEvent.Game) -> Swift.Void
   public var failureEvent: (InAppStorySDK.IASEvent.Failure) -> Swift.Void
-  public var stackFeedUpdate: ((_ newStackObject: InAppStorySDK.StackFeedObject) -> Swift.Void)?
+  public var stackFeedUpdate: ((_ newStackObject: InAppStorySDK.StackFeedObject?) -> Swift.Void)?
   public func initWith(serviceKey: Swift.String, testKey: Swift.String? = nil, settings: InAppStorySDK.Settings? = nil)
   public func setTags(_ tags: Swift.Array<Swift.String>)
   public func addTags(_ addedTags: Swift.Array<Swift.String>)
@@ -1223,7 +1223,7 @@ public protocol DownloadPlaceholderProtocol : UIKit.UIView {
   @_spi(Private) @_Concurrency.MainActor(unsafe) public func downloadedFrom(link: Swift.String, contentMode mode: UIKit.UIView.ContentMode = .scaleAspectFit, withViewTag tag: Swift.Int)
 }
 @_spi(IAS_API) public typealias StoryUpdateHandler = (_ data: InAppStorySDK.StoryCellData) -> Swift.Void
-@_spi(IAS_API) public typealias StoriesListUpdateHandler = (_ list: Swift.Array<InAppStorySDK.StoryCellData>, _ favorite: Swift.Array<InAppStorySDK.SimpleFavoriteData>?) -> Swift.Void
+@_spi(IAS_API) public typealias StoriesListUpdateHandler = (_ list: Swift.Array<InAppStorySDK.StoryCellData>, _ favorite: Swift.Array<InAppStorySDK.SimpleFavoriteData>?, _ feed: Swift.String) -> Swift.Void
 @_spi(IAS_API) public typealias FavoriteUpdateHandler = (_ data: Swift.Array<InAppStorySDK.SimpleFavoriteData>?) -> Swift.Void
 @_spi(IAS_API) public typealias ScrollHandler = (_ index: Swift.Int) -> Swift.Void
 @_spi(IAS_API) @_hasMissingDesignatedInitializers public class StoryCellData {
@@ -1250,6 +1250,7 @@ public protocol DownloadPlaceholderProtocol : UIKit.UIView {
   @_spi(IAS_API) public var favoritesUpdate: InAppStorySDK.FavoriteUpdateHandler?
   @_spi(IAS_API) public var scrollUpdate: InAppStorySDK.ScrollHandler?
   @_spi(IAS_API) public init(feed: Swift.String = "default", isFavorite: Swift.Bool = false)
+  @_spi(IAS_API) public func setNewFeed(_ feed: Swift.String)
   @_spi(IAS_API) @objc deinit
 }
 @_spi(IAS_API) extension InAppStorySDK.StoryListAPI {

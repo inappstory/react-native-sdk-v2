@@ -3,7 +3,6 @@ import * as React from 'react';
 import { NativeEventEmitter, NativeModules } from 'react-native';
 
 export const useEvents = ({ onFavoriteCell }) => {
-  //console.error('sheet', sheetRef.open);
   const [events, setEvents] = React.useState<any>([]);
   //const [loading, setLoading] = React.useState(false);
   const [_feeds, setFeeds] = React.useState<any>({});
@@ -89,7 +88,6 @@ export const useEvents = ({ onFavoriteCell }) => {
           }
           if (eventName == 'storyListUpdate') {
             const feedName = event.feed + '_' + event.list;
-            console.error('slu', feedName, event.stories.length);
             setFeeds((feeds) => {
               feeds[feedName] = [];
               event.stories.map((story) => {
@@ -107,7 +105,6 @@ export const useEvents = ({ onFavoriteCell }) => {
           if (eventName == 'storyUpdate') {
             const feedName = event.feed + '_' + event.list;
             setFeeds((feeds) => {
-              if (feeds[feedName]) console.log('A?', feedName);
               const eventIdx = feeds[feedName].findIndex(
                 (s) => s.storyID == event.storyID
               );

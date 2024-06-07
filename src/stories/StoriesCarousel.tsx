@@ -78,7 +78,7 @@ export const StoriesCarousel = ({
         horizontal
         data={
           !favoritesOnly
-            ? !showFavorites || !favoriteStories.length
+            ? !showFavorites || !favoriteStories?.length
               ? stories
               : [...stories, { favorites: favoriteStories }]
             : favoriteStories
