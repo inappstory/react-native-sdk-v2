@@ -7,10 +7,18 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 
 import android.util.Log
+import android.os.Handler;
+import android.os.Looper;
 
 import com.inappstory.sdk.InAppStoryManager;
 import com.inappstory.sdk.AppearanceManager;
 import com.inappstory.sdk.ugc.UGCInAppStoryManager;
+
+import com.inappstory.sdk.externalapi.InAppStoryAPI;
+import com.inappstory.sdk.externalapi.StoryAPIData;
+import com.inappstory.sdk.externalapi.StoryFavoriteItemAPIData;
+import com.inappstory.sdk.externalapi.subscribers.InAppStoryAPIListSubscriber;
+import com.inappstory.sdk.stories.ui.list.FavoriteImage;
 
 import com.inappstory.sdk.stories.outercallbacks.common.errors.ErrorCallback;
 import com.inappstory.sdk.stories.outercallbacks.common.gamereader.GameReaderCallback;
@@ -50,7 +58,8 @@ import java.util.Locale
 import android.view.View
 import com.facebook.react.bridge.WritableMap;
 
-import com.inappstory.sdk.externalapi.InAppStoryAPI;
+import com.facebook.react.bridge.Arguments
+import com.facebook.react.bridge.WritableNativeMap
 
 /*
 idgetEventName,
@@ -61,20 +70,45 @@ idgetEventName,
                      int slidesCount,
                      int slideIndex,
                      String tags) */
-
+fun sendEvent(reactContext: ReactContext, eventName: String, params: WritableMap?) {
+    reactContext
+    .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
+    .emit(eventName, params)
+}
 class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
-  override fun getName() = "RNInAppStorySDKModule"
-  var ias: InAppStoryManager? = null
-  var appearanceManager: AppearanceManager? = null;
-  var api:InAppStoryAPI?  = null;
-    private fun sendEvent(reactContext: ReactContext, eventName: String, params: WritableMap?) {
-        reactContext
-        .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
-        .emit(eventName, params)
-    }
+    override fun getName() = "RNInAppStorySDKModule"
+    var ias: InAppStoryManager? = null
+    var appearanceManager: AppearanceManager? = null;
+    var api:InAppStoryAPI?  = null;
+    var TAG:String = "IAS_SDK_API";
 
+    var stories: ArrayList<String>? = null;
+    var uniqueId1 = "list1";
     private var listenerCount = 0
 
+    @ReactMethod
+    fun getStories(feed: String) {
+        Log.d("InappstorySdkModule", "getStories");
+        this.api?.storyList?.load(
+            feed,
+            uniqueId1,
+            true,
+            false,
+            this.ias?.getTags()
+        )
+        //this.api.getStories()
+    }
+    @ReactMethod
+    fun getFavoriteStories(feed: String) {
+        Log.d("InappstorySdkModule", "getFavoriteStories");
+        this.api?.storyList?.load(
+            feed,
+            uniqueId1,
+            true,
+            true,
+            this.ias?.getTags()
+        )
+    }
     @ReactMethod
     fun addListener(eventName: String) {
     if (listenerCount == 0) {
@@ -97,6 +131,8 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
       this.ias = this.createInAppStoryManager(apiKey, userID)
       this.appearanceManager = AppearanceManager()
       this.api = InAppStoryAPI()
+      this.createManager(this.api as InAppStoryAPI)
+      this.subscribeLists(this.api as InAppStoryAPI)
   }
 
   @ReactMethod
@@ -654,67 +690,133 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
         }
         promise.resolve(feed)
     }
+
+    @ReactMethod
+    fun setVisibleWith(storyIDs: ReadableArray) {
+        Log.d("InappstorySdkModule", "setVisibleWith")
+        val ids: ArrayList<Int> = storyIDs.toArrayList() as ArrayList<Int>
+        this.api?.storyList?.updateVisiblePreviews(ids.toList(), "list1")
+    }
+    @ReactMethod
+    fun selectStoryCellWith(storyID: String) {
+        Log.d("InappstorySdkModule", "selectStoryCellWith")
+        this.api?.storyList?.openStoryReader(
+            reactContext.currentActivity,
+            "list1",
+            storyID.toInt(),
+            this.appearanceManager
+        );
+    }
     @ReactMethod
     fun showEditor() {
         this.appearanceManager?.csHasUGC(true)
         UGCInAppStoryManager.openEditor(reactContext)
         //promise.resolve(true)
     }
+    private fun createManager(inAppStoryAPI: InAppStoryAPI) {
+        inAppStoryAPI.inAppStoryManager.create(
+            "HDGXt7z1WVQoaN_IzLv8KdRl5f_Ghxdo",
+            "testuser231",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            true,
+            null,
+            true
+        )
+    }
     fun subscribeLists(inAppStoryAPI: InAppStoryAPI) {
-/*
-        inAppStoryAPI.addSubscriber(new InAppStoryAPIListSubscriber(uniqueId1) {
-            @Override
-            public void updateFavoriteItemData(List<StoryFavoriteItemAPIData> favorites) {
-                Log.e(TAG, getUniqueId() + " updateFavoriteItemData: " + favorites);
+        inAppStoryAPI.addSubscriber(object : InAppStoryAPIListSubscriber(uniqueId1) {
+            override fun updateFavoriteItemData(favorites: List<StoryFavoriteItemAPIData>) {
+                Log.e(TAG, "$uniqueId1 updateFavoriteItemData: $favorites")
             }
 
-            @Override
-            public void updateStoryData(StoryAPIData story) {
-                Log.e(TAG, getUniqueId() + " updateStoryData: " + story);
+            override fun updateStoryData(story: StoryAPIData) {
+                Log.e(TAG, "$uniqueId1 updateStoryData: $story")
             }
 
-            @Override
-            public void updateStoriesData(List<StoryAPIData> stories) {
-                Log.e(TAG, getUniqueId() + " updateStoriesData: " + stories);
-                MainActivity.this.stories.clear();
-                MainActivity.this.stories.addAll(stories);
-                List<Integer> ids = new ArrayList<>();
-                for (StoryAPIData storyAPIData : stories) {
-                    ids.add(storyAPIData.id);
+            override fun updateStoriesData(stories: List<StoryAPIData>) {
+                Log.e(TAG, "$uniqueId1 updateStoriesData: $stories")
+
+                /*
+                //var stories: ReadableArray()
+                "storyID": storyData.storyID,
+                "storyData": storyData.storyData,
+                "title": storyData.title,
+                "coverImagePath": storyData.coverImagePath,
+                "coverVideoPath": storyData.coverVideoPath,
+                "backgroundColor": storyData.backgroundColor,
+                "titleColor": storyData.titleColor,
+                "opened": storyData.opened,
+                "hasAudio": storyData.hasAudio,
+                "list": "favorites",
+                "feed": storyData.storyData.feed,
+ */
+                
+                val storiesList = ArrayList<WritableNativeMap>()
+                val iterator = stories.listIterator()
+                for (item in iterator) {
+                    var storyData = Arguments.makeNativeMap(
+                        mutableMapOf(
+                            "storyID" to item.id,
+                            //"storyData" to item.storyData,
+                            "title" to item.title,
+                            "coverImagePath" to item.imageFilePath,
+                            "coverVideoPath" to item.videoFilePath,
+                            "backgroundColor" to item.backgroundColor,
+                            "titleColor" to item.titleColor,
+                            "opened" to item.opened,
+                            "hasAudio" to false, //FIXME
+                            "list" to "feed",
+                            "feed" to item.storyData.feed,
+                            "type" to "AUTHENTICATION_URL",
+                        ) as Map<String, Any>)
+                    Log.e(TAG, "Item = $item")
+                    
+                    storiesList.add(storyData)
                 }
-                new Handler(Looper.getMainLooper()).post(new Runnable() {
-                    @Override
-                    public void run() {
-                        inAppStoryAPI.storyList.updateVisiblePreviews(ids, getUniqueId());
-                        inAppStoryAPI.storyList.showFavoriteItem(getUniqueId());
-                    }
-                });
 
+               /* val action = 
+
+                val actionArray = Arguments.makeNativeArray(listOf(action))
+
+                val arguments = Arguments.createMap().apply {
+                    putString("path", "general/authentication")
+                    putArray("actions",actionArray)
+                }
+                val array = Array(stories.size) { index ->
+                    stories[index]
+                }*/
+                val ids = stories.map { it.id }
+                val map:WritableMap = Arguments.createMap()
+                map.putArray("stories", Arguments.makeNativeArray(storiesList));
+                map.putString("feed", "default")
+                map.putString("list", "feed")
+                //map.putString("key1", "Value1");
+                sendEvent(reactContext,"storyListUpdate", map)
+                //stories.clear()
+                //stories.addAll(stories)
+                /*Handler(Looper.getMainLooper()).post {
+                    inAppStoryAPI.storyList.updateVisiblePreviews(ids, uniqueId1)
+                    inAppStoryAPI.storyList.showFavoriteItem(uniqueId1)
+                }*/
             }
 
-            @Override
-            public void storyIsOpened(int storyId) {
-                Log.e(TAG, getUniqueId() + " storyIsOpened: " + storyId);
+            override fun storyIsOpened(storyId: Int) {
+                Log.e(TAG, "$uniqueId1 storyIsOpened: $storyId")
             }
 
-            @Override
-            public void readerIsClosed() {
-                Log.e(TAG, getUniqueId() + " readerIsClosed");
+            override fun readerIsClosed() {
+                Log.e(TAG, "$uniqueId1 readerIsClosed")
             }
 
-            @Override
-            public void readerIsOpened() {
-                Log.e(TAG, getUniqueId() + " readerIsOpened");
+            override fun readerIsOpened() {
+                Log.e(TAG, "$uniqueId1 readerIsOpened")
             }
-        });
-        inAppStoryAPI.storyList.load(
-                "extrafeed",
-                uniqueId1,
-                true,
-                false,
-                new ArrayList<>()
-        );
-         */
+        })
     }
   fun createInAppStoryManager(
     apiKey: String,
@@ -729,12 +831,12 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
 }
 
 /*
-appearanceManager.csClosePosition(settings.closePosition);
-appearanceManager.csCloseOnOverscroll(settings.closeOnOverscroll);
-appearanceManager.csCloseOnSwipe(settings.closeOnSwipe);
+
+
+
 appearanceManager.csIsDraggable(true);
-appearanceManager.csTimerGradientEnable(settings.timerGradientEnable);
-appearanceManager.csStoryReaderAnimation(settings.readerAnimation);
+
+
 appearanceManager.csCloseIcon(settings.closeIcon);
 appearanceManager.csDislikeIcon(settings.dislikeIcon);
 appearanceManager.csLikeIcon(settings.likeIcon);
