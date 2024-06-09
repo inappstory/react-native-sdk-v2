@@ -64,11 +64,13 @@ export const StoriesCarousel = ({
     const newIDs = items.changed
       .filter((i) => i.isViewable)
       .map((i) => String(i.key))
-      .filter((id) => !visibleIds.current.includes(id));
+      .filter((id) => !visibleIds.current.includes(id))
+      .filter((f) => f !== 'undefined');
     newIDs.map((id) => {
       visibleIds.current.push(id);
     });
-    if (newIDs.length) {
+    if (newIDs.length > 0) {
+      console.error('setVisi', newIDs);
       InAppStorySDK.setVisibleWith(newIDs);
     }
   };

@@ -1,5 +1,12 @@
 import * as React from 'react';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import {
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  Platform,
+} from 'react-native';
 import Video from 'react-native-video';
 
 export const StoryComponent = ({
@@ -38,7 +45,9 @@ export const StoryComponent = ({
   const cover = story.coverVideoPath ? (
     <View style={[styles.video, { borderRadius }]}>
       <Video
-        source={{ uri: story?.coverVideoPath }}
+        source={{
+          uri: (Platform.OS === 'android' ? '' : '') + story?.coverVideoPath,
+        }}
         style={[
           styles.video,
           { borderRadius, overflow: 'hidden', resizeMode: 'cover' },
@@ -46,11 +55,19 @@ export const StoryComponent = ({
         repeat={true}
         volume={0}
         resizeMode={'cover'}
+        paused={false}
+        playInBackground={true}
+        playWhenInactive={true}
+        useTextureView={false}
+        disableFocus={true}
       />
     </View>
   ) : story.coverImagePath ? (
     <Image
-      source={{ uri: story?.coverImagePath }}
+      source={{
+        uri:
+          (Platform.OS == 'android' ? 'file://' : '') + story?.coverImagePath,
+      }}
       style={[styles.image, { borderRadius }]}
     />
   ) : null;

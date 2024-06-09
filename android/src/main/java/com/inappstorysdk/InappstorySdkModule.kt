@@ -119,6 +119,15 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
     }
 
     @ReactMethod
+    fun selectFavoriteStoryCellWith(storyID: String) {
+        this.favoritesApi?.storyList?.openStoryReader(
+            reactContext.currentActivity,
+            "favorites",
+            storyID.toInt(),
+            this.appearanceManager
+        );
+    }
+    @ReactMethod
     fun removeListeners(count: Int) {
     listenerCount -= count
     if (listenerCount == 0) {
