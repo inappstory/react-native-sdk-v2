@@ -57,8 +57,10 @@ export const InAppStoryProvider = ({
   appearanceManager,
   ...props
 }) => {
+  const [favoritesOpen, setFavoritesOpen] = useState('default');
   const context = useInAppStoryContext(props);
-  const onFavoriteCell = () => {
+  const onFavoriteCell = (feed) => {
+    setFavoritesOpen(feed);
     sheetRef.current.open();
   };
   const sheetRef = React.useRef<BottomSheetMethods>({ open: () => {} });
@@ -70,6 +72,9 @@ export const InAppStoryProvider = ({
       (storiesListViewModel.current = viewModel),
     []
   );
+  React.useEffect(() => {
+    console.log('uno iascontext');
+  }, []);
   const { events, feeds, readerOpen } = useEvents({ onFavoriteCell });
   return (
     <InAppStoryContext.Provider
@@ -78,15 +83,17 @@ export const InAppStoryProvider = ({
       {children}
       <BottomSheet ref={sheetRef}>
         <View style={{ paddingHorizontal: 10 }}>
-          <StoriesList
-            feed={'default'}
-            favoritesOnly={true}
-            storyManager={storyManager}
-            appearanceManager={appearanceManager}
-            onLoadEnd={onLoadEnd}
-            onLoadStart={onLoadStart}
-            viewModelExporter={viewModelExporter}
-          />
+          {!!favoritesOpen && (
+            <StoriesList
+              feed={favoritesOpen}
+              favoritesOnly={true}
+              storyManager={storyManager}
+              appearanceManager={appearanceManager}
+              onLoadEnd={onLoadEnd}
+              onLoadStart={onLoadStart}
+              viewModelExporter={viewModelExporter}
+            />
+          )}
         </View>
       </BottomSheet>
     </InAppStoryContext.Provider>

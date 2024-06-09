@@ -87,13 +87,13 @@ export function ProjectSettingsScreen({
   useEffect(() => {
     const json = isJsonString(imagePlaceholders);
     if (json !== false) {
-      storyManager.setImagePlaceholders(json);
+      //storyManager.setImagePlaceholders(json);
     }
   }, [imagePlaceholders]);
   React.useEffect(() => {
     const json = isJsonString(placeholders);
     if (json !== false) {
-      storyManager.setPlaceholders(json);
+      //storyManager.setPlaceholders(json);
     }
   }, [placeholders]);
   React.useEffect(() => {

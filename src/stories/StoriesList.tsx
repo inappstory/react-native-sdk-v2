@@ -56,10 +56,11 @@ export const StoriesList = ({
   }, []);
   React.useEffect(() => {
     setTimeout(() => {
+      console.error('timeout ', feed);
       fetchFeed();
     }, 10);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [feed]);
+  }, []);
   const onViewLoaded = (refId) => {
     ref.current = refId;
   };
@@ -69,12 +70,13 @@ export const StoriesList = ({
   const onFavoritePress = React.useCallback(
     (story) => {
       if (typeof story == 'string') {
-        onFavoriteCell();
+        onFavoriteCell(feed);
       } else {
+        console.error('clicking on favorites', story.storyID);
         InAppStorySDK.selectFavoriteStoryCellWith(String(story.storyID));
       }
     },
-    [onFavoriteCell]
+    [onFavoriteCell, feed]
   );
 
   const customFeed = false;

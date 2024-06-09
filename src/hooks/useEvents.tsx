@@ -8,6 +8,9 @@ export const useEvents = ({ onFavoriteCell }) => {
   //const [loading, setLoading] = React.useState(false);
   const [_feeds, setFeeds] = React.useState<any>({});
   const [readerOpen, setReaderOpen] = React.useState<any>(false);
+  const imageCoverCache = React.useRef<any>({});
+  const videoCoverCache = React.useRef<any>({});
+
   React.useEffect(() => {
     console.log('set Listeners');
     const eventEmitter = new NativeEventEmitter(
@@ -86,6 +89,7 @@ export const useEvents = ({ onFavoriteCell }) => {
             onFavoriteCell();
           }
           if (eventName == 'storyListUpdate') {
+            console.error('SLU', event);
             const feedName = event.feed + '_' + event.list;
             setFeeds((feeds) => {
               feeds[feedName] = [];
@@ -95,18 +99,33 @@ export const useEvents = ({ onFavoriteCell }) => {
                     (s) => s.storyID == story.storyID
                   ) === -1
                 ) {
-                  feeds[feedName].push(story);
+                  feeds[feedName].push({
+                    ...story,
+                    coverImagePath:
+                      imageCoverCache.current[story.storyID] ||
+                      story.coverImagePath,
+                    coverVideoPath:
+                      videoCoverCache.current[story.storyID] ||
+                      story.coverVideoPath,
+                  });
                 }
               });
               return { ...feeds };
             });
           }
           if (eventName == 'storyUpdate') {
+            console.error('storyUpdate', event);
             const feedName = event.feed + '_' + event.list;
             setFeeds((feeds) => {
               const eventIdx = feeds[feedName].findIndex(
                 (s) => s.storyID == event.storyID
               );
+              if (event.coverImagePath) {
+                imageCoverCache.current[event.storyID] = event.coverImagePath;
+              }
+              if (event.coverVideoPath) {
+                videoCoverCache.current[event.storyID] = event.coverVideoPath;
+              }
               if (eventIdx === -1) {
                 feeds[feedName].push(event);
               } else {

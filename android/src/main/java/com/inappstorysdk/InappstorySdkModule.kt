@@ -690,9 +690,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
   }
 */
     @ReactMethod
-    fun showOnboardings(feed: String, tags: ReadableArray, promise: Promise) {
-        var limit: Int? = null;
-        var success: Boolean = true;
+    fun showOnboardings(feed: String, limit:Int, tags: ReadableArray, promise: Promise) {
         var tags: List<String>? = null; //FIXME
         Log.d("InappstorySdkModule", "showOnboardings")
         if (limit != null) {

@@ -8,7 +8,7 @@ import { useInAppStory } from 'react-native-inappstory-sdk';
 export function AppearanceSettingsScreen(): React.ReactNode {
   const {
     customStoryView,
-    setCustomStoryView,
+    //setCustomStoryView,
     showFavorites,
     setShowFavorites,
   } = useInAppStory();
@@ -31,7 +31,7 @@ export function AppearanceSettingsScreen(): React.ReactNode {
             flex: 1,
           }}
         >
-          <Text>Custom story view</Text>
+          {/*<Text>Custom story view</Text>
           <Switch
             trackColor={{ false: '#767577', true: '#81b0ff' }}
             thumbColor={customStoryView ? '#f5dd4b' : '#f4f3f4'}
@@ -40,7 +40,7 @@ export function AppearanceSettingsScreen(): React.ReactNode {
               setCustomStoryView((csv) => !csv);
             }}
             value={customStoryView}
-          />
+          />*/}
           {customStoryView && (
             <>
               <Text>Show Favorites</Text>
