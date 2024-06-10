@@ -46,6 +46,9 @@ import com.inappstory.sdk.stories.ui.views.goodswidget.ICustomGoodsItem;
 import com.inappstory.sdk.stories.ui.views.goodswidget.ICustomGoodsWidget;
 
 import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.ReadableNativeMap;
+
 
 import com.facebook.react.bridge.Promise;
 import com.inappstory.sdk.stories.ui.views.goodswidget.GetGoodsDataCallback;
@@ -473,15 +476,17 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
   }
   
   @ReactMethod
-  fun setPlaceholders(placeholders: ReadableArray) {
-      Log.d("InappstorySdkModule", "setPlaceholders")
-      //FIXME: this.ias?.setPlaceholders(placeholders)
+  fun setPlaceholders(placeholders: ReadableMap) {
+      Log.d("InappstorySdkModule", "setPlaceholders $placeholders")
+      var nativeMap:ReadableNativeMap = placeholders as ReadableNativeMap;
+      this.ias?.setPlaceholders(nativeMap.toHashMap() as Map<String, String>)
   }
 
   @ReactMethod
   fun setImagesPlaceholders(imagePlaceholders: ReadableArray) {
       Log.d("InappstorySdkModule", "setImagesPlaceholders")
-      //FIXME: this.ias?.setImagePlaceholders(imagePlaceholders)
+      var nativeMap:ReadableNativeMap = imagePlaceholders as ReadableNativeMap;
+      this.ias?.setImagePlaceholders(nativeMap.toHashMap() as Map<String, String>)
   }
 
   @ReactMethod
