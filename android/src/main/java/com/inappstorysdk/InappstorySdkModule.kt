@@ -64,6 +64,9 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.WritableNativeMap
 
+import com.inappstory.sdk.stories.api.models.ImagePlaceholderValue;
+
+
 /*
 idgetEventName,
                      Map<String, String> widgetData,
@@ -486,7 +489,8 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
   fun setImagesPlaceholders(imagePlaceholders: ReadableArray) {
       Log.d("InappstorySdkModule", "setImagesPlaceholders")
       var nativeMap:ReadableNativeMap = imagePlaceholders as ReadableNativeMap;
-      this.ias?.setImagePlaceholders(nativeMap.toHashMap() as Map<String, String>)
+      var imageMap: Map<String, ImagePlaceholderValue> = nativeMap.toHashMap().mapValues { ImagePlaceholderValue.createByUrl(it.value as String) }
+      this.ias?.setImagePlaceholders(imageMap)
   }
 
   @ReactMethod

@@ -93,7 +93,7 @@ export function ProjectSettingsScreen({
   React.useEffect(() => {
     const json = isJsonString(placeholders);
     if (json !== false) {
-      //storyManager.setPlaceholders(json);
+      storyManager.setPlaceholders(json);
     }
   }, [placeholders]);
   React.useEffect(() => {
