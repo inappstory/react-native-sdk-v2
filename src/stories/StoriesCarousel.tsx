@@ -90,7 +90,7 @@ export const StoriesCarousel = ({
           !favoritesOnly
             ? !showFavorites || !favoriteStories?.length
               ? stories
-              : [...stories, { favorites: favoriteStories }]
+              : [...stories, { favorites: favoriteStories.slice(0, 4) }]
             : favoriteStories
         }
         renderItem={(item) => renderItem(item)}

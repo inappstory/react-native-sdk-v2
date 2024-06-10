@@ -145,6 +145,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
       this.createManager(apiKey, userID, this.favoritesApi as InAppStoryAPI)
       this.subscribeLists(this.api as InAppStoryAPI, "feed")
       this.subscribeLists(this.favoritesApi as InAppStoryAPI, "favorites")
+      setupListeners()
   }
 
   @ReactMethod
@@ -208,7 +209,10 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                 story: StoryData?,
                 showStoryAction: ShowStoryAction?
             ) {
-                TODO("Not yet implemented")
+                val map:WritableMap = Arguments.createMap()
+
+                sendEvent(reactContext,"showStory", map)
+                Log.d("InappstorySdkModule","showStory story = $story, showstoryaction = $showStoryAction");
             }
         }
     )
@@ -217,7 +221,9 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
             override fun showSlide(
                 slide: SlideData?
             ) {
-                TODO("Not yet implemented")
+                val map:WritableMap = Arguments.createMap()
+                sendEvent(reactContext,"showSlide", map)
+                Log.d("InappstorySdkModule","showSlide slide = $slide");
             }
         }
     )
@@ -227,7 +233,10 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                 slide: SlideData?,
                 action: CloseReader?
             ) {
-                TODO("Not yet implemented")
+                val map:WritableMap = Arguments.createMap()
+                sendEvent(reactContext,"closeStory", map)
+                Log.d("InappstorySdkModule","closeStory slide = $slide action= $action");
+
             }
         }
     )
@@ -239,7 +248,9 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                 url: String?,
                 action: ClickAction
             ) {
-                TODO("Not yet implemented")
+                val map:WritableMap = Arguments.createMap()
+                sendEvent(reactContext,"callToAction", map)
+                Log.d("InappstorySdkModule","callToAction slide = $slide url = $url action= $action");
             }
         }
     )
@@ -249,7 +260,11 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                 slide: SlideData?,
                 value: Boolean
             ) {
-                TODO("Not yet implemented")
+                val map:WritableMap = Arguments.createMap()
+                map.putBoolean("favorite", value)
+                map.putString("storyID", slide?.story?.id.toString())
+                sendEvent(reactContext,"favoriteStory", map)
+                Log.d("InappstorySdkModule","favoriteStory slide = $slide value = $value");
             }
         }
     )
@@ -259,14 +274,18 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                 slide: SlideData?,
                 value: Boolean
             ) {
-                TODO("Not yet implemented")
+                val map:WritableMap = Arguments.createMap()
+                sendEvent(reactContext,"setLike", map)
+                Log.d("InappstorySdkModule","setLike slide = $slide value = $value");
             }
 
             override fun dislikeStory(
                 slide: SlideData?,
                 value: Boolean
             ) {
-                TODO("Not yet implemented")
+                val map:WritableMap = Arguments.createMap()
+                sendEvent(reactContext,"setDislike", map)
+                Log.d("InappstorySdkModule","setDislike slide = $slide value = $value");
             }
         }
     )
@@ -275,21 +294,27 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
             override fun shareClick(
                 slide: SlideData?
             ) {
-                TODO("Not yet implemented")
+                val map:WritableMap = Arguments.createMap()
+                sendEvent(reactContext,"clickOnShare", map)
+                Log.d("InappstorySdkModule","clickOnShare slide = $slide");
             }
         }
     )
       this.ias?.setOnboardingLoadCallback(
         object : OnboardingLoadCallback {
             override fun onboardingLoad(count: Int, feed: String?) {
-                TODO("Not yet implemented")
+                val map:WritableMap = Arguments.createMap()
+                sendEvent(reactContext,"onboardingLoad", map)
+                Log.d("InappstorySdkModule","onboardingLoad count = $count, feed = $feed");
             }
         }
     )
       this.ias?.setSingleLoadCallback(
         object : SingleLoadCallback {
             override fun singleLoad(story: StoryData?) {
-                TODO("Not yet implemented")
+                val map:WritableMap = Arguments.createMap()
+                sendEvent(reactContext,"singleLoad", map)
+                Log.d("InappstorySdkModule","singleLoad story = $story");
             }
         }
     )
@@ -301,7 +326,9 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                 widgetData: Map<String, String?>?,
                 //feed: String?
             ) {
-                TODO("Not yet implemented")
+                val map:WritableMap = Arguments.createMap()
+                sendEvent(reactContext,"storyWidget", map)
+                Log.d("InappstorySdkModule","storyWidget story = $slideData, widgetEventName = $widgetEventName, widgetData = $widgetData");
             }
         }
     )
@@ -311,7 +338,9 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                 gameStoryData: GameStoryData?,
                 id: String?
             ) {
-                TODO("Not yet implemented")
+                val map:WritableMap = Arguments.createMap()
+                sendEvent(reactContext,"startGame", map)
+                Log.d("InappstorySdkModule","startGame gameStoryData = $gameStoryData, id = $id");
             }
 
             override fun finishGame(
@@ -319,26 +348,34 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                 result: String?,
                 id: String?
             ) {
-                TODO("Not yet implemented")
+                val map:WritableMap = Arguments.createMap()
+                sendEvent(reactContext,"finishGame", map)
+                Log.d("InappstorySdkModule","startGame gameStoryData = $gameStoryData, result = $result, id = $id");
             }
 
             override fun closeGame(
                 gameStoryData: GameStoryData?,
                 id: String?
             ) {
-                TODO("Not yet implemented")
+                val map:WritableMap = Arguments.createMap()
+                sendEvent(reactContext,"closeGame", map)
+                Log.d("InappstorySdkModule","closeGame gameStoryData = $gameStoryData, id = $id");
             }
             override fun gameLoadError(
                 gameStoryData: GameStoryData?,
                 id: String?
             ) {
-                TODO("Not yet implemented")
+                val map:WritableMap = Arguments.createMap()
+                sendEvent(reactContext,"gameLoadError", map)
+                Log.d("InappstorySdkModule","gameLoadError gameStoryData = $gameStoryData, id = $id");
             }
             override fun gameOpenError(
               gameStoryData: GameStoryData?,
               id: String?
           ) {
-              TODO("Not yet implemented")
+            val map:WritableMap = Arguments.createMap()
+            sendEvent(reactContext,"gameOpenError", map)
+            Log.d("InappstorySdkModule","gameOpenError gameStoryData = $gameStoryData, id = $id");
           }
             override fun eventGame(
                 gameStoryData: GameStoryData?,
@@ -346,42 +383,60 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                 id2: String?,
                 id3: String?
             ) {
-                TODO("Not yet implemented")
+                val map:WritableMap = Arguments.createMap()
+                sendEvent(reactContext,"eventGame", map)
+                Log.d("InappstorySdkModule","eventGame gameStoryData = $gameStoryData, id = $id , id2 = $id2 , id3 = $id3");
             }
         }
     )
       this.ias?.setErrorCallback(
         object : ErrorCallback {
             override fun loadListError(feed: String?) {
-                TODO("Not yet implemented")
+                val map:WritableMap = Arguments.createMap()
+                sendEvent(reactContext,"loadListError", map)
+                Log.d("InappstorySdkModule","loadListError feed = $feed");
             }
 
             override fun loadOnboardingError(feed: String?) {
-                TODO("Not yet implemented")
+                val map:WritableMap = Arguments.createMap()
+                sendEvent(reactContext,"loadOnboardingError", map)
+                Log.d("InappstorySdkModule","loadOnboardingError feed = $feed");
             }
 
             override fun loadSingleError() {
-                TODO("Not yet implemented")
+                val map:WritableMap = Arguments.createMap()
+                sendEvent(reactContext,"loadSingleError", map)
+                Log.d("InappstorySdkModule","loadSingleError");
             }
 
             override fun cacheError() {
-                TODO("Not yet implemented")
+                val map:WritableMap = Arguments.createMap()
+                sendEvent(reactContext,"cacheError", map)
+                Log.d("InappstorySdkModule","cacheError");
             }
 
             override fun readerError() {
-                TODO("Not yet implemented")
+                val map:WritableMap = Arguments.createMap()
+                sendEvent(reactContext,"readerError", map)
+                Log.d("InappstorySdkModule","readerError");
             }
 
             override fun emptyLinkError() {
-                TODO("Not yet implemented")
+                val map:WritableMap = Arguments.createMap()
+                sendEvent(reactContext,"emptyLinkError", map)
+                Log.d("InappstorySdkModule","emptyLinkError");
             }
 
             override fun sessionError() {
-                TODO("Not yet implemented")
+                val map:WritableMap = Arguments.createMap()
+                sendEvent(reactContext,"sessionError", map)
+                Log.d("InappstorySdkModule","sessionError");
             }
 
             override fun noConnection() {
-                TODO("Not yet implemented")
+                val map:WritableMap = Arguments.createMap()
+                sendEvent(reactContext,"noConnection", map)
+                Log.d("InappstorySdkModule","noConnection");
             }
 
         }

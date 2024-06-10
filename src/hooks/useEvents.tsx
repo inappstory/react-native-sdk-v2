@@ -88,6 +88,32 @@ export const useEvents = ({ onFavoriteCell }) => {
           if (eventName == 'favoriteCellDidSelect') {
             onFavoriteCell();
           }
+          if (eventName == 'favoriteStory') {
+            setFeeds((feeds) => {
+              Object.keys(feeds).map((feedName) => {
+                var [feed, type] = feedName.split('_');
+                if (type == 'favorites') {
+                  const idx = feeds[feedName].findIndex(
+                    (f) => f.storyID == event.storyID
+                  );
+                  if (idx !== -1 && !event.favorite) {
+                    feeds[feedName].splice(idx, 1);
+                  }
+                  if (idx === -1 && event.favorite) {
+                    const storyFromList = feeds[`${feed}_feed`]?.find(
+                      (f) => f.storyID == event.storyID
+                    );
+                    if (storyFromList) {
+                      feeds[feedName].unshift(storyFromList);
+                    } else {
+                      console.error('failed to find story');
+                    }
+                  }
+                }
+              });
+              return { ...feeds };
+            });
+          }
           if (eventName == 'storyListUpdate') {
             console.error('SLU', event);
             const feedName = event.feed + '_' + event.list;
