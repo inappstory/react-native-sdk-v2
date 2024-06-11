@@ -1,3 +1,4 @@
+import './wdyr';
 import { NativeModules } from 'react-native';
 import {
   AppearanceManager as AppearanceManagerV1,
@@ -48,9 +49,16 @@ export class StoryManager extends StoryManagerV1 {
   lang: string = '';
   soundEnabled: boolean = true;
   getGoodsCallback: Function = () => {};
+  sandbox: boolean = true;
+  sendStatistics: boolean = true;
   constructor(config: StoryManagerConfig) {
     super(config);
-    InAppStorySDK.initWith(config.apiKey, config.userId);
+    InAppStorySDK.initWith(
+      config.apiKey,
+      config.userId,
+      this.sandbox,
+      this.sendStatistics
+    );
     InAppStorySDK.setUserID(config.userId);
     /*InAppStorySDK.setLikeImage(`<?xml version="1.0" encoding="utf-8"?>
 
@@ -178,7 +186,30 @@ export class StoryManager extends StoryManagerV1 {
   }
   setApiKey(apiKey: string): void {
     this.apiKey = apiKey;
-    InAppStorySDK.initWith(this.apiKey, this.userId);
+    InAppStorySDK.initWith(
+      this.apiKey,
+      this.userId,
+      this.sandbox,
+      this.sendStatistics
+    );
+  }
+  setSandbox(sandbox: boolean): void {
+    this.sandbox = sandbox;
+    InAppStorySDK.initWith(
+      this.apiKey,
+      this.userId,
+      this.sandbox,
+      this.sendStatistics
+    );
+  }
+  setSendStatistics(sendStatistics: boolean): void {
+    this.sendStatistics = sendStatistics;
+    InAppStorySDK.initWith(
+      this.apiKey,
+      this.userId,
+      this.sandbox,
+      this.sendStatistics
+    );
   }
   async fetchFeed(feed: string) {
     console.log('getStories & getFavorites');

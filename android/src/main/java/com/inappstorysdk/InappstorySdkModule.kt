@@ -65,6 +65,7 @@ import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.WritableNativeMap
 
 import com.inappstory.sdk.stories.api.models.ImagePlaceholderValue;
+import java.lang.reflect.Field;
 
 
 /*
@@ -141,14 +142,14 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
     }
     }
   @ReactMethod
-  fun initWith(apiKey: String, userID: String) {
+  fun initWith(apiKey: String, userID: String, sandbox: Boolean, sendStatistics: Boolean) {
       Log.d("InappstorySdkModule", "initWith")
       //this.ias = this.createInAppStoryManager(apiKey, userID)
       this.appearanceManager = AppearanceManager()
       this.api = InAppStoryAPI()
       this.favoritesApi = InAppStoryAPI()
-      this.createManager(apiKey, userID, this.api as InAppStoryAPI)
-      this.createManager(apiKey, userID, this.favoritesApi as InAppStoryAPI)
+      this.createManager(apiKey, userID, sandbox, sendStatistics, this.api as InAppStoryAPI)
+      this.createManager(apiKey, userID, sandbox, sendStatistics, this.favoritesApi as InAppStoryAPI)
       this.subscribeLists(this.api as InAppStoryAPI, "feed")
       this.subscribeLists(this.favoritesApi as InAppStoryAPI, "favorites")
       setupListeners()
@@ -789,7 +790,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
         UGCInAppStoryManager.openEditor(reactContext)
         //promise.resolve(true)
     }
-    private fun createManager(apiKey: String, userID: String, inAppStoryAPI: InAppStoryAPI) {
+    private fun createManager(apiKey: String, userID: String, sandbox: Boolean,sendStatistic: Boolean, inAppStoryAPI: InAppStoryAPI) {
         this.ias = inAppStoryAPI.inAppStoryManager.create(
             apiKey,
             userID,
@@ -801,8 +802,13 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
             null,
             true,
             null,
-            true
+            sandbox, 
         )
+        this.ias?.let {
+            val f1: Field = it.javaClass.getDeclaredField("sendStatistic")
+            f1.isAccessible = true
+            f1.set(it, sendStatistic)
+        }
     }
     fun subscribeLists(inAppStoryAPI: InAppStoryAPI, feed: String) {
         inAppStoryAPI.addSubscriber(object : InAppStoryAPIListSubscriber(feed) {

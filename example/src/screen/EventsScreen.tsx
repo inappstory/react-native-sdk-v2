@@ -8,15 +8,15 @@ import {
 import React from 'react';
 
 import { Colors } from 'react-native/Libraries/NewAppScreen';
-import { useInAppStory } from 'react-native-inappstory-sdk';
 import Animated, {
   useSharedValue,
   useAnimatedScrollHandler,
 } from 'react-native-reanimated';
+import { useStore } from '../../../src/hooks/useStore';
 
 export function EventsScreen(): React.ReactNode {
   const isDarkMode = useColorScheme() === 'dark';
-  const { events } = useInAppStory();
+  const { events } = useStore((state) => state.events);
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
@@ -45,8 +45,8 @@ export function EventsScreen(): React.ReactNode {
             flex: 1,
           }}
         >
-          {events.map((event) => {
-            return <Text>{event.event}</Text>;
+          {events.map((event, i) => {
+            return <Text key={i}>{event.event}</Text>;
           })}
         </View>
       </Animated.ScrollView>

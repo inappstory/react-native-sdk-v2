@@ -2,16 +2,22 @@ import * as React from 'react';
 import { useState, useCallback, createContext } from 'react';
 import { useEvents } from '../hooks/useEvents';
 import { View } from 'react-native';
-import BottomSheet, { BottomSheetMethods } from '@devvie/bottom-sheet';
+import BottomSheet, { type BottomSheetMethods } from '@devvie/bottom-sheet';
 import { StoriesList } from '../stories/StoriesList';
 import type { StoriesListViewModel } from 'react-native-ias';
 export const InAppStoryContext = createContext({
   events: [],
+  feeds: {},
   tags: [],
   placeholders: [],
   imagePlaceholders: [],
   lang: '',
   userID: '',
+  readerOpen: false,
+  onFavoriteCell: () => {},
+  setShowFavorites: () => {},
+  customStoryView: true,
+  showFavorites: true,
 });
 
 export const useInAppStoryContext = function (props) {
@@ -57,13 +63,16 @@ export const InAppStoryProvider = ({
   appearanceManager,
   ...props
 }) => {
-  const [favoritesOpen, setFavoritesOpen] = useState('default');
+  const [favoritesOpen, setFavoritesOpen] = useState(null);
   const context = useInAppStoryContext(props);
-  const onFavoriteCell = (feed) => {
+  const onFavoriteCell = React.useCallback((feed) => {
     setFavoritesOpen(feed);
     sheetRef.current.open();
-  };
-  const sheetRef = React.useRef<BottomSheetMethods>({ open: () => {} });
+  }, []);
+  const sheetRef = React.useRef<BottomSheetMethods>({
+    open: () => {},
+    close: () => {},
+  });
   const onLoadEnd = () => {};
   const onLoadStart = () => {};
   const storiesListViewModel = React.useRef<StoriesListViewModel>();
@@ -75,12 +84,21 @@ export const InAppStoryProvider = ({
   React.useEffect(() => {
     console.log('uno iascontext');
   }, []);
-  const { events, feeds, readerOpen } = useEvents({ onFavoriteCell });
+  const { readerOpen } = useEvents({ onFavoriteCell });
+  const contextValue = React.useMemo(
+    () => ({
+      ...context,
+      readerOpen,
+      onFavoriteCell,
+    }),
+    [context, readerOpen, onFavoriteCell]
+  );
+  const childrenComponent = React.useMemo(() => {
+    return children;
+  }, [children]);
   return (
-    <InAppStoryContext.Provider
-      value={{ ...context, events, feeds, readerOpen, onFavoriteCell }}
-    >
-      {children}
+    <InAppStoryContext.Provider value={contextValue}>
+      {childrenComponent}
       <BottomSheet ref={sheetRef}>
         <View style={{ paddingHorizontal: 10 }}>
           {!!favoritesOpen && (

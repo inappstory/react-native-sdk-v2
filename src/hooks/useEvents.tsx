@@ -2,11 +2,13 @@
 import * as React from 'react';
 
 import { NativeEventEmitter, NativeModules } from 'react-native';
+import { useStore } from './useStore';
 
 export const useEvents = ({ onFavoriteCell }) => {
-  const [events, setEvents] = React.useState<any>([]);
-  //const [loading, setLoading] = React.useState(false);
-  const [_feeds, setFeeds] = React.useState<any>({});
+  const addEvent = useStore((state) => state.addEvent);
+  const addToFeed = useStore((state) => state.addToFeed);
+  const replaceInFeed = useStore((state) => state.replaceInFeed);
+  const setFavorite = useStore((state) => state.setFavorite);
   const [readerOpen, setReaderOpen] = React.useState<any>(false);
   const imageCoverCache = React.useRef<any>({});
   const videoCoverCache = React.useRef<any>({});
@@ -89,85 +91,36 @@ export const useEvents = ({ onFavoriteCell }) => {
             onFavoriteCell();
           }
           if (eventName == 'favoriteStory') {
-            setFeeds((feeds) => {
-              Object.keys(feeds).map((feedName) => {
-                var [feed, type] = feedName.split('_');
-                if (type == 'favorites') {
-                  const idx = feeds[feedName].findIndex(
-                    (f) => f.storyID == event.storyID
-                  );
-                  if (idx !== -1 && !event.favorite) {
-                    feeds[feedName].splice(idx, 1);
-                  }
-                  if (idx === -1 && event.favorite) {
-                    const storyFromList = feeds[`${feed}_feed`]?.find(
-                      (f) => f.storyID == event.storyID
-                    );
-                    if (storyFromList) {
-                      feeds[feedName].unshift(storyFromList);
-                    } else {
-                      console.error('failed to find story');
-                    }
-                  }
-                }
-              });
-              return { ...feeds };
-            });
+            setFavorite(event.storyID, event.favorite);
           }
           if (eventName == 'storyListUpdate') {
-            console.error('SLU', event);
             const feedName = event.feed + '_' + event.list;
-            setFeeds((feeds) => {
-              feeds[feedName] = [];
-              event.stories.map((story) => {
-                if (
-                  feeds[feedName].findIndex(
-                    (s) => s.storyID == story.storyID
-                  ) === -1
-                ) {
-                  feeds[feedName].push({
-                    ...story,
-                    coverImagePath:
-                      imageCoverCache.current[story.storyID] ||
-                      story.coverImagePath,
-                    coverVideoPath:
-                      videoCoverCache.current[story.storyID] ||
-                      story.coverVideoPath,
-                  });
-                }
+            event.stories.map((story) => {
+              addToFeed(feedName, {
+                ...story,
+                coverImagePath:
+                  imageCoverCache.current[story.storyID] ||
+                  story.coverImagePath,
+                coverVideoPath:
+                  videoCoverCache.current[story.storyID] ||
+                  story.coverVideoPath,
               });
-              return { ...feeds };
             });
           }
           if (eventName == 'storyUpdate') {
-            console.error('storyUpdate', event);
             const feedName = event.feed + '_' + event.list;
-            setFeeds((feeds) => {
-              const eventIdx = feeds[feedName].findIndex(
-                (s) => s.storyID == event.storyID
-              );
-              if (event.coverImagePath) {
-                imageCoverCache.current[event.storyID] = event.coverImagePath;
-              }
-              if (event.coverVideoPath) {
-                videoCoverCache.current[event.storyID] = event.coverVideoPath;
-              }
-              if (eventIdx === -1) {
-                feeds[feedName].push(event);
-              } else {
-                feeds[feedName][eventIdx] = event;
-              }
-              //console.error('event index = ', eventIdx, event);
-              return { ...feeds };
-            });
+            if (event.coverImagePath) {
+              imageCoverCache.current[event.storyID] = event.coverImagePath;
+            }
+            if (event.coverVideoPath) {
+              videoCoverCache.current[event.storyID] = event.coverVideoPath;
+            }
+            replaceInFeed(feedName, event);
           }
-          setEvents((_events) => {
-            _events.push({
-              event: eventName,
-              data: event,
-              time: +Date.now(),
-            });
-            return _events;
+          addEvent({
+            event: eventName,
+            data: event,
+            time: +Date.now(),
           });
         })
       );
@@ -179,5 +132,5 @@ export const useEvents = ({ onFavoriteCell }) => {
       });
     };
   }, []);
-  return { events, feeds: _feeds, readerOpen, onFavoriteCell };
+  return { readerOpen, onFavoriteCell };
 };

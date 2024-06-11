@@ -6,6 +6,7 @@ import {
   Text,
   TextInput,
   StyleSheet,
+  Switch,
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
 
@@ -70,12 +71,27 @@ export function ProjectSettingsScreen({
   const device = useCameraDevice('back');
   const [QREnabled, setQREnabled] = useState(false);
   const [tags, setTags] = useState(storyManager.tags);
+  const [sandboxEnabled, setSandboxEnabled] = useState(storyManager.sandbox);
+  const [statsEnabled, setStatsEnabled] = useState(storyManager.sendStatistics);
+
   const [placeholders, setPlaceholders] = useState(
     JSON.stringify(storyManager.placeholders)
   );
   const [imagePlaceholders, setImagePlaceholders] = useState(
     storyManager.imagePlaceholders
   );
+  const toggleStats = () => {
+    setStatsEnabled((previousState) => {
+      storyManager.setSendStatistics(!previousState);
+      return !previousState;
+    });
+  };
+  const toggleSandbox = () => {
+    setSandboxEnabled((previousState) => {
+      storyManager.setSandbox(!previousState);
+      return !previousState;
+    });
+  };
   const [APIKey, setAPIKey] = useState(storyManager.apiKey);
   useEffect(() => {
     setTags(storyManager.tags);
@@ -178,6 +194,27 @@ export function ProjectSettingsScreen({
           />
           <Text>API Key</Text>
           <TextInput onChangeText={setAPIKey} value={APIKey} />
+          <View>
+            <Text>Sandbox</Text>
+            <Switch
+              trackColor={{ false: '#767577', true: '#81b0ff' }}
+              thumbColor={sandboxEnabled ? '#f5dd4b' : '#f4f3f4'}
+              ios_backgroundColor="#3e3e3e"
+              onValueChange={toggleSandbox}
+              value={sandboxEnabled}
+            />
+          </View>
+          <View>
+            <Text>Send Statistics</Text>
+            <Switch
+              trackColor={{ false: '#767577', true: '#81b0ff' }}
+              thumbColor={statsEnabled ? '#f5dd4b' : '#f4f3f4'}
+              ios_backgroundColor="#3e3e3e"
+              onValueChange={toggleStats}
+              value={statsEnabled}
+            />
+          </View>
+
           {!QREnabled && (
             <Button
               containerStyle={styles.buttonContainer}

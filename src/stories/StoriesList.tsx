@@ -5,6 +5,7 @@ import { StoriesCarousel } from './StoriesCarousel';
 import { StoriesWidget } from '../StoriesWidget';
 import InAppStorySDK from 'react-native-inappstory-sdk';
 import { useInAppStory } from '../context/InAppStoryContext';
+import { useStore } from '../hooks/useStore';
 /*const createClick = (viewId, storyIndex) =>
   UIManager.dispatchViewManagerCommand(
     viewId,
@@ -22,8 +23,14 @@ export const StoriesList = ({
   viewModelExporter,
   favoritesOnly,
 }) => {
-  const { customStoryView, showFavorites, feeds, onFavoriteCell } =
-    useInAppStory();
+  const { customStoryView, showFavorites, onFavoriteCell } = useInAppStory();
+  //const feeds = getFeeds();
+  //const _events = useStore((state) => state.events);
+  const feedEvents = useStore((state) => state['feeds_default_feed']);
+  const feedFavoriteEvents = useStore(
+    (state) => state['feeds_default_favorites']
+  );
+
   const tags = storyManager.tags;
   const placeholders = storyManager.placeholders;
   const imagePlaceholders = storyManager.imagePlaceholders;
@@ -36,16 +43,14 @@ export const StoriesList = ({
   }, [feed, storyManager]);
   React.useEffect(() => {
     onLoadStart();
-    if (feeds[feed + '_feed']?.length) {
-      onLoadEnd({
-        defaultListLength: feeds[feed + '_feed'].length || 0,
-        feed,
-        list: 'feed',
-      });
-    } else {
-    }
+    if (!feedEvents) return;
+    onLoadEnd({
+      defaultListLength: feedEvents.length || 0,
+      feed,
+      list: 'feed',
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [feeds]);
+  }, [feedEvents]);
   React.useEffect(() => {
     viewModelExporter({
       reload: () => {
@@ -86,9 +91,9 @@ export const StoriesList = ({
         <>
           <StoriesCarousel
             feed={feed}
-            stories={feeds[feed + '_feed']}
+            stories={feedEvents}
             showFavorites={showFavorites}
-            favoriteStories={feeds['default_favorites']}
+            favoriteStories={feedFavoriteEvents}
             storyManager={storyManager}
             appearanceManager={appearanceManager}
             onPress={onPress}
