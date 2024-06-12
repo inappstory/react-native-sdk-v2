@@ -89,6 +89,10 @@ storyManager.getGoodsObject((skus) => {
 });
 ```
 
+### Migrating from old version
+
+if you used svgMask in appearance manager, try to use custom cells to achieve same results
+
 ## Contributing
 
 See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.

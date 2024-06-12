@@ -416,12 +416,6 @@ export class AppearanceManager extends AppearanceManagerV1 {
         dropShadow: Option<string>;
         opacity: Option<number>;
         mask: Partial<{ color: Option<string> }>;
-        svgMask: Partial<
-          Option<{
-            cardMask: Option<string>;
-            overlayMask: { mask: Option<string>; background: Option<string> }[];
-          }>
-        >;
         opened: Partial<{
           border: Partial<{
             radius: Option<number>;
@@ -433,15 +427,6 @@ export class AppearanceManager extends AppearanceManagerV1 {
           dropShadow: Option<string>;
           opacity: Option<number>;
           mask: Partial<{ color: Option<string> }>;
-          svgMask: Partial<
-            Option<{
-              cardMask: Option<string>;
-              overlayMask: {
-                mask: Option<string>;
-                background: Option<string>;
-              }[];
-            }>
-          >;
         }>;
       }>;
       favoriteCard: StoriesListFavoriteCardOptions;

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+@_spi(QAApp) import InAppStorySDK
 @_spi(IAS_API) import InAppStorySDK
 import InAppStoryUGC
 import React
@@ -45,7 +46,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
     RNInAppStorySDKModule.emitter = self
   }
   //@ReactMethod
-  @objc func initWith(_ apiKey: String, userID: String) {
+  @objc func initWith(_ apiKey: String, userID: String, sandbox: Bool, sendStats: Bool) {
     DispatchQueue.main.async {
       // the parameter is responsible for logging to the XCode console
         InAppStory.shared.isLoggingEnabled = true
@@ -58,7 +59,11 @@ class RNInAppStorySDKModule: RCTEventEmitter {
         InAppStory.shared.panelSettings = PanelSettings(like: self._hasLike, favorites: self._hasFavorites, share: self._hasShare)
         // the parameter is responsible for animation of the reader display when you tap on a story cell
         InAppStory.shared.presentationStyle = .zoom
+        
+        InAppStory.shared.sandBox = sandbox;
+        
         InAppStory.shared.initWith(serviceKey: apiKey, settings: Settings(userID: userID))
+        
         
         InAppStory.shared.storyReaderWillShow = {showed in
           NSLog("TODO: storyReaderWillShow closure");
@@ -322,6 +327,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
             "hasAudio": $0.hasAudio,
             "list": "feed",
             "feed": feed,
+            "aspectRatio": 1.0 //self.storiesAPI.cellRatio,
           ]},
             "feed": feed,
             "list": "feed", 
@@ -339,9 +345,11 @@ class RNInAppStorySDKModule: RCTEventEmitter {
           "hasAudio": storyData.hasAudio,
           "list": "feed",
           "feed": storyData.storyData.feed,
+          "aspectRatio": 1.0 //self.storiesAPI.cellRatio,
         ])
     }
     self.favoriteStoriesAPI.storyListUpdate = {storiesList,isFavorite, feed in
+    
             RNInAppStorySDKModule.emitter.sendEvent(withName: "storyListUpdate", body: [
               "stories": storiesList.map { [
                 "storyID": $0.storyID,
@@ -355,6 +363,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
                 "hasAudio": $0.hasAudio,
                 "list": "favorites",
                 "feed": "default",
+                "aspectRatio": 1.0 //self.favoriteStoriesAPI.cellRatio,
               ]},
                 "feed": "default",
                 "list": "favorites",
@@ -372,6 +381,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
               "hasAudio": storyData.hasAudio,
               "list": "favorites",
               "feed": storyData.storyData.feed,
+              "aspectRatio": 1.0 //self.favoriteStoriesAPI.cellRatio,
             ])
           }
   }
@@ -379,7 +389,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   @objc
   func getCellRatio(resolve:@escaping RCTPromiseResolveBlock, reject:@escaping RCTPromiseRejectBlock) {
     DispatchQueue.main.async {
-      resolve(self.storiesAPI.cellRatio)
+      //resolve(self.storiesAPI.cellRatio)
     }
   }
 

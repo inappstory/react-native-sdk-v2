@@ -10,7 +10,7 @@
 
 @interface RCT_EXTERN_MODULE(RNInAppStorySDKModule, RCTEventEmitter)
 
-RCT_EXTERN_METHOD(initWith:(NSString *)apiKey userID:(NSString *)userID)
+RCT_EXTERN_METHOD(initWith:(NSString *)apiKey userID:(NSString *)userID sandbox:(BOOL *)sandbox sendStats:(BOOL *)sendStats)
 
 RCT_EXTERN_METHOD(getStories:(NSString *)feed)
 RCT_EXTERN_METHOD(getFavoriteStories:(NSString *)feed)
