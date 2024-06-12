@@ -284,6 +284,9 @@ export class StoryManager extends StoryManagerV1 {
       });
     });
   }
+  showGame(id: string) {
+    InAppStorySDK.showGame(id);
+  }
   showOnboardingStories(
     appearanceManager: AppearanceManagerV1,
     options?:
@@ -296,7 +299,7 @@ export class StoryManager extends StoryManagerV1 {
   ): Promise<OnboardingLoadStatus> {
     return new Promise((resolve, reject) => {
       InAppStorySDK.showOnboardingStories(
-        options?.limit,
+        options?.limit || 10,
         options?.feed,
         options?.customTags
       ).then((success) => {

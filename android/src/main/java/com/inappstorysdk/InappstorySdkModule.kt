@@ -66,6 +66,9 @@ import com.facebook.react.bridge.WritableNativeMap
 
 import com.inappstory.sdk.stories.api.models.ImagePlaceholderValue;
 import java.lang.reflect.Field;
+import com.inappstory.sdk.UseManagerInstanceCallback;
+
+
 
 
 /*
@@ -160,6 +163,13 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
       Log.d("InappstorySdkModule", "setUserID")
       this.ias?.setUserId(userId)
   }
+
+  @ReactMethod
+  fun closeReader() {
+    //this.ias?.closeStoryReader()
+    InAppStoryManager.closeStoryReader()
+  }
+
   @ReactMethod
   fun setLang(lang: String) {
       Log.d("InappstorySdkModule", "setLang")
@@ -247,7 +257,8 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
             }
         }
     )
-      this.ias?.setCallToActionCallback(
+    
+    this.ias?.setCallToActionCallback(
         object : CallToActionCallback {
             override fun callToAction(
                 context: Context?, //Here context of story reader or context of storiesList if it calls from it's deeplinks
@@ -255,9 +266,13 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                 url: String?,
                 action: ClickAction
             ) {
-                val map:WritableMap = Arguments.createMap()
-                sendEvent(reactContext,"callToAction", map)
+
                 Log.d("InappstorySdkModule","callToAction slide = $slide url = $url action= $action");
+                val map:WritableMap = Arguments.createMap()
+                map.putString("url", url);
+                sendEvent(reactContext,"clickOnButton", map)
+                Log.d("InappstorySdkModule","callToAction sent");
+                //InAppStoryManager.closeStoryReader()
             }
         }
     )
@@ -727,14 +742,6 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
       //TODO
   }
 
-  
-
-  @ReactMethod
-  fun closeReader() {
-      Log.d("InappstorySdkModule", "closeReader")
-      //TODO
-  }
-
   @ReactMethod
   fun clearCache() {
       Log.d("InappstorySdkModule", "clearCache")
@@ -787,7 +794,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
     @ReactMethod
     fun showEditor() {
         this.appearanceManager?.csHasUGC(true)
-        UGCInAppStoryManager.openEditor(reactContext)
+        //UGCInAppStoryManager.openEditor(reactContext)
         //promise.resolve(true)
     }
     private fun createManager(apiKey: String, userID: String, sandbox: Boolean,sendStatistic: Boolean, inAppStoryAPI: InAppStoryAPI) {

@@ -15,57 +15,51 @@ export const StoriesCarousel = ({
   favoritesOnly,
 }) => {
   const visibleIds = React.useRef([]);
-  const renderItem = React.useCallback(
-    (item) => {
-      const story = item.item;
-      if (!story.favorites) {
-        return (
-          <StoryComponent
-            key={story.storyID}
-            story={story}
-            storyManager={storyManager}
-            appearanceManager={appearanceManager}
-            onPress={!favoritesOnly ? onPress : onFavoritePress}
-          />
-        );
-      } else {
-        return (
-          <Pressable
-            style={{
-              width: appearanceManager?.storiesListOptions.card.height + 30,
-              height: appearanceManager?.storiesListOptions.card.height * 2,
-              paddingTop: appearanceManager?.storiesListOptions.topPadding,
-              flexWrap: 'wrap',
-              flexDirection: 'row',
-              flex: 1,
-              alignSelf: 'baseline',
-              top: -5,
-            }}
-            key="pressable"
-            onPress={() => onFavoritePress(feed)}
-          >
-            {story.favorites.map((story) => {
-              return (
-                <StoryComponent
-                  key={story.storyID}
-                  story={story}
-                  storyManager={storyManager}
-                  appearanceManager={appearanceManager}
-                  onPress={() => onFavoritePress(feed)}
-                  cellSize={
-                    appearanceManager?.storiesListOptions.card.height / 2
-                  }
-                  hideTitle={true}
-                />
-              );
-            })}
-          </Pressable>
-        );
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [stories]
-  );
+  const renderItem = (item) => {
+    const story = item.item;
+    if (!story.favorites) {
+      return (
+        <StoryComponent
+          key={story.storyID}
+          story={story}
+          storyManager={storyManager}
+          appearanceManager={appearanceManager}
+          onPress={!favoritesOnly ? onPress : onFavoritePress}
+        />
+      );
+    } else {
+      return (
+        <Pressable
+          style={{
+            width: appearanceManager?.storiesListOptions.card.height + 30,
+            height: appearanceManager?.storiesListOptions.card.height * 2,
+            paddingTop: appearanceManager?.storiesListOptions.topPadding,
+            flexWrap: 'wrap',
+            flexDirection: 'row',
+            flex: 1,
+            alignSelf: 'baseline',
+            top: -5,
+          }}
+          key="pressable"
+          onPress={() => onFavoritePress(feed)}
+        >
+          {story.favorites.map((story) => {
+            return (
+              <StoryComponent
+                key={story.storyID}
+                story={story}
+                storyManager={storyManager}
+                appearanceManager={appearanceManager}
+                onPress={() => onFavoritePress(feed)}
+                cellSize={appearanceManager?.storiesListOptions.card.height / 2}
+                hideTitle={true}
+              />
+            );
+          })}
+        </Pressable>
+      );
+    }
+  };
 
   if (typeof stories === 'undefined') return;
   const onViewableItemsChanged = (items) => {
@@ -78,7 +72,6 @@ export const StoriesCarousel = ({
       visibleIds.current.push(id);
     });
     if (newIDs.length > 0) {
-      console.error('setVisi', newIDs);
       InAppStorySDK.setVisibleWith(newIDs);
     }
   };
@@ -101,3 +94,5 @@ export const StoriesCarousel = ({
     </>
   );
 };
+
+StoriesCarousel.whyDidYouRender = true;

@@ -112,6 +112,7 @@ export const StoryComponent = ({
           borderRadius: borderRadius + cardOpenedStyles.border.gap,
           justifyContent: 'center',
           alignItems: 'center',
+          backgroundColor: story.backgroundColor,
         }}
       >
         {cover}
@@ -120,7 +121,12 @@ export const StoryComponent = ({
         <Text
           style={[
             styles.title,
-            { color: appearanceManager?.storiesListOptions.card.title.color },
+            {
+              color:
+                title.color !== '#ffffff'
+                  ? title.color
+                  : appearanceManager?.storiesListOptions.card.title.color,
+            },
           ]}
         >
           {title}

@@ -7996,6 +7996,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"immer@npm:^10.1.1":
+  version: 10.1.1
+  resolution: "immer@npm:10.1.1"
+  checksum: 07c67970b7d22aded73607193d84861bf786f07d47f7d7c98bb10016c7a88f6654ad78ae1e220b3c623695b133aabbf24f5eb8d9e8060cff11e89ccd81c9c10b
+  languageName: node
+  linkType: hard
+
 "import-fresh@npm:^2.0.0":
   version: 2.0.0
   resolution: "import-fresh@npm:2.0.0"
@@ -11820,6 +11827,7 @@ __metadata:
     "@types/react-native-button": ^3.0.5
     "@welldone-software/why-did-you-render": ^8.0.1
     babel-plugin-module-resolver: ^5.0.0
+    immer: ^10.1.1
     react: 18.2.0
     react-content-loader: ^7.0.0
     react-native: 0.73.7
@@ -11866,6 +11874,7 @@ __metadata:
     eslint: ^8.51.0
     eslint-config-prettier: ^9.0.0
     eslint-plugin-prettier: ^5.0.1
+    immer: ^10.1.1
     jest: ^29.7.0
     prettier: ^3.0.3
     react: 18.2.0
@@ -11874,6 +11883,7 @@ __metadata:
     react-native-gesture-handler: ^2.16.2
     react-native-ias: 0.3.17
     react-native-reanimated: ^3.12.0
+    react-native-simple-toast: ^3.3.1
     release-it: ^15.0.0
     turbo: ^1.10.7
     typescript: ^5.2.2

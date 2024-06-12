@@ -198,11 +198,12 @@ export function MainScreen({
           style={styles.button}
           styleDisabled={styles.buttonDisabled}
           onPress={() => {
-            InAppStorySDK.showGame('263');
+            storyManager.showGame('263');
           }}
         >
           Open game
         </Button>
+        {/*
         <Button
           containerStyle={styles.buttonContainer}
           style={styles.button}
@@ -212,7 +213,7 @@ export function MainScreen({
           }}
         >
           Open editor
-        </Button>
+        </Button>*/}
         <Button
           containerStyle={styles.buttonContainer}
           style={styles.button}

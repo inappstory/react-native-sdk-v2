@@ -3,6 +3,7 @@ import { create } from 'zustand';
 export const useStore = create((set) => ({
   events: [],
   feeds: [],
+  update: 0,
   addEvent: (newEvent) =>
     set((state) => {
       return { events: state.events.concat([newEvent]) };
@@ -48,7 +49,8 @@ export const useStore = create((set) => ({
           }
         }
       });
-      return state;
+      state.update = state.update + 1;
+      return { ...state };
     }, true),
   replaceInFeed: (feed, event) =>
     set((state) => {
@@ -64,6 +66,7 @@ export const useStore = create((set) => ({
         newState[feedName].push(event);
       } else {
         newState[feedName][eventIdx] = event;
+        newState.update = newState.update + 1;
         console.error('updated', event);
       }
       return newState;

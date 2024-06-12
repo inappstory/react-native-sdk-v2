@@ -26,7 +26,8 @@ export const StoriesList = ({
   const { customStoryView, showFavorites, onFavoriteCell } = useInAppStory();
   //const feeds = getFeeds();
   //const _events = useStore((state) => state.events);
-  const feedEvents = useStore((state) => state['feeds_default_feed']);
+  const updateVersion = useStore((state) => state.update);
+  const feedEvents = useStore((state) => state.feeds_default_feed);
   const feedFavoriteEvents = useStore(
     (state) => state['feeds_default_favorites']
   );
@@ -37,6 +38,9 @@ export const StoriesList = ({
   const userID = storyManager.userId;
   const ref = useRef(null);
   //const [loading, setLoading] = React.useState(false);
+  React.useEffect(() => {
+    console.log('v', updateVersion);
+  }, [updateVersion]);
   const fetchFeed = React.useCallback(async () => {
     console.log('fetch feed', feed);
     storyManager.fetchFeed(feed);
