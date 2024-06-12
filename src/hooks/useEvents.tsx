@@ -79,11 +79,16 @@ export const useEvents = ({ onFavoriteCell }) => {
           if (eventName == 'clickOnButton') {
             console.log('openURL');
             console.log(event.url);
-            const supported = await Linking.canOpenURL(event.url);
-            if (!supported) {
-              Toast.show(`Failed to open the URL: ${event.url}`, 3000);
+            try {
+              const supported = await Linking.canOpenURL(event.url);
+
+              if (!supported) {
+                Toast.show(`Failed to open the URL: ${event.url}`, 3);
+              }
+              Linking.openURL(event.url);
+            } catch (error) {
+              Toast.show(`Failed to open the URL: ${event.url}`, 3);
             }
-            Linking.openURL(event.url);
             InAppStorySDK.closeReader();
           }
           if (eventName == 'storyReaderWillShow') {

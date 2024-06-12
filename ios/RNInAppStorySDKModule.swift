@@ -228,7 +228,9 @@ class RNInAppStorySDKModule: RCTEventEmitter {
                     RNInAppStorySDKModule.emitter.sendEvent(withName: "closeStory", body: [])
                 NSLog("closeStory")
                 case .clickOnButton(slideData: let slideData, link: let link):
-                    RNInAppStorySDKModule.emitter.sendEvent(withName: "clickOnButton", body: [])
+                    RNInAppStorySDKModule.emitter.sendEvent(withName: "clickOnButton", body: [
+                      "url":link
+                    ])
                     NSLog("clickOnButton")
                     
                 case .showSlide(slideData: let slideData):
@@ -555,7 +557,9 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   @objc
     func closeReader() {
         DispatchQueue.main.async {
-          InAppStory.shared.clearCache()
+            InAppStory.shared.closeReader() {
+
+            }
         }
   }
   @objc

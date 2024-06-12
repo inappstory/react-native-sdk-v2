@@ -132,6 +132,16 @@ export const StoryComponent = ({
                 title.color !== '#ffffff'
                   ? title.color
                   : appearanceManager?.storiesListOptions.card.title.color,
+              fontSize:
+                appearanceManager?.storiesListOptions.card.title.fontSize,
+              fontWeight:
+                appearanceManager?.storiesListOptions.card.title.fontWeight,
+              fontFamily:
+                appearanceManager?.storiesListOptions.card.title.fontFamily,
+              lineHeight:
+                appearanceManager?.storiesListOptions.card.title.lineHeight,
+              textAlign:
+                appearanceManager?.storiesListOptions.card.title.textAlign,
             },
           ]}
         >
