@@ -61,7 +61,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
         InAppStory.shared.presentationStyle = .zoom
         
         InAppStory.shared.sandBox = sandbox;
-        
+        InAppStory.shared.isStatisticDisabled = !sendStats
         InAppStory.shared.initWith(serviceKey: apiKey, settings: Settings(userID: userID))
         
         
