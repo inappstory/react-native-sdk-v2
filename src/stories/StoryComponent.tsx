@@ -16,6 +16,7 @@ export const StoryComponent = ({
   onPress,
   cellSize,
   hideTitle,
+  renderCell,
 }) => {
   const size = cellSize || appearanceManager?.storiesListOptions.card.height;
   const borderRadius =
@@ -79,6 +80,11 @@ export const StoryComponent = ({
         storyManager.placeholders[placeholder]
       );
     });
+  }
+  if (renderCell) {
+    return (
+      <Pressable onPress={() => onPress(story)}>{renderCell(story)}</Pressable>
+    );
   }
   return (
     <Pressable

@@ -43,6 +43,16 @@ export const storyManager = createStoryManager();
 />
 ```
 
+## Custom Story Cell
+
+```js
+<StoriesList
+  renderCell={(story) => {
+    return <Text>{story.storyID}</Text>;
+  }}
+/>
+```
+
 ## Games
 
 ```js

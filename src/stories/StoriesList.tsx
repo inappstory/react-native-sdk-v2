@@ -22,6 +22,7 @@ export const StoriesList = ({
   onLoadEnd,
   viewModelExporter,
   favoritesOnly,
+  renderCell,
 }) => {
   const { customStoryView, showFavorites, onFavoriteCell } = useInAppStory();
   //const feeds = getFeeds();
@@ -103,6 +104,7 @@ export const StoriesList = ({
             onPress={onPress}
             onFavoritePress={onFavoritePress}
             favoritesOnly={favoritesOnly}
+            renderCell={renderCell}
           />
         </>
       )}

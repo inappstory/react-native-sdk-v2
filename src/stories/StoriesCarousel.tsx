@@ -13,6 +13,7 @@ export const StoriesCarousel = ({
   favoriteStories,
   onFavoritePress,
   favoritesOnly,
+  renderCell,
 }) => {
   const visibleIds = React.useRef([]);
   const renderItem = (item) => {
@@ -25,6 +26,7 @@ export const StoriesCarousel = ({
           storyManager={storyManager}
           appearanceManager={appearanceManager}
           onPress={!favoritesOnly ? onPress : onFavoritePress}
+          renderCell={renderCell}
         />
       );
     } else {
@@ -53,6 +55,7 @@ export const StoriesCarousel = ({
                 onPress={() => onFavoritePress(feed)}
                 cellSize={appearanceManager?.storiesListOptions.card.height / 2}
                 hideTitle={true}
+                renderCell={renderCell}
               />
             );
           })}
