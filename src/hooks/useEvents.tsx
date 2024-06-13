@@ -14,7 +14,6 @@ export const useEvents = ({ onFavoriteCell }) => {
   const imageCoverCache = React.useRef<any>({});
   const videoCoverCache = React.useRef<any>({});
   React.useEffect(() => {
-    console.log('set Listeners');
     const eventEmitter = new NativeEventEmitter(
       NativeModules.RNInAppStorySDKModule
     );
@@ -75,10 +74,7 @@ export const useEvents = ({ onFavoriteCell }) => {
     ].forEach((eventName) => {
       eventListeners.push(
         eventEmitter.addListener(eventName, async (event) => {
-          console.log('event:', eventName);
           if (eventName == 'clickOnButton') {
-            console.log('openURL');
-            console.log(event.url);
             try {
               const supported = await Linking.canOpenURL(event.url);
 

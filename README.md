@@ -47,6 +47,7 @@ export const storyManager = createStoryManager();
 
 ```js
 <StoriesList
+  ...props
   renderCell={(story) => {
     return <Text>{story.storyID}</Text>;
   }}
@@ -91,7 +92,10 @@ storyManager.getGoodsObject((skus) => {
 
 ### Migrating from old version
 
-if you used svgMask in appearance manager, try to use custom cells to achieve same results
+Breaking changes:
+
+1. Font settings are defined using separate variables (fontSize, fontWeight, fontFamily) instead of a string
+2. If you used svgMask in appearance manager, try to use custom cells to achieve same results.
 
 ## Contributing
 

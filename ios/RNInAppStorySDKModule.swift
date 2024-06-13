@@ -462,9 +462,9 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   func setTags(_ tags: [String]) {
         DispatchQueue.main.async {
           NSLog("setTags")
-            self._tags = tags
-            InAppStory.shared.settings = Settings(userID:self._userID,tags: self._tags, lang: self._lang)
-            InAppStory.shared.settings?.tags = tags
+          self._tags = tags
+            //InAppStory.shared.settings = Settings(userID:self._userID,tags: self._tags, lang: self._lang)
+         InAppStory.shared.settings?.tags = tags
           InAppStory.shared.setTags(tags)
         }
   }

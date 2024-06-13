@@ -86,6 +86,46 @@ export const StoryComponent = ({
       <Pressable onPress={() => onPress(story)}>{renderCell(story)}</Pressable>
     );
   }
+
+  const cardOutsideBottom =
+    appearanceManager?.storiesListOptions.card.title.position ==
+    'cardOutsideBottom';
+  const cardOutsideTop =
+    appearanceManager?.storiesListOptions.card.title.position ==
+    'cardOutsideTop';
+  const cardInsideBottom =
+    appearanceManager?.storiesListOptions.card.title.position ==
+    'cardInsideBottom';
+  const titleBox = !hideTitle ? (
+    <Text
+      style={[
+        styles.title,
+        {
+          color:
+            !appearanceManager?.storiesListOptions.card.title.color ||
+            story.titleColor !== '#ffffff'
+              ? story.titleColor
+              : appearanceManager?.storiesListOptions.card.title.color,
+          fontSize: appearanceManager?.storiesListOptions.card.title.fontSize,
+          fontWeight:
+            appearanceManager?.storiesListOptions.card.title.fontWeight,
+          fontFamily:
+            appearanceManager?.storiesListOptions.card.title.fontFamily,
+          lineHeight:
+            appearanceManager?.storiesListOptions.card.title.lineHeight,
+          textAlign: appearanceManager?.storiesListOptions.card.title.textAlign,
+          height:
+            appearanceManager?.storiesListOptions.card.title.lineHeight * 4,
+          position: cardInsideBottom ? 'absolute' : 'relative',
+          alignItems: 'flex-end',
+          justifyContent: 'flex-end',
+        },
+      ]}
+    >
+      {title}
+    </Text>
+  ) : null;
+
   return (
     <Pressable
       style={{
@@ -103,6 +143,7 @@ export const StoryComponent = ({
       }}
       onPress={() => onPress(story)}
     >
+      {cardOutsideTop && titleBox}
       <View
         style={{
           borderWidth: cardOpenedStyles.border.width,
@@ -116,38 +157,15 @@ export const StoryComponent = ({
             cardOpenedStyles.border.gap * 2 +
             cardOpenedStyles.border.width,
           borderRadius: borderRadius + cardOpenedStyles.border.gap,
-          justifyContent: 'center',
+          justifyContent: 'flex-end',
           alignItems: 'center',
           backgroundColor: story.backgroundColor,
         }}
       >
         {cover}
+        {cardInsideBottom && titleBox}
       </View>
-      {!hideTitle && (
-        <Text
-          style={[
-            styles.title,
-            {
-              color:
-                title.color !== '#ffffff'
-                  ? title.color
-                  : appearanceManager?.storiesListOptions.card.title.color,
-              fontSize:
-                appearanceManager?.storiesListOptions.card.title.fontSize,
-              fontWeight:
-                appearanceManager?.storiesListOptions.card.title.fontWeight,
-              fontFamily:
-                appearanceManager?.storiesListOptions.card.title.fontFamily,
-              lineHeight:
-                appearanceManager?.storiesListOptions.card.title.lineHeight,
-              textAlign:
-                appearanceManager?.storiesListOptions.card.title.textAlign,
-            },
-          ]}
-        >
-          {title}
-        </Text>
-      )}
+      {cardOutsideBottom && titleBox}
     </Pressable>
   );
 };

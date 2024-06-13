@@ -38,12 +38,10 @@ export const StoriesList = ({
   const imagePlaceholders = storyManager.imagePlaceholders;
   const userID = storyManager.userId;
   const ref = useRef(null);
-  //const [loading, setLoading] = React.useState(false);
   React.useEffect(() => {
     console.log('v', updateVersion);
   }, [updateVersion]);
   const fetchFeed = React.useCallback(async () => {
-    console.log('fetch feed', feed);
     storyManager.fetchFeed(feed);
   }, [feed, storyManager]);
   React.useEffect(() => {
@@ -66,7 +64,6 @@ export const StoriesList = ({
   }, []);
   React.useEffect(() => {
     setTimeout(() => {
-      console.error('timeout ', feed);
       fetchFeed();
     }, 10);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -82,7 +79,6 @@ export const StoriesList = ({
       if (typeof story == 'string') {
         onFavoriteCell(feed);
       } else {
-        console.error('clicking on favorites', story.storyID);
         InAppStorySDK.selectFavoriteStoryCellWith(String(story.storyID));
       }
     },

@@ -67,7 +67,6 @@ export const useStore = create((set) => ({
       } else {
         newState[feedName][eventIdx] = event;
         newState.update = newState.update + 1;
-        console.error('updated', event);
       }
       return newState;
     }, true),

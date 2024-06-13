@@ -36,7 +36,6 @@ function DropdownElement({
     <SelectDropdown
       data={items}
       onSelect={(selectedItem, _index) => {
-        console.error(selectedItem);
         onValueChange(selectedItem.value);
       }}
       defaultValue={selectedValue}
@@ -302,7 +301,6 @@ export function SettingsScreen(): React.ReactNode {
               //color={this.state.currentColor}
               swatchesOnly={true}
               onColorChangeComplete={(color) => {
-                console.error(typeof color, color);
                 InAppStorySDK.setReaderBackgroundColor(color + 'ff');
               }}
               thumbSize={40}

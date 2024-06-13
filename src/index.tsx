@@ -161,7 +161,6 @@ export class StoryManager extends StoryManagerV1 {
     }
     if (config.placeholders) {
       this.placeholders = config.placeholders;
-      console.log('setting placeholders', config.placeholders);
       InAppStorySDK.setPlaceholders(config.placeholders);
     }
     if (config.lang) {
@@ -212,7 +211,6 @@ export class StoryManager extends StoryManagerV1 {
     );
   }
   async fetchFeed(feed: string) {
-    console.log('getStories & getFavorites');
     InAppStorySDK.getStories(feed);
     InAppStorySDK.getFavoriteStories(feed);
   }
@@ -241,7 +239,6 @@ export class StoryManager extends StoryManagerV1 {
     super.setUserId(userId);
     this.userId = userId;
     InAppStorySDK.setUserID(userId);
-    console.log('set User ID', userId);
   }
   setLang(lang: string): void {
     super.setLang(lang);
@@ -391,6 +388,7 @@ export class AppearanceManager extends AppearanceManagerV1 {
         content: string;
         color: string;
         font: string;
+        fontSize: number;
         marginBottom: number;
       }>;
       card: Partial<{
@@ -399,6 +397,7 @@ export class AppearanceManager extends AppearanceManagerV1 {
           padding: string | number;
           font: string;
           display: boolean;
+          fontSize: number;
           textAlign: StoriesListCardTitleTextAlign;
           position: StoriesListCardTitlePosition;
           lineClamp: number;
