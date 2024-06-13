@@ -81,9 +81,6 @@ export const InAppStoryProvider = ({
       (storiesListViewModel.current = viewModel),
     []
   );
-  React.useEffect(() => {
-    console.log('uno iascontext');
-  }, []);
   const { readerOpen } = useEvents({ onFavoriteCell });
   const contextValue = React.useMemo(
     () => ({

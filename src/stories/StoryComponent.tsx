@@ -114,11 +114,12 @@ export const StoryComponent = ({
           lineHeight:
             appearanceManager?.storiesListOptions.card.title.lineHeight,
           textAlign: appearanceManager?.storiesListOptions.card.title.textAlign,
-          height:
-            appearanceManager?.storiesListOptions.card.title.lineHeight * 4,
+          //height:
+          //appearanceManager?.storiesListOptions.card.title.lineHeight * 4,
           position: cardInsideBottom ? 'absolute' : 'relative',
           alignItems: 'flex-end',
           justifyContent: 'flex-end',
+          height: cellSize,
         },
       ]}
     >

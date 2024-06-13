@@ -17,7 +17,6 @@ import Animated, {
   Easing,
 } from 'react-native-reanimated';
 
-import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { appearanceManager, storyManager } from '../services/StoryService';
 
 const windowWidth = Dimensions.get('window').width;
@@ -38,7 +37,6 @@ export const StoryListComponent = ({
   viewModelExporter,
 }: StoryListComponentProps): JSX.Element => {
   feedId = feedId || 'default';
-
   const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.loading);
 
   const loadStartAtRef = useRef<number | null>(null);
@@ -88,11 +86,6 @@ export const StoryListComponent = ({
       layout: {
         backgroundColor,
       },
-      card: {
-        title: {
-          color: isDarkMode ? Colors.lighter : Colors.darker,
-        },
-      },
     });
   }, [backgroundColor, isDarkMode]);
 
@@ -101,15 +94,10 @@ export const StoryListComponent = ({
     storiesListViewModel.current = viewModel;
   };
 
-  // @ts-ignore
-  const containerHeight =
-    storiesListViewModel.current?.storiesListDimensions?.totalHeight ?? 200;
-
   return (
     <View
       style={[
         styles.storyListContainer,
-        { height: containerHeight },
         loadStatus === LoadStatus.fail ? styles.displayNone : null,
       ]}
     >
@@ -136,7 +124,6 @@ const styles = StyleSheet.create({
   storyList: {
     flex: 1,
     width: '100%',
-    position: 'absolute',
     top: 0,
     left: 0,
   },
@@ -236,7 +223,6 @@ const AnimatedStoryList = ({
   useEffect(() => {
     opacity.value = loadStatus === LoadStatus.success ? 1 : 0;
   }, [loadStatus, opacity]);
-
   return (
     <Animated.View style={[styles.storyList, style]}>
       <StoriesList

@@ -54,7 +54,7 @@ export function RNWelcome({
           // eslint-disable-next-line react-native/no-inline-styles
           style={{
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
-            height: 2000,
+            flex: 1,
           }}
         >
           <StoryListComponent
