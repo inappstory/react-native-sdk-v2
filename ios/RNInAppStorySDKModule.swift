@@ -536,7 +536,13 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   @objc
   func changeSound(_ soundEnabled: Bool) {
         DispatchQueue.main.async {
-          InAppStory.shared.muted = soundEnabled
+          InAppStory.shared.muted = !soundEnabled
+        }
+  }
+  @objc
+  func getSound(resolve:@escaping RCTPromiseResolveBlock, reject:@escaping RCTPromiseRejectBlock) {
+        DispatchQueue.main.async {
+            resolve(!InAppStory.shared.muted)
         }
   }
 

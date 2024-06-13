@@ -43,6 +43,8 @@ RCT_EXTERN_METHOD(setPlaceholders:(NSDictionary *))
 RCT_EXTERN_METHOD(setImagesPlaceholders:(NSDictionary *))
 
 RCT_EXTERN_METHOD(changeSound:(BOOL *)value)
+RCT_EXTERN_METHOD(getSound:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+
 RCT_EXTERN_METHOD(setHasLike:(BOOL *)value)
 RCT_EXTERN_METHOD(setHasFavorites:(BOOL *)value)
 RCT_EXTERN_METHOD(setHasShare:(BOOL *)value)

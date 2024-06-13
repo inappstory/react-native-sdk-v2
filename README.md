@@ -143,7 +143,10 @@ InAppStorySDK.setHasFavorites(value);
 ## Sound
 
 ```js
+//To change sound settings
 InAppStorySDK.changeSound(value);
+//Get sound status
+const soundEnabled = await InAppStorySDK.getSound();
 ```
 
 ### UGC editor

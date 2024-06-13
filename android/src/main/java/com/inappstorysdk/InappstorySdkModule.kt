@@ -522,6 +522,12 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
   }
 
   @ReactMethod
+  fun getSound(promise: Promise) {
+      Log.d("InappstorySdkModule", "getSound")
+      promise.resolve(this.ias?.soundOn())
+  }
+
+  @ReactMethod
   fun setHasLike(value: Boolean) {
       Log.d("InappstorySdkModule", "setHasLike")
       this.appearanceManager?.csHasLike(value);
