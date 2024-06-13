@@ -24,8 +24,8 @@ export const StoryComponent = ({
   const cardOpenedStyles = story.opened
     ? appearanceManager?.storiesListOptions.card.opened
     : appearanceManager?.storiesListOptions.card;
-  const storyWidth = size;
-  const storyHeight = size / story.aspectRatio;
+  const storyWidth = size * story.aspectRatio;
+  const storyHeight = size;
   const styles = StyleSheet.create({
     image: {
       width: storyWidth,

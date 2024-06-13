@@ -329,7 +329,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
             "hasAudio": $0.hasAudio,
             "list": "feed",
             "feed": feed,
-            "aspectRatio": 1.0 //self.storiesAPI.cellRatio,
+            "aspectRatio": self.storiesAPI.cellRatio,
           ]},
             "feed": feed,
             "list": "feed", 
@@ -347,7 +347,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
           "hasAudio": storyData.hasAudio,
           "list": "feed",
           "feed": storyData.storyData.feed,
-          "aspectRatio": 1.0 //self.storiesAPI.cellRatio,
+          "aspectRatio": self.storiesAPI.cellRatio,
         ])
     }
     self.favoriteStoriesAPI.storyListUpdate = {storiesList,isFavorite, feed in
@@ -365,7 +365,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
                 "hasAudio": $0.hasAudio,
                 "list": "favorites",
                 "feed": "default",
-                "aspectRatio": 1.0 //self.favoriteStoriesAPI.cellRatio,
+                "aspectRatio": self.storiesAPI.cellRatio,
               ]},
                 "feed": "default",
                 "list": "favorites",
@@ -383,7 +383,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
               "hasAudio": storyData.hasAudio,
               "list": "favorites",
               "feed": storyData.storyData.feed,
-              "aspectRatio": 1.0 //self.favoriteStoriesAPI.cellRatio,
+              "aspectRatio": self.storiesAPI.cellRatio,
             ])
           }
   }
