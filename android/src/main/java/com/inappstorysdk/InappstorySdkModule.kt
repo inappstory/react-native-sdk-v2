@@ -83,6 +83,14 @@ fun sendEvent(reactContext: ReactContext, eventName: String, params: WritableMap
     .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
     .emit(eventName, params)
 }
+class InAppStory {
+    companion object {
+        fun initSDK(context:Context) {
+            InAppStoryManager.initSDK(context)
+        }
+     }
+}
+
 class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
     override fun getName() = "RNInAppStorySDKModule"
     var ias: InAppStoryManager? = null

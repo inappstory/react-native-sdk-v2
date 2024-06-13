@@ -29,22 +29,16 @@ pod 'IASFilePicker', :git => 'https://github.com/inappstory/ios-filepicker.git',
 
 ## Android Requirements
 
-Add Android SDK to your app/build.gradle
-
-```gradle
-implementation 'com.github.inappstory:android-sdk:0c282fbc27c9d982de665317926320b7b0fcf8fb'
-```
-
 Import InAppStory SDK in MainApplication
 
 ```java
-import com.inappstory.sdk.InAppStoryManager;
+import com.inappstorysdk.InAppStory;
 ```
 
 Add following code to onCreate() function
 
 ```java
-    InAppStoryManager.initSDK(getApplicationContext())
+    InAppStory.initSDK(getApplicationContext())
 ```
 
 ## Usage

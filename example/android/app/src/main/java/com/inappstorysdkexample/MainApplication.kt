@@ -1,6 +1,6 @@
 package com.inappstorysdkexample
 
-import com.inappstory.sdk.InAppStoryManager;
+import com.inappstorysdk.InAppStory;
 
 import android.app.Application
 import com.facebook.react.PackageList
@@ -39,7 +39,7 @@ class MainApplication : Application(), ReactApplication {
   override fun onCreate() {
     super.onCreate()
     Log.d("InAppStoryManager", "initSDK");
-    InAppStoryManager.initSDK(getApplicationContext())
+    InAppStory.initSDK(getApplicationContext())
     SoLoader.init(this, false)
     if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
       // If you opted-in for the New Architecture, we load the native entry point for this app.
