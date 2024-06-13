@@ -24,22 +24,27 @@ export const StoryComponent = ({
   const cardOpenedStyles = story.opened
     ? appearanceManager?.storiesListOptions.card.opened
     : appearanceManager?.storiesListOptions.card;
+  const storyWidth = size;
+  const storyHeight = size / story.aspectRatio;
   const styles = StyleSheet.create({
     image: {
-      width: size,
-      height: size,
+      width: storyWidth,
+      height: storyHeight,
       borderRadius: borderRadius,
     },
     video: {
-      width: size,
-      height: size,
+      width: storyWidth,
+      height: storyHeight,
       borderRadius: borderRadius,
     },
     title: {
       maxWidth:
-        size + cardOpenedStyles.border.gap * 2 + cardOpenedStyles.border.width,
+        storyWidth +
+        cardOpenedStyles.border.gap * 2 +
+        cardOpenedStyles.border.width,
       textAlign:
         appearanceManager?.storiesListOptions.card.title.textAlign || 'center',
+      paddingBottom: 4,
     },
   });
 
@@ -150,11 +155,11 @@ export const StoryComponent = ({
           borderWidth: cardOpenedStyles.border.width,
           borderColor: cardOpenedStyles.border.color,
           width:
-            size +
+            storyWidth +
             cardOpenedStyles.border.gap * 2 +
             cardOpenedStyles.border.width,
           height:
-            size +
+            storyHeight +
             cardOpenedStyles.border.gap * 2 +
             cardOpenedStyles.border.width,
           borderRadius: borderRadius + cardOpenedStyles.border.gap,

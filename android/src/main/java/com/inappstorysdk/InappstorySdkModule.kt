@@ -67,9 +67,7 @@ import com.facebook.react.bridge.WritableNativeMap
 import com.inappstory.sdk.stories.api.models.ImagePlaceholderValue;
 import java.lang.reflect.Field;
 import com.inappstory.sdk.UseManagerInstanceCallback;
-
-
-
+import com.inappstory.sdk.stories.api.models.CachedSessionData;
 
 /*
 idgetEventName,
@@ -824,6 +822,12 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
             }
 
             override fun updateStoryData(story: StoryAPIData) {
+                var sessionData:CachedSessionData = CachedSessionData.getInstance(reactContext);
+                var aspectRatio:Float = 1.0f;
+                if (sessionData != null) {
+                    aspectRatio = sessionData.previewAspectRatio;
+                    Log.e(TAG, "aspectratio return $aspectRatio ")
+                }
                 Log.e(TAG, "$feed updateStoryData: $story")
                 var storyData = Arguments.makeNativeMap(
                         mutableMapOf(
@@ -838,6 +842,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                             "hasAudio" to false, //FIXME
                             "list" to feed,
                             "feed" to story.storyData.feed,
+                            "aspectRatio" to aspectRatio
                         ) as Map<String, Any>)
                     Log.e(TAG, "Item = $story")
                 sendEvent(reactContext,"storyUpdate", storyData)
@@ -845,6 +850,12 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
 
             override fun updateStoriesData(stories: List<StoryAPIData>) {
                 Log.e(TAG, "$feed updateStoriesData: $stories")
+                var sessionData:CachedSessionData = CachedSessionData.getInstance(reactContext);
+                var aspectRatio:Float = 1.0f;
+                if (sessionData != null) {
+                    aspectRatio = sessionData.previewAspectRatio;
+                    Log.e(TAG, "aspectratio return $aspectRatio ")
+                }
                 val storiesList = ArrayList<WritableNativeMap>()
                 val iterator = stories.listIterator()
                 for (item in iterator) {
@@ -861,6 +872,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                             "hasAudio" to false, //FIXME
                             "list" to feed,
                             "feed" to item.storyData.feed,
+                            "aspectRatio" to aspectRatio
                         ) as Map<String, Any>)
                     Log.e(TAG, "Item = $item")
                     

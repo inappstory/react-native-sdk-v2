@@ -60,6 +60,39 @@ export const storyManager = createStoryManager();
 InAppStorySDK.showGame(gameID);
 ```
 
+## Tags
+
+```js
+InAppStorySDK.setTags(['tag1']);
+```
+
+## Placeholders
+
+```js
+InAppStorySDK.setPlaceholders({ username: 'John Doe' });
+```
+
+## Image Placeholders
+
+```js
+InAppStorySDK.setImagesPlaceholders({
+  image1: 'https://example.com/image.jpg',
+});
+```
+
+## Story Reader Appearance
+
+```js
+InAppStorySDK.setOverScrollToClose(value);
+InAppStorySDK.setSwipeToClose(value);
+InAppStorySDK.setTimerGradientEnable(value);
+InAppStorySDK.setCloseButtonPosition(value);
+InAppStorySDK.setScrollStyle(value);
+InAppStorySDK.setPresentationStyle(value);
+InAppStorySDK.setReaderBackgroundColor(value);
+InAppStorySDK.setReaderCornerRadius(value);
+```
+
 ## Likes, Share, Favorites
 
 ```js
