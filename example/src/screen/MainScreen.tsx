@@ -203,7 +203,6 @@ export function MainScreen({
         >
           Open game
         </Button>
-        {/*
         <Button
           containerStyle={styles.buttonContainer}
           style={styles.button}
@@ -213,7 +212,7 @@ export function MainScreen({
           }}
         >
           Open editor
-        </Button>*/}
+        </Button>
         <Button
           containerStyle={styles.buttonContainer}
           style={styles.button}

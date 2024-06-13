@@ -16,7 +16,7 @@ import { useStore } from '../../../src/hooks/useStore';
 
 export function EventsScreen(): React.ReactNode {
   const isDarkMode = useColorScheme() === 'dark';
-  const { events } = useStore((state) => state.events);
+  const events = useStore((state) => state.events);
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };

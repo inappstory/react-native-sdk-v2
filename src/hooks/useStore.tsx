@@ -8,7 +8,20 @@ export const useStore = create((set) => ({
     set((state) => {
       return { events: state.events.concat([newEvent]) };
     }),
-  addToFeed: (feed, event) =>
+
+  clearFeed: (feed) =>
+    set((state) => {
+      const newState = state;
+      const feedIndex = newState.feeds.indexOf(`${feed}`);
+      const feedName = `feeds_${feed}`;
+      if (feedIndex !== -1) {
+        newState.feeds.splice(feedIndex, 1);
+        delete newState[`${feedName}`];
+      }
+      newState.update = newState.update + 1;
+      return newState;
+    }, true),
+  addToFeed: (feed, events) =>
     set((state) => {
       const newState = { ...state };
       if (state.feeds.indexOf(feed) == -1) {
@@ -18,12 +31,15 @@ export const useStore = create((set) => ({
       if (typeof newState[feedName] === 'undefined') {
         newState[feedName] = [];
       }
-      const idx = newState[`${feedName}`].findIndex(
-        (f) => f.storyID == event.storyID
-      );
-      if (idx === -1) {
-        newState[feedName].push(event);
-      }
+      events.map((event) => {
+        const idx = newState[`${feedName}`].findIndex(
+          (f) => f.storyID == event.storyID
+        );
+        if (idx === -1) {
+          newState[feedName].push(event);
+        }
+      });
+      newState.update = newState.update + 1;
       return newState;
     }, true),
   setFavorite: (storyID, isFavorite) =>

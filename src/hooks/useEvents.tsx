@@ -10,6 +10,8 @@ export const useEvents = ({ onFavoriteCell }) => {
   const addToFeed = useStore((state) => state.addToFeed);
   const replaceInFeed = useStore((state) => state.replaceInFeed);
   const setFavorite = useStore((state) => state.setFavorite);
+  const clearFeed = useStore((state) => state.clearFeed);
+
   const [readerOpen, setReaderOpen] = React.useState<any>(false);
   const imageCoverCache = React.useRef<any>({});
   const videoCoverCache = React.useRef<any>({});
@@ -74,6 +76,7 @@ export const useEvents = ({ onFavoriteCell }) => {
     ].forEach((eventName) => {
       eventListeners.push(
         eventEmitter.addListener(eventName, async (event) => {
+          console.log('event:', eventName);
           if (eventName == 'clickOnButton') {
             try {
               const supported = await Linking.canOpenURL(event.url);
@@ -105,17 +108,8 @@ export const useEvents = ({ onFavoriteCell }) => {
           }
           if (eventName == 'storyListUpdate') {
             const feedName = event.feed + '_' + event.list;
-            event.stories.map((story) => {
-              addToFeed(feedName, {
-                ...story,
-                coverImagePath:
-                  imageCoverCache.current[story.storyID] ||
-                  story.coverImagePath,
-                coverVideoPath:
-                  videoCoverCache.current[story.storyID] ||
-                  story.coverVideoPath,
-              });
-            });
+            clearFeed(feedName);
+            addToFeed(feedName, event.stories);
           }
           if (eventName == 'storyUpdate') {
             const feedName = event.feed + '_' + event.list;
