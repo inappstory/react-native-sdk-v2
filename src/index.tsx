@@ -212,8 +212,14 @@ export class StoryManager extends StoryManagerV1 {
   }
   async fetchFeed(feed: string) {
     InAppStorySDK.getStories(feed);
+    //if (include_favorites) {
+    InAppStorySDK.getFavoriteStories(feed);
+    //}
+  }
+  async fetchFavorites(feed) {
     InAppStorySDK.getFavoriteStories(feed);
   }
+
   on(eventName: string | symbol, listener: any) {
     super.on(eventName, listener);
     //TODO: implement events

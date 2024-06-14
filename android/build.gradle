@@ -84,7 +84,7 @@ repositories {
 }
 
 def kotlin_version = getExtOrDefault("kotlinVersion")
-def ugc_version = "1.3.0"
+def ugc_version = "bcd5bb710c16dd84441a0dbd95f7d9bfa590f80a"
 dependencies {
   // For < 0.71, this will be from the local maven repo
   // For > 0.71, this will be replaced by `com.facebook.react:react-android:$version` by react gradle plugin
@@ -103,4 +103,3 @@ dependencies {
     exclude group: 'com.github.inappstory', module: 'android-sdk' //exclude to prevent libraries overriding
   }
 }
-

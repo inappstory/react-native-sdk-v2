@@ -105,6 +105,9 @@ export const useEvents = ({ onFavoriteCell }) => {
           }
           if (eventName == 'favoriteStory') {
             setFavorite(event.storyID, event.favorite);
+            if (!event.favorite) {
+              InAppStorySDK.getFavoriteStories('default');
+            }
           }
           if (eventName == 'storyListUpdate') {
             const feedName = event.feed + '_' + event.list;
@@ -113,6 +116,7 @@ export const useEvents = ({ onFavoriteCell }) => {
           }
           if (eventName == 'storyUpdate') {
             const feedName = event.feed + '_' + event.list;
+            console.log(`feed: ${feedName} event: ${event.storyID}`, event);
             if (event.coverImagePath) {
               imageCoverCache.current[event.storyID] = event.coverImagePath;
             }

@@ -1,8 +1,8 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { View } from 'react-native';
 
 import { StoriesCarousel } from './StoriesCarousel';
-import { StoriesWidget } from '../StoriesWidget';
+//import { StoriesWidget } from '../StoriesWidget';
 import InAppStorySDK from 'react-native-inappstory-sdk';
 import { useInAppStory } from '../context/InAppStoryContext';
 import { useStore } from '../hooks/useStore';
@@ -29,15 +29,10 @@ export const StoriesList = ({
   //const _events = useStore((state) => state.events);
   const updateVersion = useStore((state) => state.update);
   const feedEvents = useStore((state) => state.feeds_default_feed);
-  const feedFavoriteEvents = useStore(
-    (state) => state['feeds_default_favorites']
-  );
+  const feedFavoriteEvents = useStore((state) => state.feeds_default_favorites);
 
-  const tags = storyManager.tags;
-  const placeholders = storyManager.placeholders;
-  const imagePlaceholders = storyManager.imagePlaceholders;
   const userID = storyManager.userId;
-  const ref = useRef(null);
+  //const ref = useRef(null);
   React.useEffect(() => {
     console.log('v', updateVersion);
   }, [updateVersion]);
@@ -45,13 +40,15 @@ export const StoriesList = ({
     storyManager.fetchFeed(feed);
   }, [feed, storyManager]);
   React.useEffect(() => {
-    onLoadStart();
-    if (!feedEvents) return;
-    onLoadEnd({
-      defaultListLength: feedEvents.length || 0,
-      feed,
-      list: 'feed',
-    });
+    if (!favoritesOnly) {
+      onLoadStart();
+      if (!feedEvents) return;
+      onLoadEnd({
+        defaultListLength: feedEvents.length || 0,
+        feed,
+        list: 'feed',
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [feedEvents]);
   React.useEffect(() => {
@@ -64,13 +61,12 @@ export const StoriesList = ({
   }, []);
   React.useEffect(() => {
     setTimeout(() => {
-      fetchFeed();
+      if (!favoritesOnly) {
+        fetchFeed();
+      }
     }, 10);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  const onViewLoaded = (refId) => {
-    ref.current = refId;
-  };
   const onPress = React.useCallback((story) => {
     InAppStorySDK.selectStoryCellWith(String(story.storyID));
   }, []);
@@ -78,11 +74,12 @@ export const StoriesList = ({
     (story) => {
       if (typeof story == 'string') {
         onFavoriteCell(feed);
+        storyManager.fetchFavorites(feed);
       } else {
         InAppStorySDK.selectFavoriteStoryCellWith(String(story.storyID));
       }
     },
-    [onFavoriteCell, feed]
+    [onFavoriteCell, feed, storyManager]
   );
 
   const customFeed = false;
@@ -103,17 +100,6 @@ export const StoriesList = ({
             renderCell={renderCell}
           />
         </>
-      )}
-      {!customFeed && !customStoryView && (
-        <StoriesWidget
-          feed={feed}
-          onViewLoaded={onViewLoaded}
-          tags={tags}
-          placeholders={placeholders}
-          imagePlaceholders={imagePlaceholders}
-          userID={userID}
-          favoritesOnly={favoritesOnly}
-        />
       )}
     </View>
   );

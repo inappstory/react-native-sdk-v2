@@ -38,13 +38,12 @@ export const StoryComponent = ({
       borderRadius: borderRadius,
     },
     title: {
-      maxWidth:
-        storyWidth +
-        cardOpenedStyles.border.gap * 2 +
-        cardOpenedStyles.border.width,
       textAlign:
         appearanceManager?.storiesListOptions.card.title.textAlign || 'center',
-      paddingBottom: 4,
+      paddingHorizontal: 5,
+      paddingVertical: 5,
+      width: '100%',
+      //backgroundColor: 'rgba(255,255,255,0.1)',
     },
   });
 
@@ -118,7 +117,6 @@ export const StoryComponent = ({
             appearanceManager?.storiesListOptions.card.title.fontFamily,
           lineHeight:
             appearanceManager?.storiesListOptions.card.title.lineHeight,
-          textAlign: appearanceManager?.storiesListOptions.card.title.textAlign,
           //height:
           //appearanceManager?.storiesListOptions.card.title.lineHeight * 4,
           position: cardInsideBottom ? 'absolute' : 'relative',
@@ -142,10 +140,10 @@ export const StoryComponent = ({
         opacity: cardOpenedStyles.opacity || 1,
         paddingTop: !cellSize
           ? appearanceManager?.storiesListOptions.topPadding
-          : 2,
+          : 1,
         paddingBottom: !cellSize
           ? appearanceManager?.storiesListOptions.bottomPadding
-          : 2,
+          : 0,
       }}
       onPress={() => onPress(story)}
     >
@@ -164,7 +162,7 @@ export const StoryComponent = ({
             cardOpenedStyles.border.width,
           borderRadius: borderRadius + cardOpenedStyles.border.gap,
           justifyContent: 'flex-end',
-          alignItems: 'center',
+          //alignItems: 'center',
           backgroundColor: story.backgroundColor,
         }}
       >

@@ -805,8 +805,10 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
     }
     @ReactMethod
     fun showEditor() {
+        Log.d("IAS","openEditor")
         this.appearanceManager?.csHasUGC(true)
-        UGCInAppStoryManager.openEditor(reactContext)
+        UGCInAppStoryManager.init(reactContext.currentActivity as Context)
+        UGCInAppStoryManager.openEditor(reactContext.currentActivity as Context)
         //promise.resolve(true)
     }
     private fun createManager(apiKey: String, userID: String, sandbox: Boolean,sendStatistic: Boolean, inAppStoryAPI: InAppStoryAPI) {

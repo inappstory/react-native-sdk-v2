@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { View, Platform } from 'react-native';
 import { StoryComponent } from './StoryComponent';
 import { FlatList, Pressable } from 'react-native';
 import InAppStorySDK from 'react-native-inappstory-sdk';
@@ -16,6 +17,7 @@ export const StoriesCarousel = ({
   renderCell,
 }) => {
   const visibleIds = React.useRef([]);
+  const flatListRef = React.useRef<any>(null);
   const renderItem = (item) => {
     const story = item.item;
     if (!story.favorites) {
@@ -33,14 +35,13 @@ export const StoriesCarousel = ({
       return (
         <Pressable
           style={{
-            width: appearanceManager?.storiesListOptions.card.height + 30,
-            height: appearanceManager?.storiesListOptions.card.height * 2,
+            width: appearanceManager?.storiesListOptions.card.height + 10,
+            height: appearanceManager?.storiesListOptions.card.height,
             paddingTop: appearanceManager?.storiesListOptions.topPadding,
             flexWrap: 'wrap',
             flexDirection: 'row',
             flex: 1,
             alignSelf: 'baseline',
-            top: -5,
           }}
           key="pressable"
           onPress={() => onFavoritePress(feed)}
@@ -64,7 +65,14 @@ export const StoriesCarousel = ({
     }
   };
 
-  if (typeof stories === 'undefined') return;
+  if (typeof stories === 'undefined')
+    return (
+      <View
+        style={{
+          height: appearanceManager?.storiesListOptions.card.height + 7,
+        }}
+      ></View>
+    );
   const onViewableItemsChanged = (items) => {
     const newIDs = items.changed
       .filter((i) => i.isViewable)
@@ -89,10 +97,14 @@ export const StoriesCarousel = ({
               : [...stories, { favorites: favoriteStories.slice(0, 4) }]
             : favoriteStories
         }
-        renderItem={(item) => renderItem(item)}
+        renderItem={renderItem}
         onViewableItemsChanged={onViewableItemsChanged}
         showsHorizontalScrollIndicator={false}
         keyExtractor={(item, _index) => item.storyID}
+        ref={flatListRef}
+        onEndReached={() => {
+          if (Platform.OS === 'android') flatListRef?.current?.scrollToEnd();
+        }}
       />
     </>
   );

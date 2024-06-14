@@ -160,8 +160,9 @@ const StoryListLoader = ({ loadStatus }: { loadStatus: LoadStatus }) => {
   const paddingVertical = appearanceManager.storiesListOptions.topPadding;
   const sidePadding = appearanceManager.storiesListOptions.sidePadding ?? 0;
   const cardGap = appearanceManager.storiesListOptions.card?.gap ?? 0;
-
-  const radius = height / 2;
+  const isCircle =
+    appearanceManager.storiesListOptions.card?.variant == 'circle';
+  const radius = isCircle ? height / 2 : 10;
 
   return (
     <Animated.View
