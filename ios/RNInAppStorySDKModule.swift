@@ -66,40 +66,94 @@ class RNInAppStorySDKModule: RCTEventEmitter {
         
         
         InAppStory.shared.storyReaderWillShow = {showed in
-          NSLog("TODO: storyReaderWillShow closure");
-          RNInAppStorySDKModule.emitter.sendEvent(withName: "storyReaderWillShow", body: [])
+            switch showed {
+            case .list(feed: let feed):
+              RNInAppStorySDKModule.emitter.sendEvent(withName: "storyReaderWillShow", body: [
+                "feed": feed,
+                "type": "list",
+              ])
+            case .ugcList:
+                RNInAppStorySDKModule.emitter.sendEvent(withName: "storyReaderWillShow", body: [
+                  "type": "ugcList",
+                ])
+            case .single:
+                RNInAppStorySDKModule.emitter.sendEvent(withName: "storyReaderWillShow", body: [
+                  "type": "single",
+                ])
+            case .onboarding(feed: let feed):
+                RNInAppStorySDKModule.emitter.sendEvent(withName: "storyReaderWillShow", body: [
+                  "feed": feed,
+                  "type": "onboarding",
+                ])
+            @unknown default:
+                NSLog("WARNING: unknown storyReaderWillShow")
+            }
         }
         
         InAppStory.shared.storyReaderDidClose = { showed in
-            NSLog("TODO: storyReaderDidClose closure");
-            RNInAppStorySDKModule.emitter.sendEvent(withName: "storyReaderDidClose", body: [])
+            switch showed {
+            case .list(feed: let feed):
+              RNInAppStorySDKModule.emitter.sendEvent(withName: "storyReaderDidClose", body: [
+                "feed": feed,
+                "type": "list",
+              ])
+            case .ugcList:
+                RNInAppStorySDKModule.emitter.sendEvent(withName: "storyReaderDidClose", body: [
+                  "type": "ugcList",
+                ])
+            case .single:
+                RNInAppStorySDKModule.emitter.sendEvent(withName: "storyReaderDidClose", body: [
+                  "type": "single",
+                ])
+            case .onboarding(feed: let feed):
+                RNInAppStorySDKModule.emitter.sendEvent(withName: "storyReaderDidClose", body: [
+                  "feed": feed,
+                  "type": "onboarding",
+                ])
+            @unknown default:
+                NSLog("WARNING: unknown storyReaderDidClose")
+            }
         }
         self.storiesAPI.favoritesUpdate = { showed in
-            NSLog("TODO: favoritesUpdate closure");
-            RNInAppStorySDKModule.emitter.sendEvent(withName: "favoritesUpdate", body: [])
+            RNInAppStorySDKModule.emitter.sendEvent(withName: "favoritesUpdate", body: [
+                "feed": showed,
+            ])
         }
         self.storiesAPI.scrollUpdate = { showed in
-            NSLog("TODO: scrollUpdate closure");
-            RNInAppStorySDKModule.emitter.sendEvent(withName: "scrollUpdate", body: [])
+            RNInAppStorySDKModule.emitter.sendEvent(withName: "scrollUpdate", body: [
+                "index":showed
+            ])
         }
         InAppStory.shared.gameEvent = { gameEvent in
             NSLog("gameEvent");
             switch gameEvent {
             case .closeGame(gameData: let gameData):
-                NSLog("closeGame")
-                RNInAppStorySDKModule.emitter.sendEvent(withName: "closeGame", body: [])
-                print(gameData)
+                RNInAppStorySDKModule.emitter.sendEvent(withName: "closeGame", body: [
+                    "gameID": gameData.gameID,
+                    "id": gameData.slideData?.storyData?.id,
+                    "feed": gameData.slideData?.storyData?.feed,
+                ])
             case .startGame(gameData: let gameData):
-                NSLog("startGame")
-                RNInAppStorySDKModule.emitter.sendEvent(withName: "startGame", body: [])
-                print(gameData)
+                RNInAppStorySDKModule.emitter.sendEvent(withName: "startGame", body: [
+                    "id": gameData.slideData?.storyData?.id,
+                    "gameID": gameData.gameID
+                ])
             case .finishGame(gameData: let gameData, result: let result):
                 NSLog("finishGame")
-                RNInAppStorySDKModule.emitter.sendEvent(withName: "finishGame", body: [])
+                RNInAppStorySDKModule.emitter.sendEvent(withName: "finishGame", body: [
+                    "id": gameData.slideData?.storyData?.id,
+                    "gameID": gameData.gameID
+                ])
                 print(gameData, result)
             case .eventGame(gameData: let gameData, name: let name, payload: let payload):
                 NSLog("eventGame")
-                RNInAppStorySDKModule.emitter.sendEvent(withName: "eventGame", body: [])
+                RNInAppStorySDKModule.emitter.sendEvent(withName: "eventGame", body: [
+                    "id": gameData.slideData?.storyData?.id,
+                    "feed": gameData.slideData?.storyData?.feed,
+                    "gameID": gameData.gameID,
+                    "name": name,
+                    "payload": payload,
+                ])
                 print(gameData, name ,payload)
             case .gameFailure(gameData: let gameData, message: let message):
                 NSLog("gameFailure")
@@ -141,25 +195,26 @@ class RNInAppStorySDKModule: RCTEventEmitter {
             NSLog("failureEvent");
             switch failureEvent {
             case .sessionFailure(message: let message):
-                RNInAppStorySDKModule.emitter.sendEvent(withName: "sessionFailure", body: [])
-                NSLog("sessionFailure")
-                print(message)
+                RNInAppStorySDKModule.emitter.sendEvent(withName: "sessionFailure", body: [
+                  "message": message,
+                ])
             case .storyFailure(message: let message):
-                RNInAppStorySDKModule.emitter.sendEvent(withName: "storyFailure", body: [])
-                NSLog("storyFailure")
-                print(message)
+                RNInAppStorySDKModule.emitter.sendEvent(withName: "storyFailure", body: [
+                  "message": message
+                ])
             case .currentStoryFailure(message: let message):
-                RNInAppStorySDKModule.emitter.sendEvent(withName: "currentStoryFailure", body: [])
-                NSLog("currentStoryFailure")
-                print(message)
+                RNInAppStorySDKModule.emitter.sendEvent(withName: "currentStoryFailure", body: [
+                  "message": message,
+                ])
             case .networkFailure(message: let message):
-                RNInAppStorySDKModule.emitter.sendEvent(withName: "networkFailure", body: [])
-                NSLog("networkFailure")
-                print(message)
+                RNInAppStorySDKModule.emitter.sendEvent(withName: "networkFailure", body: [
+                  "message": message
+                ])
             case .requestFailure(message: let message, statusCode: let statusCode):
-                RNInAppStorySDKModule.emitter.sendEvent(withName: "requestFailure", body: [])
-                NSLog("requestFailure")
-                print(message, statusCode)
+                RNInAppStorySDKModule.emitter.sendEvent(withName: "requestFailure", body: [
+                  "message": message,
+                  "statusCode": statusCode,
+                ])
             @unknown default:
                 NSLog("WARNING: unknown failureEvent")
             }
@@ -172,7 +227,11 @@ class RNInAppStorySDKModule: RCTEventEmitter {
         }
         InAppStory.shared.gameComplete = { data, result, url in
             NSLog("TODO: gameComplete closure");
-            RNInAppStorySDKModule.emitter.sendEvent(withName: "gameComplete", body: [])
+            RNInAppStorySDKModule.emitter.sendEvent(withName: "gameComplete", body: [
+                "data": data,
+                "result": result ?? [:],
+                "url": url ?? ""
+            ])
         }
 
         InAppStory.shared.favoriteCellDidSelect = {
@@ -196,7 +255,10 @@ class RNInAppStorySDKModule: RCTEventEmitter {
 
         InAppStory.shared.storiesDidUpdated = { isContent, storyType in
           NSLog("TODO: storiesDidUpdated closure");
-          RNInAppStorySDKModule.emitter.sendEvent(withName: "storiesDidUpdated", body: [])
+          RNInAppStorySDKModule.emitter.sendEvent(withName: "storiesDidUpdated", body: [
+            "isContent": isContent,
+            "storyType": storyType,
+          ])
           NSLog("TODO: onActionWith closure");
         }
 
@@ -212,20 +274,61 @@ class RNInAppStorySDKModule: RCTEventEmitter {
         
         InAppStory.shared.storiesEvent = { storiesEvent in
             NSLog("TODO: storiesEvent");
-             RNInAppStorySDKModule.emitter.sendEvent(withName: "storiesLoaded", body: [])
+             //RNInAppStorySDKModule.emitter.sendEvent(withName: "storiesLoaded", body: [])
              switch storiesEvent {
-                case .storiesLoaded(stories: let stories):
-                    RNInAppStorySDKModule.emitter.sendEvent(withName: "storiesLoaded", body: [])
-                    NSLog("storiesLoaded")
-                    print(stories)
-                case .clickOnStory(storyData: let storyData):
-                    RNInAppStorySDKModule.emitter.sendEvent(withName: "clickOnStory", body: [])
+             case .storiesLoaded(feed: let feed, stories: let stories):
+                    RNInAppStorySDKModule.emitter.sendEvent(withName: "storiesLoaded", body: [
+                        "feed": feed,
+                        "stories": stories,
+                    ])
+             case .clickOnStory(storyData: let storyData, index: let index):
+                    RNInAppStorySDKModule.emitter.sendEvent(withName: "clickOnStory", body: [
+                        "id": storyData.id,
+                        "feed": storyData.feed,
+                        "index": index,
+                    ])
                     NSLog("clickOnStory")
                 case .showStory(storyData: let storyData, action: let action):
-                    RNInAppStorySDKModule.emitter.sendEvent(withName: "showStory", body: [])
+                 var actionString = "";
+                 switch action {
+                 case .swipe:
+                     actionString = "swipe"
+                 case .auto:
+                     actionString = "auto"
+                 case .custom:
+                     actionString = "custom"
+                 case .open:
+                     actionString = "open"
+                 case .tap:
+                     actionString = "tap"
+                 @unknown default:
+                     actionString = "unknown"
+                 }
+                    RNInAppStorySDKModule.emitter.sendEvent(withName: "showStory", body: [
+                        "id": storyData.id,
+                        "action": actionString
+                    ])
                     NSLog("showStory")
                 case .closeStory(slideData: let slideData, action: let action):
-                    RNInAppStorySDKModule.emitter.sendEvent(withName: "closeStory", body: [])
+                 var actionString = "";
+                 switch action {
+                 case .swipe:
+                     actionString = "swipe"
+                 case .click:
+                     actionString = "click"
+                 case .auto:
+                     actionString = "auto"
+                 case .custom:
+                     actionString = "custom"
+                 @unknown default:
+                     actionString = "unknown"
+                 }
+                    RNInAppStorySDKModule.emitter.sendEvent(withName: "closeStory", body: [
+                        "id": slideData.storyData?.id,
+                        "feed": slideData.storyData?.feed,
+                        "index": slideData.index,
+                        "action": actionString,
+                    ])
                 NSLog("closeStory")
                 case .clickOnButton(slideData: let slideData, link: let link):
                     RNInAppStorySDKModule.emitter.sendEvent(withName: "clickOnButton", body: [
@@ -234,29 +337,49 @@ class RNInAppStorySDKModule: RCTEventEmitter {
                     NSLog("clickOnButton")
                     
                 case .showSlide(slideData: let slideData):
-                    RNInAppStorySDKModule.emitter.sendEvent(withName: "showSlide", body: [])
+                    RNInAppStorySDKModule.emitter.sendEvent(withName: "showSlide", body: [
+                      "id": slideData.storyData?.id,
+                      "index": slideData.index
+                    ])
+                    
                     NSLog("showSlide")
                     
                 case .likeStory(slideData: let slideData, value: let value):
-                    RNInAppStorySDKModule.emitter.sendEvent(withName: "likeStory", body: [])
+                    RNInAppStorySDKModule.emitter.sendEvent(withName: "likeStory", body: [
+                        "feed": slideData.storyData?.feed,
+                        "id": slideData.storyData?.id,
+                        "value": value
+                    ])
                     NSLog("likeStory")
                     
                 case .dislikeStory(slideData: let slideData, value: let value):
-                    RNInAppStorySDKModule.emitter.sendEvent(withName: "dislikeStory", body: [])
+                    RNInAppStorySDKModule.emitter.sendEvent(withName: "dislikeStory", body: [
+                      "feed": slideData.storyData?.feed,
+                      "id": slideData.storyData?.id,
+                      "value": value
+                    ])
                     NSLog("dislikeStory")
                     
                 case .favoriteStory(slideData: let slideData, value: let value):
-                    RNInAppStorySDKModule.emitter.sendEvent(withName: "favoriteStory", body: [])
-                    NSLog("favoriteStory")
+                    RNInAppStorySDKModule.emitter.sendEvent(withName: "favoriteStory", body: [
+                      "feed": slideData.storyData?.feed,
+                      "id": slideData.storyData?.id,
+                      "value": value
+                    ])
                 case .clickOnShareStory(slideData: let slideData):
-                    RNInAppStorySDKModule.emitter.sendEvent(withName: "clickOnShareStory", body: [])
-                    NSLog("clickOnShareStory")
+                    RNInAppStorySDKModule.emitter.sendEvent(withName: "clickOnShareStory", body: [
+                      "feed": slideData.storyData?.feed,
+                      "id": slideData.storyData?.id,
+                    ])
                 case .storyWidgetEvent(slideData: let slideData, name: let name, data: let data):
-                    RNInAppStorySDKModule.emitter.sendEvent(withName: "storyWidgetEvent", body: [])
-                    NSLog("storyWidgetEvent")
+                    RNInAppStorySDKModule.emitter.sendEvent(withName: "storyWidgetEvent", body: [
+                        "id": slideData?.storyData?.id,
+                        "feed": slideData?.storyData?.feed,
+                        "name": name,
+                        "data": data
+                    ])
                 case .ugcStoriesLoaded(stories: let stories):
                     RNInAppStorySDKModule.emitter.sendEvent(withName: "ugcStoriesLoaded", body: [])
-                    NSLog("ugcStoriesLoaded")
                 @unknown default:
                      NSLog("WARNING: unknown storiesEvent")
                             
@@ -335,6 +458,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
             "list": "feed", 
         ])}
     self.storiesAPI.storyUpdate = {storyData in
+        print("StoryUpdate = $storyData");
         RNInAppStorySDKModule.emitter.sendEvent(withName: "storyUpdate", body: [
           "storyID": storyData.storyID,
           "storyData": storyData.storyData,
@@ -453,6 +577,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   func setLang(_ lang: String) {
         DispatchQueue.main.async {
           NSLog("setLang")
+            print("$lang")
             self._lang = lang;
             InAppStory.shared.settings = Settings(userID:self._userID, tags: self._tags, lang: lang)
         }
@@ -462,6 +587,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   func setTags(_ tags: [String]) {
         DispatchQueue.main.async {
           NSLog("setTags")
+            print("$tags")
           self._tags = tags
             //InAppStory.shared.settings = Settings(userID:self._userID,tags: self._tags, lang: self._lang)
          InAppStory.shared.settings?.tags = tags

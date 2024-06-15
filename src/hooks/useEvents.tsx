@@ -76,7 +76,7 @@ export const useEvents = ({ onFavoriteCell }) => {
     ].forEach((eventName) => {
       eventListeners.push(
         eventEmitter.addListener(eventName, async (event) => {
-          console.log('event:', eventName);
+          console.log('event:', eventName, event);
           if (eventName == 'clickOnButton') {
             try {
               const supported = await Linking.canOpenURL(event.url);
