@@ -226,15 +226,28 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
             return;
         }
     });
+
     this.ias?.setShowStoryCallback(
         object : ShowStoryCallback {
             override fun showStory(
                 story: StoryData?,
                 showStoryAction: ShowStoryAction?
             ) {
-                val map:WritableMap = Arguments.createMap()
-
-                sendEvent(reactContext,"showStory", map)
+                var payload = Arguments.makeNativeMap(
+                    mutableMapOf(
+                        "action" to when(showStoryAction){
+                            ShowStoryAction.OPEN -> "open"
+                            ShowStoryAction.TAP -> "tap"
+                            ShowStoryAction.SWIPE -> "swipe"
+                            ShowStoryAction.AUTO -> "auto"
+                            ShowStoryAction.CUSTOM -> "custom"
+                            null -> "unknown"
+                        },
+                        "feed" to story?.feed,
+                        "id" to story?.id
+                        
+                    ) as Map<String, Any>)
+                sendEvent(reactContext,"showStory", payload)
                 Log.d("InappstorySdkModule","showStory story = $story, showstoryaction = $showStoryAction");
             }
         }
@@ -244,8 +257,13 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
             override fun showSlide(
                 slide: SlideData?
             ) {
-                val map:WritableMap = Arguments.createMap()
-                sendEvent(reactContext,"showSlide", map)
+                var payload = Arguments.makeNativeMap(
+                        mutableMapOf(
+                            "id" to slide?.story?.id,
+                            "index" to slide?.index
+                            
+                        ) as Map<String, Any>)
+                sendEvent(reactContext,"showSlide", payload)
                 Log.d("InappstorySdkModule","showSlide slide = $slide");
             }
         }
@@ -256,8 +274,20 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                 slide: SlideData?,
                 action: CloseReader?
             ) {
-                val map:WritableMap = Arguments.createMap()
-                sendEvent(reactContext,"closeStory", map)
+                var payload = Arguments.makeNativeMap(
+                        mutableMapOf(
+                            "action" to when(action){
+                                CloseReader.AUTO -> "auto"
+                                CloseReader.CLICK -> "click"
+                                CloseReader.SWIPE -> "swipe"
+                                CloseReader.CUSTOM -> "custom"
+                                null -> "unknown"
+                            },
+                            "feed" to slide?.story?.feed,
+                            "id" to slide?.story?.id
+                            
+                        ) as Map<String, Any>)
+                sendEvent(reactContext,"closeStory", payload)
                 Log.d("InappstorySdkModule","closeStory slide = $slide action= $action");
 
             }
@@ -272,12 +302,23 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                 url: String?,
                 action: ClickAction
             ) {
+                var payload = Arguments.makeNativeMap(
+                            mutableMapOf(
+                                "action" to when(action){
+                                    ClickAction.BUTTON -> "button"
+                                    ClickAction.SWIPE -> "swipe"
+                                    ClickAction.GAME -> "game"
+                                    ClickAction.DEEPLINK -> "deeplink"
+                                },
+                                "feed" to slide?.story?.feed,
+                                "index" to slide?.index,
+                                "id" to slide?.story?.id,
+                                "url" to url
+                                
+                            ) as Map<String, Any>)
 
                 Log.d("InappstorySdkModule","callToAction slide = $slide url = $url action= $action");
-                val map:WritableMap = Arguments.createMap()
-                map.putString("url", url);
-                sendEvent(reactContext,"clickOnButton", map)
-                Log.d("InappstorySdkModule","callToAction sent");
+                sendEvent(reactContext,"clickOnButton", payload)
                 //InAppStoryManager.closeStoryReader()
             }
         }
@@ -288,10 +329,15 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                 slide: SlideData?,
                 value: Boolean
             ) {
-                val map:WritableMap = Arguments.createMap()
-                map.putBoolean("favorite", value)
-                map.putString("storyID", slide?.story?.id.toString())
-                sendEvent(reactContext,"favoriteStory", map)
+                var payload = Arguments.makeNativeMap(
+                    mutableMapOf(
+                        "feed" to slide?.story?.feed,
+                        "index" to slide?.index,
+                        "storyID" to slide?.story?.id,
+                        "favorite" to value
+                        
+                    ) as Map<String, Any>)
+                sendEvent(reactContext,"favoriteStory", payload)
                 Log.d("InappstorySdkModule","favoriteStory slide = $slide value = $value");
             }
         }
@@ -302,8 +348,15 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                 slide: SlideData?,
                 value: Boolean
             ) {
-                val map:WritableMap = Arguments.createMap()
-                sendEvent(reactContext,"setLike", map)
+                var payload = Arguments.makeNativeMap(
+                        mutableMapOf(
+                            "feed" to slide?.story?.feed,
+                            "index" to slide?.index,
+                            "id" to slide?.story?.id,
+                            "value" to value
+                            
+                        ) as Map<String, Any>)
+                sendEvent(reactContext,"setLike", payload)
                 Log.d("InappstorySdkModule","setLike slide = $slide value = $value");
             }
 
@@ -311,8 +364,15 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                 slide: SlideData?,
                 value: Boolean
             ) {
-                val map:WritableMap = Arguments.createMap()
-                sendEvent(reactContext,"setDislike", map)
+                var payload = Arguments.makeNativeMap(
+                        mutableMapOf(
+                            "feed" to slide?.story?.feed,
+                            "index" to slide?.index,
+                            "id" to slide?.story?.id,
+                            "value" to value
+                            
+                        ) as Map<String, Any>)
+                sendEvent(reactContext,"setDislike", payload)
                 Log.d("InappstorySdkModule","setDislike slide = $slide value = $value");
             }
         }
@@ -322,8 +382,14 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
             override fun shareClick(
                 slide: SlideData?
             ) {
-                val map:WritableMap = Arguments.createMap()
-                sendEvent(reactContext,"clickOnShare", map)
+                var payload = Arguments.makeNativeMap(
+                        mutableMapOf(
+                            "feed" to slide?.story?.feed,
+                            "index" to slide?.index,
+                            "id" to slide?.story?.id
+                            
+                        ) as Map<String, Any>)
+                sendEvent(reactContext,"clickOnShare", payload)
                 Log.d("InappstorySdkModule","clickOnShare slide = $slide");
             }
         }
@@ -331,8 +397,13 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
       this.ias?.setOnboardingLoadCallback(
         object : OnboardingLoadCallback {
             override fun onboardingLoad(count: Int, feed: String?) {
-                val map:WritableMap = Arguments.createMap()
-                sendEvent(reactContext,"onboardingLoad", map)
+                var payload = Arguments.makeNativeMap(
+                        mutableMapOf(
+                            "count" to count,
+                            "feed" to feed,
+                            
+                        ) as Map<String, Any>)
+                sendEvent(reactContext,"onboardingLoad", payload)
                 Log.d("InappstorySdkModule","onboardingLoad count = $count, feed = $feed");
             }
         }
@@ -340,8 +411,13 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
       this.ias?.setSingleLoadCallback(
         object : SingleLoadCallback {
             override fun singleLoad(story: StoryData?) {
-                val map:WritableMap = Arguments.createMap()
-                sendEvent(reactContext,"singleLoad", map)
+                var payload = Arguments.makeNativeMap(
+                        mutableMapOf(
+                            "id" to story?.id,
+                            "feed" to story?.feed,
+                            
+                        ) as Map<String, Any>)
+                sendEvent(reactContext,"singleLoad", payload)
                 Log.d("InappstorySdkModule","singleLoad story = $story");
             }
         }
@@ -354,8 +430,14 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                 widgetData: Map<String, String?>?,
                 //feed: String?
             ) {
-                val map:WritableMap = Arguments.createMap()
-                sendEvent(reactContext,"storyWidget", map)
+                var payload = Arguments.makeNativeMap(
+                    mutableMapOf(
+                        "feed" to slideData?.story?.feed,
+                        "id" to slideData?.story?.id,
+                        "name" to widgetEventName,
+                        "data" to widgetData
+                    ) as Map<String, Any>)
+                sendEvent(reactContext,"storyWidget", payload)
                 Log.d("InappstorySdkModule","storyWidget story = $slideData, widgetEventName = $widgetEventName, widgetData = $widgetData");
             }
         }
@@ -366,8 +448,12 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                 gameStoryData: GameStoryData?,
                 id: String?
             ) {
-                val map:WritableMap = Arguments.createMap()
-                sendEvent(reactContext,"startGame", map)
+                var payload = Arguments.makeNativeMap(
+                mutableMapOf(
+                    "gameStoryData" to gameStoryData,
+                    "id" to id
+                ) as Map<String, Any>)
+                sendEvent(reactContext,"startGame", payload)
                 Log.d("InappstorySdkModule","startGame gameStoryData = $gameStoryData, id = $id");
             }
 
@@ -376,8 +462,13 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                 result: String?,
                 id: String?
             ) {
-                val map:WritableMap = Arguments.createMap()
-                sendEvent(reactContext,"finishGame", map)
+                var payload = Arguments.makeNativeMap(
+                mutableMapOf(
+                    "gameStoryData" to gameStoryData,
+                    "result" to result,
+                    "id" to id
+                ) as Map<String, Any>)
+                sendEvent(reactContext,"finishGame", payload)
                 Log.d("InappstorySdkModule","startGame gameStoryData = $gameStoryData, result = $result, id = $id");
             }
 
@@ -385,24 +476,36 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                 gameStoryData: GameStoryData?,
                 id: String?
             ) {
-                val map:WritableMap = Arguments.createMap()
-                sendEvent(reactContext,"closeGame", map)
+                var payload = Arguments.makeNativeMap(
+                mutableMapOf(
+                    "gameStoryData" to gameStoryData,
+                    "id" to id
+                ) as Map<String, Any>)
+                sendEvent(reactContext,"closeGame", payload)
                 Log.d("InappstorySdkModule","closeGame gameStoryData = $gameStoryData, id = $id");
             }
             override fun gameLoadError(
                 gameStoryData: GameStoryData?,
                 id: String?
             ) {
-                val map:WritableMap = Arguments.createMap()
-                sendEvent(reactContext,"gameLoadError", map)
+                var payload = Arguments.makeNativeMap(
+                mutableMapOf(
+                    "gameStoryData" to gameStoryData,
+                    "id" to id
+                ) as Map<String, Any>)
+                sendEvent(reactContext,"gameLoadError", payload)
                 Log.d("InappstorySdkModule","gameLoadError gameStoryData = $gameStoryData, id = $id");
             }
             override fun gameOpenError(
               gameStoryData: GameStoryData?,
               id: String?
           ) {
-            val map:WritableMap = Arguments.createMap()
-            sendEvent(reactContext,"gameOpenError", map)
+            var payload = Arguments.makeNativeMap(
+                mutableMapOf(
+                    "gameStoryData" to gameStoryData,
+                    "id" to id
+                ) as Map<String, Any>)
+            sendEvent(reactContext,"gameOpenError", payload)
             Log.d("InappstorySdkModule","gameOpenError gameStoryData = $gameStoryData, id = $id");
           }
             override fun eventGame(
@@ -411,8 +514,14 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                 id2: String?,
                 id3: String?
             ) {
-                val map:WritableMap = Arguments.createMap()
-                sendEvent(reactContext,"eventGame", map)
+                var payload = Arguments.makeNativeMap(
+                    mutableMapOf(
+                        "gameStoryData" to gameStoryData,
+                        "id" to id,
+                        "id2" to id2,
+                        "id3" to id3
+                    ) as Map<String, Any>)
+                sendEvent(reactContext,"eventGame", payload)
                 Log.d("InappstorySdkModule","eventGame gameStoryData = $gameStoryData, id = $id , id2 = $id2 , id3 = $id3");
             }
         }
@@ -420,50 +529,56 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
       this.ias?.setErrorCallback(
         object : ErrorCallback {
             override fun loadListError(feed: String?) {
-                val map:WritableMap = Arguments.createMap()
-                sendEvent(reactContext,"loadListError", map)
+                var payload = Arguments.makeNativeMap(
+                    mutableMapOf(
+                        "feed" to feed
+                    ) as Map<String, Any>)
+                sendEvent(reactContext,"loadListError", payload)
                 Log.d("InappstorySdkModule","loadListError feed = $feed");
             }
 
             override fun loadOnboardingError(feed: String?) {
-                val map:WritableMap = Arguments.createMap()
-                sendEvent(reactContext,"loadOnboardingError", map)
+                var payload = Arguments.makeNativeMap(
+                    mutableMapOf(
+                        "feed" to feed
+                    ) as Map<String, Any>)
+                sendEvent(reactContext,"loadOnboardingError", payload)
                 Log.d("InappstorySdkModule","loadOnboardingError feed = $feed");
             }
 
             override fun loadSingleError() {
-                val map:WritableMap = Arguments.createMap()
-                sendEvent(reactContext,"loadSingleError", map)
+                val payload:WritableMap = Arguments.createMap()
+                sendEvent(reactContext,"loadSingleError", payload)
                 Log.d("InappstorySdkModule","loadSingleError");
             }
 
             override fun cacheError() {
-                val map:WritableMap = Arguments.createMap()
-                sendEvent(reactContext,"cacheError", map)
+                val payload:WritableMap = Arguments.createMap()
+                sendEvent(reactContext,"cacheError", payload)
                 Log.d("InappstorySdkModule","cacheError");
             }
 
             override fun readerError() {
-                val map:WritableMap = Arguments.createMap()
-                sendEvent(reactContext,"readerError", map)
+                val payload:WritableMap = Arguments.createMap()
+                sendEvent(reactContext,"readerError", payload)
                 Log.d("InappstorySdkModule","readerError");
             }
 
             override fun emptyLinkError() {
-                val map:WritableMap = Arguments.createMap()
-                sendEvent(reactContext,"emptyLinkError", map)
+                val payload:WritableMap = Arguments.createMap()
+                sendEvent(reactContext,"emptyLinkError", payload)
                 Log.d("InappstorySdkModule","emptyLinkError");
             }
 
             override fun sessionError() {
-                val map:WritableMap = Arguments.createMap()
-                sendEvent(reactContext,"sessionError", map)
+                val payload:WritableMap = Arguments.createMap()
+                sendEvent(reactContext,"sessionError", payload)
                 Log.d("InappstorySdkModule","sessionError");
             }
 
             override fun noConnection() {
-                val map:WritableMap = Arguments.createMap()
-                sendEvent(reactContext,"noConnection", map)
+                val payload:WritableMap = Arguments.createMap()
+                sendEvent(reactContext,"noConnection", payload)
                 Log.d("InappstorySdkModule","noConnection");
             }
 
@@ -845,7 +960,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                     Log.e(TAG, "aspectratio return $aspectRatio ")
                 }
                 Log.e(TAG, "$feed updateStoryData: $story")
-                var storyData = Arguments.makeNativeMap(
+                var payload = Arguments.makeNativeMap(
                         mutableMapOf(
                             "storyID" to story.id,
                             //"storyData" to item.storyData,
@@ -861,7 +976,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                             "aspectRatio" to aspectRatio
                         ) as Map<String, Any>)
                     Log.e(TAG, "Item = $story")
-                sendEvent(reactContext,"storyUpdate", storyData)
+                sendEvent(reactContext,"storyUpdate", payload)
             }
 
             override fun updateStoriesData(stories: List<StoryAPIData>) {
@@ -906,12 +1021,12 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                 val array = Array(stories.size) { index ->
                     stories[index]
                 }*/
-                val map:WritableMap = Arguments.createMap()
-                map.putArray("stories", Arguments.makeNativeArray(storiesList));
-                map.putString("feed", "default")
-                map.putString("list", feed)
+                val payload:WritableMap = Arguments.createMap()
+                payload.putArray("stories", Arguments.makeNativeArray(storiesList));
+                payload.putString("feed", "default")
+                payload.putString("list", feed)
                 //map.putString("key1", "Value1");
-                sendEvent(reactContext,"storyListUpdate", map)
+                sendEvent(reactContext,"storyListUpdate", payload)
                 //stories.clear()
                 //stories.addAll(stories)
                 /*Handler(Looper.getMainLooper()).post {
