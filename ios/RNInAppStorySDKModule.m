@@ -19,10 +19,10 @@ RCT_EXTERN_METHOD(getCellRatio:(RCTPromiseResolveBlock)resolve rejecter:(RCTProm
 
 RCT_EXTERN_METHOD(sliderEvent:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 
-RCT_EXTERN_METHOD(showGame:(NSString *)gameID)
-RCT_EXTERN_METHOD(showOnboardings:(NSString *)feed limit:(NSInteger)limit tags:(nullable NSArray<NSString *> *)tags)
-RCT_EXTERN_METHOD(showSingle:(NSString *)storyID)
-RCT_EXTERN_METHOD(showEditor)
+RCT_EXTERN_METHOD(showGame:(NSString *)gameID resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(showOnboardings:(NSString *)feed limit:(NSInteger)limit tags:(nullable NSArray<NSString *> *)tags resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(showSingle:(NSString *)storyID resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(showEditor:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 
 
 RCT_EXTERN_METHOD(removeFromFavorite:(NSString *)storyID)

@@ -125,7 +125,6 @@ class RNInAppStorySDKModule: RCTEventEmitter {
             ])
         }
         InAppStory.shared.gameEvent = { gameEvent in
-            NSLog("gameEvent");
             switch gameEvent {
             case .closeGame(gameData: let gameData):
                 RNInAppStorySDKModule.emitter.sendEvent(withName: "closeGame", body: [
@@ -139,14 +138,12 @@ class RNInAppStorySDKModule: RCTEventEmitter {
                     "gameID": gameData.gameID
                 ])
             case .finishGame(gameData: let gameData, result: let result):
-                NSLog("finishGame")
                 RNInAppStorySDKModule.emitter.sendEvent(withName: "finishGame", body: [
                     "id": gameData.slideData?.storyData?.id,
-                    "gameID": gameData.gameID
+                    "gameID": gameData.gameID,
+                    "result": result,
                 ])
-                print(gameData, result)
             case .eventGame(gameData: let gameData, name: let name, payload: let payload):
-                NSLog("eventGame")
                 RNInAppStorySDKModule.emitter.sendEvent(withName: "eventGame", body: [
                     "id": gameData.slideData?.storyData?.id,
                     "feed": gameData.slideData?.storyData?.feed,
@@ -156,9 +153,11 @@ class RNInAppStorySDKModule: RCTEventEmitter {
                 ])
                 print(gameData, name ,payload)
             case .gameFailure(gameData: let gameData, message: let message):
-                NSLog("gameFailure")
-                RNInAppStorySDKModule.emitter.sendEvent(withName: "gameFailure", body: [])
-                print(gameData, message)
+                RNInAppStorySDKModule.emitter.sendEvent(withName: "gameFailure", body: [
+                    "message": message,
+                    "gameID": gameData.gameID,
+                    "id": gameData.slideData?.storyData?.id
+                ])
 
             @unknown default:
                 NSLog("WARNING: unknown gameEvent")
@@ -192,7 +191,6 @@ class RNInAppStorySDKModule: RCTEventEmitter {
         }
 
         InAppStory.shared.failureEvent = { failureEvent in
-            NSLog("failureEvent");
             switch failureEvent {
             case .sessionFailure(message: let message):
                 RNInAppStorySDKModule.emitter.sendEvent(withName: "sessionFailure", body: [
@@ -235,18 +233,16 @@ class RNInAppStorySDKModule: RCTEventEmitter {
         }
 
         InAppStory.shared.favoriteCellDidSelect = {
-          NSLog("TODO: favoriteCellDidSelect closure");
           RNInAppStorySDKModule.emitter.sendEvent(withName: "favoriteCellDidSelect", body: [])
         }
         InAppStory.shared.editorCellDidSelect = {
-          NSLog("TODO: editorCellDidSelect closure");
           RNInAppStorySDKModule.emitter.sendEvent(withName: "editorCellDidSelect", body: [])
         }
 
-        InAppStory.shared.customShare = { share, fn in
+        /*InAppStory.shared.customShare = { share, fn in
           RNInAppStorySDKModule.emitter.sendEvent(withName: "customShare", body: [])
           NSLog("TODO: customShare closure");
-        }
+        }*/
         
         /*InAppStory.shared.onActionWith = { target, type, storyType in
           RNInAppStorySDKModule.emitter.sendEvent(withName: "onActionWith", body: [])
@@ -263,8 +259,27 @@ class RNInAppStorySDKModule: RCTEventEmitter {
         }
 
         InAppStory.shared.goodItemSelected = { item, storyType in
-          NSLog("TODO: goodItemSelected closure");
-          RNInAppStorySDKModule.emitter.sendEvent(withName: "goodItemSelected", body: [])
+            var storyTypeString = "";
+            var feedString = "";
+            switch (storyType) {
+                case .onboarding: storyTypeString = "onboarding"
+                case .list(feed: let feed):
+                    storyTypeString = "list"
+                    feedString = feed ?? "default"
+                case .ugcList:
+                    storyTypeString = "ugcList"
+                case .single:
+                    storyTypeString = "single"
+                case .none:
+                    storyTypeString = "none"
+                @unknown default:
+                    storyTypeString = "none"
+            }
+          RNInAppStorySDKModule.emitter.sendEvent(withName: "goodItemSelected", body: [
+            "sku":item.sku,
+            "feed": feedString,
+            "storyType": storyTypeString
+          ])
         }
 
         InAppStory.shared.stackFeedUpdate = { newFeed in
@@ -273,22 +288,19 @@ class RNInAppStorySDKModule: RCTEventEmitter {
         
         
         InAppStory.shared.storiesEvent = { storiesEvent in
-            NSLog("TODO: storiesEvent");
-             //RNInAppStorySDKModule.emitter.sendEvent(withName: "storiesLoaded", body: [])
-             switch storiesEvent {
-             case .storiesLoaded(feed: let feed, stories: let stories):
-                    RNInAppStorySDKModule.emitter.sendEvent(withName: "storiesLoaded", body: [
-                        "feed": feed,
-                        "stories": stories,
+            switch storiesEvent {
+              case .storiesLoaded(feed: let feed, stories: let stories):
+                      RNInAppStorySDKModule.emitter.sendEvent(withName: "storiesLoaded", body: [
+                          "feed": feed,
+                          "stories": stories,
+                      ])
+              case .clickOnStory(storyData: let storyData, index: let index):
+                      RNInAppStorySDKModule.emitter.sendEvent(withName: "clickOnStory", body: [
+                          "id": storyData.id,
+                          "feed": storyData.feed,
+                          "index": index,
                     ])
-             case .clickOnStory(storyData: let storyData, index: let index):
-                    RNInAppStorySDKModule.emitter.sendEvent(withName: "clickOnStory", body: [
-                        "id": storyData.id,
-                        "feed": storyData.feed,
-                        "index": index,
-                    ])
-                    NSLog("clickOnStory")
-                case .showStory(storyData: let storyData, action: let action):
+              case .showStory(storyData: let storyData, action: let action):
                  var actionString = "";
                  switch action {
                  case .swipe:
@@ -306,35 +318,35 @@ class RNInAppStorySDKModule: RCTEventEmitter {
                  }
                     RNInAppStorySDKModule.emitter.sendEvent(withName: "showStory", body: [
                         "id": storyData.id,
+                        "feed": storyData.feed,
                         "action": actionString
                     ])
-                    NSLog("showStory")
-                case .closeStory(slideData: let slideData, action: let action):
-                 var actionString = "";
-                 switch action {
-                 case .swipe:
-                     actionString = "swipe"
-                 case .click:
-                     actionString = "click"
-                 case .auto:
-                     actionString = "auto"
-                 case .custom:
-                     actionString = "custom"
-                 @unknown default:
-                     actionString = "unknown"
-                 }
+              case .closeStory(slideData: let slideData, action: let action):
+                    var actionString = "";
+                    switch action {
+                    case .swipe:
+                        actionString = "swipe"
+                    case .click:
+                        actionString = "click"
+                    case .auto:
+                        actionString = "auto"
+                    case .custom:
+                        actionString = "custom"
+                    @unknown default:
+                        actionString = "unknown"
+                    }
                     RNInAppStorySDKModule.emitter.sendEvent(withName: "closeStory", body: [
                         "id": slideData.storyData?.id,
                         "feed": slideData.storyData?.feed,
                         "index": slideData.index,
                         "action": actionString,
                     ])
-                NSLog("closeStory")
                 case .clickOnButton(slideData: let slideData, link: let link):
                     RNInAppStorySDKModule.emitter.sendEvent(withName: "clickOnButton", body: [
-                      "url":link
+                      "url":link,
+                      "id": slideData.storyData?.id,
+                      "feed": slideData.storyData?.feed,
                     ])
-                    NSLog("clickOnButton")
                     
                 case .showSlide(slideData: let slideData):
                     RNInAppStorySDKModule.emitter.sendEvent(withName: "showSlide", body: [
@@ -342,15 +354,12 @@ class RNInAppStorySDKModule: RCTEventEmitter {
                       "index": slideData.index
                     ])
                     
-                    NSLog("showSlide")
-                    
                 case .likeStory(slideData: let slideData, value: let value):
                     RNInAppStorySDKModule.emitter.sendEvent(withName: "likeStory", body: [
                         "feed": slideData.storyData?.feed,
                         "id": slideData.storyData?.id,
                         "value": value
                     ])
-                    NSLog("likeStory")
                     
                 case .dislikeStory(slideData: let slideData, value: let value):
                     RNInAppStorySDKModule.emitter.sendEvent(withName: "dislikeStory", body: [
@@ -358,7 +367,6 @@ class RNInAppStorySDKModule: RCTEventEmitter {
                       "id": slideData.storyData?.id,
                       "value": value
                     ])
-                    NSLog("dislikeStory")
                     
                 case .favoriteStory(slideData: let slideData, value: let value):
                     RNInAppStorySDKModule.emitter.sendEvent(withName: "favoriteStory", body: [
@@ -515,7 +523,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   @objc
   func getCellRatio(resolve:@escaping RCTPromiseResolveBlock, reject:@escaping RCTPromiseRejectBlock) {
     DispatchQueue.main.async {
-      //resolve(self.storiesAPI.cellRatio)
+      resolve(self.storiesAPI.cellRatio)
     }
   }
 
@@ -523,14 +531,12 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   func getStories(_ feed:String) {
       DispatchQueue.main.async {
         self.storiesAPI.setNewFeed(feed)
-        //self.storiesAPI.getStoriesList()
       }
   }
 
   @objc
   func getFavoriteStories(_ feed:String) {
       DispatchQueue.main.async {
-        //self.favoriteStoriesAPI.setNewFeed(feed)
         self.favoriteStoriesAPI.getStoriesList()
       }
   }
@@ -556,11 +562,15 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   }
 
   @objc
-  func showEditor() {
+  func showEditor(_ resolve:@escaping RCTPromiseResolveBlock, rejecter reject:@escaping RCTPromiseRejectBlock) {
     DispatchQueue.main.async {
       let vc = UIApplication.shared.firstKeyWindow?.rootViewController
-      InAppStoryEditor.shared.showEditor(payload: nil, from: vc!) {show in
-
+      InAppStoryEditor.shared.showEditor(payload: nil, from: vc!) {showed in
+        if (showed) {
+          resolve(true)
+        } else {
+          resolve(false)
+        }
       }
     }
   }
@@ -577,7 +587,6 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   func setLang(_ lang: String) {
         DispatchQueue.main.async {
           NSLog("setLang")
-            print("$lang")
             self._lang = lang;
             InAppStory.shared.settings = Settings(userID:self._userID, tags: self._tags, lang: lang)
         }
@@ -587,7 +596,6 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   func setTags(_ tags: [String]) {
         DispatchQueue.main.async {
           NSLog("setTags")
-            print("$tags")
           self._tags = tags
             //InAppStory.shared.settings = Settings(userID:self._userID,tags: self._tags, lang: self._lang)
          InAppStory.shared.settings?.tags = tags
@@ -605,9 +613,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   @objc
   func removeTags(_ tags: [String]) {
         DispatchQueue.main.async {
-            NSLog("removeTags")
-            print(tags)
-          InAppStory.shared.settings = Settings(userID:self._userID,tags: ["tag3"], lang: self._lang)
+          //InAppStory.shared.settings = Settings(userID:self._userID,tags: ["tag3"], lang: self._lang)
           InAppStory.shared.removeTags(tags)
         }
   }
@@ -620,33 +626,33 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   }
 
   @objc
-  func isReaderOpen(resolve:@escaping RCTPromiseResolveBlock, reject:@escaping RCTPromiseRejectBlock) {
+  func isReaderOpen(_ resolve:@escaping RCTPromiseResolveBlock, rejecter reject:@escaping RCTPromiseRejectBlock) {
         DispatchQueue.main.async {
           resolve(InAppStory.shared.isReaderOpen)
         }
   }
 
   @objc
-  func isGameOpen(resolve:@escaping RCTPromiseResolveBlock, reject:@escaping RCTPromiseRejectBlock) {
+  func isGameOpen(_ resolve:@escaping RCTPromiseResolveBlock, rejecter reject:@escaping RCTPromiseRejectBlock) {
         DispatchQueue.main.async {
           resolve(InAppStory.shared.isGameOpen)
         }
   }
 
   @objc
-  func getFrameworkInfo(resolve:@escaping RCTPromiseResolveBlock, reject:@escaping RCTPromiseRejectBlock) {
+  func getFrameworkInfo(_ resolve:@escaping RCTPromiseResolveBlock, rejecter reject:@escaping RCTPromiseRejectBlock) {
         DispatchQueue.main.async {
           resolve(InAppStory.frameworkInfo)
         }
   }
   @objc
-  func getBuildNumber(resolve:@escaping RCTPromiseResolveBlock, reject:@escaping RCTPromiseRejectBlock) {
+  func getBuildNumber(_ resolve:@escaping RCTPromiseResolveBlock, rejecter reject:@escaping RCTPromiseRejectBlock) {
         DispatchQueue.main.async {
             resolve(InAppStory.BuildSDK)
         }
   }
   @objc
-  func getVersion(resolve:@escaping RCTPromiseResolveBlock, reject:@escaping RCTPromiseRejectBlock) {
+  func getVersion(_ resolve:@escaping RCTPromiseResolveBlock, rejecter reject:@escaping RCTPromiseRejectBlock) {
         DispatchQueue.main.async {
             resolve(InAppStory.VersionSDK)
         }
@@ -666,7 +672,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
         }
   }
   @objc
-  func getSound(resolve:@escaping RCTPromiseResolveBlock, reject:@escaping RCTPromiseRejectBlock) {
+  func getSound(_ resolve:@escaping RCTPromiseResolveBlock, rejecter reject:@escaping RCTPromiseRejectBlock) {
         DispatchQueue.main.async {
             resolve(!InAppStory.shared.muted)
         }
@@ -701,7 +707,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
         }
   }
   @objc
-  func getFavoritesCount(_ storyID: String, resolve:@escaping RCTPromiseResolveBlock, reject:@escaping RCTPromiseRejectBlock) {
+  func getFavoritesCount(_ storyID: String, resolve:@escaping RCTPromiseResolveBlock, rejecter reject:@escaping RCTPromiseRejectBlock) {
         DispatchQueue.main.async {
           resolve(InAppStory.shared.favoritesCount)
         }
@@ -721,13 +727,15 @@ class RNInAppStorySDKModule: RCTEventEmitter {
 
   //@ReactMethod
   @objc
-  func showGame(_ gameID: String) {
+  func showGame(_ gameID: String, resolver resolve:@escaping RCTPromiseResolveBlock, rejecter reject:@escaping RCTPromiseRejectBlock) {
         DispatchQueue.main.async {
           let vc = UIApplication.shared.firstKeyWindow?.rootViewController
           InAppStory.shared.openGame(with: Game(id: gameID), from: vc) { opened in
-              /// the closure is called after processing the possibility of launching the game
-              /// if all went well and the game opened on the screen, `opened = true`
-              /// otherwise,` opened = false` (e.g. failed to load the archive with the game)
+            if (opened) {
+              resolve(true)
+            } else {
+              resolve(false)
+            }
           }
         }
   }
@@ -752,17 +760,17 @@ class RNInAppStorySDKModule: RCTEventEmitter {
       InAppStory.shared.panelSettings = PanelSettings(like: self._hasLike, favorites: self._hasFavorites, share: self._hasShare)
   }
   @objc
-  func showOnboardings(_ feed: String, limit: Int, tags: [String]?) {
+  func showOnboardings(_ feed: String, limit: Int, tags: [String]?, resolver resolve:@escaping RCTPromiseResolveBlock, rejecter reject:@escaping RCTPromiseRejectBlock) {
       DispatchQueue.main.async {
           let vc = UIApplication.shared.firstKeyWindow?.rootViewController
           InAppStory.shared.showOnboardings(feed: feed, limit: limit, from: vc!, with:tags, with: InAppStory.shared.panelSettings, complete: {show in
-              
+              resolve(show)
           })
       }
   }
 
   @objc
-  func showSingle(_ storyID: String) {
+  func showSingle(_ storyID: String, resolver resolve:@escaping RCTPromiseResolveBlock, rejecter reject:@escaping RCTPromiseRejectBlock) {
       DispatchQueue.main.async {
         let vc = UIApplication.shared.firstKeyWindow?.rootViewController
           if (vc != nil) {
@@ -770,7 +778,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
                                            from: vc!
               ) {
                   opened in
-                  // closure
+                  resolve(opened)
               }
           }
       }
@@ -799,7 +807,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   @objc
   func setTimerGradient(_ value: Bool) {
         DispatchQueue.main.async {
-          //InAppStory.shared.timerGradient = value
+          //FIXME: InAppStory.shared.timerGradient = value
         }
   }
   @objc
@@ -819,9 +827,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   @objc
   func setReaderBackgroundColor(_ value: String) {
         DispatchQueue.main.async {
-          NSLog("setReaderBackgroundColor");
-          print(value)
-            InAppStory.shared.readerBackgroundColor = UIColor(hex: value)!
+          InAppStory.shared.readerBackgroundColor = UIColor(hex: value)!
         }
   }
 
