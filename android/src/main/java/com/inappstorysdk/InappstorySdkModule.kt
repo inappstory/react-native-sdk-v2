@@ -23,6 +23,7 @@ import com.inappstory.sdk.stories.ui.list.FavoriteImage;
 import com.inappstory.sdk.stories.outercallbacks.common.errors.ErrorCallback;
 import com.inappstory.sdk.stories.outercallbacks.common.gamereader.GameReaderCallback;
 import com.inappstory.sdk.game.reader.GameStoryData;
+
 import com.inappstory.sdk.stories.outercallbacks.common.reader.StoryWidgetCallback;
 import com.inappstory.sdk.stories.outercallbacks.common.reader.SlideData;
 import com.inappstory.sdk.stories.outercallbacks.common.single.SingleLoadCallback;
@@ -157,8 +158,8 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
       this.appearanceManager = AppearanceManager()
       this.api = InAppStoryAPI()
       this.favoritesApi = InAppStoryAPI()
-      this.createManager(apiKey, userID, sandbox, sendStatistics, this.api as InAppStoryAPI)
       this.createManager(apiKey, userID, sandbox, sendStatistics, this.favoritesApi as InAppStoryAPI)
+      this.createManager(apiKey, userID, sandbox, sendStatistics, this.api as InAppStoryAPI)
       this.subscribeLists(this.api as InAppStoryAPI, "feed")
       this.subscribeLists(this.favoritesApi as InAppStoryAPI, "favorites")
       setupListeners()
@@ -248,7 +249,6 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                         
                     ) as Map<String, Any>)
                 sendEvent(reactContext,"showStory", payload)
-                Log.d("InappstorySdkModule","showStory story = $story, showstoryaction = $showStoryAction");
             }
         }
     )
@@ -264,7 +264,6 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                             
                         ) as Map<String, Any>)
                 sendEvent(reactContext,"showSlide", payload)
-                Log.d("InappstorySdkModule","showSlide slide = $slide");
             }
         }
     )
@@ -288,8 +287,6 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                             
                         ) as Map<String, Any>)
                 sendEvent(reactContext,"closeStory", payload)
-                Log.d("InappstorySdkModule","closeStory slide = $slide action= $action");
-
             }
         }
     )
@@ -338,7 +335,6 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                         
                     ) as Map<String, Any>)
                 sendEvent(reactContext,"favoriteStory", payload)
-                Log.d("InappstorySdkModule","favoriteStory slide = $slide value = $value");
             }
         }
     )
@@ -356,8 +352,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                             "value" to value
                             
                         ) as Map<String, Any>)
-                sendEvent(reactContext,"setLike", payload)
-                Log.d("InappstorySdkModule","setLike slide = $slide value = $value");
+                sendEvent(reactContext,"likeStory", payload)
             }
 
             override fun dislikeStory(
@@ -366,14 +361,13 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
             ) {
                 var payload = Arguments.makeNativeMap(
                         mutableMapOf(
-                            "feed" to slide?.story?.feed,
+                            "feed" to slide?.story?.feed ,
                             "index" to slide?.index,
                             "id" to slide?.story?.id,
                             "value" to value
                             
                         ) as Map<String, Any>)
-                sendEvent(reactContext,"setDislike", payload)
-                Log.d("InappstorySdkModule","setDislike slide = $slide value = $value");
+                sendEvent(reactContext,"dislikeStory", payload)
             }
         }
     )
@@ -389,8 +383,8 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                             "id" to slide?.story?.id
                             
                         ) as Map<String, Any>)
-                sendEvent(reactContext,"clickOnShare", payload)
-                Log.d("InappstorySdkModule","clickOnShare slide = $slide");
+                sendEvent(reactContext,"clickOnShareStory", payload)
+                Log.d("InappstorySdkModule","clickOnShareStory slide = $slide");
             }
         }
     )
@@ -437,7 +431,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                         "name" to widgetEventName,
                         "data" to widgetData
                     ) as Map<String, Any>)
-                sendEvent(reactContext,"storyWidget", payload)
+                sendEvent(reactContext,"storyWidgetEvent", payload)
                 Log.d("InappstorySdkModule","storyWidget story = $slideData, widgetEventName = $widgetEventName, widgetData = $widgetData");
             }
         }
@@ -450,11 +444,11 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
             ) {
                 var payload = Arguments.makeNativeMap(
                 mutableMapOf(
-                    "gameStoryData" to gameStoryData,
+                    "storyID" to gameStoryData?.slideData?.story?.id,
+                    "index" to gameStoryData?.slideData?.index,
                     "id" to id
                 ) as Map<String, Any>)
                 sendEvent(reactContext,"startGame", payload)
-                Log.d("InappstorySdkModule","startGame gameStoryData = $gameStoryData, id = $id");
             }
 
             override fun finishGame(
@@ -464,12 +458,12 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
             ) {
                 var payload = Arguments.makeNativeMap(
                 mutableMapOf(
-                    "gameStoryData" to gameStoryData,
+                    "storyID" to gameStoryData?.slideData?.story?.id,
+                    "index" to gameStoryData?.slideData?.index,
                     "result" to result,
                     "id" to id
                 ) as Map<String, Any>)
                 sendEvent(reactContext,"finishGame", payload)
-                Log.d("InappstorySdkModule","startGame gameStoryData = $gameStoryData, result = $result, id = $id");
             }
 
             override fun closeGame(
@@ -478,11 +472,11 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
             ) {
                 var payload = Arguments.makeNativeMap(
                 mutableMapOf(
-                    "gameStoryData" to gameStoryData,
+                    "storyID" to gameStoryData?.slideData?.story?.id,
+                    "index" to gameStoryData?.slideData?.index,
                     "id" to id
                 ) as Map<String, Any>)
                 sendEvent(reactContext,"closeGame", payload)
-                Log.d("InappstorySdkModule","closeGame gameStoryData = $gameStoryData, id = $id");
             }
             override fun gameLoadError(
                 gameStoryData: GameStoryData?,
@@ -490,10 +484,11 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
             ) {
                 var payload = Arguments.makeNativeMap(
                 mutableMapOf(
-                    "gameStoryData" to gameStoryData,
+                    "storyID" to gameStoryData?.slideData?.story?.id,
+                    "index" to gameStoryData?.slideData?.index,
                     "id" to id
                 ) as Map<String, Any>)
-                sendEvent(reactContext,"gameLoadError", payload)
+                sendEvent(reactContext,"gameFailure", payload)
                 Log.d("InappstorySdkModule","gameLoadError gameStoryData = $gameStoryData, id = $id");
             }
             override fun gameOpenError(
@@ -502,10 +497,11 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
           ) {
             var payload = Arguments.makeNativeMap(
                 mutableMapOf(
-                    "gameStoryData" to gameStoryData,
+                    "storyID" to gameStoryData?.slideData?.story?.id,
+                    "index" to gameStoryData?.slideData?.index,
                     "id" to id
                 ) as Map<String, Any>)
-            sendEvent(reactContext,"gameOpenError", payload)
+            sendEvent(reactContext,"gameFailure", payload)
             Log.d("InappstorySdkModule","gameOpenError gameStoryData = $gameStoryData, id = $id");
           }
             override fun eventGame(
@@ -516,7 +512,8 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
             ) {
                 var payload = Arguments.makeNativeMap(
                     mutableMapOf(
-                        "gameStoryData" to gameStoryData,
+                        "storyID" to gameStoryData?.slideData?.story?.id,
+                        "index" to gameStoryData?.slideData?.index,
                         "id" to id,
                         "id2" to id2,
                         "id3" to id3
