@@ -185,31 +185,36 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
 
   fun setupListeners() {
     //Goods widget
-    this.appearanceManager?.csCustomGoodsWidget(object : ICustomGoodsWidget {
+    AppearanceManager.getCommonInstance().csCustomGoodsWidget(object : ICustomGoodsWidget {
         override fun getWidgetView(context: Context): View? {
+            print("csCustomGoodsWidget getWidgetView");
             return null;
         }
 
         override fun getItem(): ICustomGoodsItem? {
+            print("csCustomGoodsWidget getItem");
             return null;
         }
 
         override fun getWidgetAppearance(): IGoodsWidgetAppearance? {
+            print("csCustomGoodsWidget getWidgetAppearance");
             return null;
         }
 
         override fun getDecoration(): RecyclerView.ItemDecoration? {
+            print("csCustomGoodsWidget getDecoration");
             return null;
         }
 
         public override fun getSkus(skus: ArrayList<String>, callback: GetGoodsDataCallback) {
+            print("csCustomGoodsWidget getSkus = $skus")
             val goodsItemData: ArrayList<GoodsItemData> = ArrayList<GoodsItemData>()
             for (sku: String in skus) {
                 val data = GoodsItemData(
                     sku,
                     "title_$sku",
                     "desc_$sku",
-                    "https://media.istockphoto.com/photos/big-and-small-picture-id172759822",
+                    "https://images-na.ssl-images-amazon.com/images/G/01/AMAZON_FASHION/2022/SITE_FLIPS/SPR_22/GW/DQC/DQC_APR_TBYB_W_SHOES_2x._SY232_CB624172947_.jpg",
                     "10",
                     "20",
                     sku
@@ -224,6 +229,9 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
             goodsItemData: GoodsItemData,
             callback: GetGoodsDataCallback
         ) {
+            print("Selected goods $goodsItemData")
+            callback.onClose()
+            InAppStoryManager.closeStoryReader()
             return;
         }
     });
