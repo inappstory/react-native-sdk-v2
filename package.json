@@ -41,14 +41,14 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mstrokin/react-native-inappstory-sdk-v2.git"
+    "url": "git+https://github.com/inappstory/react-native-sdk-v2.git"
   },
   "author": "Michail Strokin <mstrokin@gmail.com> (https://github.com/mstrokin)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mstrokin/react-native-inappstory-sdk-v2/issues"
+    "url": "https://github.com/inappstory/react-native-sdk-v2/issues"
   },
-  "homepage": "https://github.com/mstrokin/react-native-inappstory-sdk-v2#readme",
+  "homepage": "https://github.com/inappstory/react-native-sdk-v2#readme",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
