@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
   s.authors      = package["author"]
 
   s.platforms    = { :ios => min_ios_version_supported }
-  s.source       = { :git => "https://github.com/mstrokin/react-native-inappstory-sdk-v2.git", :tag => "#{s.version}" }
+  s.source       = { :git => "https://github.com/inappstory/react-native-sdk-v2.git", :tag => "#{s.version}" }
 
   s.source_files = "ios/**/*.{h,m,mm,swift}"
 
@@ -24,6 +24,9 @@ Pod::Spec.new do |s|
   s.dependency "React-Core"
   s.dependency "SVGKit"
   #s.dependency "InAppStory"
+  #s.dependency "InAppStoryUGC"
+  #s.dependency "IASFilePicker"
+  
 
   # Don't install the dependencies when we run `pod install` in the old architecture.
   if ENV['RCT_NEW_ARCH_ENABLED'] == '1' then
