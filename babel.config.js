@@ -1,3 +1,9 @@
 module.exports = {
-  presets: ['module:@react-native/babel-preset'],
+  presets: ['@react-native/babel-preset'],
+
+  env: {
+    development: {
+      plugins: [['@babel/plugin-transform-react-jsx', { runtime: 'classic' }]],
+    },
+  },
 };

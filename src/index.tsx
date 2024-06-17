@@ -288,7 +288,7 @@ export class StoryManager extends StoryManagerV1 {
     });
   }
   showGame(id: string) {
-    InAppStorySDK.showGame(id);
+    return InAppStorySDK.showGame(id);
   }
   showOnboardingStories(
     appearanceManager: AppearanceManagerV1,

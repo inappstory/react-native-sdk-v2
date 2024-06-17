@@ -46,7 +46,20 @@ export function EventsScreen(): React.ReactNode {
           }}
         >
           {events.map((event, i) => {
-            return <Text key={i}>{event.event}</Text>;
+            return (
+              <View
+                key={i}
+                style={{ borderBottomColor: 'black', borderBottomWidth: 1 }}
+              >
+                <Text>{event.event}</Text>
+                {['storyUpdate', 'storyListUpdate'].indexOf(event.event) ===
+                -1 ? (
+                  <Text style={{ fontSize: 11 }}>
+                    {JSON.stringify(event.data)}
+                  </Text>
+                ) : null}
+              </View>
+            );
           })}
         </View>
       </Animated.ScrollView>

@@ -13,6 +13,8 @@ import {
   ScrollView,
   RefreshControl,
 } from 'react-native';
+import Toast from 'react-native-simple-toast';
+
 import React, { useCallback, useRef } from 'react';
 import Button from 'react-native-button';
 
@@ -67,17 +69,17 @@ export function MainScreen({
 
   const [refreshing, setRefreshing] = React.useState(false);
   const { readerOpen } = useInAppStory();
-  const [feed, setFeed] = React.useState('default');
+  const [feed, _setFeed] = React.useState('default');
   const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
     await storiesListViewModel.current?.reload();
     setRefreshing(false);
   }, []);
-  const onFeedChangePress = React.useCallback(() => {
+  /*const onFeedChangePress = React.useCallback(() => {
     setFeed((feed) => {
       return feed == 'default' ? 'test' : 'default';
     });
-  }, []);
+  }, []);*/
   return (
     <SafeAreaView style={[styles.container, backgroundStyle]}>
       <StatusBar
@@ -109,14 +111,14 @@ export function MainScreen({
         >
           Reload StoriesList
         </Button>
-        <Button
+        {/*<Button
           containerStyle={styles.buttonContainer}
           style={styles.button}
           styleDisabled={styles.buttonDisabled}
           onPress={onFeedChangePress}
         >
           Change feed
-        </Button>
+        </Button>*/}
         <Button
           containerStyle={styles.buttonContainer}
           style={styles.button}
@@ -177,8 +179,9 @@ export function MainScreen({
           containerStyle={styles.buttonContainer}
           style={styles.button}
           styleDisabled={styles.buttonDisabled}
-          onPress={() => {
-            InAppStorySDK.showSingle('55512');
+          onPress={async () => {
+            const showed = await InAppStorySDK.showSingle('5663');
+            console.error('single show', showed);
           }}
         >
           Show single story
@@ -187,8 +190,15 @@ export function MainScreen({
           containerStyle={styles.buttonContainer}
           style={styles.button}
           styleDisabled={styles.buttonDisabled}
-          onPress={() => {
-            InAppStorySDK.showOnboardings('onboarding', 10, []);
+          onPress={async () => {
+            const showed = await InAppStorySDK.showOnboardings(
+              'default',
+              10,
+              []
+            );
+            if (!showed) {
+              Toast.show('No more onboarding stories, switch user to test');
+            }
           }}
         >
           Show onboarding stories
@@ -197,8 +207,9 @@ export function MainScreen({
           containerStyle={styles.buttonContainer}
           style={styles.button}
           styleDisabled={styles.buttonDisabled}
-          onPress={() => {
-            storyManager.showGame('263');
+          onPress={async () => {
+            const showed = await storyManager.showGame('263');
+            console.error('Showed game = ', showed);
           }}
         >
           Open game
