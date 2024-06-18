@@ -10,13 +10,13 @@ import {
 } from 'react-native-inappstory-sdk';
 
 import { Linking } from 'react-native';
-
+const testKey = 'HDGXt7z1WVQoaN_IzLv8KdRl5f_Ghxdo';
 const storyManagerConfig: StoryManagerConfig = {
-  apiKey: 'test-key',
-  userId: '42',
+  apiKey: testKey,
+  userId: '420702',
   tags: [],
   placeholders: {
-    user: 'Guest',
+    username: 'Guest',
   },
   lang: 'en',
   defaultMuted: true,
@@ -24,9 +24,20 @@ const storyManagerConfig: StoryManagerConfig = {
 
 const createStoryManager = () => {
   const storyManager = new StoryManager(storyManagerConfig);
-
+  storyManager.getGoodsCallback((skus: string[]) => {
+    //TODO: Fetch goods information
+    return skus.map((sku) => ({
+      sku: sku, //item sku
+      title: 'title of ' + sku, //item title for cell
+      subtitle: 'subtitle of ' + sku, //item subtitle for cell
+      imageURL:
+        'https://www.bocage.eu/media/catalog/product/W/W/WWWBOC_20386050411_10.jpg', //image url for cell
+      price: Number(Math.random() * 1000).toFixed(2), //price value for cell
+      oldPrice: Number(Math.random() * 1000).toFixed(2),
+    }));
+  });
   storyManager.on('clickOnStory', (payload: any) =>
-    console.log('clickOnStory', { payload })
+    console.log('SS clickOnStory', { payload })
   );
   storyManager.on('clickOnFavoriteCell', (payload: any) =>
     console.log('clickOnFavoriteCell', { payload })
@@ -82,60 +93,42 @@ const createAppearanceManager = () => {
     .setStoriesListOptions({
       card: {
         title: {
-          color: 'black',
+          color: 'white',
           font: 'bold normal 14px/16px "InternalPrimaryFont"',
-          padding: '30px 0 0 0',
+          padding: '0px 0 0 0',
+          fontSize: 12,
+          fontWeight: 600,
+          fontFamily: Platform.OS == 'ios' ? 'Bradley Hand' : 'Comic Sans',
+          lineHeight: 13,
           lineClamp: 3,
-          textAlign: StoriesListCardTitleTextAlign.CENTER,
-          position: StoriesListCardTitlePosition.CARD_OUTSIDE_BOTTOM,
+          textAlign: StoriesListCardTitleTextAlign.LEFT,
+          position: StoriesListCardTitlePosition.CARD_INSIDE_BOTTOM,
         },
-        gap: 10,
-        height: 100,
-        variant: StoriesListCardViewVariant.CIRCLE,
+        gap: 3,
+        height: 150,
+        variant: StoriesListCardViewVariant.RECTANGLE,
         border: {
-          radius: 0,
-          color: 'purple',
+          radius: 1,
+          color: 'black',
           width: 2,
-          gap: 3,
+          gap: 1,
         },
         boxShadow: null,
         opacity: 1,
         mask: {
           color: 'rgba(34, 34, 34, 0.3)',
         },
-        svgMask: {
-          cardMask: null,
-          overlayMask: [
-            {
-              mask: `<svg width="100%" height="auto" viewBox="0 0 63 63" fill="none" xmlns="http://www.w3.org/2000/svg">
-<circle cx="57" cy="6" r="6" fill="#D9D9D9"/>
-</svg>`,
-              background: '#F31A37',
-            },
-          ],
-        },
         opened: {
           border: {
             radius: 0,
-            color: 'transparent',
-            width: 2,
-            gap: 3,
+            color: 'red',
+            width: 0,
+            gap: 0,
           },
           boxShadow: null,
-          opacity: null,
+          opacity: 1,
           mask: {
             color: 'rgba(34, 34, 34, 0.1)',
-          },
-          svgMask: {
-            cardMask: null,
-            overlayMask: [
-              {
-                mask: `<svg width="100%" height="auto" viewBox="0 0 63 63" fill="none" xmlns="http://www.w3.org/2000/svg">
-<circle cx="57" cy="6" r="6" fill="#D9D9D9"/>
-</svg>`,
-                background: '#F31A37',
-              },
-            ],
           },
         },
       },
@@ -148,9 +141,9 @@ const createAppearanceManager = () => {
         height: 0,
         backgroundColor: 'transparent',
       },
-      sidePadding: 20,
-      topPadding: 20,
-      bottomPadding: 0,
+      sidePadding: 5,
+      topPadding: 5,
+      bottomPadding: 2,
       navigation: {
         showControls: false,
         controlsSize: 48,

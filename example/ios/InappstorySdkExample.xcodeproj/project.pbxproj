@@ -11,7 +11,6 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		52B3C5EC2C20C602009BCFA0 /* InAppStorySDK.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52B3C5EB2C20C602009BCFA0 /* InAppStorySDK.xcframework */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		9DEAAD2B3D87AA3141409780 /* libPods-InappstorySdkExample-InappstorySdkExampleTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 75B8CCA13C9523FAB6B252DC /* libPods-InappstorySdkExample-InappstorySdkExampleTests.a */; };
 		ADE83FEB5D647A324AA2FC87 /* libPods-InappstorySdkExample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 342D054DFA00162F418369C2 /* libPods-InappstorySdkExample.a */; };
@@ -41,7 +40,7 @@
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = InappstorySdkExample/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		342D054DFA00162F418369C2 /* libPods-InappstorySdkExample.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-InappstorySdkExample.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B4392A12AC88292D35C810B /* Pods-InappstorySdkExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InappstorySdkExample.debug.xcconfig"; path = "Target Support Files/Pods-InappstorySdkExample/Pods-InappstorySdkExample.debug.xcconfig"; sourceTree = "<group>"; };
-		3C617F86A8558FAF5383FA4D /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = InappstorySdkExample/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		3C617F86A8558FAF5383FA4D /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = InappstorySdkExample/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		52B3C5EB2C20C602009BCFA0 /* InAppStorySDK.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = InAppStorySDK.xcframework; sourceTree = "<group>"; };
 		5709B34CF0A7D63546082F79 /* Pods-InappstorySdkExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InappstorySdkExample.release.xcconfig"; path = "Target Support Files/Pods-InappstorySdkExample/Pods-InappstorySdkExample.release.xcconfig"; sourceTree = "<group>"; };
 		5B7EB9410499542E8C5724F5 /* Pods-InappstorySdkExample-InappstorySdkExampleTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InappstorySdkExample-InappstorySdkExampleTests.debug.xcconfig"; path = "Target Support Files/Pods-InappstorySdkExample-InappstorySdkExampleTests/Pods-InappstorySdkExample-InappstorySdkExampleTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -65,7 +64,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				ADE83FEB5D647A324AA2FC87 /* libPods-InappstorySdkExample.a in Frameworks */,
-				52B3C5EC2C20C602009BCFA0 /* InAppStorySDK.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -192,6 +190,7 @@
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				00EEFC60759A1932668264C0 /* [CP] Embed Pods Frameworks */,
 				E235C05ADACE081382539298 /* [CP] Copy Pods Resources */,
+				523C4D1C2C22037B00217448 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -291,6 +290,23 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-InappstorySdkExample/Pods-InappstorySdkExample-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
+		};
+		523C4D1C2C22037B00217448 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 8;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+			shellPath = /bin/sh;
+			shellScript = "echo \"Remove signature files (Xcode 15 workaround)\"\n  find \"$BUILD_DIR/${CONFIGURATION}-iphoneos\" -name \"*.signature\" -type f | echo \n";
 		};
 		A55EABD7B0C7F3A422A6CC61 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -474,22 +490,27 @@
 			baseConfigurationReference = 3B4392A12AC88292D35C810B /* Pods-InappstorySdkExample.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 7;
+				DEVELOPMENT_TEAM = MLV6NFSTQU;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = InappstorySdkExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 2.11.7;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.inappstory.rnsdk;
 				PRODUCT_NAME = InappstorySdkExample;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -501,21 +522,26 @@
 			baseConfigurationReference = 5709B34CF0A7D63546082F79 /* Pods-InappstorySdkExample.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 7;
+				DEVELOPMENT_TEAM = MLV6NFSTQU;
 				INFOPLIST_FILE = InappstorySdkExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 2.11.7;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.inappstory.rnsdk;
 				PRODUCT_NAME = InappstorySdkExample;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -602,10 +628,7 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;
@@ -685,10 +708,7 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;

@@ -23,7 +23,7 @@ Pod::Spec.new do |s|
   else
   s.dependency "React-Core"
   s.dependency "SVGKit"
-  #s.dependency "InAppStory"
+  s.dependency "InAppStory"
   #s.dependency "InAppStoryUGC"
   #s.dependency "IASFilePicker"
   

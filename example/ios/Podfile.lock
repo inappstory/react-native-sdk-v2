@@ -8,6 +8,7 @@ PODS:
     - hermes-engine/Pre-built (= 0.74.2)
   - hermes-engine/Pre-built (0.74.2)
   - IASFilePicker (0.1.0)
+  - InAppStory (1.23.6)
   - InAppStoryUGC (1.3.1)
   - RCT-Folly (2024.01.01.00):
     - boost
@@ -939,7 +940,7 @@ PODS:
     - React-debug
   - react-native-get-random-values (1.11.0):
     - React-Core
-  - react-native-inappstory-sdk (0.7.0):
+  - react-native-inappstory-sdk (0.8.0):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1349,6 +1350,7 @@ DEPENDENCIES:
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
   - IASFilePicker (from `https://github.com/inappstory/ios-filepicker.git`, tag `0.1.0`)
+  - InAppStory
   - InAppStoryUGC (from `https://github.com/inappstory/ios-ugc-sdk.git`, tag `1.3.1`)
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCT-Folly/Fabric (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
@@ -1418,6 +1420,7 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
+    - InAppStory
     - SocketRocket
     - Toast
 
@@ -1584,6 +1587,7 @@ SPEC CHECKSUMS:
   glog: fdfdfe5479092de0c4bdbebedd9056951f092c4f
   hermes-engine: 01d3e052018c2a13937aca1860fbedbccd4a41b7
   IASFilePicker: ad25941d7bd2cbd63ad6491f8d3ebe8b95618e58
+  InAppStory: ccac02a6b58405e8a5978fe376807dbfbe51ddb2
   InAppStoryUGC: e3cefdf3e5a24930b369bfbfdcc87b15afc3bfc3
   RCT-Folly: 02617c592a293bd6d418e0a88ff4ee1f88329b47
   RCTDeprecation: b03c35057846b685b3ccadc9bfe43e349989cdb2
@@ -1610,7 +1614,7 @@ SPEC CHECKSUMS:
   React-logger: 29fa3e048f5f67fe396bc08af7606426d9bd7b5d
   React-Mapbuffer: bf56147c9775491e53122a94c423ac201417e326
   react-native-get-random-values: 21325b2244dfa6b58878f51f9aa42821e7ba3d06
-  react-native-inappstory-sdk: 7c7e473efbbf2306074996fbe11088ccbea278bb
+  react-native-inappstory-sdk: ba14dcdafd1c6b133c41a1f71648b577eb76151d
   react-native-safe-area-context: a240ad4b683349e48b1d51fed1611138d1bdad97
   react-native-simple-toast: 1f1cc551d419bc0ab05dcb0136554006c274789d
   react-native-video: 8cd68fa00f56087184154c0e976d3756adaad144
@@ -1651,6 +1655,6 @@ SPEC CHECKSUMS:
   VisionCamera: 2c4cb89c573c5d54d1191e433bd224998d3b14b7
   Yoga: 2f71ecf38d934aecb366e686278102a51679c308
 
-PODFILE CHECKSUM: 63bca500834cfde9eec03bc275a4650cad9c3408
+PODFILE CHECKSUM: 14c227ebe9934c9f528e50ebb2fa7b9aa594674c
 
 COCOAPODS: 1.14.3

@@ -8,7 +8,7 @@
 import Foundation
 @_spi(QAApp) import InAppStorySDK
 @_spi(IAS_API) import InAppStorySDK
-import InAppStoryUGC
+// import InAppStoryUGC
 import React
 
 //import ReactBridge
@@ -564,6 +564,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   @objc
   func showEditor(_ resolve:@escaping RCTPromiseResolveBlock, rejecter reject:@escaping RCTPromiseRejectBlock) {
     DispatchQueue.main.async {
+      /*
       let vc = UIApplication.shared.firstKeyWindow?.rootViewController
       InAppStoryEditor.shared.showEditor(payload: nil, from: vc!) {showed in
         if (showed) {
@@ -571,7 +572,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
         } else {
           resolve(false)
         }
-      }
+      }*/
     }
   }
   @objc
