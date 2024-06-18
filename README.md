@@ -165,6 +165,87 @@ storyManager.getGoodsObject((skus) => {
 });
 ```
 
+### Events
+
+To subscribe to events, use **storyManager.on** or **storyManager.once**
+
+```js
+storyManager.on(eventName, (payload) => {
+  console.log(eventName, payload);
+});
+```
+
+| Event Name        |     |     |     |
+| ----------------- | --- | --- | --- |
+| storiesLoaded     |     |     |     |
+| ugcStoriesLoaded  |     |     |     |
+| clickOnStory      |     |     |     |
+| showStory         |     |     |     |
+| closeStory        |     |     |     |
+| clickOnButton     |     |     |     |
+| showSlide         |     |     |     |
+| likeStory         |     |     |     |
+| dislikeStory      |     |     |     |
+| favoriteStory     |     |     |     |
+| clickOnShareStory |     |     |     |
+| storyWidgetEvent  |     |     |     |
+
+## Feed Events
+
+| Event                 |     |     |     |
+| --------------------- | --- | --- | --- |
+| storyListUpdate       |     |     |     |
+| storyUpdate           |     |     |     |
+| favoritesUpdate       |     |     |     |
+| favoriteCellDidSelect |     |     |     |
+| editorCellDidSelect   |     |     |     |
+| favoritesUpdate       |     |     |     |
+
+## Reader events
+
+| Event               |     |     |     |
+| ------------------- | --- | --- | --- |
+| storyReaderWillShow |     |     |     |
+| storyReaderDidClose |     |     |     |
+| storiesDidUpdated   |     |     |     |
+| scrollUpdate        |     |     |     |
+
+## Failure events
+
+| Event               |     |     |     |
+| ------------------- | --- | --- | --- |
+| sessionFailure      |     |     |     |
+| storyFailure        |     |     |     |
+| currentStoryFailure |     |     |     |
+| networkFailure      |     |     |     |
+| requestFailure      |     |     |     |
+
+## Game Events
+
+| Event              |     |     |     |
+| ------------------ | --- | --- | --- |
+| startGame          |     |     |     |
+| finishGame         |     |     |     |
+| closeGame          |     |     |     |
+| eventGame          |     |     |     |
+| gameFailure        |     |     |     |
+| gameReaderWillShow |     |     |     |
+| gameReaderDidClose |     |     |     |
+| gameComplete       |     |     |     |
+
+## Goods events
+
+| Event            |     |     |     |
+| ---------------- | --- | --- | --- |
+| goodItemSelected |     |     |     |
+
+## Share events
+
+| Event        |     |     |     |
+| ------------ | --- | --- | --- |
+| customShare  |     |     |     |
+| onActionWith |     |     |     |
+
 ### Migrating from old version
 
 Breaking changes:
