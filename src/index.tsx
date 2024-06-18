@@ -1,5 +1,5 @@
 import './wdyr';
-import { NativeModules } from 'react-native';
+import { NativeEventEmitter, NativeModules } from 'react-native';
 import {
   AppearanceManager as AppearanceManagerV1,
   type ListLoadStatus,
@@ -39,7 +39,15 @@ export {
   useInAppStory,
 };
 //import AsyncStorage from '@react-native-async-storage/async-storage';
-
+const eventEmitter = new NativeEventEmitter(
+  NativeModules.RNInAppStorySDKModule
+);
+const EVENTS_MAP = {
+  shareStory: 'clickOnShareStory',
+};
+const getEventName = (eventName) => {
+  return EVENTS_MAP[eventName] || eventName;
+};
 export class StoryManager extends StoryManagerV1 {
   apiKey: string = '';
   userId: string | number = '';
@@ -51,6 +59,7 @@ export class StoryManager extends StoryManagerV1 {
   getGoodsCallback: Function = () => {};
   sandbox: boolean = true;
   sendStatistics: boolean = true;
+  listeners: any = [];
   constructor(config: StoryManagerConfig) {
     super(config);
     InAppStorySDK.initWith(
@@ -222,12 +231,16 @@ export class StoryManager extends StoryManagerV1 {
 
   on(eventName: string | symbol, listener: any) {
     super.on(eventName, listener);
-    //TODO: implement events
+    eventEmitter.addListener(getEventName(eventName), async (event) => {
+      listener(event);
+    });
     return this;
   }
   once(eventName: string | symbol, listener: any) {
-    super.on(eventName, listener);
-    //TODO: implement events
+    //super.on(eventName, listener);
+    eventEmitter.addListener(getEventName(eventName), async (event) => {
+      listener(event);
+    });
     return this;
   }
 
