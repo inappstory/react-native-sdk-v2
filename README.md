@@ -14,18 +14,25 @@ or
 yarn add react-native-inappstory-sdk
 ```
 
-## iOS Requirements
+## iOS Requirements (This step will be removed after CocoaPods release)
 
 1. Add required dependencies to Podfile
 
 ```ruby
-pod 'InAppStory', :git => 'https://github.com/inappstory/ios-sdk.git', :tag => '1.23.5'
+#pod 'InAppStory', :git => 'https://github.com/inappstory/ios-sdk.git', :tag => '1.23.5'
 pod 'InAppStoryUGC', :git => 'https://github.com/inappstory/ios-ugc-sdk.git', :tag => '1.3.1'
 pod 'IASFilePicker', :git => 'https://github.com/inappstory/ios-filepicker.git', :tag => '0.1.0'
 ```
 
-2. After running pod install, Open Xcode, find react-native-inappstory-sdk in Pods, Open Build Phases,
-   and add required SDK to Link Binary With Libraries
+2. Run pod install
+3. Open project in Xcode
+4. Add **InAppStory.xcframework** (you can find it in example/ios/) to the project.
+5. Open **Pods** in sidebar
+6. Find **react-native-inappstory-sdk** in Pods
+7. Open **Build Phases**
+8. Add InAppStory.xcframework, InAppStoryUGC, IASFilePicker to **Link Binary With Libraries** step
+
+FYI: You have to repeat steps 5-8 every time you run pod install.
 
 ## Android Requirements
 
