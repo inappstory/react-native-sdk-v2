@@ -19,7 +19,7 @@ export const useEvents = ({ onFavoriteCell }) => {
     const eventEmitter = new NativeEventEmitter(
       NativeModules.RNInAppStorySDKModule
     );
-    let eventListeners = [];
+    let eventListeners: Array<any> = [];
     const storiesEvents = [
       'storiesLoaded',
       'ugcStoriesLoaded',

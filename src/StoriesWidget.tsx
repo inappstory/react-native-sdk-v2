@@ -6,6 +6,7 @@ const createFragment = (viewId) =>
   UIManager.dispatchViewManagerCommand(
     viewId,
     // we are calling the 'create' command
+    // @ts-ignore:next-line
     UIManager.InappstorySdkView.Commands.create.toString(),
     [viewId]
   );

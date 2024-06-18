@@ -23,6 +23,15 @@ export const StoriesList = ({
   viewModelExporter,
   favoritesOnly,
   renderCell,
+}: {
+  storyManager?: any;
+  appearanceManager?: any;
+  feed?: any;
+  onLoadStart?: any;
+  onLoadEnd?: any;
+  viewModelExporter?: any;
+  favoritesOnly?: any;
+  renderCell?: any;
 }) => {
   const { customStoryView, showFavorites, onFavoriteCell } = useInAppStory();
   //const feeds = getFeeds();
@@ -31,7 +40,7 @@ export const StoriesList = ({
   const feedEvents = useStore((state) => state.feeds_default_feed);
   const feedFavoriteEvents = useStore((state) => state.feeds_default_favorites);
 
-  const userID = storyManager.userId;
+  //const userID = storyManager.userId;
   //const ref = useRef(null);
   React.useEffect(() => {
     console.log('v', updateVersion);
@@ -84,7 +93,7 @@ export const StoriesList = ({
 
   const customFeed = false;
   return (
-    <View userID={userID}>
+    <View>
       {!customFeed && customStoryView && (
         <>
           <StoriesCarousel

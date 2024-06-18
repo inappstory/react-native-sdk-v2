@@ -17,6 +17,14 @@ export const StoryComponent = ({
   cellSize,
   hideTitle,
   renderCell,
+}: {
+  story: any;
+  appearanceManager: any;
+  storyManager: any;
+  onPress: any;
+  cellSize?: any;
+  hideTitle?: any;
+  renderCell?: any;
 }) => {
   const size = cellSize || appearanceManager?.storiesListOptions.card.height;
   const borderRadius =
@@ -53,10 +61,7 @@ export const StoryComponent = ({
         source={{
           uri: (Platform.OS === 'android' ? '' : '') + story?.coverVideoPath,
         }}
-        style={[
-          styles.video,
-          { borderRadius, overflow: 'hidden', resizeMode: 'cover' },
-        ]}
+        style={[styles.video, { borderRadius, overflow: 'hidden' }]}
         repeat={true}
         volume={0}
         resizeMode={'cover'}

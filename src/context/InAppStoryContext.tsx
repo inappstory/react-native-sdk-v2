@@ -6,8 +6,6 @@ import BottomSheet, { type BottomSheetMethods } from '@devvie/bottom-sheet';
 import { StoriesList } from '../stories/StoriesList';
 import type { StoriesListViewModel } from 'react-native-ias';
 export const InAppStoryContext = createContext({
-  events: [],
-  feeds: {},
   tags: [],
   placeholders: [],
   imagePlaceholders: [],
@@ -15,7 +13,7 @@ export const InAppStoryContext = createContext({
   userID: '',
   readerOpen: false,
   onFavoriteCell: () => {},
-  setShowFavorites: () => {},
+  setShowFavorites: (_show: boolean) => {},
   customStoryView: true,
   showFavorites: true,
 });
@@ -24,7 +22,7 @@ export const useInAppStoryContext = function (props) {
   const [test, setTest] = useState(props.test || 'Hello world');
   const [tags, setTags] = useState([]);
   const [placeholders, setPlaceholders] = useState([]);
-  const [imagePlaceholders, setImagePlaceholders] = useState();
+  const [imagePlaceholders, setImagePlaceholders] = useState([]);
   const [lang, setLang] = useState('en_US');
   const [userID, setUserID] = useState('en_US');
   const [apiKey, setApiKey] = useState('en_US');
@@ -63,10 +61,10 @@ export const InAppStoryProvider = ({
   appearanceManager,
   ...props
 }) => {
-  const [favoritesOpen, setFavoritesOpen] = useState(null);
+  const [favoritesOpen, setFavoritesOpen] = useState(false);
   const context = useInAppStoryContext(props);
-  const onFavoriteCell = React.useCallback((feed) => {
-    setFavoritesOpen(feed);
+  const onFavoriteCell = React.useCallback(() => {
+    setFavoritesOpen(true);
     sheetRef.current.open();
   }, []);
   const sheetRef = React.useRef<BottomSheetMethods>({

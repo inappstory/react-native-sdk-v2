@@ -8,10 +8,14 @@ type StoreState = {
   addToFeed: (feed: String, events: Array<any>) => void;
   setFavorite: (storyID: String, isFavorite: Boolean) => void;
   replaceInFeed: (feed: String, event: any) => void;
+  feeds_default_feed: Array<any>;
+  feeds_default_favorites: Array<any>;
 };
 export const useStore = create<StoreState>((set) => ({
   events: [],
   feeds: [],
+  feeds_default_feed: [],
+  feeds_default_favorites: [],
   update: 0,
   addEvent: (newEvent) =>
     set((state) => {

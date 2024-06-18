@@ -15,8 +15,19 @@ export const StoriesCarousel = ({
   onFavoritePress,
   favoritesOnly,
   renderCell,
+}: {
+  feed: any;
+  stories: any;
+  storyManager: any;
+  appearanceManager: any;
+  onPress: any;
+  showFavorites: any;
+  favoriteStories: any;
+  onFavoritePress: any;
+  favoritesOnly: any;
+  renderCell: any;
 }) => {
-  const visibleIds = React.useRef([]);
+  const visibleIds = React.useRef<any>([]);
   const flatListRef = React.useRef<any>(null);
   const renderItem = (item) => {
     const story = item.item;

@@ -304,7 +304,7 @@ export class StoryManager extends StoryManagerV1 {
     return InAppStorySDK.showGame(id);
   }
   showOnboardingStories(
-    appearanceManager: AppearanceManagerV1,
+    _appearanceManager: AppearanceManagerV1,
     options?:
       | {
           feed?: Option<string>;
