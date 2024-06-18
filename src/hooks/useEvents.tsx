@@ -76,7 +76,6 @@ export const useEvents = ({ onFavoriteCell }) => {
     ].forEach((eventName) => {
       eventListeners.push(
         eventEmitter.addListener(eventName, async (event) => {
-          console.log('event:', eventName, event);
           if (eventName == 'clickOnButton') {
             try {
               const supported = await Linking.canOpenURL(event.url);
@@ -116,7 +115,6 @@ export const useEvents = ({ onFavoriteCell }) => {
           }
           if (eventName == 'storyUpdate') {
             const feedName = event.feed + '_' + event.list;
-            console.log(`feed: ${feedName} event: ${event.storyID}`, event);
             if (event.coverImagePath) {
               imageCoverCache.current[event.storyID] = event.coverImagePath;
             }

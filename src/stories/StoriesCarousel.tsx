@@ -76,7 +76,7 @@ export const StoriesCarousel = ({
     }
   };
 
-  if (typeof stories === 'undefined')
+  if (typeof stories === 'undefined' || !stories.length)
     return (
       <View
         style={{

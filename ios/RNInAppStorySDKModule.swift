@@ -26,6 +26,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
      "favoritesUpdate","scrollUpdate",
      "storyReaderWillShow","storyReaderDidClose","sessionFailure","storyFailure","currentStoryFailure","networkFailure","requestFailure","favoriteCellDidSelect","editorCellDidSelect",
      "customShare", "onActionWith","storiesDidUpdated","goodItemSelected",
+     "openStoryReader", "openStoryFavoriteReader", "clickOnFavoriteCell", "shareStoryWithPath",
     ]      // etc. 
   }
   @objc private var _hasLike: Bool = true

@@ -43,15 +43,17 @@ export const StoriesList = ({
   //const userID = storyManager.userId;
   //const ref = useRef(null);
   React.useEffect(() => {
-    console.log('v', updateVersion);
+    updateVersion;
   }, [updateVersion]);
   const fetchFeed = React.useCallback(async () => {
     storyManager.fetchFeed(feed);
   }, [feed, storyManager]);
   React.useEffect(() => {
     if (!favoritesOnly) {
-      onLoadStart();
-      if (!feedEvents) return;
+      if (updateVersion < 1) {
+        onLoadStart();
+      }
+      if (!feedEvents || !feedEvents.length) return;
       onLoadEnd({
         defaultListLength: feedEvents.length || 0,
         feed,
@@ -59,7 +61,7 @@ export const StoriesList = ({
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [feedEvents]);
+  }, [feedEvents.length, updateVersion]);
   React.useEffect(() => {
     viewModelExporter({
       reload: () => {

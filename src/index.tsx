@@ -230,7 +230,7 @@ export class StoryManager extends StoryManagerV1 {
   }
 
   on(eventName: string | symbol, listener: any) {
-    super.on(eventName, listener);
+    //super.on(eventName, listener);
     eventEmitter.addListener(getEventName(eventName), async (event) => {
       listener(event);
     });

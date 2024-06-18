@@ -66,7 +66,7 @@ export const StoryListComponent = ({
       }
 
       if (listLoadStatus.error != null) {
-        console.log({
+        console.error('LOAD ERROR', {
           name: listLoadStatus.error.name,
           networkStatus: listLoadStatus.error.networkStatus,
           networkMessage: listLoadStatus.error.networkMessage,
@@ -95,12 +95,7 @@ export const StoryListComponent = ({
   };
 
   return (
-    <View
-      style={[
-        styles.storyListContainer,
-        loadStatus === LoadStatus.fail ? styles.displayNone : null,
-      ]}
-    >
+    <View style={[styles.storyListContainer]}>
       <AnimatedStoryList
         loadStatus={loadStatus}
         feedId={feedId}
@@ -135,7 +130,6 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
   },
-  displayNone: { display: 'none' },
 });
 
 const StoryListLoader = ({ loadStatus }: { loadStatus: LoadStatus }) => {
