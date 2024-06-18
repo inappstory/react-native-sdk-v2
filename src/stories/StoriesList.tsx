@@ -73,7 +73,7 @@ export const StoriesList = ({
   const onFavoritePress = React.useCallback(
     (story) => {
       if (typeof story == 'string') {
-        onFavoriteCell(feed);
+        onFavoriteCell();
         storyManager.fetchFavorites(feed);
       } else {
         InAppStorySDK.selectFavoriteStoryCellWith(String(story.storyID));

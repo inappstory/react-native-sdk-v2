@@ -1,6 +1,15 @@
 import { create } from 'zustand';
-
-export const useStore = create((set) => ({
+type StoreState = {
+  events: Array<any>;
+  feeds: Array<any>;
+  update: number;
+  addEvent: (event: any) => void;
+  clearFeed: (feed: String) => void;
+  addToFeed: (feed: String, events: Array<any>) => void;
+  setFavorite: (storyID: String, isFavorite: Boolean) => void;
+  replaceInFeed: (feed: String, event: any) => void;
+};
+export const useStore = create<StoreState>((set) => ({
   events: [],
   feeds: [],
   update: 0,
