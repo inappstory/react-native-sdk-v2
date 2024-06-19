@@ -17,6 +17,7 @@ export const StoryComponent = ({
   cellSize,
   hideTitle,
   renderCell,
+  hideBorder,
 }: {
   story: any;
   appearanceManager: any;
@@ -25,6 +26,7 @@ export const StoryComponent = ({
   cellSize?: any;
   hideTitle?: any;
   renderCell?: any;
+  hideBorder?: any;
 }) => {
   const size = cellSize || appearanceManager?.storiesListOptions.card.height;
   const borderRadius =
@@ -155,7 +157,7 @@ export const StoryComponent = ({
       {cardOutsideTop && titleBox}
       <View
         style={{
-          borderWidth: cardOpenedStyles.border.width,
+          borderWidth: !hideBorder ? cardOpenedStyles.border.width : 0,
           borderColor: cardOpenedStyles.border.color,
           width:
             storyWidth +
