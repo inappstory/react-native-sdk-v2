@@ -969,22 +969,56 @@ class RNInAppStorySDKModule: RCTEventEmitter {
             }
         }
   }
-  //TODO:
-  //likeImage
-  //likeSelectedImage
-  //dislikeImage
-  //dislikeSelectedImage
-  //favoriteImage
-  //favoriteSelectedImag
-  //shareImage
-  //shareSelectedImage
-  //soundmage
-  //soundSelectedImage
-  //closeReaderImage
-  //refreshImage
-  //refreshGoodsImage
-  //goodsCloseImage
 
+  @objc
+  func setLikeImage(_ image: String, selected selectedImage: String) {
+    InAppStory.shared.likeImage = UIImage(named: image)!
+    InAppStory.shared.likeSelectedImage = UIImage(named: selectedImage)!
+  }
+
+  @objc
+  func setDislikeImage(_ image: String, selected selectedImage: String) {
+    InAppStory.shared.dislikeImage = UIImage(named: image)!
+    InAppStory.shared.dislikeSelectedImage = UIImage(named: selectedImage)!
+  }
+
+  @objc
+  func setFavoriteImage(_ image: String, selected selectedImage: String) {
+    InAppStory.shared.favoriteImage = UIImage(named: image)!
+    InAppStory.shared.favoriteSelectedImag = UIImage(named: selectedImage)!
+  }
+
+  @objc
+  func setShareImage(_ image: String, selected selectedImage: String) {
+    InAppStory.shared.shareImage = UIImage(named: image)!
+    InAppStory.shared.shareSelectedImage = UIImage(named: selectedImage)!
+  }
+
+  @objc
+  func setSoundImage(_ image: String, selected selectedImage: String) {
+    InAppStory.shared.soundImage = UIImage(named: image)!
+    InAppStory.shared.soundSelectedImage = UIImage(named: selectedImage)!
+  }
+
+  @objc
+  func setCloseReaderImage(_ image: String) {
+    InAppStory.shared.closeReaderImage = UIImage(named: image)!
+  }
+
+  @objc
+  func setRefreshImage(_ image: String) {
+    InAppStory.shared.refreshImage = UIImage(named: image)!
+  }
+
+  @objc
+  func setRefreshGoodsImage(_ image: String) {
+    InAppStory.shared.refreshImage = UIImage(named: image)!
+  }
+
+  @objc
+  func setCloseGoodsImage(_ image: String) {
+    InAppStory.shared.goodsCloseImage = UIImage(named: image)!
+  }
 
   @objc
   override static func requiresMainQueueSetup() -> Bool {

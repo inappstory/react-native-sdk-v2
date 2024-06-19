@@ -923,6 +923,51 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
             this.appearanceManager
         );
     }
+
+    fun getImageID(imgName:String):Int {
+        var id: Int = reactContext.getResources().getIdentifier(imgName, "drawable", reactContext.currentActivity?.getPackageName());
+        return id;
+    }
+    @ReactMethod
+    fun setLikeImage(image: String, selectedImage: String) {
+        this.appearanceManager?.csLikeIcon(this.getImageID(image));
+    }
+
+    @ReactMethod
+    fun setDislikeImage(image: String, selectedImage: String) {
+        this.appearanceManager?.csDislikeIcon(this.getImageID(image));
+    }
+
+    @ReactMethod
+    fun setFavoriteImage(image: String, selectedImage: String) {
+        this.appearanceManager?.csFavoriteIcon(this.getImageID(image));
+    }
+
+    @ReactMethod
+    fun setShareImage(image: String, selectedImage: String) {
+        this.appearanceManager?.csShareIcon(this.getImageID(image));
+    }
+
+    @ReactMethod
+    fun setSoundImage(image: String, selectedImage: String) {
+        this.appearanceManager?.csSoundIcon(this.getImageID(image));
+    }
+
+    @ReactMethod
+    fun setCloseReaderImage(image: String) {
+        this.appearanceManager?.csCloseIcon(this.getImageID(image));
+    }
+
+    @ReactMethod
+    fun setCloseGoodsImage(image: String) {
+        this.appearanceManager?.csCloseIcon(this.getImageID(image));
+    }
+
+    @ReactMethod
+    fun setRefreshImage(image: String) {
+        this.appearanceManager?.csRefreshIcon(this.getImageID(image));
+    }
+
     @ReactMethod
     fun showEditor() {
         Log.d("IAS","openEditor")
@@ -1064,19 +1109,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
       .create()
   }
 }
-
 /*
 
-
-
 appearanceManager.csIsDraggable(true);
-
-
-appearanceManager.csCloseIcon(settings.closeIcon);
-appearanceManager.csDislikeIcon(settings.dislikeIcon);
-appearanceManager.csLikeIcon(settings.likeIcon);
-appearanceManager.csRefreshIcon(settings.refreshIcon);
-appearanceManager.csFavoriteIcon(settings.favoriteIcon);
-appearanceManager.csShareIcon(settings.shareIcon);
-appearanceManager.csSoundIcon(settings.soundIcon);
   :*/
