@@ -172,7 +172,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
               if goodsCount > 0 {
                 timer.invalidate()
                 complete(.success(self.goodsCache))
-                self.goodsCache = nil;
+                self.goodsCache = [];
               }
           }
         }
