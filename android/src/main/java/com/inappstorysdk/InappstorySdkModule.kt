@@ -229,7 +229,11 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
             goodsItemData: GoodsItemData,
             callback: GetGoodsDataCallback
         ) {
-            print("Selected goods $goodsItemData")
+            var payload = Arguments.makeNativeMap(
+                mutableMapOf(
+                    "sku" to goodsItemData.sku,
+                ) as Map<String, Any>)
+            sendEvent(reactContext,"goodItemSelected", payload)            
             callback.onClose()
             InAppStoryManager.closeStoryReader()
             return;
