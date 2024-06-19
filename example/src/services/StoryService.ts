@@ -24,7 +24,7 @@ const storyManagerConfig: StoryManagerConfig = {
 
 const createStoryManager = () => {
   const storyManager = new StoryManager(storyManagerConfig);
-  storyManager.getGoodsCallback((skus: string[]) => {
+  storyManager.getGoods((skus: string[]) => {
     //TODO: Fetch goods information
     return skus.map((sku) => ({
       sku: sku, //item sku

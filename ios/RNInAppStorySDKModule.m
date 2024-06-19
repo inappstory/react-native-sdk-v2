@@ -100,7 +100,7 @@ RCT_EXTERN_METHOD(setRefreshImage:(NSString *)image)
 RCT_EXTERN_METHOD(setRefreshGoodsImage:(NSString *)image)
 RCT_EXTERN_METHOD(setGoodsCloseImage:(NSString *)image)
 
-
+RCT_EXTERN_METHOD(addProductToCache:(NSString *)sku title:(NSString *)title subtitle:(NSString *)subtitle imageURL:(NSString *)imageURL price:(NSString *)price oldPrice:(NSString *)oldPrice)
 
 RCT_EXTERN_METHOD(setLogging:(BOOL *)value)
 RCT_EXTERN_METHOD(useDeviceID:(BOOL *)value)

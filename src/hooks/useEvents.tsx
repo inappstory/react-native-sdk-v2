@@ -95,10 +95,6 @@ export const useEvents = ({ onFavoriteCell }) => {
           if (eventName == 'storyReaderDidClose' || eventName == 'closeStory') {
             setReaderOpen(false);
           }
-          if (eventName == 'getGoodsObject') {
-            //setLoading(true)
-            //FIXME: storyManager.fetchGoods(event);
-          }
           if (eventName == 'favoriteCellDidSelect') {
             onFavoriteCell();
           }

@@ -87,17 +87,30 @@ export class StoryManager extends StoryManagerV1 {
       this.soundEnabled = false;
       InAppStorySDK.changeSound(false);
     }
+    eventEmitter.addListener('getGoodsObject', (event) => {
+      this.fetchGoods(event.skus);
+    });
   }
-  async fetchGoods(_skus: string[]) {
-    //AsyncStorage.setItem('IAS_GOODS_LOADING', '1');
-    /*const goods = await this.getGoodsCallback(skus);
-    goods.map((good) => {
-      // AsyncStorage.setItem('IAS_GOODS_' + good.sku, JSON.stringify(good));
-    });*/
-    //AsyncStorage.setItem('IAS_GOODS_LOADING', '0');
+  async fetchGoods(skus: string[]) {
+    this.getGoodsCallback(skus).then((goods) => {
+      goods.map((good) => {
+        InAppStorySDK.addProductToCache(
+          good.sku,
+          good.title,
+          good.subtitle,
+          good.imageURL,
+          good.price,
+          good.oldPrice
+        );
+      });
+    });
   }
-  getGoodsObject(callback: any) {
-    this.getGoodsCallback = callback;
+  getGoods(callback: any) {
+    this.getGoodsCallback = (skus) => {
+      return new Promise((resolve, _reject) => {
+        resolve(callback(skus));
+      });
+    };
   }
   setApiKey(apiKey: string): void {
     this.apiKey = apiKey;

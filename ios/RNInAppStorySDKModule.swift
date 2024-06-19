@@ -36,6 +36,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   @objc private var _userID: String = ""
   @objc private var _lang: String = ""
   @objc private var _tags: [String] = [""]
+  @objc private var goodsCache: Array<GoodObject> = []
   var storiesAPI = StoryListAPI()
   var favoriteStoriesAPI = StoryListAPI(isFavorite: true)
   @objc
@@ -167,26 +168,11 @@ class RNInAppStorySDKModule: RCTEventEmitter {
         InAppStory.shared.getGoodsObject = { skus, complete in
               RNInAppStorySDKModule.emitter.sendEvent(withName: "getGoodsObject", body: ["skus":skus])
               Timer.scheduledTimer(withTimeInterval: 0.25, repeats: true) { timer in
-              let randomNumber = Int.random(in: 1...20)
-              print("Number: \(randomNumber)")
-              //FIXME: Get data from async storage?
-              if randomNumber == 10 {
-                  timer.invalidate()
-                  var goodsArray: Array<GoodObject> = []
-
-                  for sku in skus {
-                      let goodObject = GoodObject(sku: sku, //item sku
-                                                  title:"title1", //item title for cell
-                                                  subtitle: "subtitle1", //item subtitle for cell
-                                                  imageURL: URL(string: "https://images-na.ssl-images-amazon.com/images/G/01/AMAZON_FASHION/2022/SITE_FLIPS/SPR_22/GW/DQC/DQC_APR_TBYB_W_SHOES_2x._SY232_CB624172947_.jpg"), //image url for cell
-                                                  price: "100", //price value for cell
-                                                  oldPrice: "99.99") //discount value for cell
-                      goodsArray.append(goodObject)
-                  }
-
-                  complete(.success(goodsArray))
-                  //if the list could not be retrieved or a network error occurred while retrieving,
-                  //you must call complete(.failure(.close or .refresh))
+              let goodsCount = self.goodsCache.count
+              if goodsCount > 0 {
+                timer.invalidate()
+                complete(.success(self.goodsCache))
+                self.goodsCache = nil;
               }
           }
         }
@@ -1018,6 +1004,17 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   @objc
   func setCloseGoodsImage(_ image: String) {
     InAppStory.shared.goodsCloseImage = UIImage(named: image)!
+  }
+
+  @objc
+  func addProductToCache(_ sku: String, title: String, subtitle: String, imageURL: String, price: String, oldPrice: String) {
+    let goodObject = GoodObject(sku: sku,
+                                title:title,
+                                subtitle: subtitle,
+                                imageURL: URL(string: imageURL),
+                                price: price, 
+                                oldPrice: oldPrice)
+      self.goodsCache.append(goodObject)
   }
 
   @objc
