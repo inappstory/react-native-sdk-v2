@@ -101,6 +101,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
     var TAG:String = "IAS_SDK_API";
 
     var stories: ArrayList<String>? = null;
+    var goodsCache: ArrayList<GoodsItemData> = ArrayList<GoodsItemData>()
     private var listenerCount = 0
 
     @ReactMethod
@@ -184,6 +185,8 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
     }
 
   fun setupListeners() {
+
+    val that:InappstorySdkModule = this;
     //Goods widget
     AppearanceManager.getCommonInstance().csCustomGoodsWidget(object : ICustomGoodsWidget {
         override fun getWidgetView(context: Context): View? {
@@ -208,20 +211,23 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
 
         public override fun getSkus(skus: ArrayList<String>, callback: GetGoodsDataCallback) {
             print("csCustomGoodsWidget getSkus = $skus")
-            val goodsItemData: ArrayList<GoodsItemData> = ArrayList<GoodsItemData>()
-            for (sku: String in skus) {
-                val data = GoodsItemData(
-                    sku,
-                    "title_$sku",
-                    "desc_$sku",
-                    "https://images-na.ssl-images-amazon.com/images/G/01/AMAZON_FASHION/2022/SITE_FLIPS/SPR_22/GW/DQC/DQC_APR_TBYB_W_SHOES_2x._SY232_CB624172947_.jpg",
-                    "10",
-                    "20",
-                    sku
-                )
-                goodsItemData.add(data)
+            var payload = Arguments.makeNativeMap(
+                mutableMapOf(
+                    "skus" to skus,
+                ) as Map<String, Any>)
+            sendEvent(reactContext,"getGoodsObject", payload) 
+            val handler = Handler()
+            val runnableCode: Runnable = Runnable {
+                if (that.goodsCache.size > 0) {
+                    callback.onSuccess(that.goodsCache)
+                    that.goodsCache.clear();
+                } else {
+                    handler.postDelayed(this as Runnable, 250)
+                }
             }
-            callback.onSuccess(goodsItemData)
+            handler.post(runnableCode)
+
+            
         }
 
         override fun onItemClick(
@@ -593,6 +599,19 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
 
         }
     )
+  }
+  @ReactMethod
+  fun addProductToCache(sku: String, title: String, subtitle: String, imageURL: String, price: String, oldPrice: String) {
+    val data = GoodsItemData(
+        sku,
+        title,
+        subtitle,
+        imageURL,
+        price,
+        oldPrice,
+        sku
+    )
+    this.goodsCache.add(data)
   }
 
   @ReactMethod
