@@ -154,6 +154,14 @@ storyManager.getGoodsObject((skus) => {
 });
 ```
 
+After goods item is selected,
+
+```js
+storyManager.on('goodItemSelected', (payload: any) => {
+   // User selected payload.sku SKU
+});
+```
+
 ### Events
 
 To subscribe to events, use **storyManager.on** or **storyManager.once**

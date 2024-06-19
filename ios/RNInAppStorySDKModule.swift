@@ -267,6 +267,9 @@ class RNInAppStorySDKModule: RCTEventEmitter {
             "feed": feedString,
             "storyType": storyTypeString
           ])
+            InAppStory.shared.closeReader() {
+                
+            }
         }
 
         InAppStory.shared.stackFeedUpdate = { newFeed in

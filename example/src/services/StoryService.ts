@@ -10,6 +10,8 @@ import {
 } from 'react-native-inappstory-sdk';
 
 import { Linking } from 'react-native';
+import Toast from 'react-native-simple-toast';
+
 const testKey = 'HDGXt7z1WVQoaN_IzLv8KdRl5f_Ghxdo';
 const storyManagerConfig: StoryManagerConfig = {
   apiKey: testKey,
@@ -35,6 +37,9 @@ const createStoryManager = () => {
       price: Number(Math.random() * 1000).toFixed(2), //price value for cell
       oldPrice: Number(Math.random() * 1000).toFixed(2),
     }));
+  });
+  storyManager.on('goodItemSelected', (payload: any) => {
+    Toast.show(`Selected SKU "${payload.sku}" in goods widget`, 3);
   });
   storyManager.on('clickOnStory', (payload: any) =>
     console.log('SS clickOnStory', { payload })
