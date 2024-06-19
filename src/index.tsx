@@ -1,4 +1,4 @@
-import './wdyr';
+//import './wdyr';
 import { NativeEventEmitter, NativeModules } from 'react-native';
 import {
   AppearanceManager as AppearanceManagerV1,

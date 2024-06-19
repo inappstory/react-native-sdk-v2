@@ -14,6 +14,14 @@ or
 yarn add react-native-inappstory-sdk
 ```
 
+## iOS Requirements
+
+You need to install pods with static frameworks, use USE_FRAMEWORKS = 'static' or have this in your Podfile:
+
+```js
+use_frameworks! :linkage => :static
+```
+
 ## Android Requirements
 
 Import InAppStory SDK in MainApplication
