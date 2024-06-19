@@ -235,6 +235,30 @@ storyManager.on(eventName, (payload) => {
 | customShare  |     |     |     |
 | onActionWith |     |     |     |
 
+### Custom Icons
+
+1. Add images to your project assets
+
+2. Configure required InAppStorySDK icons before showing stories:
+
+```js
+InAppStorySDK.setLikeImage(image, activeImage);
+InAppStorySDK.setDislikeImage(image, activeImage);
+InAppStorySDK.setFavoriteImage(image, activeImage);
+InAppStorySDK.setShareImage(image, activeImage);
+InAppStorySDK.setSoundImage(image, activeImage);
+InAppStorySDK.setCloseReaderImage(image);
+InAppStorySDK.setRefreshImage(image);
+InAppStorySDK.setRefreshGoodsImage(image);
+InAppStorySDK.setCloseGoodsImage(image);
+```
+
+image and activeImage parameters are the names of the images in your assets folder.
+
+```js
+InAppStorySDK.setLikeImage('like', 'likeSelected');
+```
+
 ### Migrating from old version
 
 Breaking changes:
