@@ -24,6 +24,14 @@ use_frameworks! :linkage => :static
 
 ## Android Requirements
 
+Make sure you update your Android SDK versions in build.gradle
+
+```
+minSdkVersion = 23
+compileSdkVersion = 34
+targetSdkVersion = 34
+```
+
 Import InAppStory SDK in MainApplication
 
 ```java

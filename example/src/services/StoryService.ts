@@ -9,7 +9,7 @@ import {
   type StoryManagerConfig,
 } from 'react-native-inappstory-sdk';
 
-import { Linking } from 'react-native';
+import { Linking, Platform } from 'react-native';
 import Toast from 'react-native-simple-toast';
 
 const testKey = 'HDGXt7z1WVQoaN_IzLv8KdRl5f_Ghxdo';
@@ -26,6 +26,7 @@ const storyManagerConfig: StoryManagerConfig = {
 
 const createStoryManager = () => {
   const storyManager = new StoryManager(storyManagerConfig);
+
   storyManager.getGoods((skus: string[]) => {
     //TODO: Fetch goods information
     return skus.map((sku) => ({

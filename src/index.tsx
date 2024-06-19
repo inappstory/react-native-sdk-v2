@@ -1,48 +1,173 @@
 //import './wdyr';
 import { NativeEventEmitter, NativeModules } from 'react-native';
-import {
-  AppearanceManager as AppearanceManagerV1,
-  type ListLoadStatus,
-  type StoriesListViewModel,
-  type StoryManagerConfig,
-  StoriesListCardTitlePosition,
-  StoriesListCardTitleTextAlign,
-  StoriesListCardViewVariant,
-  StoryManager as StoryManagerV1,
-  StoryReader,
-  StoryReaderCloseButtonPosition,
-  StoryReaderSwipeStyle,
-  useIas,
-  type Option,
-  StoriesListSliderAlign,
-} from 'react-native-ias';
 import InAppStorySDK from 'react-native-inappstory-sdk';
-import type { OnboardingLoadStatus } from 'react-native-ias/types/StoryManager';
-import type {
-  StoriesListFavoriteCardOptions,
-  StoriesListClickEvent,
-} from 'react-native-ias/types/AppearanceManager';
 import { StoriesList } from './stories/StoriesList';
 import { InAppStoryProvider, useInAppStory } from './context/InAppStoryContext';
 import { useStore } from './hooks/useStore';
 
 export {
-  type ListLoadStatus,
-  StoriesListCardTitlePosition,
-  StoriesListCardTitleTextAlign,
-  StoriesListCardViewVariant,
-  type StoriesListViewModel,
-  type StoryManagerConfig,
-  StoryReader,
   StoriesList,
-  StoryReaderCloseButtonPosition,
-  StoryReaderSwipeStyle,
-  useIas,
   useInAppStory,
   InAppStoryProvider,
   useStore,
+  StoriesListCardTitlePosition,
+  StoriesListCardViewVariant,
+  StoriesListCardTitleTextAlign,
 };
-//import AsyncStorage from '@react-native-async-storage/async-storage';
+export declare type StoriesListClickEvent = {
+  id: number;
+  index: number;
+  isDeeplink: boolean;
+  url: string | undefined;
+};
+export declare type StoriesListFavoriteCardOptions = StoriesListCardOptions &
+  Partial<{
+    title: Partial<{
+      content: string;
+      color: string;
+      padding: string | number;
+      font: string;
+    }>;
+  }>;
+
+export declare type OnboardingLoadStatus = {
+  feed: string | number;
+  defaultListLength: number;
+  favoriteListLength: number;
+  success: boolean;
+  error: Option<{
+    name: string;
+    networkStatus: number;
+    networkMessage: string;
+  }>;
+};
+
+export enum AndroidWindowSoftInputMode {
+  AdjustNothing = 'AdjustNothing',
+  AdjustPan = 'AdjustPan',
+  AdjustResize = 'AdjustResize',
+  AdjustUnspecified = 'AdjustUnspecified',
+  AlwaysHidden = 'AlwaysHidden',
+  AlwaysVisible = 'AlwaysVisible',
+  Visible = 'Visible',
+  Hidden = 'Hidden',
+  Unchanged = 'Unchanged',
+}
+
+export declare type ClickPayload = {
+  id: number;
+  index: number;
+  url: string;
+};
+
+export declare type ClickHandlerPayload = {
+  data: ClickPayload;
+};
+
+export declare enum StoriesListSliderAlign {
+  CENTER = 'center',
+  LEFT = 'left',
+  RIGHT = 'right',
+}
+export type Option<T> = T | null | undefined;
+
+export type Dict<T = any> = {
+  [key: string]: T | undefined;
+  [key: number]: T | undefined;
+};
+export enum StoryReaderSwipeStyle {
+  FLAT = 'flat',
+  COVER = 'cover',
+  CUBE = 'cube',
+}
+export enum StoryReaderCloseButtonPosition {
+  LEFT = 'left',
+  RIGHT = 'right',
+}
+export type StoriesListDimensions = {
+  totalHeight: number;
+};
+declare type StoryManagerConfig = {
+  apiKey: string;
+  userId?: Option<string | number>;
+  tags?: Option<Array<string>>;
+  placeholders?: Option<Dict<string>>;
+  lang?: string;
+  defaultMuted?: boolean;
+};
+
+enum StoriesListCardTitlePosition {
+  CARD_INSIDE_BOTTOM = 'cardInsideBottom',
+  CARD_OUTSIDE_TOP = 'cardOutsideTop',
+  CARD_OUTSIDE_BOTTOM = 'cardOutsideBottom',
+}
+
+enum StoriesListCardViewVariant {
+  CIRCLE = 'circle',
+  QUAD = 'quad',
+  RECTANGLE = 'rectangle',
+}
+enum StoriesListCardTitleTextAlign {
+  LEFT = 'left',
+  CENTER = 'center',
+  RIGHT = 'right',
+}
+export declare class StoriesListViewModel {
+  get feedSlug(): string;
+
+  get testKey(): Option<string>;
+
+  get listLoadStatus(): ListLoadStatus;
+
+  get containerOptions(): Record<any, any>;
+
+  get viewOptions(): Record<any, any>;
+
+  reload(): Promise<ListLoadStatus>;
+
+  // get storiesListDimensions(): StoriesListDimensions;
+}
+export declare class AppearanceManagerV1 {
+  public setCommonOptions(
+    options: AppearanceCommonOptions
+  ): AppearanceManagerV1;
+
+  public get commonOptions(): AppearanceCommonOptions;
+
+  public setStoriesListOptions(
+    options: StoriesListOptions
+  ): AppearanceManagerV1;
+
+  public get storiesListOptions(): StoriesListOptions;
+
+  public setStoryReaderOptions(
+    options: StoryReaderOptions
+  ): AppearanceManagerV1;
+
+  public get storyReaderOptions(): StoryReaderOptions;
+
+  public setStoryFavoriteReaderOptions(
+    options: StoryFavoriteReaderOptions
+  ): AppearanceManager;
+
+  public get storyFavoriteReaderOptions(): StoryFavoriteReaderOptions;
+
+  // public setGoodsWidgetOptions(options: GoodsWidgetOptions): AppearanceManager;
+  // public get goodsWidgetOptions(): GoodsWidgetOptions;
+}
+
+export type ListLoadStatus = {
+  feed: string | number;
+  defaultListLength: number;
+  favoriteListLength: number;
+  success: boolean;
+  error: Option<{
+    name: string;
+    networkStatus: number;
+    networkMessage: string;
+  }>;
+};
+
 const eventEmitter = new NativeEventEmitter(
   NativeModules.RNInAppStorySDKModule
 );
@@ -52,7 +177,7 @@ const EVENTS_MAP = {
 const getEventName = (eventName) => {
   return EVENTS_MAP[eventName] || eventName;
 };
-export class StoryManager extends StoryManagerV1 {
+export class StoryManager {
   apiKey: string = '';
   userId: string | number = '';
   tags: string[] = [];
@@ -65,7 +190,6 @@ export class StoryManager extends StoryManagerV1 {
   sendStatistics: boolean = true;
   listeners: any = [];
   constructor(config: StoryManagerConfig) {
-    super(config);
     InAppStorySDK.initWith(
       config.apiKey,
       config.userId,
@@ -169,7 +293,6 @@ export class StoryManager extends StoryManagerV1 {
   }
 
   setTags(tags: string[]) {
-    super.setTags(tags);
     this.tags = tags;
     InAppStorySDK.setTags(tags);
   }
@@ -179,17 +302,14 @@ export class StoryManager extends StoryManagerV1 {
     InAppStorySDK.removeTags(tags);
   }
   setUserId(userId: string | number): void {
-    super.setUserId(userId);
     this.userId = userId;
     InAppStorySDK.setUserID(userId);
   }
   setLang(lang: string): void {
-    super.setLang(lang);
     this.lang = lang;
     InAppStorySDK.setLang(lang);
   }
   setPlaceholders(placeholders: any): void {
-    super.setPlaceholders(placeholders);
     this.placeholders = placeholders;
     InAppStorySDK.setPlaceholders(placeholders);
   }
@@ -252,11 +372,12 @@ export class StoryManager extends StoryManagerV1 {
     });
   }
 }
-export class AppearanceManager extends AppearanceManagerV1 {
+export class AppearanceManager {
   hasLike = true;
   hasDislike = true;
   hasFavorites = true;
   hasShare = true;
+  storiesListOptions: any = null;
   //TODO: Migrate the APIs from JS to Native
   setCommonOptions(
     options: Partial<{
@@ -271,17 +392,17 @@ export class AppearanceManager extends AppearanceManagerV1 {
     //InAppStorySDK.setHasDislike(options.hasDislikeButton);
     InAppStorySDK.setHasFavorites(options.hasFavorite);
     InAppStorySDK.setHasShare(options.hasShare);
-    return super.setCommonOptions(options);
+    return this;
   }
   setStoryFavoriteReaderOptions(
-    options: Partial<{
+    _options: Partial<{
       title: Partial<{ content: string; font: string; color: string }>;
     }>
   ) {
-    return super.setStoryFavoriteReaderOptions(options);
+    return this;
   }
   setStoryReaderOptions(
-    options: Partial<{
+    _options: Partial<{
       closeButtonPosition: StoryReaderCloseButtonPosition;
       scrollStyle: StoryReaderSwipeStyle;
       loader: Partial<{
@@ -323,7 +444,7 @@ export class AppearanceManager extends AppearanceManagerV1 {
       options.closeButtonPosition || 'right'
     );
     InAppStorySDK.setScrollStyle(options.scrollStyle || 'cover');*/
-    return super.setStoryReaderOptions(options);
+    return this;
   }
   setStoriesListOptions(
     options: Partial<{
@@ -394,8 +515,171 @@ export class AppearanceManager extends AppearanceManagerV1 {
       handleStopLoad: (loaderContainer: HTMLElement) => void;
     }>
   ) {
-    return super.setStoriesListOptions(options);
+    this.storiesListOptions = {
+      ...this.storiesListOptions,
+      ...options,
+    };
+    return this;
   }
 }
+export declare type AppearanceCommonOptions = Partial<{
+  hasFavorite: boolean;
+  hasLike: boolean;
+  hasLikeButton: boolean;
+  hasDislikeButton: boolean;
+  hasShare: boolean;
+}>;
+export declare type StoryReaderOptions = Partial<{
+  closeButtonPosition: StoryReaderCloseButtonPosition;
+  scrollStyle: StoryReaderSwipeStyle;
+  loader: Partial<{
+    default: Partial<{
+      color: Option<string>;
+      accentColor: Option<string>;
+    }>;
+    custom: Option<string>;
+  }>;
+  slideBorderRadius: number;
+  recycleStoriesList: boolean;
+  closeOnLastSlideByTimer: boolean;
+  closeButton: {
+    svgSrc: {
+      baseState: string;
+    };
+  };
+  likeButton: {
+    svgSrc: {
+      baseState: string;
+      activeState: string;
+    };
+  };
+  dislikeButton: {
+    svgSrc: {
+      baseState: string;
+      activeState: string;
+    };
+  };
+  favoriteButton: {
+    svgSrc: {
+      baseState: string;
+      activeState: string;
+    };
+  };
+  muteButton: {
+    svgSrc: {
+      baseState: string;
+      activeState: string;
+    };
+  };
+  shareButton: {
+    svgSrc: {
+      baseState: string;
+    };
+  };
+}>;
+export declare type StoryFavoriteReaderOptions = Partial<{
+  title: Partial<{
+    content: string;
+    font: string;
+    color: string;
+  }>;
+}>;
+
+export declare type StoriesListTitleOptions = Partial<{
+  content: string;
+  color: string;
+  font: string;
+  marginBottom: number;
+}>;
+export declare type StoriesListOptions = Partial<{
+  title: StoriesListTitleOptions;
+  card: StoriesListCardOptions;
+  favoriteCard: StoriesListFavoriteCardOptions;
+  layout: Partial<{
+    storiesListInnerHeight: number | null;
+    height: number;
+    backgroundColor: string;
+    sliderAlign: StoriesListSliderAlign;
+  }>;
+  sidePadding: number;
+  topPadding: number;
+  bottomPadding: number;
+  bottomMargin: number;
+
+  navigation: Partial<{
+    showControls: boolean;
+    controlsSize: number;
+    controlsBackgroundColor: string;
+    controlsColor: string;
+  }>;
+
+  extraCss: string;
+
+  // setCallback ?
+  handleStoryLinkClick: (payload: StoriesListClickEvent) => void;
+
+  handleStartLoad: (loaderContainer: HTMLElement) => void;
+  handleStopLoad: (loaderContainer: HTMLElement) => void;
+
+  // handleClickOnStory?: (event: StoriesListClickEvent) => void,
+}>;
+export declare type StoriesListCardOptions = Partial<{
+  title: Partial<{
+    color: string;
+    padding: string | number;
+    font: string;
+    display: boolean;
+    textAlign: StoriesListCardTitleTextAlign;
+    position: StoriesListCardTitlePosition;
+    lineClamp: number;
+  }>;
+  gap: number;
+  height: number;
+  variant: StoriesListCardViewVariant;
+  border: Partial<{
+    radius: number;
+    color: string;
+    width: number;
+    gap: number;
+  }>;
+  boxShadow: Option<string>;
+  dropShadow: Option<string>;
+  opacity: Option<number>;
+  mask: Partial<{
+    color: Option<string>;
+  }>;
+  svgMask: Partial<
+    Option<{
+      cardMask: Option<string>;
+      overlayMask: Array<{
+        mask: Option<string>;
+        background: Option<string>;
+      }>;
+    }>
+  >;
+  opened: Partial<{
+    border: Partial<{
+      radius: Option<number>;
+      color: Option<string>;
+      width: Option<number>;
+      gap: Option<number>;
+    }>;
+    boxShadow: Option<string>;
+    dropShadow: Option<string>;
+    opacity: Option<number>;
+    mask: Partial<{
+      color: Option<string>;
+    }>;
+    svgMask: Partial<
+      Option<{
+        cardMask: Option<string>;
+        overlayMask: Array<{
+          mask: Option<string>;
+          background: Option<string>;
+        }>;
+      }>
+    >;
+  }>;
+}>;
 
 export default NativeModules.RNInAppStorySDKModule;

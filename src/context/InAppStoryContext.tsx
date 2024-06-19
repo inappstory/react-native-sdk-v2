@@ -4,7 +4,8 @@ import { useEvents } from '../hooks/useEvents';
 import { View } from 'react-native';
 import BottomSheet, { type BottomSheetMethods } from '@devvie/bottom-sheet';
 import { StoriesList } from '../stories/StoriesList';
-import type { StoriesListViewModel } from 'react-native-ias';
+import { StoriesListViewModel } from 'react-native-inappstory-sdk';
+
 export const InAppStoryContext = createContext({
   tags: [],
   placeholders: [],

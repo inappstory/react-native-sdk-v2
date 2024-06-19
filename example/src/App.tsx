@@ -9,7 +9,7 @@ import { SettingsScreen } from './screen/SettingsScreen';
 import { FavoritesScreen } from './screen/FavoritesScreen';
 import { EventsScreen } from './screen/EventsScreen';
 import { ProjectSettingsScreen } from './screen/ProjectSettingsScreen';
-import { InAppStoryProvider } from 'react-native-inappstory-sdk';
+import { InAppStoryProvider } from '../../src/context/InAppStoryContext';
 import { AppearanceSettingsScreen } from './screen/AppearanceSettings';
 import { appearanceManager, storyManager } from './services/StoryService';
 
