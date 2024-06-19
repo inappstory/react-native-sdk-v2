@@ -40,6 +40,8 @@ Add following code to onCreate() function
 
 To use the library, create StoryService.ts, configure **storyManagerConfig** with your API key and adjust **appearanceManager** styles
 
+### Step 1
+
 ```js
 import {
   AppearanceManager,
@@ -206,6 +208,26 @@ const createAppearanceManager = () => {
 export const storyManager = createStoryManager();
 
 export const appearanceManager = createAppearanceManager();
+```
+
+### Step 2
+
+Add **InAppStoryProvider** to the top of your application
+
+```js
+import { InAppStoryProvider } from 'react-native-inappstory-sdk';
+import { appearanceManager, storyManager } from './StoryService';
+
+export default function App() {
+  return (
+    <InAppStoryProvider
+      storyManager={storyManager}
+      appearanceManager={appearanceManager}
+    >
+      //Your app
+    </InAppStoryProvider>
+  );
+}
 ```
 
 ## Story View

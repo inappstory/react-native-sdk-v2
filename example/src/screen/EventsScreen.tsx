@@ -12,7 +12,7 @@ import Animated, {
   useSharedValue,
   useAnimatedScrollHandler,
 } from 'react-native-reanimated';
-import { useStore } from '../../../src/hooks/useStore';
+import { useStore } from 'react-native-inappstory-sdk';
 
 export function EventsScreen(): React.ReactNode {
   const isDarkMode = useColorScheme() === 'dark';

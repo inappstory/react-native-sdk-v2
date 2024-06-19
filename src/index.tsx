@@ -23,7 +23,9 @@ import type {
   StoriesListClickEvent,
 } from 'react-native-ias/types/AppearanceManager';
 import { StoriesList } from './stories/StoriesList';
-import { useInAppStory } from './context/InAppStoryContext';
+import { InAppStoryProvider, useInAppStory } from './context/InAppStoryContext';
+import { useStore } from './hooks/useStore';
+
 export {
   type ListLoadStatus,
   StoriesListCardTitlePosition,
@@ -37,6 +39,8 @@ export {
   StoryReaderSwipeStyle,
   useIas,
   useInAppStory,
+  InAppStoryProvider,
+  useStore,
 };
 //import AsyncStorage from '@react-native-async-storage/async-storage';
 const eventEmitter = new NativeEventEmitter(
