@@ -211,7 +211,6 @@ class RNInAppStorySDKModule: RCTEventEmitter {
           RNInAppStorySDKModule.emitter.sendEvent(withName: "gameReaderDidClose", body: [])
         }
         InAppStory.shared.gameComplete = { data, result, url in
-            NSLog("TODO: gameComplete closure");
             RNInAppStorySDKModule.emitter.sendEvent(withName: "gameComplete", body: [
                 "data": data,
                 "result": result ?? [:],
@@ -237,12 +236,10 @@ class RNInAppStorySDKModule: RCTEventEmitter {
         }*/
 
         InAppStory.shared.storiesDidUpdated = { isContent, storyType in
-          NSLog("TODO: storiesDidUpdated closure");
           RNInAppStorySDKModule.emitter.sendEvent(withName: "storiesDidUpdated", body: [
             "isContent": isContent,
             "storyType": storyType,
           ])
-          NSLog("TODO: onActionWith closure");
         }
 
         InAppStory.shared.goodItemSelected = { item, storyType in
@@ -567,11 +564,10 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   }
   @objc
   func setUserID(_ _userID: String) {
-        DispatchQueue.main.async {
-           NSLog("setUserID")
-            self._userID = _userID
-            InAppStory.shared.settings?.userID = _userID
-        }
+    DispatchQueue.main.async {
+      self._userID = _userID
+      InAppStory.shared.settings?.userID = _userID
+    }
   }
 
   @objc

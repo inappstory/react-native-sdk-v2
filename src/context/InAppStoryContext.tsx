@@ -89,17 +89,14 @@ export const InAppStoryProvider = ({
     }),
     [context, readerOpen, onFavoriteCell]
   );
-  const childrenComponent = React.useMemo(() => {
-    return children;
-  }, [children]);
   return (
     <InAppStoryContext.Provider value={contextValue}>
-      {childrenComponent}
+      {children}
       <BottomSheet ref={sheetRef}>
         <View style={{ paddingHorizontal: 10 }}>
           {!!favoritesOpen && (
             <StoriesList
-              feed={favoritesOpen}
+              feed={'default'}
               favoritesOnly={true}
               storyManager={storyManager}
               appearanceManager={appearanceManager}

@@ -34,10 +34,9 @@ export const StoriesList = ({
   renderCell?: any;
 }) => {
   const { customStoryView, showFavorites, onFavoriteCell } = useInAppStory();
-  //const feeds = getFeeds();
-  //const _events = useStore((state) => state.events);
   const updateVersion = useStore((state) => state.update);
-  const feedEvents = useStore((state) => state.feeds_default_feed);
+  const _feedEvents = useStore((state) => state[`feeds_${feed}_feed`]);
+  const feedEvents = _feedEvents || [];
   const feedFavoriteEvents = useStore((state) => state.feeds_default_favorites);
 
   //const userID = storyManager.userId;
@@ -79,7 +78,10 @@ export const StoriesList = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const onPress = React.useCallback((story) => {
-    InAppStorySDK.selectStoryCellWith(String(story.storyID));
+    InAppStorySDK.getStories(story.feed);
+    setTimeout(() => {
+      InAppStorySDK.selectStoryCellWith(String(story.storyID));
+    }, 100);
   }, []);
   const onFavoritePress = React.useCallback(
     (story) => {
