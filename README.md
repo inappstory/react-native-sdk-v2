@@ -246,10 +246,26 @@ const viewModelExporter = React.useCallback(
 
 ## Favorites
 
-To display favorites, pass **favoritesOnly** to <StoriesList>
+If you use favorites, use **onFavoriteCell** event that fires when user clicks on favorites cell
+
+```js
+storyManager.on('onFavoriteCell', () => {
+  //Navigate to favorites screen
+});
+```
+
+To display favorite stories, pass **favoritesOnly** to <StoriesList>
 
 ```js
 <StoriesList favoritesOnly={true} />
+```
+
+## Vertical Stories list
+
+To display items vertically, use **vertical=true**
+
+```js
+<StoriesList vertical={true} />
 ```
 
 ## Custom Story Cell

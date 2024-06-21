@@ -15,6 +15,7 @@ export const StoriesCarousel = ({
   onFavoritePress,
   favoritesOnly,
   renderCell,
+  horizontal,
 }: {
   feed: any;
   stories: any;
@@ -26,6 +27,7 @@ export const StoriesCarousel = ({
   onFavoritePress: any;
   favoritesOnly: any;
   renderCell: any;
+  horizontal: any;
 }) => {
   const visibleIds = React.useRef<any>([]);
   const flatListRef = React.useRef<any>(null);
@@ -101,7 +103,7 @@ export const StoriesCarousel = ({
   return (
     <>
       <FlatList
-        horizontal
+        horizontal={horizontal}
         data={
           !favoritesOnly
             ? !showFavorites || !favoriteStories?.length

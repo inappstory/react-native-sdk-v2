@@ -89,6 +89,7 @@ export default function App() {
               onLoadEnd={onLoadEnd}
               onLoadStart={onLoadStart}
               viewModelExporter={viewModelExporter}
+              vertical={false}
             />
           )}
         </View>

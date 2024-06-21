@@ -15,6 +15,7 @@ export const StoriesList = ({
   showFavorites,
   favoritesOnly,
   renderCell,
+  vertical,
 }: {
   storyManager?: any;
   appearanceManager?: any;
@@ -25,6 +26,7 @@ export const StoriesList = ({
   showFavorites?: any;
   favoritesOnly?: any;
   renderCell?: any;
+  vertical?: any;
 }) => {
   const updateVersion = useStore((state) => state.update);
   const _feedEvents = useStore((state) => state[`feeds_${feed}_feed`]);
@@ -97,6 +99,7 @@ export const StoriesList = ({
         onFavoritePress={onFavoritePress}
         favoritesOnly={favoritesOnly}
         renderCell={renderCell}
+        horizontal={!vertical}
       />
     </View>
   );
