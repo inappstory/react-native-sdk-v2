@@ -575,7 +575,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
         DispatchQueue.main.async {
           NSLog("setLang")
             self._lang = lang;
-            InAppStory.shared.settings = Settings(userID:self._userID, tags: self._tags, lang: lang)
+            //InAppStory.shared.settings?.lang = Settings(userID:self._userID, tags: self._tags, lang: lang)
         }
   }
 
@@ -686,6 +686,10 @@ class RNInAppStorySDKModule: RCTEventEmitter {
 
             }
         }
+  }
+  @objc
+  func onFavoriteCell() {
+    RNInAppStorySDKModule.emitter.sendEvent(withName: "favoriteCellDidSelect", body: [])
   }
   @objc
   func clearCache() {

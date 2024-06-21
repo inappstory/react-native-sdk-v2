@@ -2,13 +2,11 @@
 import { NativeEventEmitter, NativeModules } from 'react-native';
 import InAppStorySDK from 'react-native-inappstory-sdk';
 import { StoriesList } from './stories/StoriesList';
-import { InAppStoryProvider, useInAppStory } from './context/InAppStoryContext';
 import { useStore } from './hooks/useStore';
+import deepmerge from 'deepmerge';
 
 export {
   StoriesList,
-  useInAppStory,
-  InAppStoryProvider,
   useStore,
   StoriesListCardTitlePosition,
   StoriesListCardViewVariant,
@@ -173,6 +171,8 @@ const eventEmitter = new NativeEventEmitter(
 );
 const EVENTS_MAP = {
   shareStory: 'clickOnShareStory',
+  clickOnFavoriteCell: 'favoriteCellDidSelect',
+  onFavoriteCell: 'favoriteCellDidSelect',
 };
 const getEventName = (eventName) => {
   return EVENTS_MAP[eventName] || eventName;
@@ -277,8 +277,13 @@ export class StoryManager {
     InAppStorySDK.getFavoriteStories(feed);
   }
 
+  onFavoriteCell(feed) {
+    InAppStorySDK.onFavoriteCell();
+    this.fetchFavorites(feed);
+  }
   on(eventName: string | symbol, listener: any) {
     //super.on(eventName, listener);
+
     eventEmitter.addListener(getEventName(eventName), async (event) => {
       listener(event);
     });
@@ -297,8 +302,6 @@ export class StoryManager {
     InAppStorySDK.setTags(tags);
   }
   removeTags(tags: string[]) {
-    //super.removeTags(tags);
-    //this.tags =
     InAppStorySDK.removeTags(tags);
   }
   setUserId(userId: string | number): void {
@@ -314,7 +317,6 @@ export class StoryManager {
     InAppStorySDK.setPlaceholders(placeholders);
   }
   setImagePlaceholders(placeholders: any): void {
-    //super.setImagePlaceholders(placeholders);
     this.imagePlaceholders = placeholders;
     InAppStorySDK.setImagesPlaceholders(placeholders);
   }
@@ -325,16 +327,11 @@ export class StoryManager {
     return new Promise((resolve, reject) => {
       if (appearanceManager.commonOptions.hasLike) {
         InAppStorySDK.setHasLike(appearanceManager.commonOptions.hasLikeButton);
-        /*InAppStorySDK.setHasDislike(
-          appearanceManager.commonOptions.hasDislikeButton
-        );*/
-
         InAppStorySDK.setHasFavorites(
           appearanceManager.commonOptions.hasFavorite
         );
         InAppStorySDK.setHasShare(appearanceManager.commonOptions.hasShare);
       }
-      //InAppStorySDK.setAppearance(appearanceManager);
       InAppStorySDK.showSingle(storyId).then((success: boolean) => {
         if (success) {
           resolve({ loaded: true });
@@ -378,6 +375,9 @@ export class AppearanceManager {
   hasFavorites = true;
   hasShare = true;
   storiesListOptions: any = null;
+  storyReaderOptions: any = null;
+  storyFavoriteReaderOptions: any = null;
+  commonOptions: any = null;
   //TODO: Migrate the APIs from JS to Native
   setCommonOptions(
     options: Partial<{
@@ -388,21 +388,26 @@ export class AppearanceManager {
       hasShare: boolean;
     }>
   ) {
-    InAppStorySDK.setHasLike(options.hasLike);
+    this.commonOptions = deepmerge(this.commonOptions, options);
+    InAppStorySDK.setHasLike(this.commonOptions.hasLike);
     //InAppStorySDK.setHasDislike(options.hasDislikeButton);
-    InAppStorySDK.setHasFavorites(options.hasFavorite);
-    InAppStorySDK.setHasShare(options.hasShare);
+    InAppStorySDK.setHasFavorites(this.commonOptions.hasFavorite);
+    InAppStorySDK.setHasShare(this.commonOptions.hasShare);
     return this;
   }
   setStoryFavoriteReaderOptions(
-    _options: Partial<{
+    options: Partial<{
       title: Partial<{ content: string; font: string; color: string }>;
     }>
   ) {
+    this.storyFavoriteReaderOptions = deepmerge(
+      this.storyFavoriteReaderOptions,
+      options
+    );
     return this;
   }
   setStoryReaderOptions(
-    _options: Partial<{
+    options: Partial<{
       closeButtonPosition: StoryReaderCloseButtonPosition;
       scrollStyle: StoryReaderSwipeStyle;
       loader: Partial<{
@@ -413,37 +418,18 @@ export class AppearanceManager {
         custom: Option<string>;
       }>;
       slideBorderRadius: number;
-      recycleStoriesList: boolean;
-      closeOnLastSlideByTimer: boolean;
-      closeButton: { svgSrc: { baseState: string } };
-      //dislikeStory
-      //favoriteStory
-      //shareStory
-      //shareStoryWithPath
-      //);
-      likeButton: {
-        //favoriteStory
-        //shareStory
-        //shareStoryWithPath
-        //);
-        svgSrc: {
-          //shareStory
-          //shareStoryWithPath
-          //);
-          baseState: string;
-          activeState: string;
-        };
-      };
-      dislikeButton: { svgSrc: { baseState: string; activeState: string } };
-      favoriteButton: { svgSrc: { baseState: string; activeState: string } };
-      muteButton: { svgSrc: { baseState: string; activeState: string } };
-      shareButton: { svgSrc: { baseState: string } };
     }>
   ) {
-    /*InAppStorySDK.setCloseButtonPosition(
-      options.closeButtonPosition || 'right'
+    this.storyReaderOptions = deepmerge(this.storyReaderOptions, options);
+    InAppStorySDK.setCloseButtonPosition(
+      this.storyReaderOptions.closeButtonPosition || 'right'
     );
-    InAppStorySDK.setScrollStyle(options.scrollStyle || 'cover');*/
+    InAppStorySDK.setScrollStyle(
+      this.storyReaderOptions.scrollStyle || 'cover'
+    );
+    InAppStorySDK.setReaderCornerRadius(
+      this.storyReaderOptions.slideBorderRadius || 0
+    );
     return this;
   }
   setStoriesListOptions(
@@ -515,10 +501,7 @@ export class AppearanceManager {
       handleStopLoad: (loaderContainer: HTMLElement) => void;
     }>
   ) {
-    this.storiesListOptions = {
-      ...this.storiesListOptions,
-      ...options,
-    };
+    this.storiesListOptions = deepmerge(this.storiesListOptions, options);
     return this;
   }
 }

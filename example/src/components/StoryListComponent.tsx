@@ -227,6 +227,7 @@ const AnimatedStoryList = ({
         onLoadStart={onLoadStart}
         onLoadEnd={onLoadEnd}
         viewModelExporter={viewModelExporter}
+        showFavorites={true}
       />
     </Animated.View>
   );

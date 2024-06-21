@@ -48,8 +48,6 @@ Add following code to onCreate() function
 
 To use the library, create StoryService.ts, configure **storyManagerConfig** with your API key and adjust **appearanceManager** styles
 
-### Step 1
-
 ```js
 import {
   AppearanceManager,
@@ -218,32 +216,23 @@ export const storyManager = createStoryManager();
 export const appearanceManager = createAppearanceManager();
 ```
 
-### Step 2
-
-Add **InAppStoryProvider** to the top of your application
-
-```js
-import { InAppStoryProvider } from 'react-native-inappstory-sdk';
-import { appearanceManager, storyManager } from './StoryService';
-
-export default function App() {
-  return (
-    <InAppStoryProvider
-      storyManager={storyManager}
-      appearanceManager={appearanceManager}
-    >
-      //Your app
-    </InAppStoryProvider>
-  );
-}
-```
-
 ## Story View
 
-To display feed, use StoriesList component
+To display feed, use StoriesList component. **storiesListViewModel** allows to reload the story feed using **storiesListViewModel.current.reload()**.
 
 ```js
 import { StoriesList } from 'react-native-inappstory-sdk';
+import {
+  type StoriesListViewModel,
+} from 'react-native-inappstory-sdk';
+...
+const storiesListViewModel = React.useRef<StoriesListViewModel>();
+const viewModelExporter = React.useCallback(
+  (viewModel: StoriesListViewModel) =>
+    (storiesListViewModel.current = viewModel),
+  []
+);
+...
 
 <StoriesList
   storyManager={storyManager}
@@ -253,6 +242,14 @@ import { StoriesList } from 'react-native-inappstory-sdk';
   onLoadEnd={onLoadEnd}
   viewModelExporter={viewModelExporter}
 />;
+```
+
+## Favorites
+
+To display favorites, pass **favoritesOnly** to <StoriesList>
+
+```js
+<StoriesList favoritesOnly={true} />
 ```
 
 ## Custom Story Cell

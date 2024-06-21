@@ -38,7 +38,6 @@ export function RNWelcome({
   });
 
   const storiesListViewModel = useRef<StoriesListViewModel>();
-
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />

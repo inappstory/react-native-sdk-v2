@@ -1,19 +1,10 @@
 import React from 'react';
 import { View } from 'react-native';
-
-import { StoriesCarousel } from './StoriesCarousel';
-//import { StoriesWidget } from '../StoriesWidget';
 import InAppStorySDK from 'react-native-inappstory-sdk';
-import { useInAppStory } from '../context/InAppStoryContext';
+import { StoriesCarousel } from './StoriesCarousel';
 import { useStore } from '../hooks/useStore';
-/*const createClick = (viewId, storyIndex) =>
-  UIManager.dispatchViewManagerCommand(
-    viewId,
-    // we are calling the 'create' command
-    UIManager.InappstorySdkView.Commands.click.toString(),
-    [viewId, storyIndex]
-  );
-*/
+import { useEvents } from '../hooks/useEvents';
+
 export const StoriesList = ({
   storyManager,
   appearanceManager,
@@ -21,6 +12,7 @@ export const StoriesList = ({
   onLoadStart,
   onLoadEnd,
   viewModelExporter,
+  showFavorites,
   favoritesOnly,
   renderCell,
 }: {
@@ -30,15 +22,16 @@ export const StoriesList = ({
   onLoadStart?: any;
   onLoadEnd?: any;
   viewModelExporter?: any;
+  showFavorites?: any;
   favoritesOnly?: any;
   renderCell?: any;
 }) => {
-  const { customStoryView, showFavorites, onFavoriteCell } = useInAppStory();
   const updateVersion = useStore((state) => state.update);
   const _feedEvents = useStore((state) => state[`feeds_${feed}_feed`]);
   const feedEvents = _feedEvents || [];
   const feedFavoriteEvents = useStore((state) => state.feeds_default_favorites);
 
+  const {} = useEvents();
   //const userID = storyManager.userId;
   //const ref = useRef(null);
   React.useEffect(() => {
@@ -78,42 +71,33 @@ export const StoriesList = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const onPress = React.useCallback((story) => {
-    InAppStorySDK.getStories(story.feed);
-    setTimeout(() => {
-      InAppStorySDK.selectStoryCellWith(String(story.storyID));
-    }, 100);
+    InAppStorySDK.selectStoryCellWith(String(story.storyID));
   }, []);
   const onFavoritePress = React.useCallback(
     (story) => {
       if (typeof story == 'string') {
-        onFavoriteCell();
-        storyManager.fetchFavorites(feed);
+        storyManager.onFavoriteCell(feed);
       } else {
         InAppStorySDK.selectFavoriteStoryCellWith(String(story.storyID));
       }
     },
-    [onFavoriteCell, feed, storyManager]
+    [feed, storyManager]
   );
 
-  const customFeed = false;
   return (
     <View>
-      {!customFeed && customStoryView && (
-        <>
-          <StoriesCarousel
-            feed={feed}
-            stories={feedEvents}
-            showFavorites={showFavorites}
-            favoriteStories={feedFavoriteEvents}
-            storyManager={storyManager}
-            appearanceManager={appearanceManager}
-            onPress={onPress}
-            onFavoritePress={onFavoritePress}
-            favoritesOnly={favoritesOnly}
-            renderCell={renderCell}
-          />
-        </>
-      )}
+      <StoriesCarousel
+        feed={feed}
+        stories={feedEvents}
+        showFavorites={showFavorites}
+        favoriteStories={feedFavoriteEvents}
+        storyManager={storyManager}
+        appearanceManager={appearanceManager}
+        onPress={onPress}
+        onFavoritePress={onFavoritePress}
+        favoritesOnly={favoritesOnly}
+        renderCell={renderCell}
+      />
     </View>
   );
 };

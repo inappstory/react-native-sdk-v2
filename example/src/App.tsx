@@ -9,18 +9,36 @@ import { SettingsScreen } from './screen/SettingsScreen';
 import { FavoritesScreen } from './screen/FavoritesScreen';
 import { EventsScreen } from './screen/EventsScreen';
 import { ProjectSettingsScreen } from './screen/ProjectSettingsScreen';
-import { InAppStoryProvider } from '../../src/context/InAppStoryContext';
 import { AppearanceSettingsScreen } from './screen/AppearanceSettings';
 import { appearanceManager, storyManager } from './services/StoryService';
+import BottomSheet, { type BottomSheetMethods } from '@devvie/bottom-sheet';
+import { View } from 'react-native';
+import { StoriesList, StoriesListViewModel } from 'react-native-inappstory-sdk';
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+  const storiesListViewModel = React.useRef<StoriesListViewModel>();
+  const [favoritesOpen, setFavoritesOpen] = React.useState(false);
+  React.useEffect(() => {
+    storyManager.on('onFavoriteCell', () => {
+      setFavoritesOpen(true);
+      sheetRef.current.open();
+    });
+  }, []);
+  const onLoadEnd = () => {};
+  const onLoadStart = () => {};
+  const sheetRef = React.useRef<BottomSheetMethods>({
+    open: () => {},
+    close: () => {},
+  });
+  const viewModelExporter = React.useCallback(
+    (viewModel: StoriesListViewModel) =>
+      (storiesListViewModel.current = viewModel),
+    []
+  );
   return (
-    <InAppStoryProvider
-      storyManager={storyManager}
-      appearanceManager={appearanceManager}
-    >
+    <>
       <NavigationContainer>
         <Stack.Navigator
           initialRouteName="Home"
@@ -60,7 +78,22 @@ export default function App() {
           />
         </Stack.Navigator>
       </NavigationContainer>
-    </InAppStoryProvider>
+      <BottomSheet ref={sheetRef}>
+        <View style={{ paddingHorizontal: 10 }}>
+          {!!favoritesOpen && (
+            <StoriesList
+              feed={'default'}
+              favoritesOnly={true}
+              storyManager={storyManager}
+              appearanceManager={appearanceManager}
+              onLoadEnd={onLoadEnd}
+              onLoadStart={onLoadStart}
+              viewModelExporter={viewModelExporter}
+            />
+          )}
+        </View>
+      </BottomSheet>
+    </>
   );
 }
 

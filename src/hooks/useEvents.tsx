@@ -5,7 +5,8 @@ import { NativeEventEmitter, NativeModules, Linking } from 'react-native';
 import { useStore } from './useStore';
 import InAppStorySDK from 'react-native-inappstory-sdk';
 import Toast from 'react-native-simple-toast';
-export const useEvents = ({ onFavoriteCell }) => {
+var init = false;
+export const useEvents = () => {
   const addEvent = useStore((state) => state.addEvent);
   const addToFeed = useStore((state) => state.addToFeed);
   const replaceInFeed = useStore((state) => state.replaceInFeed);
@@ -16,6 +17,8 @@ export const useEvents = ({ onFavoriteCell }) => {
   const imageCoverCache = React.useRef<any>({});
   const videoCoverCache = React.useRef<any>({});
   React.useEffect(() => {
+    if (init) return;
+    init = true;
     const eventEmitter = new NativeEventEmitter(
       NativeModules.RNInAppStorySDKModule
     );
@@ -96,7 +99,7 @@ export const useEvents = ({ onFavoriteCell }) => {
             setReaderOpen(false);
           }
           if (eventName == 'favoriteCellDidSelect') {
-            onFavoriteCell();
+            //onFavoriteCell();
           }
           if (eventName == 'favoriteStory') {
             setFavorite(event.storyID, event.favorite);
@@ -134,5 +137,5 @@ export const useEvents = ({ onFavoriteCell }) => {
       });
     };
   }, []);
-  return { readerOpen, onFavoriteCell };
+  return { readerOpen };
 };

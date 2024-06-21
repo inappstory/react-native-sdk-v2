@@ -19,10 +19,7 @@ import React, { useCallback, useRef } from 'react';
 import Button from 'react-native-button';
 
 import { Colors } from 'react-native/Libraries/NewAppScreen';
-import {
-  useInAppStory,
-  type StoriesListViewModel,
-} from 'react-native-inappstory-sdk';
+import { type StoriesListViewModel } from 'react-native-inappstory-sdk';
 
 import { StoryListComponent } from '../components/StoryListComponent';
 import { storyManager } from '../services/StoryService';
@@ -68,7 +65,15 @@ export function MainScreen({
   );
 
   const [refreshing, setRefreshing] = React.useState(false);
-  const { readerOpen } = useInAppStory();
+  const [readerOpen, setReaderOpen] = React.useState(false);
+  React.useEffect(() => {
+    storyManager.on('storyReaderWillShow', () => {
+      setReaderOpen(true);
+    });
+    storyManager.on('storyReaderDidClose', () => {
+      setReaderOpen(false);
+    });
+  }, []);
   const [feed, _setFeed] = React.useState('default');
   const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
