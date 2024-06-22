@@ -80,7 +80,7 @@ export const InAppStoryProvider = ({
       (storiesListViewModel.current = viewModel),
     []
   );
-  const { readerOpen } = useEvents({ onFavoriteCell });
+  const { readerOpen } = useEvents();
   const contextValue = React.useMemo(
     () => ({
       ...context,
