@@ -373,69 +373,69 @@ storyManager.on(eventName, (payload) => {
 });
 ```
 
-| Event Name        |     |     |     |
-| ----------------- | --- | --- | --- |
-| storiesLoaded     |     |     |     |
-| ugcStoriesLoaded  |     |     |     |
-| clickOnStory      |     |     |     |
-| showStory         |     |     |     |
-| closeStory        |     |     |     |
-| clickOnButton     |     |     |     |
-| showSlide         |     |     |     |
-| likeStory         |     |     |     |
-| dislikeStory      |     |     |     |
-| favoriteStory     |     |     |     |
-| clickOnShareStory |     |     |     |
-| storyWidgetEvent  |     |     |     |
+| Event Name        |                                                           |     |     |
+| ----------------- | --------------------------------------------------------- | --- | --- |
+| storiesLoaded     |                                                           |     |     |
+| ugcStoriesLoaded  |                                                           |     |     |
+| clickOnStory      | {id: String, feed: String, index: Number}                 |     |     |
+| showStory         | {id: String, feed: String, action: String}                |     |     |
+| closeStory        | {id: String, feed: String, index: Number, action: String} |     |     |
+| clickOnButton     |                                                           |     |     |
+| showSlide         | {id: String, index: Number}                               |     |     |
+| likeStory         | {id: String, feed: String, value: Boolean}                |     |     |
+| dislikeStory      | {id: String, feed: String, value: Boolean}                |     |     |
+| favoriteStory     | {id: String, feed: String, value: Boolean}                |     |     |
+| clickOnShareStory |                                                           |     |     |
+| storyWidgetEvent  | {id: String, feed: String, name: String, data: String }   |     |     |
 
 ## Feed Events
 
-| Event                 |     |     |     |
-| --------------------- | --- | --- | --- |
-| storyListUpdate       |     |     |     |
-| storyUpdate           |     |     |     |
-| favoritesUpdate       |     |     |     |
-| favoriteCellDidSelect |     |     |     |
-| editorCellDidSelect   |     |     |     |
-| favoritesUpdate       |     |     |     |
+| Event                 | Payload                |     |     |
+| --------------------- | ---------------------- | --- | --- |
+| storyListUpdate       | {stories: [StoryData]} |     |     |
+| storyUpdate           | StoryData              |     |     |
+| favoritesUpdate       | {}                     |     |     |
+| favoriteCellDidSelect | {}                     |     |     |
+| editorCellDidSelect   | {}                     |     |     |
+| favoritesUpdate       | {}                     |     |     |
 
 ## Reader events
 
-| Event               |     |     |     |
-| ------------------- | --- | --- | --- |
-| storyReaderWillShow |     |     |     |
-| storyReaderDidClose |     |     |     |
-| storiesDidUpdated   |     |     |     |
-| scrollUpdate        |     |     |     |
+| Event               |                                        |     |     |
+| ------------------- | -------------------------------------- | --- | --- |
+| storyReaderWillShow | {type: String}                         |     |     |
+| storyReaderDidClose | {type: String}                         |     |     |
+| storiesDidUpdated   | {isContent: String, storyType: String} |     |     |
+| scrollUpdate        | {index: String}                        |     |     |
 
 ## Failure events
 
-| Event               |     |     |     |
-| ------------------- | --- | --- | --- |
-| sessionFailure      |     |     |     |
-| storyFailure        |     |     |     |
-| currentStoryFailure |     |     |     |
-| networkFailure      |     |     |     |
-| requestFailure      |     |     |     |
+| Event               |                                       |     |     |
+| ------------------- | ------------------------------------- | --- | --- |
+| sessionFailure      | {message: String}                     |     |     |
+| storyFailure        | {message: String}                     |     |     |
+| currentStoryFailure | {message: String}                     |     |     |
+| networkFailure      | {message: String}                     |     |     |
+| requestFailure      | {message: String, statusCode: String} |     |     |
 
 ## Game Events
 
-| Event              |     |     |     |
-| ------------------ | --- | --- | --- |
-| startGame          |     |     |     |
-| finishGame         |     |     |     |
-| closeGame          |     |     |     |
-| eventGame          |     |     |     |
-| gameFailure        |     |     |     |
-| gameReaderWillShow |     |     |     |
-| gameReaderDidClose |     |     |     |
-| gameComplete       |     |     |     |
+| Event              | Payload                                                     |
+| ------------------ | ----------------------------------------------------------- | --- | --- |
+| startGame          | {id: String, gameID: String}                                |
+| finishGame         | {id: String, gameID: String, result: String}                |     |     |
+| closeGame          | {id: String, gameID: String}                                |     |     |
+| eventGame          | {id: String, gameID: String, name: String, payload: Object} |     |     |
+| gameFailure        | {id: String, gameID: String, message: String}               |     |     |
+| gameReaderWillShow | {}                                                          |     |     |
+| gameReaderDidClose | {}                                                          |     |     |
+| gameComplete       | {data: Object, result: String, url: String}                 |     |     |
 
 ## Goods events
 
-| Event            |     |     |     |
-| ---------------- | --- | --- | --- |
-| goodItemSelected |     |     |     |
+| Event            | Payload       |     |     |
+| ---------------- | ------------- | --- | --- |
+| goodItemSelected | {sku: String} |     |     |
 
 ## Share events
 
