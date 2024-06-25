@@ -374,7 +374,7 @@ storyManager.on(eventName, (payload) => {
 ```
 
 | Event Name        |                                                           |     |     |
-| ----------------- | --------------------------------------------------------- | --- | --- |
+|-------------------|-----------------------------------------------------------|-----|-----|
 | storiesLoaded     |                                                           |     |     |
 | ugcStoriesLoaded  |                                                           |     |     |
 | clickOnStory      | {id: String, feed: String, index: Number}                 |     |     |
@@ -391,7 +391,7 @@ storyManager.on(eventName, (payload) => {
 ## Feed Events
 
 | Event                 | Payload                |     |     |
-| --------------------- | ---------------------- | --- | --- |
+|-----------------------|------------------------|-----|-----|
 | storyListUpdate       | {stories: [StoryData]} |     |     |
 | storyUpdate           | StoryData              |     |     |
 | favoritesUpdate       | {}                     |     |     |
@@ -402,7 +402,7 @@ storyManager.on(eventName, (payload) => {
 ## Reader events
 
 | Event               |                                        |     |     |
-| ------------------- | -------------------------------------- | --- | --- |
+|---------------------|----------------------------------------|-----|-----|
 | storyReaderWillShow | {type: String}                         |     |     |
 | storyReaderDidClose | {type: String}                         |     |     |
 | storiesDidUpdated   | {isContent: String, storyType: String} |     |     |
@@ -411,7 +411,7 @@ storyManager.on(eventName, (payload) => {
 ## Failure events
 
 | Event               |                                       |     |     |
-| ------------------- | ------------------------------------- | --- | --- |
+|---------------------|---------------------------------------|-----|-----|
 | sessionFailure      | {message: String}                     |     |     |
 | storyFailure        | {message: String}                     |     |     |
 | currentStoryFailure | {message: String}                     |     |     |
@@ -420,8 +420,8 @@ storyManager.on(eventName, (payload) => {
 
 ## Game Events
 
-| Event              | Payload                                                     |
-| ------------------ | ----------------------------------------------------------- | --- | --- |
+| Event              | Payload                                                     |     |     |
+|--------------------|-------------------------------------------------------------|-----|-----|
 | startGame          | {id: String, gameID: String}                                |
 | finishGame         | {id: String, gameID: String, result: String}                |     |     |
 | closeGame          | {id: String, gameID: String}                                |     |     |
@@ -434,13 +434,13 @@ storyManager.on(eventName, (payload) => {
 ## Goods events
 
 | Event            | Payload       |     |     |
-| ---------------- | ------------- | --- | --- |
+|------------------|---------------|-----|-----|
 | goodItemSelected | {sku: String} |     |     |
 
 ## Share events
 
 | Event        |     |     |     |
-| ------------ | --- | --- | --- |
+|--------------|-----|-----|-----|
 | customShare  |     |     |     |
 | onActionWith |     |     |     |
 
