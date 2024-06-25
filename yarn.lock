@@ -2056,6 +2056,8 @@ __metadata:
     react: 18.2.0
     react-native: 0.74.2
     react-native-builder-bob: ^0.20.0
+    react-native-simple-toast: ^3.3.1
+    react-native-video: ^6.3.0
     release-it: ^15.0.0
     turbo: ^1.10.7
     typescript: ^5.2.2
@@ -11570,7 +11572,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-video@npm:^6.2.0":
+"react-native-video@npm:^6.2.0, react-native-video@npm:^6.3.0":
   version: 6.3.0
   resolution: "react-native-video@npm:6.3.0"
   peerDependencies:
