@@ -61,6 +61,7 @@
   },
   "homepage": "https://github.com/inappstory/react-native-sdk-v2#readme",
   "publishConfig": {
+    "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
   "devDependencies": {
