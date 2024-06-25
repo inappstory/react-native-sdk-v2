@@ -71,7 +71,7 @@ export const useStore = create<StoreState>((set) => ({
               (f) => f.storyID == storyID
             );
             if (storyFromList) {
-              state[`feeds_default_favorites`].unshift(storyFromList);
+              state.feeds_default_favorites.unshift(storyFromList);
             } else {
               console.error('failed to find story');
             }

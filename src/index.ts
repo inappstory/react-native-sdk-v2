@@ -4,6 +4,7 @@ import InAppStorySDK from 'react-native-inappstory-sdk';
 import { StoriesList } from './stories/StoriesList';
 import { useStore } from './hooks/useStore';
 import deepmerge from 'deepmerge';
+import parseSides from 'parse-css-sides';
 
 export {
   StoriesList,
@@ -123,7 +124,7 @@ export declare class StoriesListViewModel {
 
   reload(): Promise<ListLoadStatus>;
 
-  // get storiesListDimensions(): StoriesListDimensions;
+  // public get storiesListDimensions(): StoriesListDimensions;
 }
 export declare class AppearanceManagerV1 {
   public setCommonOptions(
@@ -432,77 +433,51 @@ export class AppearanceManager {
     );
     return this;
   }
-  setStoriesListOptions(
-    options: Partial<{
-      title: Partial<{
-        content: string;
-        color: string;
-        font: string;
-        fontSize: number;
-        marginBottom: number;
-      }>;
-      card: Partial<{
-        title: Partial<{
-          color: string;
-          padding: string | number;
-          font: string;
-          display: boolean;
-          fontSize: number;
-          textAlign: StoriesListCardTitleTextAlign;
-          position: StoriesListCardTitlePosition;
-          lineClamp: number;
-        }>;
-        gap: number;
-        height: number;
-        variant: StoriesListCardViewVariant;
-        border: Partial<{
-          radius: number;
-          color: string;
-          width: number;
-          gap: number;
-        }>;
-        boxShadow: Option<string>;
-        dropShadow: Option<string>;
-        opacity: Option<number>;
-        mask: Partial<{ color: Option<string> }>;
-        opened: Partial<{
-          border: Partial<{
-            radius: Option<number>;
-            color: Option<string>;
-            width: Option<number>;
-            gap: Option<number>;
-          }>;
-          boxShadow: Option<string>;
-          dropShadow: Option<string>;
-          opacity: Option<number>;
-          mask: Partial<{ color: Option<string> }>;
-        }>;
-      }>;
-      favoriteCard: StoriesListFavoriteCardOptions;
-      layout: Partial<{
-        storiesListInnerHeight: number | null;
-        height: number;
-        backgroundColor: string;
-        sliderAlign: StoriesListSliderAlign;
-      }>;
-      sidePadding: number;
-      topPadding: number;
-      bottomPadding: number;
-      bottomMargin: number;
-      navigation: Partial<{
-        showControls: boolean;
-        controlsSize: number;
-        controlsBackgroundColor: string;
-        controlsColor: string;
-      }>;
-      extraCss: string;
-      handleStoryLinkClick: (payload: StoriesListClickEvent) => void;
-      handleStartLoad: (loaderContainer: HTMLElement) => void;
-      handleStopLoad: (loaderContainer: HTMLElement) => void;
-    }>
-  ) {
+  setStoriesListOptions(options: StoriesListOptions) {
     this.storiesListOptions = deepmerge(this.storiesListOptions, options);
+    this.storiesListOptions = this.proccessCardTitlePadding(
+      this.storiesListOptions
+    );
     return this;
+  }
+
+  private proccessCardTitlePadding(
+    storiesListOptions: StoriesListOptions
+  ): StoriesListOptions {
+    const cardTitleOptions = storiesListOptions.card?.title;
+    const cardTitlePadding = cardTitleOptions?.padding;
+
+    let cardTitlePaddingParsed = {
+      paddingTop: 0,
+      paddingRight: 0,
+      paddingBottom: 0,
+      paddingLeft: 0,
+    };
+    try {
+      if (typeof cardTitlePadding === 'number') {
+        cardTitlePaddingParsed.paddingTop = cardTitlePadding;
+        cardTitlePaddingParsed.paddingRight = cardTitlePadding;
+        cardTitlePaddingParsed.paddingBottom = cardTitlePadding;
+        cardTitlePaddingParsed.paddingLeft = cardTitlePadding;
+      } else {
+        const sides = parseSides(cardTitlePadding ?? '0px');
+        cardTitlePaddingParsed.paddingTop = parseFloat(sides.top);
+        cardTitlePaddingParsed.paddingRight = parseFloat(sides.right);
+        cardTitlePaddingParsed.paddingBottom = parseFloat(sides.bottom);
+        cardTitlePaddingParsed.paddingLeft = parseFloat(sides.left);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    if (!storiesListOptions.card) {
+      storiesListOptions.card = {};
+    }
+    if (!storiesListOptions.card.title) {
+      storiesListOptions.card.title = {};
+    }
+    // @ts-ignore
+    storiesListOptions.card.title.padding = cardTitlePaddingParsed;
+    return storiesListOptions;
   }
 }
 export declare type AppearanceCommonOptions = Partial<{
@@ -616,6 +591,7 @@ export declare type StoriesListCardOptions = Partial<{
     position: StoriesListCardTitlePosition;
     lineClamp: number;
   }>;
+  aspectRatio: number;
   gap: number;
   height: number;
   variant: StoriesListCardViewVariant;

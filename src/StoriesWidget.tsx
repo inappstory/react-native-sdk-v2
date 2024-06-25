@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { PixelRatio, Platform, UIManager, findNodeHandle } from 'react-native';
 import { InAppStoryFavorites, InappstorySdkViewManager } from './ViewManager';
 

@@ -8,6 +8,7 @@ import {
   Platform,
 } from 'react-native';
 import Video from 'react-native-video';
+import { AppearanceManager, StoryManager } from '../index';
 
 export const StoryComponent = ({
   story,
@@ -18,15 +19,19 @@ export const StoryComponent = ({
   hideTitle,
   renderCell,
   hideBorder,
+  isFirstItem = false,
+  isLastItem = false,
 }: {
   story: any;
-  appearanceManager: any;
-  storyManager: any;
+  appearanceManager: AppearanceManager;
+  storyManager: StoryManager;
   onPress: any;
   cellSize?: any;
   hideTitle?: any;
   renderCell?: any;
   hideBorder?: any;
+  isFirstItem?: boolean;
+  isLastItem?: boolean;
 }) => {
   const size = cellSize || appearanceManager?.storiesListOptions.card.height;
   const borderRadius =
@@ -34,36 +39,52 @@ export const StoryComponent = ({
   const cardOpenedStyles = story.opened
     ? appearanceManager?.storiesListOptions.card.opened
     : appearanceManager?.storiesListOptions.card;
-  const storyWidth = size * story.aspectRatio;
+  const storyWidth =
+    size *
+    (appearanceManager?.storiesListOptions.card.aspectRatio ??
+      story.aspectRatio);
   const storyHeight = size;
+
+  const mediaWidth =
+    storyWidth -
+    (cardOpenedStyles.border.gap * 2 + cardOpenedStyles.border.width);
+  const mediaHeight =
+    storyHeight -
+    (cardOpenedStyles.border.gap * 2 + cardOpenedStyles.border.width);
+
   const styles = StyleSheet.create({
-    image: {
-      width: storyWidth,
-      height: storyHeight,
+    coverOverlay: {
+      width: mediaWidth,
+      height: mediaHeight,
       borderRadius: borderRadius,
+      backgroundColor:
+        appearanceManager?.storiesListOptions.card.mask.color ?? 'transparent',
+      position: 'absolute',
     },
-    video: {
-      width: storyWidth,
-      height: storyHeight,
+    cover: {
+      backgroundColor: story.backgroundColor,
+      width: mediaWidth,
+      height: mediaHeight,
       borderRadius: borderRadius,
     },
     title: {
       textAlign:
         appearanceManager?.storiesListOptions.card.title.textAlign || 'center',
-      paddingHorizontal: 5,
-      paddingVertical: 5,
-      width: '100%',
+      ...appearanceManager?.storiesListOptions.card.title.padding,
+      width: storyWidth,
       //backgroundColor: 'rgba(255,255,255,0.1)',
     },
   });
 
+  const coverOverlay = <View style={styles.coverOverlay} />;
+
   const cover = story.coverVideoPath ? (
-    <View style={[styles.video, { borderRadius }]}>
+    <View style={[styles.cover, { borderRadius }]}>
       <Video
         source={{
           uri: (Platform.OS === 'android' ? '' : '') + story?.coverVideoPath,
         }}
-        style={[styles.video, { borderRadius, overflow: 'hidden' }]}
+        style={[styles.cover, { borderRadius, overflow: 'hidden' }]}
         repeat={true}
         volume={0}
         resizeMode={'cover'}
@@ -73,16 +94,24 @@ export const StoryComponent = ({
         useTextureView={false}
         disableFocus={true}
       />
+      {coverOverlay}
     </View>
   ) : story.coverImagePath ? (
-    <Image
-      source={{
-        uri:
-          (Platform.OS == 'android' ? 'file://' : '') + story?.coverImagePath,
-      }}
-      style={[styles.image, { borderRadius }]}
-    />
-  ) : null;
+    <View style={[styles.cover, { borderRadius }]}>
+      <Image
+        resizeMode={'cover'}
+        source={{
+          uri:
+            (Platform.OS == 'android' ? 'file://' : '') + story?.coverImagePath,
+        }}
+        style={[styles.cover, { borderRadius }]}
+      />
+      {coverOverlay}
+    </View>
+  ) : (
+    <View style={styles.cover}>{coverOverlay}</View>
+  );
+
   let title = story.title;
   if (storyManager.placeholders) {
     Object.keys(storyManager.placeholders).map((placeholder) => {
@@ -109,6 +138,8 @@ export const StoryComponent = ({
     'cardInsideBottom';
   const titleBox = !hideTitle ? (
     <Text
+      numberOfLines={appearanceManager?.storiesListOptions.card.title.lineClamp}
+      ellipsizeMode="tail"
       style={[
         styles.title,
         {
@@ -124,9 +155,9 @@ export const StoryComponent = ({
             appearanceManager?.storiesListOptions.card.title.fontFamily,
           lineHeight:
             appearanceManager?.storiesListOptions.card.title.lineHeight,
-          //height:
-          //appearanceManager?.storiesListOptions.card.title.lineHeight * 4,
+          // height: appearanceManager?.storiesListOptions.card.title.lineHeight * appearanceManager?.storiesListOptions.card.title.lineClamp,
           position: cardInsideBottom ? 'absolute' : 'relative',
+          bottom: cardInsideBottom ? 0 : 'auto',
           alignItems: 'flex-end',
           justifyContent: 'flex-end',
           height: cellSize,
@@ -137,20 +168,28 @@ export const StoryComponent = ({
     </Text>
   ) : null;
 
+  let paddingLeft = 0;
+  let paddingRight = 0;
+  if (!cellSize) {
+    if (isFirstItem) {
+      paddingLeft = appearanceManager?.storiesListOptions.sidePadding;
+    } else if (isLastItem) {
+      paddingRight = appearanceManager?.storiesListOptions.sidePadding;
+    }
+  } else {
+    paddingLeft = paddingRight = 2;
+  }
+
   return (
     <Pressable
       style={{
+        // height: appearanceManager?.storiesListOptions.layout.storiesListInnerHeight ?? '100%',
         flexDirection: 'column',
-        paddingHorizontal: !cellSize
-          ? appearanceManager?.storiesListOptions.sidePadding
-          : 2,
+        paddingLeft,
+        paddingRight,
         opacity: cardOpenedStyles.opacity || 1,
-        paddingTop: !cellSize
-          ? appearanceManager?.storiesListOptions.topPadding
-          : 1,
-        paddingBottom: !cellSize
-          ? appearanceManager?.storiesListOptions.bottomPadding
-          : 0,
+        paddingTop: cellSize ? 1 : 0,
+        paddingBottom: 0,
       }}
       onPress={() => onPress(story)}
     >
@@ -159,18 +198,11 @@ export const StoryComponent = ({
         style={{
           borderWidth: !hideBorder ? cardOpenedStyles.border.width : 0,
           borderColor: cardOpenedStyles.border.color,
-          width:
-            storyWidth +
-            cardOpenedStyles.border.gap * 2 +
-            cardOpenedStyles.border.width,
-          height:
-            storyHeight +
-            cardOpenedStyles.border.gap * 2 +
-            cardOpenedStyles.border.width,
+          width: storyWidth,
+          height: storyHeight,
           borderRadius: borderRadius + cardOpenedStyles.border.gap,
-          justifyContent: 'flex-end',
-          //alignItems: 'center',
-          backgroundColor: story.backgroundColor,
+          justifyContent: 'center',
+          alignItems: 'center',
         }}
       >
         {cover}

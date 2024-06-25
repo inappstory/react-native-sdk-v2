@@ -63,9 +63,7 @@ export function RNWelcome({
               (storiesListViewModel.current = viewModel)
             }
           />
-          {
-            // eslint-disable-next-line react-native/no-inline-styles
-          }
+          {}
           <View style={{ height: 32 }} />
           <Button
             containerStyle={styles.buttonContainer}

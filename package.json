@@ -43,7 +43,18 @@
     "type": "git",
     "url": "git+https://github.com/inappstory/react-native-sdk-v2.git"
   },
-  "author": "Michail Strokin <mstrokin@gmail.com> (https://github.com/mstrokin)",
+  "author": "InAppStory",
+  "contributors": [
+    {
+      "name": "Michail Strokin",
+      "email": "mstrokin@gmail.com",
+      "url": "https://github.com/mstrokin"
+    },
+    {
+      "name": "Artem Strebizh",
+      "email": "artem.strebizh@kiozk.ru"
+    }
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/inappstory/react-native-sdk-v2/issues"
@@ -79,7 +90,9 @@
   },
   "peerDependencies": {
     "react": "*",
-    "react-native": "*"
+    "react-native": "*",
+    "react-native-simple-toast": "^3.3.1",
+    "react-native-video": "^6.2.0"
   },
   "workspaces": [
     "example"
@@ -159,10 +172,8 @@
     ]
   },
   "dependencies": {
-    "@devvie/bottom-sheet": "^0.3.0",
     "deepmerge": "^4.3.1",
-    "react-native-simple-toast": "^3.3.1",
-    "react-native-video": "^6.2.0",
+    "parse-css-sides": "^3.0.1",
     "zustand": "^4.5.2"
   }
 }

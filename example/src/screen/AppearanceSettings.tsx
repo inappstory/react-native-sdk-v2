@@ -22,7 +22,7 @@ export function AppearanceSettingsScreen(): React.ReactNode {
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
             flex: 1,
           }}
-        ></View>
+        />
       </Animated.ScrollView>
     </SafeAreaView>
   );

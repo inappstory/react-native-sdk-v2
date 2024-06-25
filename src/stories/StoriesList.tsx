@@ -1,14 +1,15 @@
 import React from 'react';
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import InAppStorySDK from 'react-native-inappstory-sdk';
 import { StoriesCarousel } from './StoriesCarousel';
 import { useStore } from '../hooks/useStore';
 import { useEvents } from '../hooks/useEvents';
+import { AppearanceManager, StoryManager } from '../index';
 
 export const StoriesList = ({
   storyManager,
   appearanceManager,
-  feed,
+  feed = 'default',
   onLoadStart,
   onLoadEnd,
   viewModelExporter,
@@ -17,8 +18,8 @@ export const StoriesList = ({
   renderCell,
   vertical,
 }: {
-  storyManager?: any;
-  appearanceManager?: any;
+  storyManager: StoryManager;
+  appearanceManager: AppearanceManager;
   feed?: any;
   onLoadStart?: any;
   onLoadEnd?: any;
@@ -61,6 +62,11 @@ export const StoriesList = ({
       reload: () => {
         fetchFeed();
       },
+      // get storiesListDimensions(): StoriesListDimensions {
+      //   return {
+      //     totalHeight: appearanceManager.storiesListOptions.layout.height,
+      //   }
+      // }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -77,7 +83,7 @@ export const StoriesList = ({
   }, []);
   const onFavoritePress = React.useCallback(
     (story) => {
-      if (typeof story == 'string') {
+      if (typeof story === 'string') {
         storyManager.onFavoriteCell(feed);
       } else {
         InAppStorySDK.selectFavoriteStoryCellWith(String(story.storyID));
@@ -86,8 +92,15 @@ export const StoriesList = ({
     [feed, storyManager]
   );
 
+  const styles = StyleSheet.create({
+    storyList: {
+      paddingTop: appearanceManager?.storiesListOptions.topPadding,
+      paddingBottom: appearanceManager?.storiesListOptions.bottomPadding,
+    },
+  });
+
   return (
-    <View>
+    <View style={styles.storyList}>
       <StoriesCarousel
         feed={feed}
         stories={feedEvents}

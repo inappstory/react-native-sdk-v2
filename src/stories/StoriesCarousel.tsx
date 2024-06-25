@@ -3,6 +3,7 @@ import { View, Platform } from 'react-native';
 import { StoryComponent } from './StoryComponent';
 import { FlatList, Pressable } from 'react-native';
 import InAppStorySDK from 'react-native-inappstory-sdk';
+import { AppearanceManager, StoryManager } from '../index';
 
 export const StoriesCarousel = ({
   feed,
@@ -19,8 +20,8 @@ export const StoriesCarousel = ({
 }: {
   feed: any;
   stories: any;
-  storyManager: any;
-  appearanceManager: any;
+  storyManager: StoryManager;
+  appearanceManager: AppearanceManager;
   onPress: any;
   showFavorites: any;
   favoriteStories: any;
@@ -31,8 +32,8 @@ export const StoriesCarousel = ({
 }) => {
   const visibleIds = React.useRef<any>([]);
   const flatListRef = React.useRef<any>(null);
-  const renderItem = (item) => {
-    const story = item.item;
+  const renderItem = ({ item, index }) => {
+    const story = item;
     if (!story.favorites) {
       return (
         <StoryComponent
@@ -42,15 +43,18 @@ export const StoriesCarousel = ({
           appearanceManager={appearanceManager}
           onPress={!favoritesOnly ? onPress : onFavoritePress}
           renderCell={renderCell}
+          isFirstItem={index === 0}
+          isLastItem={index === datasource.length - 1}
         />
       );
     } else {
       return (
         <Pressable
           style={{
-            width: appearanceManager?.storiesListOptions.card.height + 10,
+            width: appearanceManager?.storiesListOptions.card.height + 30,
             height: appearanceManager?.storiesListOptions.card.height,
-            paddingTop: appearanceManager?.storiesListOptions.topPadding,
+            // paddingTop: appearanceManager?.storiesListOptions.topPadding,
+            paddingRight: appearanceManager?.storiesListOptions.sidePadding,
             flexWrap: 'wrap',
             flexDirection: 'row',
             flex: 1,
@@ -85,7 +89,7 @@ export const StoriesCarousel = ({
         style={{
           height: appearanceManager?.storiesListOptions.card.height + 7,
         }}
-      ></View>
+      />
     );
   const onViewableItemsChanged = (items) => {
     const newIDs = items.changed
@@ -100,27 +104,34 @@ export const StoriesCarousel = ({
       InAppStorySDK.setVisibleWith(newIDs);
     }
   };
+  let datasource: any = [];
+  if (favoritesOnly) {
+    datasource = favoriteStories;
+  } else {
+    if (!showFavorites || !favoriteStories?.length) {
+      datasource = stories;
+    } else {
+      datasource = [...stories, { favorites: favoriteStories.slice(0, 4) }];
+    }
+  }
   return (
-    <>
-      <FlatList
-        horizontal={horizontal}
-        data={
-          !favoritesOnly
-            ? !showFavorites || !favoriteStories?.length
-              ? stories
-              : [...stories, { favorites: favoriteStories.slice(0, 4) }]
-            : favoriteStories
-        }
-        renderItem={renderItem}
-        onViewableItemsChanged={onViewableItemsChanged}
-        showsHorizontalScrollIndicator={false}
-        keyExtractor={(item, _index) => item.storyID}
-        ref={flatListRef}
-        onEndReached={() => {
-          if (Platform.OS === 'android') flatListRef?.current?.scrollToEnd();
-        }}
-      />
-    </>
+    <FlatList
+      horizontal={horizontal}
+      data={datasource}
+      renderItem={renderItem}
+      contentContainerStyle={{
+        gap: appearanceManager.storiesListOptions.card.gap,
+      }}
+      // numColumns={2}
+      // columnWrapperStyle={{ gap: appearanceManager.storiesListOptions.card.gap }}
+      onViewableItemsChanged={onViewableItemsChanged}
+      showsHorizontalScrollIndicator={false}
+      keyExtractor={(item, _index) => item.storyID}
+      ref={flatListRef}
+      onEndReached={() => {
+        if (Platform.OS === 'android') flatListRef?.current?.scrollToEnd();
+      }}
+    />
   );
 };
 
