@@ -13,7 +13,10 @@ import { AppearanceSettingsScreen } from './screen/AppearanceSettings';
 import { appearanceManager, storyManager } from './services/StoryService';
 import BottomSheet, { type BottomSheetMethods } from '@devvie/bottom-sheet';
 import { View } from 'react-native';
-import { StoriesList, StoriesListViewModel } from 'react-native-inappstory-sdk';
+import {
+  StoriesList,
+  StoriesListViewModel,
+} from '@inappstory/react-native-sdk';
 
 const Stack = createNativeStackNavigator();
 

@@ -19,7 +19,7 @@ import Animated, {
 import { Slider } from '@miblanchard/react-native-slider';
 import ColorPicker from 'react-native-wheel-color-picker';
 //import DropDownPicker from 'react-native-dropdown-picker';
-import InAppStorySDK from 'react-native-inappstory-sdk';
+import InAppStorySDK from '@inappstory/react-native-sdk';
 import SelectDropdown from 'react-native-select-dropdown';
 function DropdownElement({
   items,

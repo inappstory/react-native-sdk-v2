@@ -5,7 +5,7 @@ import {
   StoriesList,
   type ListLoadStatus,
   type StoriesListViewModel,
-} from 'react-native-inappstory-sdk';
+} from '@inappstory/react-native-sdk';
 
 import ContentLoader, { Rect } from 'react-content-loader/native';
 

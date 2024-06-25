@@ -1,17 +1,17 @@
-# react-native-inappstory-sdk
+# @inappstory/react-native-sdk
 
 Wrapper for InAppStory
 
 ## Installation
 
 ```sh
-npm install react-native-inappstory-sdk
+npm install @inappstory/react-native-sdk
 ```
 
 or
 
 ```sh
-yarn add react-native-inappstory-sdk
+yarn add @inappstory/react-native-sdk
 ```
 
 ## iOS Requirements
@@ -58,7 +58,7 @@ import {
   StoryReaderSwipeStyle,
   StoriesListCardTitleTextAlign,
   type StoryManagerConfig,
-} from 'react-native-inappstory-sdk';
+} from '@inappstory/react-native-sdk';
 
 import { Linking } from 'react-native';
 const storyManagerConfig: StoryManagerConfig = {
@@ -221,10 +221,10 @@ export const appearanceManager = createAppearanceManager();
 To display feed, use StoriesList component. **storiesListViewModel** allows to reload the story feed using **storiesListViewModel.current.reload()**.
 
 ```js
-import { StoriesList } from 'react-native-inappstory-sdk';
+import { StoriesList } from '@inappstory/react-native-sdk';
 import {
   type StoriesListViewModel,
-} from 'react-native-inappstory-sdk';
+} from '@inappstory/react-native-sdk';
 ...
 const storiesListViewModel = React.useRef<StoriesListViewModel>();
 const viewModelExporter = React.useCallback(

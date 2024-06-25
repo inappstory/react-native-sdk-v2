@@ -19,11 +19,11 @@ import React, { useCallback, useRef } from 'react';
 import Button from 'react-native-button';
 
 import { Colors } from 'react-native/Libraries/NewAppScreen';
-import { type StoriesListViewModel } from 'react-native-inappstory-sdk';
+import { type StoriesListViewModel } from '@inappstory/react-native-sdk';
 
 import { StoryListComponent } from '../components/StoryListComponent';
 import { storyManager } from '../services/StoryService';
-import InAppStorySDK from 'react-native-inappstory-sdk';
+import InAppStorySDK from '@inappstory/react-native-sdk';
 
 export function MainScreen({
   navigation,

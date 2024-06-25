@@ -16,7 +16,7 @@ import Animated, {
   useAnimatedScrollHandler,
 } from 'react-native-reanimated';
 import Button from 'react-native-button';
-import { type StoriesListViewModel } from 'react-native-inappstory-sdk';
+import { type StoriesListViewModel } from '@inappstory/react-native-sdk';
 
 export function RNWelcome({
   route,

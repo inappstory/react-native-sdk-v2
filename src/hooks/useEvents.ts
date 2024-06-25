@@ -3,7 +3,7 @@ import * as React from 'react';
 
 import { NativeEventEmitter, NativeModules, Linking } from 'react-native';
 import { useStore } from './useStore';
-import InAppStorySDK from 'react-native-inappstory-sdk';
+import InAppStorySDK from '@inappstory/react-native-sdk';
 import Toast from 'react-native-simple-toast';
 var init = false;
 export const useEvents = () => {

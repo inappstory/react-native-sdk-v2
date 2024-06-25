@@ -7,7 +7,7 @@ import {
   StoryReaderSwipeStyle,
   StoriesListCardTitleTextAlign,
   type StoryManagerConfig,
-} from 'react-native-inappstory-sdk';
+} from '@inappstory/react-native-sdk';
 
 import { Linking, Platform } from 'react-native';
 import Toast from 'react-native-simple-toast';

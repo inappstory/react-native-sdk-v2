@@ -1,6 +1,6 @@
 //import './wdyr';
 import { NativeEventEmitter, NativeModules } from 'react-native';
-import InAppStorySDK from 'react-native-inappstory-sdk';
+import InAppStorySDK from '@inappstory/react-native-sdk';
 import { StoriesList } from './stories/StoriesList';
 import { useStore } from './hooks/useStore';
 import deepmerge from 'deepmerge';

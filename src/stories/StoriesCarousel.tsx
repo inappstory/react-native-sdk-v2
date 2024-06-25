@@ -2,7 +2,7 @@ import * as React from 'react';
 import { View, Platform } from 'react-native';
 import { StoryComponent } from './StoryComponent';
 import { FlatList, Pressable } from 'react-native';
-import InAppStorySDK from 'react-native-inappstory-sdk';
+import InAppStorySDK from '@inappstory/react-native-sdk';
 import { AppearanceManager, StoryManager } from '../index';
 
 export const StoriesCarousel = ({

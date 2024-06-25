@@ -4,7 +4,7 @@ import { useEvents } from '../hooks/useEvents';
 import { View } from 'react-native';
 import BottomSheet, { type BottomSheetMethods } from '@devvie/bottom-sheet';
 import { StoriesList } from '../stories/StoriesList';
-import { StoriesListViewModel } from 'react-native-inappstory-sdk';
+import { StoriesListViewModel } from '@inappstory/react-native-sdk';
 
 export const InAppStoryContext = createContext({
   tags: [],

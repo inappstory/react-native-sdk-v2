@@ -23,7 +23,7 @@ import {
   useCameraDevice,
 } from 'react-native-vision-camera';
 import Button from 'react-native-button';
-import InAppStorySDK from 'react-native-inappstory-sdk';
+import InAppStorySDK from '@inappstory/react-native-sdk';
 import { storyManager } from '../services/StoryService';
 import type { NavigationProp, RouteProp } from '@react-navigation/native';
 function extractParamsFromQR(code: string) {

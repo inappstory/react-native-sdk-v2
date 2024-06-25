@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import InAppStorySDK from 'react-native-inappstory-sdk';
+import InAppStorySDK from '@inappstory/react-native-sdk';
 import { StoriesCarousel } from './StoriesCarousel';
 import { useStore } from '../hooks/useStore';
 import { useEvents } from '../hooks/useEvents';
