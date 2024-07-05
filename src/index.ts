@@ -86,7 +86,7 @@ export enum StoryReaderCloseButtonPosition {
 export type StoriesListDimensions = {
   totalHeight: number;
 };
-declare type StoryManagerConfig = {
+export declare type StoryManagerConfig = {
   apiKey: string;
   userId?: Option<string | number>;
   tags?: Option<Array<string>>;
