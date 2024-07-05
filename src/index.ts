@@ -342,6 +342,9 @@ export class StoryManager {
       });
     });
   }
+  async closeStoryReader() {
+    return InAppStorySDK.closeReader();
+  }
   showGame(id: string) {
     return InAppStorySDK.showGame(id);
   }
