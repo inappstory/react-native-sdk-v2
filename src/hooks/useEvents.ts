@@ -1,11 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import * as React from 'react';
 
-import { NativeEventEmitter, NativeModules, Linking } from 'react-native';
+import { NativeEventEmitter, NativeModules } from 'react-native';
 import { useStore } from './useStore';
 import InAppStorySDK from '@inappstory/react-native-sdk';
-import Toast from 'react-native-simple-toast';
-var init = false;
+let init = false;
 export const useEvents = () => {
   const addEvent = useStore((state) => state.addEvent);
   const addToFeed = useStore((state) => state.addToFeed);
@@ -79,19 +78,6 @@ export const useEvents = () => {
     ].forEach((eventName) => {
       eventListeners.push(
         eventEmitter.addListener(eventName, async (event) => {
-          if (eventName == 'clickOnButton') {
-            try {
-              const supported = await Linking.canOpenURL(event.url);
-
-              if (!supported) {
-                Toast.show(`Failed to open the URL: ${event.url}`, 3);
-              }
-              Linking.openURL(event.url);
-            } catch (error) {
-              Toast.show(`Failed to open the URL: ${event.url}`, 3);
-            }
-            InAppStorySDK.closeReader();
-          }
           if (eventName == 'storyReaderWillShow') {
             setReaderOpen(true);
           }

@@ -1,10 +1,11 @@
 //import './wdyr';
-import { NativeEventEmitter, NativeModules } from 'react-native';
+import { Linking, NativeEventEmitter, NativeModules } from 'react-native';
 import InAppStorySDK from '@inappstory/react-native-sdk';
 import { StoriesList } from './stories/StoriesList';
 import { useStore } from './hooks/useStore';
 import deepmerge from 'deepmerge';
 import parseSides from 'parse-css-sides';
+import { isFunction } from './helpers/isFunction';
 
 export {
   StoriesList,
@@ -167,6 +168,26 @@ export type ListLoadStatus = {
   }>;
 };
 
+export enum CTASource {
+  STORY_LIST = 'storyList',
+  STORY_READER = 'storyReader',
+  GAME_READER = 'gameReader',
+}
+
+export type CTAGameReaderPayload = { url: string; gameInstanceId: string };
+export type CTAStoryReaderPayload = {
+  id: number;
+  index: number;
+  url: string;
+  elementId: string;
+};
+export type CTAStoryListPayload = {
+  id: number;
+  index: number;
+  isDeeplink: boolean;
+  url: string | undefined;
+};
+
 const eventEmitter = new NativeEventEmitter(
   NativeModules.RNInAppStorySDKModule
 );
@@ -218,6 +239,16 @@ export class StoryManager {
     }
     eventEmitter.addListener('getGoodsObject', (event) => {
       this.fetchGoods(event.skus);
+    });
+
+    eventEmitter.addListener('clickOnButton', (event) => {
+      const payload: CTAStoryReaderPayload = {
+        id: event.id,
+        url: event.url,
+        index: 0,
+        elementId: '',
+      };
+      this.clickOnButtonAction({ src: CTASource.STORY_READER, payload });
     });
   }
   async fetchGoods(skus: string[]) {
@@ -372,6 +403,48 @@ export class StoryManager {
       });
     });
   }
+
+  protected _callbacks: Dict<any> = {};
+
+  public set storyLinkClickHandler(callback: Function) {
+    if (isFunction(callback)) {
+      this._callbacks.storyLinkClickHandler = callback;
+    }
+  }
+
+  protected async defaultLinking(url?: string) {
+    if (url) {
+      try {
+        const supported = await Linking.canOpenURL(url);
+        if (supported) {
+          Linking.openURL(url);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  }
+
+  private clickOnButtonAction = ({
+    src,
+    payload,
+  }: {
+    src: CTASource;
+    payload: CTAStoryListPayload | CTAStoryReaderPayload | CTAGameReaderPayload;
+  }) => {
+    if (isFunction(this._callbacks.storyLinkClickHandler)) {
+      const cbPayload = { src, srcRef: 'default', data: payload };
+      try {
+        if (isFunction(this._callbacks.storyLinkClickHandler)) {
+          this._callbacks.storyLinkClickHandler(cbPayload);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    } else {
+      this.defaultLinking(payload.url);
+    }
+  };
 }
 export class AppearanceManager {
   hasLike = true;
