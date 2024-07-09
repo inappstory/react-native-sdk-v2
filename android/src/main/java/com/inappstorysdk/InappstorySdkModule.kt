@@ -215,7 +215,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                 mutableMapOf(
                     "skus" to skus,
                 ) as Map<String, Any>)
-            sendEvent(reactContext,"getGoodsObject", payload) 
+            sendEvent(reactContext,"getGoodsObject", payload)
             val handler = Handler()
             val runnableCode: Runnable = Runnable {
                 if (that.goodsCache.size > 0) {
@@ -227,7 +227,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
             }
             handler.post(runnableCode)
 
-            
+
         }
 
         override fun onItemClick(
@@ -239,7 +239,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                 mutableMapOf(
                     "sku" to goodsItemData.sku,
                 ) as Map<String, Any>)
-            sendEvent(reactContext,"goodItemSelected", payload)            
+            sendEvent(reactContext,"goodItemSelected", payload)
             callback.onClose()
             InAppStoryManager.closeStoryReader()
             return;
@@ -264,7 +264,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                         },
                         "feed" to story?.feed,
                         "id" to story?.id
-                        
+
                     ) as Map<String, Any>)
                 sendEvent(reactContext,"showStory", payload)
             }
@@ -279,7 +279,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                         mutableMapOf(
                             "id" to slide?.story?.id,
                             "index" to slide?.index
-                            
+
                         ) as Map<String, Any>)
                 sendEvent(reactContext,"showSlide", payload)
             }
@@ -302,13 +302,13 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                             },
                             "feed" to slide?.story?.feed,
                             "id" to slide?.story?.id
-                            
+
                         ) as Map<String, Any>)
                 sendEvent(reactContext,"closeStory", payload)
             }
         }
     )
-    
+
     this.ias?.setCallToActionCallback(
         object : CallToActionCallback {
             override fun callToAction(
@@ -329,12 +329,18 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                                 "index" to slide?.index,
                                 "id" to slide?.story?.id,
                                 "url" to url
-                                
+
                             ) as Map<String, Any>)
 
                 Log.d("InappstorySdkModule","callToAction slide = $slide url = $url action= $action");
-                sendEvent(reactContext,"clickOnButton", payload)
-                //InAppStoryManager.closeStoryReader()
+                // currently not work two sendEvent simultaneously
+                //if (action == ClickAction.BUTTON) {
+                    // just event
+                    //sendEvent(reactContext, "clickOnButton", payload)
+                //}
+                // CTA(link) handler
+                sendEvent(reactContext, "handleCTA", payload)
+
             }
         }
     )
@@ -350,7 +356,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                         "index" to slide?.index,
                         "storyID" to slide?.story?.id,
                         "favorite" to value
-                        
+
                     ) as Map<String, Any>)
                 sendEvent(reactContext,"favoriteStory", payload)
             }
@@ -368,7 +374,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                             "index" to slide?.index,
                             "id" to slide?.story?.id,
                             "value" to value
-                            
+
                         ) as Map<String, Any>)
                 sendEvent(reactContext,"likeStory", payload)
             }
@@ -383,7 +389,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                             "index" to slide?.index,
                             "id" to slide?.story?.id,
                             "value" to value
-                            
+
                         ) as Map<String, Any>)
                 sendEvent(reactContext,"dislikeStory", payload)
             }
@@ -399,7 +405,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                             "feed" to slide?.story?.feed,
                             "index" to slide?.index,
                             "id" to slide?.story?.id
-                            
+
                         ) as Map<String, Any>)
                 sendEvent(reactContext,"clickOnShareStory", payload)
                 Log.d("InappstorySdkModule","clickOnShareStory slide = $slide");
@@ -413,7 +419,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                         mutableMapOf(
                             "count" to count,
                             "feed" to feed,
-                            
+
                         ) as Map<String, Any>)
                 sendEvent(reactContext,"onboardingLoad", payload)
                 Log.d("InappstorySdkModule","onboardingLoad count = $count, feed = $feed");
@@ -427,7 +433,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                         mutableMapOf(
                             "id" to story?.id,
                             "feed" to story?.feed,
-                            
+
                         ) as Map<String, Any>)
                 sendEvent(reactContext,"singleLoad", payload)
                 Log.d("InappstorySdkModule","singleLoad story = $story");
@@ -642,7 +648,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
     val list: ArrayList<String> = tags.toArrayList() as ArrayList<String>
     this.ias?.setTags(list)
   }
-  
+
   @ReactMethod
   fun setPlaceholders(placeholders: ReadableMap) {
       Log.d("InappstorySdkModule", "setPlaceholders $placeholders")
@@ -749,7 +755,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
       if (value == "bottomRight") {
         this.appearanceManager?.csClosePosition(4)
       }
-      
+
   }
 
   @ReactMethod
@@ -796,7 +802,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
       ///this.ias?.removeTags(tags)
   }
 
-  
+
 
   @ReactMethod
   fun getFavoritesCount() {
@@ -822,7 +828,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
       //TODO
   }
 
-  
+
   @ReactMethod
   fun setTimerGradient() {
       Log.d("InappstorySdkModule", "setTimerGradient")
@@ -841,7 +847,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
       //TODO
   }
 
-  
+
 
   @ReactMethod
   fun setCoverQuality() {
@@ -1011,7 +1017,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
             null,
             true,
             null,
-            sandbox, 
+            sandbox,
         )
         this.ias?.let {
             val f1: Field = it.javaClass.getDeclaredField("sendStatistic")
@@ -1079,11 +1085,11 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                             "aspectRatio" to aspectRatio
                         ) as Map<String, Any>)
                     Log.e(TAG, "Item = $item")
-                    
+
                     storiesList.add(storyData)
                 }
 
-               /* val action = 
+               /* val action =
 
                 val actionArray = Arguments.makeNativeArray(listOf(action))
 

@@ -169,6 +169,7 @@ export type ListLoadStatus = {
 };
 
 export enum CTASource {
+  UNKNOWN = 'unknown',
   STORY_LIST = 'storyList',
   STORY_READER = 'storyReader',
   GAME_READER = 'gameReader',
@@ -241,14 +242,43 @@ export class StoryManager {
       this.fetchGoods(event.skus);
     });
 
-    eventEmitter.addListener('clickOnButton', (event) => {
-      const payload: CTAStoryReaderPayload = {
-        id: event.id,
-        url: event.url,
-        index: 0,
-        elementId: '',
-      };
-      this.clickOnButtonAction({ src: CTASource.STORY_READER, payload });
+    eventEmitter.addListener('handleCTA', (event) => {
+      let src = CTASource.UNKNOWN;
+      let payload:
+        | CTAStoryListPayload
+        | CTAStoryReaderPayload
+        | CTAGameReaderPayload = null!;
+      switch (event.action) {
+        case 'button':
+        case 'swipe':
+          src = CTASource.STORY_READER;
+          payload = {
+            id: 0,
+            url: event.url,
+            index: 0,
+            elementId: '',
+          };
+          break;
+        case 'deeplink':
+          src = CTASource.STORY_LIST;
+          payload = {
+            id: 0,
+            index: 0,
+            isDeeplink: true,
+            url: event.url,
+          };
+          break;
+        case 'game':
+          src = CTASource.GAME_READER;
+          payload = {
+            url: event.url,
+            gameInstanceId: '0',
+          };
+          break;
+      }
+      if (src !== CTASource.UNKNOWN) {
+        this.clickOnButtonAction({ src, payload });
+      }
     });
   }
   async fetchGoods(skus: string[]) {

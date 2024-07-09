@@ -68,6 +68,7 @@ export const useEvents = () => {
       'goodItemSelected',
       'favoritesUpdate',
       'scrollUpdate',
+      'handleCTA',
     ];
     [
       ...storiesEvents,

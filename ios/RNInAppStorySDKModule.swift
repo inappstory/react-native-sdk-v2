@@ -26,8 +26,8 @@ class RNInAppStorySDKModule: RCTEventEmitter {
      "favoritesUpdate","scrollUpdate",
      "storyReaderWillShow","storyReaderDidClose","sessionFailure","storyFailure","currentStoryFailure","networkFailure","requestFailure","favoriteCellDidSelect","editorCellDidSelect",
      "customShare", "onActionWith","storiesDidUpdated","goodItemSelected",
-     "openStoryReader", "openStoryFavoriteReader", "clickOnFavoriteCell", "shareStoryWithPath",
-    ]      // etc. 
+     "openStoryReader", "openStoryFavoriteReader", "clickOnFavoriteCell", "shareStoryWithPath", "handleCTA",
+    ]      // etc.
   }
   @objc private var _hasLike: Bool = true
   @objc private var _hasDislike: Bool = true
@@ -61,12 +61,12 @@ class RNInAppStorySDKModule: RCTEventEmitter {
         InAppStory.shared.panelSettings = PanelSettings(like: self._hasLike, favorites: self._hasFavorites, share: self._hasShare)
         // the parameter is responsible for animation of the reader display when you tap on a story cell
         InAppStory.shared.presentationStyle = .zoom
-        
+
         InAppStory.shared.sandBox = sandbox;
         InAppStory.shared.isStatisticDisabled = !sendStats
         InAppStory.shared.initWith(serviceKey: apiKey, settings: Settings(userID: userID))
-        
-        
+
+
         InAppStory.shared.storyReaderWillShow = {showed in
             switch showed {
             case .list(feed: let feed):
@@ -91,7 +91,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
                 NSLog("WARNING: unknown storyReaderWillShow")
             }
         }
-        
+
         InAppStory.shared.storyReaderDidClose = { showed in
             switch showed {
             case .list(feed: let feed):
@@ -204,7 +204,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
                 NSLog("WARNING: unknown failureEvent")
             }
         }
-        InAppStory.shared.gameReaderWillShow = { 
+        InAppStory.shared.gameReaderWillShow = {
           RNInAppStorySDKModule.emitter.sendEvent(withName: "gameReaderWillShow", body: [])
         }
         InAppStory.shared.gameReaderDidClose = {
@@ -229,7 +229,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
           RNInAppStorySDKModule.emitter.sendEvent(withName: "customShare", body: [])
           NSLog("TODO: customShare closure");
         }*/
-        
+
         /*InAppStory.shared.onActionWith = { target, type, storyType in
           RNInAppStorySDKModule.emitter.sendEvent(withName: "onActionWith", body: [])
           NSLog("TODO: onActionWith closure");
@@ -265,15 +265,15 @@ class RNInAppStorySDKModule: RCTEventEmitter {
             "storyType": storyTypeString
           ])
             InAppStory.shared.closeReader() {
-                
+
             }
         }
 
         InAppStory.shared.stackFeedUpdate = { newFeed in
             NSLog("TODO: stackFeedUpdate closure");
         }
-        
-        
+
+
         InAppStory.shared.storiesEvent = { storiesEvent in
             switch storiesEvent {
               case .storiesLoaded(feed: let feed, stories: let stories):
@@ -334,27 +334,27 @@ class RNInAppStorySDKModule: RCTEventEmitter {
                       "id": slideData.storyData?.id,
                       "feed": slideData.storyData?.feed,
                     ])
-                    
+
                 case .showSlide(slideData: let slideData):
                     RNInAppStorySDKModule.emitter.sendEvent(withName: "showSlide", body: [
                       "id": slideData.storyData?.id,
                       "index": slideData.index
                     ])
-                    
+
                 case .likeStory(slideData: let slideData, value: let value):
                     RNInAppStorySDKModule.emitter.sendEvent(withName: "likeStory", body: [
                         "feed": slideData.storyData?.feed,
                         "id": slideData.storyData?.id,
                         "value": value
                     ])
-                    
+
                 case .dislikeStory(slideData: let slideData, value: let value):
                     RNInAppStorySDKModule.emitter.sendEvent(withName: "dislikeStory", body: [
                       "feed": slideData.storyData?.feed,
                       "id": slideData.storyData?.id,
                       "value": value
                     ])
-                    
+
                 case .favoriteStory(slideData: let slideData, value: let value):
                     RNInAppStorySDKModule.emitter.sendEvent(withName: "favoriteStory", body: [
                       "feed": slideData.storyData?.feed,
@@ -377,10 +377,30 @@ class RNInAppStorySDKModule: RCTEventEmitter {
                     RNInAppStorySDKModule.emitter.sendEvent(withName: "ugcStoriesLoaded", body: [])
                 @unknown default:
                      NSLog("WARNING: unknown storiesEvent")
-                            
+
              }
         }
-      
+
+        InAppStory.shared.onActionWith = {target, type, storyType in
+          var typeString = "";
+          switch type {
+            case .button:
+                typeString = "button"
+            case .swipe:
+                typeString = "swipe"
+            case .game:
+                typeString = "game"
+            case .deeplink:
+                typeString = "deeplink"
+            @unknown default:
+                typeString = "unknown"
+          }
+          RNInAppStorySDKModule.emitter.sendEvent(withName: "handleCTA", body: [
+            "url": target,
+            "action": typeString
+          ])
+        }
+
         /*
         InAppStory.shared.sizeForItem = { showed in
             NSLog("TODO: sizeForItem closure");
@@ -450,7 +470,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
             "aspectRatio": self.storiesAPI.cellRatio,
           ]},
             "feed": feed,
-            "list": "feed", 
+            "list": "feed",
         ])}
     self.storiesAPI.storyUpdate = {storyData in
         print("StoryUpdate = $storyData");
@@ -470,7 +490,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
         ])
     }
     self.favoriteStoriesAPI.storyListUpdate = {storiesList,isFavorite, feed in
-    
+
             RNInAppStorySDKModule.emitter.sendEvent(withName: "storyListUpdate", body: [
               "stories": storiesList.map { [
                 "storyID": $0.storyID,
@@ -651,7 +671,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
           InAppStory.shared.imagesPlaceholders = imagesPlaceholders
         }
   }
-  
+
   @objc
   func changeSound(_ soundEnabled: Bool) {
         DispatchQueue.main.async {
@@ -909,7 +929,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   @objc
   func setPresentationStyle(_ value: String) {
         DispatchQueue.main.async {
-          
+
             switch (value) {
                 case "crossDissolve":
                     InAppStory.shared.presentationStyle = .crossDissolve
@@ -1015,7 +1035,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
                                 title:title,
                                 subtitle: subtitle,
                                 imageURL: URL(string: imageURL),
-                                price: price, 
+                                price: price,
                                 oldPrice: oldPrice)
       self.goodsCache.append(goodObject)
   }
