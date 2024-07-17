@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { View, Platform } from 'react-native';
 import { StoryComponent } from './StoryComponent';
-import { FlatList, Pressable } from 'react-native';
+import { Pressable } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 import InAppStorySDK from '@inappstory/react-native-sdk';
 import { AppearanceManager, StoryManager } from '../index';
 
@@ -115,7 +116,7 @@ export const StoriesCarousel = ({
     }
   }
   return (
-    <FlatList
+    <FlashList
       horizontal={horizontal}
       data={datasource}
       renderItem={renderItem}
