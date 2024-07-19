@@ -101,7 +101,7 @@ const createAppearanceManager = () => {
         title: {
           color: 'white',
           font: 'bold normal 14px/16px "InternalPrimaryFont"',
-          padding: '0px 0 0 0',
+          padding: 4,
           fontSize: 12,
           fontWeight: 600,
           fontFamily: Platform.OS == 'ios' ? 'Bradley Hand' : 'Comic Sans',
