@@ -179,6 +179,14 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
   }
 
   @ReactMethod
+  fun onFavoriteCell() {
+    var payload = Arguments.makeNativeMap(
+        mutableMapOf(
+            "event" to "onFavoriteCell",
+        ) as Map<String, Any>)
+    sendEvent(reactContext,"favoriteCellDidSelect", payload)
+  }
+  @ReactMethod
   fun setLang(lang: String) {
       Log.d("InappstorySdkModule", "setLang")
       this.ias?.setLang(Locale.forLanguageTag("en-US"))
