@@ -21,6 +21,7 @@ export const StoryComponent = ({
   hideBorder,
   isFirstItem = false,
   isLastItem = false,
+  favorite = false,
 }: {
   story: any;
   appearanceManager: AppearanceManager;
@@ -32,6 +33,7 @@ export const StoryComponent = ({
   hideBorder?: any;
   isFirstItem?: boolean;
   isLastItem?: boolean;
+  favorite?: boolean;
 }) => {
   const size = cellSize || appearanceManager?.storiesListOptions.card.height;
   const borderRadius =
@@ -189,7 +191,7 @@ export const StoryComponent = ({
         paddingRight,
         opacity: cardOpenedStyles.opacity || 1,
         paddingTop: cellSize ? 1 : 0,
-        paddingBottom: 0,
+        paddingBottom: favorite ? 5 : 0,
       }}
       onPress={() => onPress(story)}
     >
