@@ -72,7 +72,9 @@ export const StoriesCarousel = ({
                 storyManager={storyManager}
                 appearanceManager={appearanceManager}
                 onPress={() => onFavoritePress(feed)}
-                cellSize={appearanceManager?.storiesListOptions.card.height / 2}
+                cellSize={
+                  appearanceManager?.storiesListOptions.card.height / 2 - 1.5
+                }
                 hideTitle={true}
                 hideBorder={true}
                 renderCell={renderCell}
