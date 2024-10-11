@@ -209,7 +209,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
             return null;
         }
 
-        public override fun getSkus(skus: ArrayList<String>, callback: GetGoodsDataCallback) {
+        public override fun getSkus(widgetView: View, skus: ArrayList<String>, callback: GetGoodsDataCallback) {
             print("csCustomGoodsWidget getSkus = $skus")
             var payload = Arguments.makeNativeMap(
                 mutableMapOf(
@@ -231,6 +231,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
         }
 
         override fun onItemClick(
+            widgetView: View,
             goodsItemView: View,
             goodsItemData: GoodsItemData,
             callback: GetGoodsDataCallback
