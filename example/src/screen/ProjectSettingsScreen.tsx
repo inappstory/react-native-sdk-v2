@@ -71,7 +71,6 @@ export function ProjectSettingsScreen({
   const device = useCameraDevice('back');
   const [QREnabled, setQREnabled] = useState(false);
   const [tags, setTags] = useState(storyManager.tags);
-  const [sandboxEnabled, setSandboxEnabled] = useState(storyManager.sandbox);
   const [statsEnabled, setStatsEnabled] = useState(storyManager.sendStatistics);
 
   const [placeholders, setPlaceholders] = useState(
@@ -83,12 +82,6 @@ export function ProjectSettingsScreen({
   const toggleStats = () => {
     setStatsEnabled((previousState) => {
       storyManager.setSendStatistics(!previousState);
-      return !previousState;
-    });
-  };
-  const toggleSandbox = () => {
-    setSandboxEnabled((previousState) => {
-      storyManager.setSandbox(!previousState);
       return !previousState;
     });
   };
@@ -194,16 +187,6 @@ export function ProjectSettingsScreen({
           />
           <Text>API Key</Text>
           <TextInput onChangeText={setAPIKey} value={APIKey} />
-          <View>
-            <Text>Sandbox</Text>
-            <Switch
-              trackColor={{ false: '#767577', true: '#81b0ff' }}
-              thumbColor={sandboxEnabled ? '#f5dd4b' : '#f4f3f4'}
-              ios_backgroundColor="#3e3e3e"
-              onValueChange={toggleSandbox}
-              value={sandboxEnabled}
-            />
-          </View>
           <View>
             <Text>Send Statistics</Text>
             <Switch

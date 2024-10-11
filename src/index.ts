@@ -209,7 +209,7 @@ export class StoryManager {
   lang: string = '';
   soundEnabled: boolean = true;
   getGoodsCallback: Function = () => {};
-  sandbox: boolean = true;
+  sandbox: boolean = false;
   sendStatistics: boolean = true;
   listeners: any = [];
   constructor(config: StoryManagerConfig) {
@@ -304,15 +304,6 @@ export class StoryManager {
   }
   setApiKey(apiKey: string): void {
     this.apiKey = apiKey;
-    InAppStorySDK.initWith(
-      this.apiKey,
-      this.userId,
-      this.sandbox,
-      this.sendStatistics
-    );
-  }
-  setSandbox(sandbox: boolean): void {
-    this.sandbox = sandbox;
     InAppStorySDK.initWith(
       this.apiKey,
       this.userId,
