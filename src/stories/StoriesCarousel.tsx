@@ -4,6 +4,11 @@ import { StoryComponent } from './StoryComponent';
 import { FlatList, Pressable } from 'react-native';
 import InAppStorySDK from '@inappstory/react-native-sdk';
 import { AppearanceManager, StoryManager } from '../index';
+import type {
+  ViewabilityConfig,
+  ViewabilityConfigCallbackPair,
+  ViewabilityConfigCallbackPairs,
+} from '@react-native/virtualized-lists/Lists/VirtualizedList';
 
 export const StoriesCarousel = ({
   feed,
@@ -32,6 +37,29 @@ export const StoriesCarousel = ({
 }) => {
   const visibleIds = React.useRef<any>([]);
   const flatListRef = React.useRef<any>(null);
+
+  const onViewableItemsChanged: ViewabilityConfigCallbackPair['onViewableItemsChanged'] =
+    (info) => {
+      const newIDs = info.changed
+        .filter((i) => i.isViewable)
+        .map((i) => String(i.key))
+        .filter((id) => !visibleIds.current.includes(id))
+        .filter((f) => f !== 'undefined');
+      newIDs.map((id) => {
+        visibleIds.current.push(id);
+      });
+      if (newIDs.length > 0) {
+        InAppStorySDK.setVisibleWith(newIDs);
+      }
+    };
+
+  const viewabilityConfig: ViewabilityConfig = {
+    viewAreaCoveragePercentThreshold: 0,
+  };
+  const viewabilityConfigCallbackPairs =
+    React.useRef<ViewabilityConfigCallbackPairs>([
+      { viewabilityConfig, onViewableItemsChanged },
+    ]);
   const renderItem = ({ item, index }) => {
     const story = item;
     if (!story.favorites) {
@@ -91,19 +119,7 @@ export const StoriesCarousel = ({
         }}
       />
     );
-  const onViewableItemsChanged = (items) => {
-    const newIDs = items.changed
-      .filter((i) => i.isViewable)
-      .map((i) => String(i.key))
-      .filter((id) => !visibleIds.current.includes(id))
-      .filter((f) => f !== 'undefined');
-    newIDs.map((id) => {
-      visibleIds.current.push(id);
-    });
-    if (newIDs.length > 0) {
-      InAppStorySDK.setVisibleWith(newIDs);
-    }
-  };
+
   let datasource: any = [];
   if (favoritesOnly) {
     datasource = favoriteStories;
@@ -124,7 +140,8 @@ export const StoriesCarousel = ({
       }}
       // numColumns={2}
       // columnWrapperStyle={{ gap: appearanceManager.storiesListOptions.card.gap }}
-      onViewableItemsChanged={onViewableItemsChanged}
+      // onViewableItemsChanged={onViewableItemsChanged}
+      viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
       showsHorizontalScrollIndicator={false}
       keyExtractor={(item, _index) => item.storyID}
       ref={flatListRef}
