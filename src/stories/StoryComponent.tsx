@@ -91,7 +91,9 @@ export const StoryComponent = ({
         paused={false}
         playInBackground={true}
         playWhenInactive={true}
-        useTextureView={false}
+        // only TextureView allow to be animated, transformed or scaled
+        // need for set card.opened.opacity 0.5 for instance
+        useTextureView={true}
         disableFocus={true}
       />
       {coverOverlay}
