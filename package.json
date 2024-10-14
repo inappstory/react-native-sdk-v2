@@ -1,6 +1,6 @@
 {
   "name": "@inappstory/react-native-sdk",
-  "version": "0.17.6",
+  "version": "0.18.0",
   "description": "Wrapper for InAppStory",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
