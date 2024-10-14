@@ -683,6 +683,10 @@ export declare type StoriesListCardOptions = Partial<{
     color: string;
     padding: string | number;
     font: string;
+    fontSize: number;
+    fontWeight: string | number;
+    fontFamily: string;
+    lineHeight: number;
     display: boolean;
     textAlign: StoriesListCardTitleTextAlign;
     position: StoriesListCardTitlePosition;
