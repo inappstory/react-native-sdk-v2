@@ -202,7 +202,7 @@ const getEventName = (eventName) => {
 };
 export class StoryManager {
   apiKey: string = '';
-  userId: string | number = '';
+  userId?: string | number | null = null;
   tags: string[] = [];
   placeholders: any = '';
   imagePlaceholders: any = '';
@@ -213,15 +213,17 @@ export class StoryManager {
   sendStatistics: boolean = true;
   listeners: any = [];
   constructor(config: StoryManagerConfig) {
+    // use string or null as userId (native sdk require String)
+    const userId = config.userId != null ? String(config.userId) : null;
     InAppStorySDK.initWith(
       config.apiKey,
-      config.userId,
+      userId,
       this.sandbox,
       this.sendStatistics
     );
-    InAppStorySDK.setUserID(config.userId);
+    InAppStorySDK.setUserID(userId);
     this.apiKey = config.apiKey;
-    this.userId = String(config.userId);
+    this.userId = userId;
     if (config.tags) {
       this.tags = config.tags;
       InAppStorySDK.setTags(config.tags);
@@ -358,8 +360,9 @@ export class StoryManager {
     InAppStorySDK.removeTags(tags);
   }
   setUserId(userId: string | number): void {
-    this.userId = userId;
-    InAppStorySDK.setUserID(userId);
+    // use string or null as userId (native sdk require String)
+    this.userId = userId != null ? String(userId) : null;
+    InAppStorySDK.setUserID(this.userId);
   }
   setLang(lang: string): void {
     this.lang = lang;
