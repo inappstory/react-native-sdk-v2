@@ -45,9 +45,11 @@ export const StoriesList = ({
   }, [feed, storyManager]);
   React.useEffect(() => {
     if (!favoritesOnly) {
-      if (updateVersion < 1) {
-        onLoadStart();
-      }
+      // if (updateVersion < 1) {
+      // fix - allow to call onLoadStart on every update
+      // so we can show skeleton loader on every load (tag change, feed reload or user change)
+      onLoadStart();
+      // }
       if (!feedEvents || !feedEvents.length) return;
       onLoadEnd({
         defaultListLength: feedEvents.length || 0,
