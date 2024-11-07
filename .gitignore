@@ -78,3 +78,6 @@ android/keystores/debug.keystore
 lib/
 example/ios/.xcode.env.local
 /.npmrc
+
+# dotenv
+/.env
