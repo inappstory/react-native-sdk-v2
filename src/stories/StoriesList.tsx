@@ -33,6 +33,7 @@ export const StoriesList = ({
   const _feedEvents = useStore((state) => state[`feeds_${feed}_feed`]);
   const feedEvents = _feedEvents || [];
   const feedFavoriteEvents = useStore((state) => state.feeds_default_favorites);
+  const clearUpdate = useStore((state) => state.clearUpdate);
 
   const {} = useEvents();
   //const userID = storyManager.userId;
@@ -45,11 +46,9 @@ export const StoriesList = ({
   }, [feed, storyManager]);
   React.useEffect(() => {
     if (!favoritesOnly) {
-      // if (updateVersion < 1) {
-      // fix - allow to call onLoadStart on every update
-      // so we can show skeleton loader on every load (tag change, feed reload or user change)
-      onLoadStart();
-      // }
+      if (updateVersion < 1) {
+        onLoadStart();
+      }
       if (!feedEvents || !feedEvents.length) return;
       onLoadEnd({
         defaultListLength: feedEvents.length || 0,
@@ -62,6 +61,7 @@ export const StoriesList = ({
   React.useEffect(() => {
     viewModelExporter({
       reload: () => {
+        clearUpdate();
         fetchFeed();
       },
       // get storiesListDimensions(): StoriesListDimensions {

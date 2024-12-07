@@ -3,6 +3,7 @@ type StoreState = {
   events: Array<any>;
   feeds: Array<any>;
   update: number;
+  clearUpdate: () => void;
   addEvent: (event: any) => void;
   clearFeed: (feed: String) => void;
   addToFeed: (feed: String, events: Array<any>) => void;
@@ -17,6 +18,12 @@ export const useStore = create<StoreState>((set) => ({
   feeds_default_feed: [],
   feeds_default_favorites: [],
   update: 0,
+  clearUpdate: () =>
+    set((state) => {
+      const newState = { ...state };
+      newState.update = 0;
+      return newState;
+    }, true),
   addEvent: (newEvent) =>
     set((state) => {
       return { events: state.events.concat([newEvent]) };
