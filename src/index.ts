@@ -414,9 +414,9 @@ export class StoryManager {
       | undefined
   ): Promise<OnboardingLoadStatus> {
     return new Promise((resolve, reject) => {
-      InAppStorySDK.showOnboardingStories(
-        options?.limit || 10,
+      InAppStorySDK.showOnboardings(
         options?.feed,
+        options?.limit || 10,
         options?.customTags
       ).then((success) => {
         if (success) {
