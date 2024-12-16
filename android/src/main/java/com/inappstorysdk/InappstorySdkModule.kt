@@ -678,6 +678,12 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
   }
 
   @ReactMethod
+  fun setAppVersion(version: String, build: Int) {
+    Log.d("InappstorySdkModule", "setAppVersion: " + version + ", build: " + build)
+    this.ias?.setAppVersion(version, build)
+  }
+
+  @ReactMethod
   fun setHasLike(value: Boolean) {
       Log.d("InappstorySdkModule", "setHasLike")
       this.appearanceManager?.csHasLike(value);

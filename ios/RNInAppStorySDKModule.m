@@ -103,4 +103,6 @@ RCT_EXTERN_METHOD(addProductToCache:(NSString *)sku title:(NSString *)title subt
 RCT_EXTERN_METHOD(setLogging:(BOOL *)value)
 RCT_EXTERN_METHOD(useDeviceID:(BOOL *)value)
 
+RCT_EXTERN_METHOD(setAppVersion:(NSString *)appVersion appBuild:(NSInteger *)appBuild)
+
 @end

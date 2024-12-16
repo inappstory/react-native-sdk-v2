@@ -94,6 +94,10 @@ export declare type StoryManagerConfig = {
   placeholders?: Option<Dict<string>>;
   lang?: string;
   defaultMuted?: boolean;
+  appVersion?: {
+    version: string;
+    build: number;
+  };
 };
 
 enum StoriesListCardTitlePosition {
@@ -240,6 +244,18 @@ export class StoryManager {
       this.soundEnabled = false;
       InAppStorySDK.changeSound(false);
     }
+
+    if (
+      config.appVersion != null &&
+      config.appVersion.version != null &&
+      config.appVersion.build != null
+    ) {
+      InAppStorySDK.setAppVersion(
+        config.appVersion.version,
+        config.appVersion.build
+      );
+    }
+
     eventEmitter.addListener('getGoodsObject', (event) => {
       this.fetchGoods(event.skus);
     });

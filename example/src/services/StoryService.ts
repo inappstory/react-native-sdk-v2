@@ -12,9 +12,10 @@ import {
 import { Linking, Platform } from 'react-native';
 import Toast from 'react-native-simple-toast';
 
-const testKey = 'HDGXt7z1WVQoaN_IzLv8KdRl5f_Ghxdo';
+const apiKey =
+  'BewAAAAAAAAAAAAAABUaIThgHB0BP1FQNAZCQgVBAn8yIRY3g7XgQVkYvY_giYUG-0MTPizcaZlrbUbY9FjNevAAqg';
 const storyManagerConfig: StoryManagerConfig = {
-  apiKey: testKey,
+  apiKey,
   userId: '420702',
   tags: [],
   placeholders: {
@@ -22,6 +23,10 @@ const storyManagerConfig: StoryManagerConfig = {
   },
   lang: 'en',
   defaultMuted: true,
+  appVersion: {
+    version: '3.0.0',
+    build: 777,
+  },
 };
 
 const createStoryManager = () => {
