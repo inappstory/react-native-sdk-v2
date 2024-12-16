@@ -363,6 +363,24 @@ storyManager.on('goodItemSelected', (payload: any) => {
 });
 ```
 
+### AppVersion override
+The app version is used by the platform to enable targeting of stories by app versions.\
+By default, IAS-SDK uses appVersion and appBundle from the native part of the application.\
+But you can override appVersion and appBundle via StoryManagerConfig.\
+This might be useful for CodePush users.
+
+```ts
+const storyManagerConfig: StoryManagerConfig = {
+  apiKey,
+  appVersion: {
+    version: '3.0.0',
+    build: 777,
+  },
+};
+const storyManager = new StoryManager(storyManagerConfig);
+```
+
+
 ### Events
 
 To subscribe to events, use **storyManager.on** or **storyManager.once**
