@@ -727,15 +727,6 @@ export declare type StoriesListCardOptions = Partial<{
   mask: Partial<{
     color: Option<string>;
   }>;
-  svgMask: Partial<
-    Option<{
-      cardMask: Option<string>;
-      overlayMask: Array<{
-        mask: Option<string>;
-        background: Option<string>;
-      }>;
-    }>
-  >;
   opened: Partial<{
     border: Partial<{
       radius: Option<number>;
@@ -749,15 +740,6 @@ export declare type StoriesListCardOptions = Partial<{
     mask: Partial<{
       color: Option<string>;
     }>;
-    svgMask: Partial<
-      Option<{
-        cardMask: Option<string>;
-        overlayMask: Array<{
-          mask: Option<string>;
-          background: Option<string>;
-        }>;
-      }>
-    >;
   }>;
 }>;
 
