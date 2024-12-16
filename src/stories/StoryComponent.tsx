@@ -8,7 +8,7 @@ import {
   Platform,
 } from 'react-native';
 import Video from 'react-native-video';
-import { AppearanceManager, StoryManager } from '../index';
+import { AppearanceManager, type Story, StoryManager } from '../index';
 
 export const StoryComponent = ({
   story,
@@ -28,7 +28,10 @@ export const StoryComponent = ({
   onPress: any;
   cellSize?: any;
   hideTitle?: any;
-  renderCell?: any;
+  renderCell?: (
+    story: Story,
+    options: { isFirstItem: boolean; isLastItem: boolean }
+  ) => React.JSX.Element;
   hideBorder?: any;
   isFirstItem?: boolean;
   isLastItem?: boolean;
@@ -125,7 +128,9 @@ export const StoryComponent = ({
   }
   if (renderCell) {
     return (
-      <Pressable onPress={() => onPress(story)}>{renderCell(story)}</Pressable>
+      <Pressable onPress={() => onPress(story)}>
+        {renderCell(story, { isFirstItem, isLastItem })}
+      </Pressable>
     );
   }
 

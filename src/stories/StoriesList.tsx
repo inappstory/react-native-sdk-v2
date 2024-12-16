@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import InAppStorySDK from '@inappstory/react-native-sdk';
+import InAppStorySDK, { type Story } from '@inappstory/react-native-sdk';
 import { StoriesCarousel } from './StoriesCarousel';
 import { useStore } from '../hooks/useStore';
 import { useEvents } from '../hooks/useEvents';
@@ -26,7 +26,10 @@ export const StoriesList = ({
   viewModelExporter?: any;
   showFavorites?: any;
   favoritesOnly?: any;
-  renderCell?: any;
+  renderCell?: (
+    story: Story,
+    options: { isFirstItem: boolean; isLastItem: boolean }
+  ) => React.JSX.Element;
   vertical?: any;
 }) => {
   const updateVersion = useStore((state) => state.update);
