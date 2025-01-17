@@ -122,6 +122,7 @@ export const useEvents = () => {
       eventListeners.forEach((eventListener) => {
         eventListener.remove();
       });
+      init = false;
     };
   }, []);
   return { readerOpen };
