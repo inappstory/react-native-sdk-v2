@@ -127,6 +127,13 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
             this.ias?.getTags()
         )
     }
+
+    @ReactMethod
+    fun onFavoriteCell() {
+        val payload:WritableMap = Arguments.createMap()
+        sendEvent(reactContext,"favoriteCellDidSelect", payload)
+    }
+
     @ReactMethod
     fun addListener(eventName: String) {
     if (listenerCount == 0) {
