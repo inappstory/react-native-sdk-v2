@@ -78,16 +78,19 @@ export const StoriesCarousel = ({
     } else {
       return (
         <Pressable
-          style={{
-            width: appearanceManager?.storiesListOptions.card.height + 30,
-            height: appearanceManager?.storiesListOptions.card.height,
-            // paddingTop: appearanceManager?.storiesListOptions.topPadding,
-            paddingRight: appearanceManager?.storiesListOptions.sidePadding,
-            flexWrap: 'wrap',
-            flexDirection: 'row',
-            flex: 1,
-            alignSelf: 'baseline',
-          }}
+          style={
+            appearanceManager?.storiesListOptions.favoriteCard
+              ?.customStyles || {
+              width: appearanceManager?.storiesListOptions.card.height + 30,
+              height: appearanceManager?.storiesListOptions.card.height,
+              // paddingTop: appearanceManager?.storiesListOptions.topPadding,
+              paddingRight: appearanceManager?.storiesListOptions.sidePadding,
+              flexWrap: 'wrap',
+              flexDirection: 'row',
+              flex: 1,
+              alignSelf: 'baseline',
+            }
+          }
           key="pressable"
           onPress={() => onFavoritePress(feed)}
         >

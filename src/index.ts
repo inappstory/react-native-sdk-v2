@@ -6,6 +6,8 @@ import { useStore } from './hooks/useStore';
 import deepmerge from 'deepmerge';
 import parseSides from 'parse-css-sides';
 import { isFunction } from './helpers/isFunction';
+import type { StyleProp } from 'react-native/Libraries/StyleSheet/StyleSheet';
+import type { ViewStyle } from 'react-native/Libraries/StyleSheet/StyleSheetTypes';
 
 export {
   StoriesList,
@@ -28,6 +30,7 @@ export declare type StoriesListFavoriteCardOptions = StoriesListCardOptions &
       padding: string | number;
       font: string;
     }>;
+    customStyles?: StyleProp<ViewStyle>;
   }>;
 
 export declare type OnboardingLoadStatus = {
