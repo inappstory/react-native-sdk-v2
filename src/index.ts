@@ -6,6 +6,8 @@ import { useStore } from './hooks/useStore';
 import deepmerge from 'deepmerge';
 import parseSides from 'parse-css-sides';
 import { isFunction } from './helpers/isFunction';
+import type { StyleProp } from 'react-native/Libraries/StyleSheet/StyleSheet';
+import type { ViewStyle } from 'react-native/Libraries/StyleSheet/StyleSheetTypes';
 
 export {
   StoriesList,
@@ -28,6 +30,7 @@ export declare type StoriesListFavoriteCardOptions = StoriesListCardOptions &
       padding: string | number;
       font: string;
     }>;
+    customStyles?: StyleProp<ViewStyle>;
   }>;
 
 export declare type OnboardingLoadStatus = {
@@ -94,6 +97,10 @@ export declare type StoryManagerConfig = {
   placeholders?: Option<Dict<string>>;
   lang?: string;
   defaultMuted?: boolean;
+  appVersion?: {
+    version: string;
+    build: number;
+  };
 };
 
 enum StoriesListCardTitlePosition {
@@ -189,6 +196,17 @@ export type CTAStoryListPayload = {
   url: string | undefined;
 };
 
+export type Story = {
+  storyID: number;
+  opened: boolean;
+  aspectRatio: number;
+  backgroundColor: string;
+  coverVideoPath?: string;
+  coverImagePath?: string;
+  title: string;
+  titleColor: string;
+};
+
 const eventEmitter = new NativeEventEmitter(
   NativeModules.RNInAppStorySDKModule
 );
@@ -202,26 +220,28 @@ const getEventName = (eventName) => {
 };
 export class StoryManager {
   apiKey: string = '';
-  userId: string | number = '';
+  userId?: string | number | null = null;
   tags: string[] = [];
   placeholders: any = '';
   imagePlaceholders: any = '';
   lang: string = '';
   soundEnabled: boolean = true;
   getGoodsCallback: Function = () => {};
-  sandbox: boolean = true;
+  sandbox: boolean = false;
   sendStatistics: boolean = true;
   listeners: any = [];
   constructor(config: StoryManagerConfig) {
+    // use string or null as userId (native sdk require String)
+    const userId = config.userId != null ? String(config.userId) : null;
     InAppStorySDK.initWith(
       config.apiKey,
-      config.userId,
+      userId,
       this.sandbox,
       this.sendStatistics
     );
-    InAppStorySDK.setUserID(config.userId);
+    InAppStorySDK.setUserID(userId);
     this.apiKey = config.apiKey;
-    this.userId = String(config.userId);
+    this.userId = userId;
     if (config.tags) {
       this.tags = config.tags;
       InAppStorySDK.setTags(config.tags);
@@ -238,6 +258,18 @@ export class StoryManager {
       this.soundEnabled = false;
       InAppStorySDK.changeSound(false);
     }
+
+    if (
+      config.appVersion != null &&
+      config.appVersion.version != null &&
+      config.appVersion.build != null
+    ) {
+      InAppStorySDK.setAppVersion(
+        config.appVersion.version,
+        config.appVersion.build
+      );
+    }
+
     eventEmitter.addListener('getGoodsObject', (event) => {
       this.fetchGoods(event.skus);
     });
@@ -311,15 +343,6 @@ export class StoryManager {
       this.sendStatistics
     );
   }
-  setSandbox(sandbox: boolean): void {
-    this.sandbox = sandbox;
-    InAppStorySDK.initWith(
-      this.apiKey,
-      this.userId,
-      this.sandbox,
-      this.sendStatistics
-    );
-  }
   setSendStatistics(sendStatistics: boolean): void {
     this.sendStatistics = sendStatistics;
     InAppStorySDK.initWith(
@@ -367,8 +390,9 @@ export class StoryManager {
     InAppStorySDK.removeTags(tags);
   }
   setUserId(userId: string | number): void {
-    this.userId = userId;
-    InAppStorySDK.setUserID(userId);
+    // use string or null as userId (native sdk require String)
+    this.userId = userId != null ? String(userId) : null;
+    InAppStorySDK.setUserID(this.userId);
   }
   setLang(lang: string): void {
     this.lang = lang;
@@ -420,9 +444,9 @@ export class StoryManager {
       | undefined
   ): Promise<OnboardingLoadStatus> {
     return new Promise((resolve, reject) => {
-      InAppStorySDK.showOnboardingStories(
-        options?.limit || 10,
+      InAppStorySDK.showOnboardings(
         options?.feed,
+        options?.limit || 10,
         options?.customTags
       ).then((success) => {
         if (success) {
@@ -692,6 +716,10 @@ export declare type StoriesListCardOptions = Partial<{
     color: string;
     padding: string | number;
     font: string;
+    fontSize: number;
+    fontWeight: string | number;
+    fontFamily: string;
+    lineHeight: number;
     display: boolean;
     textAlign: StoriesListCardTitleTextAlign;
     position: StoriesListCardTitlePosition;
@@ -713,15 +741,6 @@ export declare type StoriesListCardOptions = Partial<{
   mask: Partial<{
     color: Option<string>;
   }>;
-  svgMask: Partial<
-    Option<{
-      cardMask: Option<string>;
-      overlayMask: Array<{
-        mask: Option<string>;
-        background: Option<string>;
-      }>;
-    }>
-  >;
   opened: Partial<{
     border: Partial<{
       radius: Option<number>;
@@ -735,15 +754,6 @@ export declare type StoriesListCardOptions = Partial<{
     mask: Partial<{
       color: Option<string>;
     }>;
-    svgMask: Partial<
-      Option<{
-        cardMask: Option<string>;
-        overlayMask: Array<{
-          mask: Option<string>;
-          background: Option<string>;
-        }>;
-      }>
-    >;
   }>;
 }>;
 

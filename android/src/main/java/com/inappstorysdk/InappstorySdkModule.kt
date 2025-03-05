@@ -127,6 +127,13 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
             this.ias?.getTags()
         )
     }
+
+    @ReactMethod
+    fun onFavoriteCell() {
+        val payload:WritableMap = Arguments.createMap()
+        sendEvent(reactContext,"favoriteCellDidSelect", payload)
+    }
+
     @ReactMethod
     fun addListener(eventName: String) {
     if (listenerCount == 0) {
@@ -209,7 +216,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
             return null;
         }
 
-        public override fun getSkus(skus: ArrayList<String>, callback: GetGoodsDataCallback) {
+        public override fun getSkus(widgetView: View, skus: ArrayList<String>, callback: GetGoodsDataCallback) {
             print("csCustomGoodsWidget getSkus = $skus")
             var payload = Arguments.makeNativeMap(
                 mutableMapOf(
@@ -231,6 +238,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
         }
 
         override fun onItemClick(
+            widgetView: View,
             goodsItemView: View,
             goodsItemData: GoodsItemData,
             callback: GetGoodsDataCallback
@@ -674,6 +682,12 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
   fun getSound(promise: Promise) {
       Log.d("InappstorySdkModule", "getSound")
       promise.resolve(this.ias?.soundOn())
+  }
+
+  @ReactMethod
+  fun setAppVersion(version: String, build: Int) {
+    Log.d("InappstorySdkModule", "setAppVersion: " + version + ", build: " + build)
+    this.ias?.setAppVersion(version, build)
   }
 
   @ReactMethod

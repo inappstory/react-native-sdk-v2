@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import InAppStorySDK from '@inappstory/react-native-sdk';
+import InAppStorySDK, { type Story } from '@inappstory/react-native-sdk';
 import { StoriesCarousel } from './StoriesCarousel';
 import { useStore } from '../hooks/useStore';
 import { useEvents } from '../hooks/useEvents';
@@ -26,13 +26,17 @@ export const StoriesList = ({
   viewModelExporter?: any;
   showFavorites?: any;
   favoritesOnly?: any;
-  renderCell?: any;
+  renderCell?: (
+    story: Story,
+    options: { isFirstItem: boolean; isLastItem: boolean }
+  ) => React.JSX.Element;
   vertical?: any;
 }) => {
   const updateVersion = useStore((state) => state.update);
   const _feedEvents = useStore((state) => state[`feeds_${feed}_feed`]);
   const feedEvents = _feedEvents || [];
   const feedFavoriteEvents = useStore((state) => state.feeds_default_favorites);
+  const clearUpdate = useStore((state) => state.clearUpdate);
 
   const {} = useEvents();
   //const userID = storyManager.userId;
@@ -60,6 +64,7 @@ export const StoriesList = ({
   React.useEffect(() => {
     viewModelExporter({
       reload: () => {
+        clearUpdate();
         fetchFeed();
       },
       // get storiesListDimensions(): StoriesListDimensions {

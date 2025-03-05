@@ -686,6 +686,14 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   }
 
   @objc
+  func setAppVersion(_ appVersion: String, appBuild: Int) {
+    DispatchQueue.main.async {
+      InAppStory.shared.appVersion = appVersion
+      InAppStory.shared.appBuild = String(appBuild)
+    }
+  }
+
+  @objc
   func setLogging(_ loggingEnabled: Bool) {
         DispatchQueue.main.async {
           InAppStory.shared.isLoggingEnabled = loggingEnabled

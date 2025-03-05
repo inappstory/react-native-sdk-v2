@@ -220,7 +220,7 @@ export const appearanceManager = createAppearanceManager();
 
 To display feed, use StoriesList component. **storiesListViewModel** allows to reload the story feed using **storiesListViewModel.current.reload()**.
 
-```js
+```jsx
 import { StoriesList } from '@inappstory/react-native-sdk';
 import {
   type StoriesListViewModel,
@@ -256,7 +256,7 @@ storyManager.on('onFavoriteCell', () => {
 
 To display favorite stories, pass **favoritesOnly** to <StoriesList>
 
-```js
+```jsx
 <StoriesList favoritesOnly={true} />
 ```
 
@@ -264,7 +264,7 @@ To display favorite stories, pass **favoritesOnly** to <StoriesList>
 
 To display items vertically, use **vertical=true**
 
-```js
+```jsx
 <StoriesList vertical={true} />
 ```
 
@@ -272,10 +272,10 @@ To display items vertically, use **vertical=true**
 
 To render custom cells, add renderCell function to **StoriesList**
 
-```js
+```jsx
 <StoriesList
   ...props
-  renderCell={(story) => {
+  renderCell={(story, {isFirstItem, isLastItem}) => {
     return <Text>{story.storyID}</Text>;
   }}
 />
@@ -362,6 +362,24 @@ storyManager.on('goodItemSelected', (payload: any) => {
    // User selected payload.sku SKU
 });
 ```
+
+### AppVersion override
+The app version is used by the platform to enable targeting of stories by app versions.\
+By default, IAS-SDK uses appVersion and appBundle from the native part of the application.\
+But you can override appVersion and appBundle via StoryManagerConfig.\
+This might be useful for CodePush users.
+
+```ts
+const storyManagerConfig: StoryManagerConfig = {
+  apiKey,
+  appVersion: {
+    version: '3.0.0',
+    build: 777,
+  },
+};
+const storyManager = new StoryManager(storyManagerConfig);
+```
+
 
 ### Events
 
