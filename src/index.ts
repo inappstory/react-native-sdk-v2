@@ -673,14 +673,7 @@ export declare type StoryFavoriteReaderOptions = Partial<{
   }>;
 }>;
 
-export declare type StoriesListTitleOptions = Partial<{
-  content: string;
-  color: string;
-  font: string;
-  marginBottom: number;
-}>;
 export declare type StoriesListOptions = Partial<{
-  title: StoriesListTitleOptions;
   card: StoriesListCardOptions;
   favoriteCard: StoriesListFavoriteCardOptions;
   layout: Partial<{
@@ -713,7 +706,6 @@ export declare type StoriesListOptions = Partial<{
 }>;
 export declare type StoriesListCardOptions = Partial<{
   title: Partial<{
-    color: string;
     padding: string | number;
     font: string;
     fontSize: number;

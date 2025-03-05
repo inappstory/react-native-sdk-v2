@@ -104,7 +104,6 @@ const createAppearanceManager = () => {
     .setStoriesListOptions({
       card: {
         title: {
-          color: 'white',
           font: 'bold normal 14px/16px "InternalPrimaryFont"',
           padding: '0px 0 0 0',
           fontSize: 12,
