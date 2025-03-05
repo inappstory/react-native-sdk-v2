@@ -773,9 +773,9 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
   }
 
   @ReactMethod
-  fun setReaderBackgroundColor(color: Int) {
+  fun setReaderBackgroundColor(color: String) {
       Log.d("InappstorySdkModule", "setReaderBackgroundColor")
-      this.appearanceManager?.csReaderBackgroundColor(color);
+      //TODO
   }
 
   @ReactMethod

@@ -7,7 +7,6 @@ import {
   Text,
   Switch,
   Platform,
-  processColor,
 } from 'react-native';
 import React, { useState } from 'react';
 
@@ -302,9 +301,7 @@ export function SettingsScreen(): React.ReactNode {
               //color={this.state.currentColor}
               swatchesOnly={true}
               onColorChangeComplete={(color) => {
-                InAppStorySDK.setReaderBackgroundColor(
-                  Platform.OS == 'ios' ? color + 'ff' : processColor(color)
-                );
+                InAppStorySDK.setReaderBackgroundColor(color + 'ff');
               }}
               thumbSize={40}
               sliderSize={40}
