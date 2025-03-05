@@ -550,14 +550,9 @@ export class AppearanceManager {
   private proccessCardTitlePadding(
     storiesListOptions: StoriesListOptions
   ): StoriesListOptions {
-    if (!storiesListOptions.card) {
-      storiesListOptions.card = {};
-    }
-    if (!storiesListOptions.card.title) {
-      storiesListOptions.card.title = {};
-    }
     const cardTitleOptions = storiesListOptions.card?.title;
     const cardTitlePadding = cardTitleOptions?.padding;
+
     let cardTitlePaddingParsed = {
       paddingTop: 0,
       paddingRight: 0,
@@ -570,18 +565,24 @@ export class AppearanceManager {
         cardTitlePaddingParsed.paddingRight = cardTitlePadding;
         cardTitlePaddingParsed.paddingBottom = cardTitlePadding;
         cardTitlePaddingParsed.paddingLeft = cardTitlePadding;
-        storiesListOptions.card.title.padding = cardTitlePaddingParsed;
-      } else if (typeof cardTitlePadding === 'string') {
+      } else {
         const sides = parseSides(cardTitlePadding ?? '0px');
         cardTitlePaddingParsed.paddingTop = parseFloat(sides.top);
         cardTitlePaddingParsed.paddingRight = parseFloat(sides.right);
         cardTitlePaddingParsed.paddingBottom = parseFloat(sides.bottom);
         cardTitlePaddingParsed.paddingLeft = parseFloat(sides.left);
-        storiesListOptions.card.title.padding = cardTitlePaddingParsed;
       }
     } catch (e) {
       console.error(e);
     }
+    if (!storiesListOptions.card) {
+      storiesListOptions.card = {};
+    }
+    if (!storiesListOptions.card.title) {
+      storiesListOptions.card.title = {};
+    }
+    // @ts-ignore
+    storiesListOptions.card.title.padding = cardTitlePaddingParsed;
     return storiesListOptions;
   }
 }

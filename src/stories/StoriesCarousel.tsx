@@ -135,7 +135,7 @@ export const StoriesCarousel = ({
       onViewableItemsChanged={onViewableItemsChanged}
       showsHorizontalScrollIndicator={false}
       keyExtractor={(item) => {
-        return item?.storyID || 9999;
+        return item?.storyID || 'favorites';
       }}
       ref={flatListRef}
       onEndReached={() => {
