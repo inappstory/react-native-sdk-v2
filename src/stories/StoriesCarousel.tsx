@@ -121,29 +121,27 @@ export const StoriesCarousel = ({
     ></View>
   );
   return (
-    <View style={{ height: appearanceManager?.storiesListOptions.card.height }}>
-      <FlashList
-        horizontal={horizontal}
-        data={datasource}
-        renderItem={renderItem}
-        ItemSeparatorComponent={() => GapComponent}
-        estimatedItemSize={159}
-        contentContainerStyle={{
-          gap: appearanceManager.storiesListOptions.card.gap,
-        }}
-        // numColumns={2}
-        // columnWrapperStyle={{ gap: appearanceManager.storiesListOptions.card.gap }}
-        onViewableItemsChanged={onViewableItemsChanged}
-        showsHorizontalScrollIndicator={false}
-        keyExtractor={(item) => {
-          return item?.storyID || 9999;
-        }}
-        ref={flatListRef}
-        onEndReached={() => {
-          if (Platform.OS === 'android') flatListRef?.current?.scrollToEnd();
-        }}
-      />
-    </View>
+    <FlashList
+      horizontal={horizontal}
+      data={datasource}
+      renderItem={renderItem}
+      ItemSeparatorComponent={() => GapComponent}
+      estimatedItemSize={159}
+      contentContainerStyle={{
+        gap: appearanceManager.storiesListOptions.card.gap,
+      }}
+      // numColumns={2}
+      // columnWrapperStyle={{ gap: appearanceManager.storiesListOptions.card.gap }}
+      onViewableItemsChanged={onViewableItemsChanged}
+      showsHorizontalScrollIndicator={false}
+      keyExtractor={(item) => {
+        return item?.storyID || 9999;
+      }}
+      ref={flatListRef}
+      onEndReached={() => {
+        if (Platform.OS === 'android') flatListRef?.current?.scrollToEnd();
+      }}
+    />
   );
 };
 
