@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { View, Platform, Dimensions } from 'react-native';
+import { View, Platform } from 'react-native';
 import { StoryComponent } from './StoryComponent';
 import { Pressable } from 'react-native';
-import { FlashList, MasonryFlashList } from '@shopify/flash-list';
+import { FlashList } from '@shopify/flash-list';
 import InAppStorySDK from '@inappstory/react-native-sdk';
 import { AppearanceManager, StoryManager } from '../index';
 
@@ -120,24 +120,7 @@ export const StoriesCarousel = ({
       style={{ width: appearanceManager.storiesListOptions.card.gap }}
     ></View>
   );
-
-  const screenWidth = Dimensions.get('window').width;
-
-  const renderFavorites = ({ item }) => {
-    return (
-      <StoryComponent
-        key={item.storyID}
-        story={item}
-        storyManager={storyManager}
-        appearanceManager={appearanceManager}
-        onPress={!favoritesOnly ? onPress : onFavoritePress}
-        renderCell={renderCell}
-        favorite
-        cellSize={screenWidth / 3.3}
-      />
-    );
-  };
-  return !favoritesOnly ? (
+  return (
     <View style={{ height: appearanceManager?.storiesListOptions.card.height }}>
       <FlashList
         horizontal={horizontal}
@@ -159,32 +142,6 @@ export const StoriesCarousel = ({
         onEndReached={() => {
           if (Platform.OS === 'android') flatListRef?.current?.scrollToEnd();
         }}
-      />
-    </View>
-  ) : (
-    <View
-      style={{
-        width: screenWidth - 20,
-        height: 455,
-      }}
-    >
-      <MasonryFlashList
-        data={datasource}
-        renderItem={renderFavorites}
-        estimatedItemSize={159}
-        numColumns={3}
-        // numColumns={2}
-        // columnWrapperStyle={{ gap: appearanceManager.storiesListOptions.card.gap }}
-        onViewableItemsChanged={onViewableItemsChanged}
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{
-          paddingVertical: 10,
-        }}
-        keyExtractor={(item) => {
-          return item?.storyID || 9999;
-        }}
-        //ItemSeparatorComponent={() => GapComponent}
-        ref={flatListRef}
       />
     </View>
   );

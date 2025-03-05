@@ -81,7 +81,7 @@ export default function App() {
           />
         </Stack.Navigator>
       </NavigationContainer>
-      <BottomSheet ref={sheetRef} height={500}>
+      <BottomSheet ref={sheetRef}>
         <View style={{ paddingHorizontal: 10 }}>
           {!!favoritesOpen && (
             <StoriesList
@@ -92,7 +92,7 @@ export default function App() {
               onLoadEnd={onLoadEnd}
               onLoadStart={onLoadStart}
               viewModelExporter={viewModelExporter}
-              vertical={true}
+              vertical={false}
             />
           )}
         </View>
