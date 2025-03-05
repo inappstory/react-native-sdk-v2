@@ -94,7 +94,6 @@ export const StoryComponent = ({
         playWhenInactive={true}
         useTextureView={false}
         disableFocus={true}
-        shutterColor={story.backgroundColor || 'transparent'}
       />
       {coverOverlay}
     </View>
