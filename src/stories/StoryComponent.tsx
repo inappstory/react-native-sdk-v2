@@ -163,6 +163,7 @@ export const StoryComponent = ({
             : 'auto',
           alignItems: 'flex-end',
           justifyContent: 'flex-end',
+          height: cellSize,
         },
       ]}
     >
