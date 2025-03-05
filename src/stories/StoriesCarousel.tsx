@@ -115,18 +115,11 @@ export const StoriesCarousel = ({
       datasource = [...stories, { favorites: favoriteStories.slice(0, 4) }];
     }
   }
-  const GapComponent = (
-    <View
-      style={{ width: appearanceManager.storiesListOptions.card.gap }}
-    ></View>
-  );
   return (
     <FlashList
       horizontal={horizontal}
       data={datasource}
       renderItem={renderItem}
-      ItemSeparatorComponent={() => GapComponent}
-      estimatedItemSize={159}
       contentContainerStyle={{
         gap: appearanceManager.storiesListOptions.card.gap,
       }}
@@ -134,9 +127,7 @@ export const StoriesCarousel = ({
       // columnWrapperStyle={{ gap: appearanceManager.storiesListOptions.card.gap }}
       onViewableItemsChanged={onViewableItemsChanged}
       showsHorizontalScrollIndicator={false}
-      keyExtractor={(item) => {
-        return item?.storyID || 'favorites';
-      }}
+      keyExtractor={(item, _index) => item.storyID}
       ref={flatListRef}
       onEndReached={() => {
         if (Platform.OS === 'android') flatListRef?.current?.scrollToEnd();
