@@ -173,7 +173,6 @@
     ]
   },
   "dependencies": {
-    "@shopify/flash-list": "^1.7.0",
     "deepmerge": "^4.3.1",
     "parse-css-sides": "^3.0.1",
     "zustand": "^4.5.2"
