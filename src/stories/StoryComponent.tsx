@@ -73,7 +73,8 @@ export const StoryComponent = ({
       textAlign:
         appearanceManager?.storiesListOptions.card.title.textAlign || 'center',
       ...appearanceManager?.storiesListOptions.card.title.padding,
-      width: mediaWidth,
+      width: storyWidth,
+      //backgroundColor: 'rgba(255,255,255,0.1)',
     },
   });
 
@@ -158,9 +159,7 @@ export const StoryComponent = ({
             appearanceManager?.storiesListOptions.card.title.lineHeight,
           // height: appearanceManager?.storiesListOptions.card.title.lineHeight * appearanceManager?.storiesListOptions.card.title.lineClamp,
           position: cardInsideBottom ? 'absolute' : 'relative',
-          bottom: cardInsideBottom
-            ? cardOpenedStyles.border.gap - cardOpenedStyles.border.width
-            : 'auto',
+          bottom: cardInsideBottom ? 0 : 'auto',
           alignItems: 'flex-end',
           justifyContent: 'flex-end',
           height: cellSize,
@@ -178,8 +177,6 @@ export const StoryComponent = ({
       paddingLeft = appearanceManager?.storiesListOptions.sidePadding;
     } else if (isLastItem) {
       paddingRight = appearanceManager?.storiesListOptions.sidePadding;
-    } else {
-      paddingLeft = paddingRight = cardOpenedStyles.border.gap;
     }
   } else {
     paddingLeft = paddingRight = 2;
