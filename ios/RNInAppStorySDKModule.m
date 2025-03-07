@@ -10,7 +10,7 @@
 
 @interface RCT_EXTERN_MODULE(RNInAppStorySDKModule, RCTEventEmitter)
 
-RCT_EXTERN_METHOD(initWith:(NSString *)apiKey userID:(NSString *)userID sandbox:(BOOL *)sandbox sendStats:(BOOL *)sendStats)
+RCT_EXTERN_METHOD(initWith:(NSString *)apiKey userID:(NSString *)userID userIdSign:(nullable NSString *)userIdSign sandbox:(BOOL *)sandbox sendStats:(BOOL *)sendStats)
 
 RCT_EXTERN_METHOD(getStories:(NSString *)feed)
 RCT_EXTERN_METHOD(getFavoriteStories:(NSString *)feed)
@@ -47,7 +47,7 @@ RCT_EXTERN_METHOD(setHasLike:(BOOL *)value)
 RCT_EXTERN_METHOD(setHasFavorites:(BOOL *)value)
 RCT_EXTERN_METHOD(setHasShare:(BOOL *)value)
 
-RCT_EXTERN_METHOD(setUserID:(NSString *)userID)
+RCT_EXTERN_METHOD(setUserID:(NSString *)userID userIdSign:(nullable NSString *)userIdSign)
 RCT_EXTERN_METHOD(setLang:(NSString *)lang)
 
 

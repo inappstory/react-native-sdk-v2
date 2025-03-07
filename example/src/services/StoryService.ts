@@ -17,6 +17,9 @@ const apiKey =
 const storyManagerConfig: StoryManagerConfig = {
   apiKey,
   userId: '420702',
+  // userIdSign: '9bddbf9d2a20d4b6fca54bcd4782d74f881f8140',
+  // userId: '420703',
+  // userIdSign: '95464e7fb4a162d2d9a46c083ca9aa804ae4b09b',
   tags: [],
   placeholders: {
     username: 'Guest',
@@ -108,7 +111,7 @@ const createAppearanceManager = () => {
           padding: '0px 0 0 0',
           fontSize: 12,
           fontWeight: 600,
-          fontFamily: Platform.OS == 'ios' ? 'Bradley Hand' : 'Comic Sans',
+          fontFamily: Platform.OS === 'ios' ? 'Bradley Hand' : 'Comic Sans',
           lineHeight: 13,
           lineClamp: 3,
           textAlign: StoriesListCardTitleTextAlign.LEFT,

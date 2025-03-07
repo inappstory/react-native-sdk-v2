@@ -136,6 +136,7 @@ export function ProjectSettingsScreen({
   });
   const changeUserID = () => {
     storyManager.setUserId(randomUserId(8));
+    // storyManager.setUserId('420702', '9bddbf9d2a20d4b6fca54bcd4782d74f881f8140');
     navigation.goBack();
   };
   const startQR = () => {

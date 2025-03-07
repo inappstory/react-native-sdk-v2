@@ -160,23 +160,23 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
     }
     }
   @ReactMethod
-  fun initWith(apiKey: String, userID: String, sandbox: Boolean, sendStatistics: Boolean) {
+  fun initWith(apiKey: String, userID: String, userIdSign: String?, sandbox: Boolean, sendStatistics: Boolean) {
       Log.d("InappstorySdkModule", "initWith")
       //this.ias = this.createInAppStoryManager(apiKey, userID)
       this.appearanceManager = AppearanceManager()
       this.api = InAppStoryAPI()
       this.favoritesApi = InAppStoryAPI()
-      this.createManager(apiKey, userID, sandbox, sendStatistics, this.favoritesApi as InAppStoryAPI)
-      this.createManager(apiKey, userID, sandbox, sendStatistics, this.api as InAppStoryAPI)
+      this.createManager(apiKey, userID, userIdSign, sandbox, sendStatistics, this.favoritesApi as InAppStoryAPI)
+      this.createManager(apiKey, userID, userIdSign, sandbox, sendStatistics, this.api as InAppStoryAPI)
       this.subscribeLists(this.api as InAppStoryAPI, "feed")
       this.subscribeLists(this.favoritesApi as InAppStoryAPI, "favorites")
       setupListeners()
   }
 
   @ReactMethod
-  fun setUserID(userId: String) {
+  fun setUserID(userId: String, userIdSign: String?) {
       Log.d("InappstorySdkModule", "setUserID")
-      this.ias?.setUserId(userId)
+      this.ias?.setUserId(userId, userIdSign)
   }
 
   @ReactMethod
@@ -1019,10 +1019,11 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
         UGCInAppStoryManager.openEditor(reactContext.currentActivity as Context)
         //promise.resolve(true)
     }
-    private fun createManager(apiKey: String, userID: String, sandbox: Boolean,sendStatistic: Boolean, inAppStoryAPI: InAppStoryAPI) {
+    private fun createManager(apiKey: String, userID: String, userIdSign: String?, sandbox: Boolean, sendStatistic: Boolean, inAppStoryAPI: InAppStoryAPI) {
         this.ias = inAppStoryAPI.inAppStoryManager.create(
             apiKey,
             userID,
+            userIdSign,
             null,
             null,
             null,

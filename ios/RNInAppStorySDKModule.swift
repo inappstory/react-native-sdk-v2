@@ -34,6 +34,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   @objc private var _hasFavorites: Bool = true
   @objc private var _hasShare: Bool = true
   @objc private var _userID: String = ""
+  @objc private var _userIdSign: String? = nil
   @objc private var _lang: String = ""
   @objc private var _tags: [String] = [""]
   @objc private var goodsCache: Array<GoodObject> = []
@@ -48,7 +49,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
     RNInAppStorySDKModule.emitter = self
   }
   //@ReactMethod
-  @objc func initWith(_ apiKey: String, userID: String, sandbox: Bool, sendStats: Bool) {
+  @objc func initWith(_ apiKey: String, userID: String, userIdSign: String?, sandbox: Bool, sendStats: Bool) {
     DispatchQueue.main.async {
       // the parameter is responsible for logging to the XCode console
         InAppStory.shared.isLoggingEnabled = true
@@ -64,7 +65,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
 
         InAppStory.shared.sandBox = sandbox;
         InAppStory.shared.isStatisticDisabled = !sendStats
-        InAppStory.shared.initWith(serviceKey: apiKey, settings: Settings(userID: userID))
+        InAppStory.shared.initWith(serviceKey: apiKey, settings: Settings(userID: userID, sign: userIdSign))
 
 
         InAppStory.shared.storyReaderWillShow = {showed in
@@ -583,10 +584,12 @@ class RNInAppStorySDKModule: RCTEventEmitter {
     }
   }
   @objc
-  func setUserID(_ _userID: String) {
+  func setUserID(_ _userID: String, userIdSign _userIdSign: String?) {
     DispatchQueue.main.async {
       self._userID = _userID
+      self._userIdSign = _userIdSign
       InAppStory.shared.settings?.userID = _userID
+      InAppStory.shared.settings?.sign = _userIdSign
     }
   }
 

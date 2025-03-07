@@ -93,6 +93,7 @@ export type StoriesListDimensions = {
 export declare type StoryManagerConfig = {
   apiKey: string;
   userId?: Option<string | number>;
+  userIdSign?: Option<string>;
   tags?: Option<Array<string>>;
   placeholders?: Option<Dict<string>>;
   lang?: string;
@@ -221,6 +222,7 @@ const getEventName = (eventName) => {
 export class StoryManager {
   apiKey: string = '';
   userId?: string | number | null = null;
+  userIdSign: string | null = null;
   tags: string[] = [];
   placeholders: any = '';
   imagePlaceholders: any = '';
@@ -232,16 +234,20 @@ export class StoryManager {
   listeners: any = [];
   constructor(config: StoryManagerConfig) {
     // use string or null as userId (native sdk require String)
-    const userId = config.userId != null ? String(config.userId) : null;
+    const userId = config.userId != null ? String(config.userId) : '';
+    const userIdSign =
+      config.userIdSign != null ? String(config.userIdSign) : null;
     InAppStorySDK.initWith(
       config.apiKey,
       userId,
+      userIdSign,
       this.sandbox,
       this.sendStatistics
     );
-    InAppStorySDK.setUserID(userId);
+    InAppStorySDK.setUserID(userId, userIdSign);
     this.apiKey = config.apiKey;
     this.userId = userId;
+    this.userIdSign = userIdSign;
     if (config.tags) {
       this.tags = config.tags;
       InAppStorySDK.setTags(config.tags);
@@ -339,6 +345,7 @@ export class StoryManager {
     InAppStorySDK.initWith(
       this.apiKey,
       this.userId,
+      this.userIdSign,
       this.sandbox,
       this.sendStatistics
     );
@@ -348,6 +355,7 @@ export class StoryManager {
     InAppStorySDK.initWith(
       this.apiKey,
       this.userId,
+      this.userIdSign,
       this.sandbox,
       this.sendStatistics
     );
@@ -389,10 +397,12 @@ export class StoryManager {
   removeTags(tags: string[]) {
     InAppStorySDK.removeTags(tags);
   }
-  setUserId(userId: string | number): void {
+  setUserId(userId: string | number, userIdSign?: string): void {
     // use string or null as userId (native sdk require String)
-    this.userId = userId != null ? String(userId) : null;
-    InAppStorySDK.setUserID(this.userId);
+    this.userId = userId != null ? String(userId) : '';
+    this.userIdSign = userIdSign != null ? String(userIdSign) : null;
+
+    InAppStorySDK.setUserID(this.userId, this.userIdSign);
   }
   setLang(lang: string): void {
     this.lang = lang;

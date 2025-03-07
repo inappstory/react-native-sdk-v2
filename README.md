@@ -48,7 +48,7 @@ Add following code to onCreate() function
 
 To use the library, create StoryService.ts, configure **storyManagerConfig** with your API key and adjust **appearanceManager** styles
 
-```js
+```ts
 import {
   AppearanceManager,
   StoriesListCardTitlePosition,
@@ -219,7 +219,7 @@ export const appearanceManager = createAppearanceManager();
 
 To display feed, use StoriesList component. **storiesListViewModel** allows to reload the story feed using **storiesListViewModel.current.reload()**.
 
-```jsx
+```tsx
 import { StoriesList } from '@inappstory/react-native-sdk';
 import {
   type StoriesListViewModel,
@@ -247,7 +247,7 @@ const viewModelExporter = React.useCallback(
 
 If you use favorites, use **onFavoriteCell** event that fires when user clicks on favorites cell
 
-```js
+```ts
 storyManager.on('onFavoriteCell', () => {
   //Navigate to favorites screen
 });
@@ -255,7 +255,7 @@ storyManager.on('onFavoriteCell', () => {
 
 To display favorite stories, pass **favoritesOnly** to <StoriesList>
 
-```jsx
+```tsx
 <StoriesList favoritesOnly={true} />
 ```
 
@@ -263,7 +263,7 @@ To display favorite stories, pass **favoritesOnly** to <StoriesList>
 
 To display items vertically, use **vertical=true**
 
-```jsx
+```tsx
 <StoriesList vertical={true} />
 ```
 
@@ -271,7 +271,7 @@ To display items vertically, use **vertical=true**
 
 To render custom cells, add renderCell function to **StoriesList**
 
-```jsx
+```tsx
 <StoriesList
   ...props
   renderCell={(story, {isFirstItem, isLastItem}) => {
@@ -282,25 +282,25 @@ To render custom cells, add renderCell function to **StoriesList**
 
 ## Games
 
-```js
+```ts
 InAppStorySDK.showGame(gameID);
 ```
 
 ## Tags
 
-```js
+```ts
 InAppStorySDK.setTags(['tag1']);
 ```
 
 ## Placeholders
 
-```js
+```ts
 InAppStorySDK.setPlaceholders({ username: 'John Doe' });
 ```
 
 ## Image Placeholders
 
-```js
+```ts
 InAppStorySDK.setImagesPlaceholders({
   image1: 'https://example.com/image.jpg',
 });
@@ -308,7 +308,7 @@ InAppStorySDK.setImagesPlaceholders({
 
 ## Story Reader Appearance
 
-```js
+```ts
 InAppStorySDK.setOverScrollToClose(value);
 InAppStorySDK.setSwipeToClose(value);
 InAppStorySDK.setTimerGradientEnable(value);
@@ -321,7 +321,7 @@ InAppStorySDK.setReaderCornerRadius(value);
 
 ## Likes, Share, Favorites
 
-```js
+```ts
 InAppStorySDK.setHasLike(value);
 InAppStorySDK.setHasShare(value);
 InAppStorySDK.setHasFavorites(value);
@@ -329,7 +329,7 @@ InAppStorySDK.setHasFavorites(value);
 
 ## Sound
 
-```js
+```ts
 //To change sound settings
 InAppStorySDK.changeSound(value);
 //Get sound status
@@ -340,7 +340,7 @@ const soundEnabled = await InAppStorySDK.getSound();
 
 To use goods widget, add a function that returns products to getGoodsObject
 
-```js
+```ts
 storyManager.getGoodsObject((skus) => {
   //TODO: return array of Goods
   return skus.map((sku) => ({
@@ -356,7 +356,7 @@ storyManager.getGoodsObject((skus) => {
 
 After goods item is selected,
 
-```js
+```ts
 storyManager.on('goodItemSelected', (payload: any) => {
    // User selected payload.sku SKU
 });
