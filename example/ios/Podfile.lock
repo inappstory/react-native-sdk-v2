@@ -940,9 +940,9 @@ PODS:
     - React-debug
   - react-native-get-random-values (1.11.0):
     - React-Core
-  - react-native-safe-area-context (4.14.1):
+  - react-native-safe-area-context (4.10.7):
     - React-Core
-  - react-native-sdk (0.22.0):
+  - react-native-sdk (0.23.0):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -964,10 +964,10 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-simple-toast (3.3.2):
+  - react-native-simple-toast (3.3.1):
     - React-Core
     - Toast (~> 4)
-  - react-native-video (6.10.2):
+  - react-native-video (6.3.0):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -981,7 +981,7 @@ PODS:
     - React-featureflags
     - React-graphics
     - React-ImageManager
-    - react-native-video/Video (= 6.10.2)
+    - react-native-video/Video (= 6.3.0)
     - React-NativeModulesApple
     - React-RCTFabric
     - React-rendererdebug
@@ -989,7 +989,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-video/Video (6.10.2):
+  - react-native-video/Video (6.3.0):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1239,11 +1239,11 @@ PODS:
     - React-logger (= 0.74.2)
     - React-perflogger (= 0.74.2)
     - React-utils (= 0.74.2)
-  - RNCPicker (2.11.0):
+  - RNCPicker (2.7.7):
     - React-Core
   - RNDeviceInfo (11.1.0):
     - React-Core
-  - RNGestureHandler (2.24.0):
+  - RNGestureHandler (2.17.1):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1264,7 +1264,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNReanimated (3.12.0):
+  - RNReanimated (3.13.0):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1285,7 +1285,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNScreens (3.36.0):
+  - RNScreens (3.32.0):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1309,15 +1309,15 @@ PODS:
     - Yoga
   - RNShare (10.2.1):
     - React-Core
-  - RNSVG (15.11.2):
+  - RNSVG (15.3.0):
     - React-Core
   - SocketRocket (0.7.0)
   - Toast (4.1.1)
-  - VisionCamera (4.6.4):
-    - VisionCamera/Core (= 4.6.4)
-    - VisionCamera/React (= 4.6.4)
-  - VisionCamera/Core (4.6.4)
-  - VisionCamera/React (4.6.4):
+  - VisionCamera (4.4.1):
+    - VisionCamera/Core (= 4.4.1)
+    - VisionCamera/React (= 4.4.1)
+  - VisionCamera/Core (4.4.1)
+  - VisionCamera/React (4.4.1):
     - React-Core
   - Yoga (0.0.0)
 
@@ -1586,10 +1586,10 @@ SPEC CHECKSUMS:
   React-logger: 70e002e04cc56ff5c12157537405d1644c050703
   React-Mapbuffer: 8d1f0fc6e7280a8ed6da70ece5f283ac5c8032cb
   react-native-get-random-values: d16467cf726c618e9c7a8c3c39c31faa2244bbba
-  react-native-safe-area-context: 758e894ca5a9bd1868d2a9cfbca7326a2b6bf9dc
-  react-native-sdk: a7e5463f0f76bbbc7786828bcc27a38d40c0e0b7
-  react-native-simple-toast: 4c9cc976cb92b6e5fb555e7c57fce38b90a56d07
-  react-native-video: ae1803bf93e88f8907f638f39233d12c1dd2f2d9
+  react-native-safe-area-context: 70eb1b5a323393076224b817f4508a2ec23be3f9
+  react-native-sdk: f51adb2baa5ddc0625adf1aee8bc90178bd6de72
+  react-native-simple-toast: f6316baf3870934e6e92cf48dbc9e330a5c8eb82
+  react-native-video: ffe771ad37b8a388b848f56bd4ea5a5887967cde
   React-nativeconfig: 9f223cd321823afdecf59ed00861ab2d69ee0fc1
   React-NativeModulesApple: 1cd770ed7dc463e55d02a05f7fc3be46076d393e
   React-perflogger: 32ed45d9cee02cf6639acae34251590dccd30994
@@ -1613,16 +1613,16 @@ SPEC CHECKSUMS:
   React-runtimescheduler: c5ba36755abc3c28a8cd327325b13599af586204
   React-utils: 08bb648cea0f37a0aa5df0c4f9ef50e5484ee0eb
   ReactCommon: 4968ff446d467c4def1945125e59f82e3e986af3
-  RNCPicker: 124b4fb5859ba1a3fd53a91e16d1e7a0fc016e59
+  RNCPicker: ba7ceb25a6e7c1d98aec9fa5a0d842934c7b316e
   RNDeviceInfo: 900bd20e1fd3bfd894e7384cc4a83880c0341bd3
-  RNGestureHandler: 4c50b5e4ca199cf497511d44e3fe45d54d62e279
-  RNReanimated: f1a8e928e0a5e8698c354c226d8d5f80629f8658
-  RNScreens: f586ee7107fd46715b9cb50b13201ae1d8af5bf5
+  RNGestureHandler: 77ca8899a0bd9a9d948e74174ee401bbffa5e524
+  RNReanimated: 0cfd3162e99b0388bd272f8e154d724148e3c496
+  RNScreens: 9b6c77e83fa17fb9cef0af508cdcb4f4dc07f468
   RNShare: 694e19d7f74ac4c04de3a8af0649e9ccc03bd8b1
-  RNSVG: 2df577ee9762d1b6deef820173b59b064c2570fe
+  RNSVG: e77adf5edb2302f0f10dd03a09e92bb9420d914e
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
   Toast: 1f5ea13423a1e6674c4abdac5be53587ae481c4e
-  VisionCamera: f56eaedde0d3fa095143b78374d29e89e71735f9
+  VisionCamera: 4dc6d934fca1d68019b18b2b6f8d83e76f5ff66a
   Yoga: ae3c32c514802d30f687a04a6a35b348506d411f
 
 PODFILE CHECKSUM: 0210e2087e5b6c89fa074c4f398f7206db8869d6
