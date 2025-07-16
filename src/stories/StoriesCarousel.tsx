@@ -2,7 +2,10 @@ import * as React from 'react';
 import { View, Platform } from 'react-native';
 import { StoryComponent } from './StoryComponent';
 import { FlatList, Pressable } from 'react-native';
-import InAppStorySDK from '@inappstory/react-native-sdk';
+import InAppStorySDK, {
+  type RenderCell,
+  type RenderFavoriteCell,
+} from '@inappstory/react-native-sdk';
 import { AppearanceManager, StoryManager } from '../index';
 import type {
   ViewabilityConfig,
@@ -21,6 +24,7 @@ export const StoriesCarousel = ({
   onFavoritePress,
   favoritesOnly,
   renderCell,
+  renderFavoriteCell,
   horizontal,
 }: {
   feed: any;
@@ -32,7 +36,8 @@ export const StoriesCarousel = ({
   favoriteStories: any;
   onFavoritePress: any;
   favoritesOnly: any;
-  renderCell: any;
+  renderCell: RenderCell | undefined;
+  renderFavoriteCell: RenderFavoriteCell | undefined;
   horizontal: any;
 }) => {
   const visibleIds = React.useRef<any>([]);
@@ -76,6 +81,16 @@ export const StoriesCarousel = ({
         />
       );
     } else {
+      if (renderFavoriteCell) {
+        return (
+          <Pressable
+            onPress={() => onFavoritePress(feed)}
+            key="favoriteCellPressable"
+          >
+            {renderFavoriteCell(story.favorites)}
+          </Pressable>
+        );
+      }
       return (
         <Pressable
           style={

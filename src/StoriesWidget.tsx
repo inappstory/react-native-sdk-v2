@@ -23,7 +23,7 @@ export const StoriesWidget = ({
   const ref = React.useRef(null);
   React.useEffect(() => {
     const viewId = findNodeHandle(ref.current);
-    if (Platform.OS == 'android') {
+    if (Platform.OS === 'android') {
       createFragment(viewId);
     }
     onViewLoaded(viewId);

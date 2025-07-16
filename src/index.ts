@@ -8,6 +8,7 @@ import parseSides from 'parse-css-sides';
 import { isFunction } from './helpers/isFunction';
 import type { StyleProp } from 'react-native/Libraries/StyleSheet/StyleSheet';
 import type { ViewStyle } from 'react-native/Libraries/StyleSheet/StyleSheetTypes';
+import React from 'react';
 
 export {
   StoriesList,
@@ -207,6 +208,13 @@ export type Story = {
   title: string;
   titleColor: string;
 };
+
+export type RenderCell = (
+  story: Story,
+  options: { isFirstItem: boolean; isLastItem: boolean }
+) => React.JSX.Element;
+
+export type RenderFavoriteCell = (stories: Array<Story>) => React.JSX.Element;
 
 const eventEmitter = new NativeEventEmitter(
   NativeModules.RNInAppStorySDKModule

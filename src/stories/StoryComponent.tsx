@@ -8,7 +8,7 @@ import {
   Platform,
 } from 'react-native';
 import Video from 'react-native-video';
-import { AppearanceManager, type Story, StoryManager } from '../index';
+import { AppearanceManager, type RenderCell, StoryManager } from '../index';
 
 export const StoryComponent = ({
   story,
@@ -28,10 +28,7 @@ export const StoryComponent = ({
   onPress: any;
   cellSize?: any;
   hideTitle?: any;
-  renderCell?: (
-    story: Story,
-    options: { isFirstItem: boolean; isLastItem: boolean }
-  ) => React.JSX.Element;
+  renderCell?: RenderCell;
   hideBorder?: any;
   isFirstItem?: boolean;
   isLastItem?: boolean;

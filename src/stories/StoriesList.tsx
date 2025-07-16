@@ -1,6 +1,9 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import InAppStorySDK, { type Story } from '@inappstory/react-native-sdk';
+import InAppStorySDK, {
+  type RenderCell,
+  type RenderFavoriteCell,
+} from '@inappstory/react-native-sdk';
 import { StoriesCarousel } from './StoriesCarousel';
 import { useStore } from '../hooks/useStore';
 import { useEvents } from '../hooks/useEvents';
@@ -16,6 +19,7 @@ export const StoriesList = ({
   showFavorites,
   favoritesOnly,
   renderCell,
+  renderFavoriteCell,
   vertical,
 }: {
   storyManager: StoryManager;
@@ -26,10 +30,8 @@ export const StoriesList = ({
   viewModelExporter?: any;
   showFavorites?: any;
   favoritesOnly?: any;
-  renderCell?: (
-    story: Story,
-    options: { isFirstItem: boolean; isLastItem: boolean }
-  ) => React.JSX.Element;
+  renderCell?: RenderCell;
+  renderFavoriteCell?: RenderFavoriteCell;
   vertical?: any;
 }) => {
   const updateVersion = useStore((state) => state.update);
@@ -118,6 +120,7 @@ export const StoriesList = ({
         onFavoritePress={onFavoritePress}
         favoritesOnly={favoritesOnly}
         renderCell={renderCell}
+        renderFavoriteCell={renderFavoriteCell}
         horizontal={!vertical}
       />
     </View>
