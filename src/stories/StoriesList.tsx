@@ -55,12 +55,13 @@ export const StoriesList = ({
       if (!feedEvents || !feedEvents.length) return;
       onLoadEnd({
         defaultListLength: feedEvents.length || 0,
+        favoriteListLength: feedFavoriteEvents.length || 0,
         feed,
         list: 'feed',
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [feedEvents.length, updateVersion]);
+  }, [feedEvents.length, feedFavoriteEvents.length, updateVersion]);
   React.useEffect(() => {
     viewModelExporter({
       reload: () => {

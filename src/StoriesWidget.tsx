@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import React from 'react';
 import { PixelRatio, Platform, UIManager, findNodeHandle } from 'react-native';
 import { InAppStoryFavorites, InappstorySdkViewManager } from './ViewManager';
 
@@ -20,8 +20,8 @@ export const StoriesWidget = ({
   feed,
   favoritesOnly,
 }) => {
-  const ref = useRef(null);
-  useEffect(() => {
+  const ref = React.useRef(null);
+  React.useEffect(() => {
     const viewId = findNodeHandle(ref.current);
     if (Platform.OS == 'android') {
       createFragment(viewId);
