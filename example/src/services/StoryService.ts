@@ -11,7 +11,6 @@ import {
 
 import { Linking, Platform } from 'react-native';
 import Toast from 'react-native-simple-toast';
-import InAppStorySDK from '@inappstory/react-native-sdk';
 
 const apiKey =
   'BewAAAAAAAAAAAAAABUaIThgHB0BP1FQNAZCQgVBAn8yIRY3g7XgQVkYvY_giYUG-0MTPizcaZlrbUbY9FjNevAAqg';
@@ -188,14 +187,3 @@ const createAppearanceManager = () => {
 export const storyManager = createStoryManager();
 
 export const appearanceManager = createAppearanceManager();
-
-InAppStorySDK.setFavoriteImage('icon_favorite', 'icon_favorite_inactive');
-// InAppStorySDK.setLikeImage('like', 'like_active');
-// InAppStorySDK.setDislikeImage(image, activeImage);
-// InAppStorySDK.setFavoriteImage(image, activeImage);
-// InAppStorySDK.setShareImage(image, activeImage);
-// InAppStorySDK.setSoundImage(image, activeImage);
-// InAppStorySDK.setCloseReaderImage(image);
-// InAppStorySDK.setRefreshImage(image);
-// InAppStorySDK.setRefreshGoodsImage(image);
-// InAppStorySDK.setCloseGoodsImage(image);
