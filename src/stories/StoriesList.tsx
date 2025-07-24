@@ -49,19 +49,22 @@ export const StoriesList = ({
   const fetchFeed = React.useCallback(async () => {
     storyManager.fetchFeed(feed);
   }, [feed, storyManager]);
+  const fetchFavoriteFeed = React.useCallback(async () => {
+    storyManager.fetchFavorites(feed);
+  }, [feed, storyManager]);
   React.useEffect(() => {
-    if (!favoritesOnly) {
-      if (updateVersion < 1) {
-        onLoadStart();
-      }
-      if (!feedEvents || !feedEvents.length) return;
-      onLoadEnd({
-        defaultListLength: feedEvents.length || 0,
-        favoriteListLength: feedFavoriteEvents.length || 0,
-        feed,
-        list: 'feed',
-      });
+    // if (!favoritesOnly) {
+    if (updateVersion < 1) {
+      onLoadStart();
     }
+    if (!feedEvents || !feedEvents.length) return;
+    onLoadEnd({
+      defaultListLength: feedEvents.length || 0,
+      favoriteListLength: feedFavoriteEvents.length || 0,
+      feed,
+      list: 'feed',
+    });
+    // }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [feedEvents.length, feedFavoriteEvents.length, updateVersion]);
   React.useEffect(() => {
@@ -80,7 +83,9 @@ export const StoriesList = ({
   }, []);
   React.useEffect(() => {
     setTimeout(() => {
-      if (!favoritesOnly) {
+      if (favoritesOnly) {
+        fetchFavoriteFeed();
+      } else {
         fetchFeed();
       }
     }, 10);
