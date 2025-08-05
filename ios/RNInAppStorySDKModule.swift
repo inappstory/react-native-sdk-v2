@@ -307,7 +307,8 @@ class RNInAppStorySDKModule: RCTEventEmitter {
                     RNInAppStorySDKModule.emitter.sendEvent(withName: "showStory", body: [
                         "id": storyData.id,
                         "feed": storyData.feed,
-                        "action": actionString
+                        "action": actionString,
+                        "slidesCount": storyData.slidesCount,
                     ])
               case .closeStory(slideData: let slideData, action: let action):
                     var actionString = "";
@@ -339,7 +340,8 @@ class RNInAppStorySDKModule: RCTEventEmitter {
                 case .showSlide(slideData: let slideData):
                     RNInAppStorySDKModule.emitter.sendEvent(withName: "showSlide", body: [
                       "id": slideData.storyData?.id,
-                      "index": slideData.index
+                      "index": slideData.index,
+                      "slidesCount": slideData.storyData?.slidesCount,
                     ])
 
                 case .likeStory(slideData: let slideData, value: let value):

@@ -271,7 +271,8 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                             null -> "unknown"
                         },
                         "feed" to story?.feed,
-                        "id" to story?.id
+                        "id" to story?.id,
+                        "slidesCount" to story?.slidesCount
 
                     ) as Map<String, Any>)
                 sendEvent(reactContext,"showStory", payload)
@@ -286,7 +287,8 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                 var payload = Arguments.makeNativeMap(
                         mutableMapOf(
                             "id" to slide?.story?.id,
-                            "index" to slide?.index
+                            "index" to slide?.index,
+                            "slidesCount" to slide?.story?.slidesCount
 
                         ) as Map<String, Any>)
                 sendEvent(reactContext,"showSlide", payload)
