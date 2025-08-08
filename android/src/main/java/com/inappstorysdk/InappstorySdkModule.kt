@@ -18,7 +18,9 @@ import com.inappstory.sdk.externalapi.InAppStoryAPI;
 import com.inappstory.sdk.externalapi.StoryAPIData;
 import com.inappstory.sdk.externalapi.StoryFavoriteItemAPIData;
 import com.inappstory.sdk.externalapi.subscribers.InAppStoryAPIListSubscriber;
-import com.inappstory.sdk.stories.ui.list.FavoriteImage;
+import com.inappstory.sdk.externalapi.storylist.IASStoryListSessionData;
+import com.inappstory.sdk.stories.ui.list.StoryFavoriteImage;
+import com.inappstory.sdk.core.api.IASDataSettingsHolder;
 
 import com.inappstory.sdk.stories.outercallbacks.common.errors.ErrorCallback;
 import com.inappstory.sdk.stories.outercallbacks.common.gamereader.GameReaderCallback;
@@ -26,8 +28,10 @@ import com.inappstory.sdk.game.reader.GameStoryData;
 
 import com.inappstory.sdk.stories.outercallbacks.common.reader.StoryWidgetCallback;
 import com.inappstory.sdk.stories.outercallbacks.common.reader.SlideData;
+import com.inappstory.sdk.stories.outercallbacks.common.reader.InAppMessageData;
 import com.inappstory.sdk.stories.outercallbacks.common.single.SingleLoadCallback;
 import com.inappstory.sdk.stories.outercallbacks.common.reader.StoryData;
+import com.inappstory.sdk.stories.outercallbacks.common.reader.ContentData;
 import com.inappstory.sdk.stories.outercallbacks.common.onboarding.OnboardingLoadCallback;
 import com.inappstory.sdk.stories.outercallbacks.common.reader.ClickOnShareStoryCallback;
 import com.inappstory.sdk.stories.outercallbacks.common.reader.LikeDislikeStoryCallback;
@@ -323,34 +327,40 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
         object : CallToActionCallback {
             override fun callToAction(
                 context: Context?, //Here context of story reader or context of storiesList if it calls from it's deeplinks
-                slide: SlideData?,
+                content: ContentData?,
                 url: String?,
                 action: ClickAction
             ) {
-                var payload = Arguments.makeNativeMap(
-                            mutableMapOf(
-                                "action" to when(action){
-                                    ClickAction.BUTTON -> "button"
-                                    ClickAction.SWIPE -> "swipe"
-                                    ClickAction.GAME -> "game"
-                                    ClickAction.DEEPLINK -> "deeplink"
-                                },
-                                "feed" to slide?.story?.feed,
-                                "index" to slide?.index,
-                                "id" to slide?.story?.id,
-                                "url" to url
 
-                            ) as Map<String, Any>)
+                if (content is SlideData) {
+                    var payload = Arguments.makeNativeMap(
+                                mutableMapOf(
+                                    "action" to when(action){
+                                        ClickAction.BUTTON -> "button"
+                                        ClickAction.SWIPE -> "swipe"
+                                        ClickAction.GAME -> "game"
+                                        ClickAction.DEEPLINK -> "deeplink"
+                                    },
+                                    "feed" to content?.story?.feed,
+                                    "index" to content?.index,
+                                    "id" to content?.story?.id,
+                                    "url" to url
 
-                Log.d("InappstorySdkModule","callToAction slide = $slide url = $url action= $action");
-                // currently not work two sendEvent simultaneously
-                //if (action == ClickAction.BUTTON) {
-                    // just event
-                    //sendEvent(reactContext, "clickOnButton", payload)
-                //}
-                // CTA(link) handler
-                sendEvent(reactContext, "handleCTA", payload)
+                                ) as Map<String, Any>)
 
+                    Log.d("InappstorySdkModule","callToAction slide = $content url = $url action= $action");
+                    // currently not work two sendEvent simultaneously
+                    //if (action == ClickAction.BUTTON) {
+                        // just event
+                        //sendEvent(reactContext, "clickOnButton", payload)
+                    //}
+                    // CTA(link) handler
+                    sendEvent(reactContext, "handleCTA", payload)
+                } else if (content is InAppMessageData) {
+                    //val inAppMessageId: Int = content.id
+                    //val title: String? = content.title
+                    //val event: String? = content.event
+                }
             }
         }
     )
@@ -424,7 +434,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
     )
       this.ias?.setOnboardingLoadCallback(
         object : OnboardingLoadCallback {
-            override fun onboardingLoad(count: Int, feed: String?) {
+            override fun onboardingLoadSuccess(count: Int, feed: String?) {
                 var payload = Arguments.makeNativeMap(
                         mutableMapOf(
                             "count" to count,
@@ -432,13 +442,24 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
 
                         ) as Map<String, Any>)
                 sendEvent(reactContext,"onboardingLoad", payload)
-                Log.d("InappstorySdkModule","onboardingLoad count = $count, feed = $feed");
+                Log.d("InappstorySdkModule","onboardingLoadSuccess count = $count, feed = $feed");
             }
+
+            override fun onboardingLoadError(feed: String?, reason: String?) {
+                var payload = Arguments.makeNativeMap(
+                    mutableMapOf(
+                        "feed" to feed,
+                        "reason" to reason,
+                    ) as Map<String, Any>)
+                sendEvent(reactContext,"loadOnboardingError", payload)
+                Log.d("InappstorySdkModule","loadOnboardingError reason = $reason, feed = $feed");
+            }
+
         }
     )
       this.ias?.setSingleLoadCallback(
         object : SingleLoadCallback {
-            override fun singleLoad(story: StoryData?) {
+            override fun singleLoadSuccess(story: StoryData?) {
                 var payload = Arguments.makeNativeMap(
                         mutableMapOf(
                             "id" to story?.id,
@@ -446,7 +467,19 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
 
                         ) as Map<String, Any>)
                 sendEvent(reactContext,"singleLoad", payload)
-                Log.d("InappstorySdkModule","singleLoad story = $story");
+                Log.d("InappstorySdkModule","singleLoadSuccess story = $story");
+            }
+
+            override fun singleLoadError(storyId: String?, reason: String?) {
+                //val payload:WritableMap = Arguments.createMap()
+                var payload = Arguments.makeNativeMap(
+                        mutableMapOf(
+                            "id" to storyId,
+                            "reason" to reason,
+
+                        ) as Map<String, Any>)
+                sendEvent(reactContext,"loadSingleError", payload)
+                Log.d("InappstorySdkModule","loadSingleError storyId = $storyId, reason = $reason");
             }
         }
     )
@@ -473,87 +506,99 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
       this.ias?.setGameReaderCallback(
         object : GameReaderCallback {
             override fun startGame(
-                gameStoryData: GameStoryData?,
+                content: ContentData?,
                 id: String?
             ) {
-                var payload = Arguments.makeNativeMap(
-                mutableMapOf(
-                    "storyID" to gameStoryData?.slideData?.story?.id,
-                    "index" to gameStoryData?.slideData?.index,
-                    "id" to id
-                ) as Map<String, Any>)
-                sendEvent(reactContext,"startGame", payload)
+                if (content is GameStoryData) {
+                    var payload = Arguments.makeNativeMap(
+                    mutableMapOf(
+                        "storyID" to content?.slideData?.story?.id,
+                        "index" to content?.slideData?.index,
+                        "id" to id
+                    ) as Map<String, Any>)
+                    sendEvent(reactContext,"startGame", payload)
+                }
             }
 
             override fun finishGame(
-                gameStoryData: GameStoryData?,
+                content: ContentData?,
                 result: String?,
                 id: String?
             ) {
-                var payload = Arguments.makeNativeMap(
-                mutableMapOf(
-                    "storyID" to gameStoryData?.slideData?.story?.id,
-                    "index" to gameStoryData?.slideData?.index,
-                    "result" to result,
-                    "id" to id
-                ) as Map<String, Any>)
-                sendEvent(reactContext,"finishGame", payload)
+               if (content is GameStoryData) {
+                    var payload = Arguments.makeNativeMap(
+                    mutableMapOf(
+                        "storyID" to content?.slideData?.story?.id,
+                        "index" to content?.slideData?.index,
+                        "result" to result,
+                        "id" to id
+                    ) as Map<String, Any>)
+                    sendEvent(reactContext,"finishGame", payload)
+                }
             }
 
             override fun closeGame(
-                gameStoryData: GameStoryData?,
+                content: ContentData?,
                 id: String?
             ) {
-                var payload = Arguments.makeNativeMap(
-                mutableMapOf(
-                    "storyID" to gameStoryData?.slideData?.story?.id,
-                    "index" to gameStoryData?.slideData?.index,
-                    "id" to id
-                ) as Map<String, Any>)
-                sendEvent(reactContext,"closeGame", payload)
+               if (content is GameStoryData) {
+                    var payload = Arguments.makeNativeMap(
+                    mutableMapOf(
+                        "storyID" to content?.slideData?.story?.id,
+                        "index" to content?.slideData?.index,
+                        "id" to id
+                    ) as Map<String, Any>)
+                    sendEvent(reactContext,"closeGame", payload)
+                }
             }
             override fun gameLoadError(
-                gameStoryData: GameStoryData?,
+                content: ContentData?,
                 id: String?
             ) {
-                var payload = Arguments.makeNativeMap(
-                mutableMapOf(
-                    "storyID" to gameStoryData?.slideData?.story?.id,
-                    "index" to gameStoryData?.slideData?.index,
-                    "id" to id
-                ) as Map<String, Any>)
-                sendEvent(reactContext,"gameFailure", payload)
-                Log.d("InappstorySdkModule","gameLoadError gameStoryData = $gameStoryData, id = $id");
+                if (content is GameStoryData) {
+                    var payload = Arguments.makeNativeMap(
+                    mutableMapOf(
+                        "storyID" to content?.slideData?.story?.id,
+                        "index" to content?.slideData?.index,
+                        "id" to id
+                    ) as Map<String, Any>)
+                    sendEvent(reactContext,"gameFailure", payload)
+                    Log.d("InappstorySdkModule","gameLoadError gameStoryData = $content, id = $id");
+                }
             }
             override fun gameOpenError(
-              gameStoryData: GameStoryData?,
+              content: ContentData?,
               id: String?
           ) {
-            var payload = Arguments.makeNativeMap(
-                mutableMapOf(
-                    "storyID" to gameStoryData?.slideData?.story?.id,
-                    "index" to gameStoryData?.slideData?.index,
-                    "id" to id
-                ) as Map<String, Any>)
-            sendEvent(reactContext,"gameFailure", payload)
-            Log.d("InappstorySdkModule","gameOpenError gameStoryData = $gameStoryData, id = $id");
+              if (content is GameStoryData) {
+                var payload = Arguments.makeNativeMap(
+                    mutableMapOf(
+                        "storyID" to content?.slideData?.story?.id,
+                        "index" to content?.slideData?.index,
+                        "id" to id
+                    ) as Map<String, Any>)
+                sendEvent(reactContext,"gameFailure", payload)
+                Log.d("InappstorySdkModule","gameOpenError gameStoryData = $content, id = $id");
+            }
           }
             override fun eventGame(
-                gameStoryData: GameStoryData?,
+                content: ContentData?,
                 id: String?,
                 id2: String?,
                 id3: String?
             ) {
-                var payload = Arguments.makeNativeMap(
-                    mutableMapOf(
-                        "storyID" to gameStoryData?.slideData?.story?.id,
-                        "index" to gameStoryData?.slideData?.index,
-                        "id" to id,
-                        "id2" to id2,
-                        "id3" to id3
-                    ) as Map<String, Any>)
-                sendEvent(reactContext,"eventGame", payload)
-                Log.d("InappstorySdkModule","eventGame gameStoryData = $gameStoryData, id = $id , id2 = $id2 , id3 = $id3");
+                if (content is GameStoryData) {
+                    var payload = Arguments.makeNativeMap(
+                        mutableMapOf(
+                            "storyID" to content?.slideData?.story?.id,
+                            "index" to content?.slideData?.index,
+                            "id" to id,
+                            "id2" to id2,
+                            "id3" to id3
+                        ) as Map<String, Any>)
+                    sendEvent(reactContext,"eventGame", payload)
+                    Log.d("InappstorySdkModule","eventGame gameStoryData = $content, id = $id , id2 = $id2 , id3 = $id3");
+                }
             }
         }
     )
@@ -568,32 +613,17 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                 Log.d("InappstorySdkModule","loadListError feed = $feed");
             }
 
-            override fun loadOnboardingError(feed: String?) {
-                var payload = Arguments.makeNativeMap(
-                    mutableMapOf(
-                        "feed" to feed
-                    ) as Map<String, Any>)
-                sendEvent(reactContext,"loadOnboardingError", payload)
-                Log.d("InappstorySdkModule","loadOnboardingError feed = $feed");
-            }
-
-            override fun loadSingleError() {
-                val payload:WritableMap = Arguments.createMap()
-                sendEvent(reactContext,"loadSingleError", payload)
-                Log.d("InappstorySdkModule","loadSingleError");
-            }
-
             override fun cacheError() {
                 val payload:WritableMap = Arguments.createMap()
                 sendEvent(reactContext,"cacheError", payload)
                 Log.d("InappstorySdkModule","cacheError");
             }
 
-            override fun readerError() {
-                val payload:WritableMap = Arguments.createMap()
-                sendEvent(reactContext,"readerError", payload)
-                Log.d("InappstorySdkModule","readerError");
-            }
+            //override fun readerError() {
+            //    val payload:WritableMap = Arguments.createMap()
+            //    sendEvent(reactContext,"readerError", payload)
+            //    Log.d("InappstorySdkModule","readerError");
+            //}
 
             override fun emptyLinkError() {
                 val payload:WritableMap = Arguments.createMap()
@@ -683,7 +713,8 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
   @ReactMethod
   fun getSound(promise: Promise) {
       Log.d("InappstorySdkModule", "getSound")
-      promise.resolve(this.ias?.soundOn())
+      // promise.resolve(this.ias?.soundOn())
+      promise.resolve((this.ias?.iasCore()?.settingsAPI() as IASDataSettingsHolder).isSoundOn())
   }
 
   @ReactMethod
@@ -1048,14 +1079,10 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                 Log.e(TAG, "$feed updateFavoriteItemData: $favorites")
             }
 
-            override fun updateStoryData(story: StoryAPIData) {
-                var sessionData:CachedSessionData = CachedSessionData.getInstance(reactContext);
-                var aspectRatio:Float = 1.0f;
-                if (sessionData != null) {
-                    aspectRatio = sessionData.previewAspectRatio;
-                    Log.e(TAG, "aspectratio return $aspectRatio ")
-                }
-                Log.e(TAG, "$feed updateStoryData: $story")
+            override fun updateStoryData(story: StoryAPIData, sessionData: IASStoryListSessionData) {
+                val aspectRatio = sessionData.previewAspectRatio();
+                Log.e(TAG, "aspect ratio return $aspectRatio ")
+                Log.e(TAG, "updateStoryData: $story")
                 var payload = Arguments.makeNativeMap(
                         mutableMapOf(
                             "storyID" to story.id,
@@ -1066,23 +1093,21 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                             "backgroundColor" to story.backgroundColor,
                             "titleColor" to story.titleColor,
                             "opened" to story.opened,
-                            "hasAudio" to false, //FIXME
+                            "hasAudio" to story.hasAudio,
                             "list" to feed,
                             "feed" to story.storyData.feed,
-                            "aspectRatio" to aspectRatio
+                            "aspectRatio" to aspectRatio,
+                            "slidesCount" to story.storyData.slidesCount,
+                            "statTitle" to story.storyData.title,
                         ) as Map<String, Any>)
                     Log.e(TAG, "Item = $story")
                 sendEvent(reactContext,"storyUpdate", payload)
             }
 
-            override fun updateStoriesData(stories: List<StoryAPIData>) {
+            override fun updateStoriesData(stories: List<StoryAPIData>, sessionData: IASStoryListSessionData) {
                 Log.e(TAG, "$feed updateStoriesData: $stories")
-                var sessionData:CachedSessionData = CachedSessionData.getInstance(reactContext);
-                var aspectRatio:Float = 1.0f;
-                if (sessionData != null) {
-                    aspectRatio = sessionData.previewAspectRatio;
-                    Log.e(TAG, "aspectratio return $aspectRatio ")
-                }
+                val aspectRatio = sessionData.previewAspectRatio();
+                Log.e(TAG, "aspect ratio return $aspectRatio ")
                 val storiesList = ArrayList<WritableNativeMap>()
                 val iterator = stories.listIterator()
                 for (item in iterator) {
@@ -1096,10 +1121,12 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                             "backgroundColor" to item.backgroundColor,
                             "titleColor" to item.titleColor,
                             "opened" to item.opened,
-                            "hasAudio" to false, //FIXME
+                            "hasAudio" to item.hasAudio,
                             "list" to feed,
                             "feed" to item.storyData.feed,
-                            "aspectRatio" to aspectRatio
+                            "aspectRatio" to aspectRatio,
+                            "slidesCount" to item.storyData.slidesCount,
+                            "statTitle" to item.storyData.title,
                         ) as Map<String, Any>)
                     Log.e(TAG, "Item = $item")
 

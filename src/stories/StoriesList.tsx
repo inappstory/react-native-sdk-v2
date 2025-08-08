@@ -39,6 +39,7 @@ export const StoriesList = ({
   const feedEvents = _feedEvents || [];
   const feedFavoriteEvents = useStore((state) => state.feeds_default_favorites);
   const clearUpdate = useStore((state) => state.clearUpdate);
+  const addEvent = useStore((state) => state.addEvent);
 
   const {} = useEvents();
   //const userID = storyManager.userId;
@@ -91,18 +92,45 @@ export const StoriesList = ({
     }, 10);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  const onPress = React.useCallback((story) => {
-    InAppStorySDK.selectStoryCellWith(String(story.storyID));
-  }, []);
+  const onPress = React.useCallback(
+    (story, index) => {
+      addEvent({
+        event: 'clickOnStory',
+        data: {
+          id: story.storyID,
+          feed,
+          index,
+          slidesCount: story.slidesCount,
+          title: story.statTitle,
+        },
+        time: +Date.now(),
+      });
+
+      InAppStorySDK.selectStoryCellWith(String(story.storyID));
+    },
+    [addEvent, feed]
+  );
   const onFavoritePress = React.useCallback(
-    (story) => {
+    (story, index) => {
       if (typeof story === 'string') {
         storyManager.onFavoriteCell(feed);
       } else {
+        addEvent({
+          event: 'clickOnStory',
+          data: {
+            id: story.storyID,
+            feed,
+            index,
+            slidesCount: story.slidesCount,
+            title: story.statTitle,
+          },
+          time: +Date.now(),
+        });
+
         InAppStorySDK.selectFavoriteStoryCellWith(String(story.storyID));
       }
     },
-    [feed, storyManager]
+    [feed, storyManager, addEvent]
   );
 
   const styles = StyleSheet.create({

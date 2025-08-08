@@ -76,6 +76,7 @@ export const StoriesCarousel = ({
           appearanceManager={appearanceManager}
           onPress={!favoritesOnly ? onPress : onFavoritePress}
           renderCell={renderCell}
+          cardIndex={index}
           isFirstItem={index === 0}
           isLastItem={index === datasource.length - 1}
         />

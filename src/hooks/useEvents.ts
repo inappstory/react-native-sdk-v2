@@ -25,10 +25,8 @@ export const useEvents = () => {
     const storiesEvents = [
       'storiesLoaded',
       'ugcStoriesLoaded',
-      'clickOnStory',
       'showStory',
       'closeStory',
-      'clickOnButton',
       'showSlide',
       'likeStory',
       'dislikeStory',

@@ -19,6 +19,7 @@ export const StoryComponent = ({
   hideTitle,
   renderCell,
   hideBorder,
+  cardIndex,
   isFirstItem = false,
   isLastItem = false,
 }: {
@@ -30,6 +31,7 @@ export const StoryComponent = ({
   hideTitle?: any;
   renderCell?: RenderCell;
   hideBorder?: any;
+  cardIndex?: number;
   isFirstItem?: boolean;
   isLastItem?: boolean;
 }) => {
@@ -125,7 +127,7 @@ export const StoryComponent = ({
   }
   if (renderCell) {
     return (
-      <Pressable onPress={() => onPress(story)}>
+      <Pressable onPress={() => onPress(story, cardIndex)}>
         {renderCell(story, { isFirstItem, isLastItem })}
       </Pressable>
     );
@@ -195,7 +197,7 @@ export const StoryComponent = ({
         paddingTop: cellSize ? 1 : 0,
         paddingBottom: 0,
       }}
-      onPress={() => onPress(story)}
+      onPress={() => onPress(story, cardIndex)}
     >
       {cardOutsideTop && titleBox}
       <View

@@ -19,7 +19,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   public static var emitter: RCTEventEmitter!
   open override func supportedEvents() -> [String] {
     [
-     "storiesLoaded","ugcStoriesLoaded","clickOnStory","showStory","closeStory","clickOnButton","showSlide","likeStory","dislikeStory","favoriteStory","clickOnShareStory","storyWidgetEvent",
+     "storiesLoaded","ugcStoriesLoaded","showStory","closeStory","showSlide","likeStory","dislikeStory","favoriteStory","clickOnShareStory","storyWidgetEvent",
      "startGame", "finishGame", "closeGame", "eventGame", "gameFailure","gameReaderWillShow","gameReaderDidClose","gameComplete",
      "getGoodsObject",
      "storyListUpdate", "storyUpdate",
@@ -282,12 +282,6 @@ class RNInAppStorySDKModule: RCTEventEmitter {
                           "feed": feed,
                           "stories": stories,
                       ])
-              case .clickOnStory(storyData: let storyData, index: let index):
-                      RNInAppStorySDKModule.emitter.sendEvent(withName: "clickOnStory", body: [
-                          "id": storyData.id,
-                          "feed": storyData.feed,
-                          "index": index,
-                    ])
               case .showStory(storyData: let storyData, action: let action):
                  var actionString = "";
                  switch action {
@@ -329,12 +323,6 @@ class RNInAppStorySDKModule: RCTEventEmitter {
                         "feed": slideData.storyData?.feed,
                         "index": slideData.index,
                         "action": actionString,
-                    ])
-                case .clickOnButton(slideData: let slideData, link: let link):
-                    RNInAppStorySDKModule.emitter.sendEvent(withName: "clickOnButton", body: [
-                      "url":link,
-                      "id": slideData.storyData?.id,
-                      "feed": slideData.storyData?.feed,
                     ])
 
                 case .showSlide(slideData: let slideData):
@@ -378,6 +366,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
                     ])
                 case .ugcStoriesLoaded(stories: let stories):
                     RNInAppStorySDKModule.emitter.sendEvent(withName: "ugcStoriesLoaded", body: [])
+
                 @unknown default:
                      NSLog("WARNING: unknown storiesEvent")
 
@@ -457,6 +446,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
     //image for close button
     InAppStory.shared.goodsCloseImage: UIImage   = UIImage(named: "goodsClose")!*/
     self.storiesAPI.storyListUpdate = {storiesList,isFavorite,feed in
+        //print("storyListUpdate \(storiesList)");
         RNInAppStorySDKModule.emitter.sendEvent(withName: "storyListUpdate", body: [
           "stories": storiesList.map { [
             "storyID": $0.storyID,
@@ -471,6 +461,8 @@ class RNInAppStorySDKModule: RCTEventEmitter {
             "list": "feed",
             "feed": feed,
             "aspectRatio": self.storiesAPI.cellRatio,
+            "slidesCount": $0.storyData.slidesCount,
+            "statTitle": $0.storyData.title,
           ]},
             "feed": feed,
             "list": "feed",
@@ -490,6 +482,8 @@ class RNInAppStorySDKModule: RCTEventEmitter {
           "list": "feed",
           "feed": storyData.storyData.feed,
           "aspectRatio": self.storiesAPI.cellRatio,
+          "slidesCount": storyData.storyData.slidesCount,
+          "statTitle": storyData.storyData.title,
         ])
     }
     self.favoriteStoriesAPI.storyListUpdate = {storiesList,isFavorite, feed in
@@ -508,6 +502,8 @@ class RNInAppStorySDKModule: RCTEventEmitter {
                 "list": "favorites",
                 "feed": "default",
                 "aspectRatio": self.storiesAPI.cellRatio,
+                "slidesCount": $0.storyData.slidesCount,
+                "statTitle": $0.storyData.title,
               ]},
                 "feed": "default",
                 "list": "favorites",
@@ -526,6 +522,8 @@ class RNInAppStorySDKModule: RCTEventEmitter {
               "list": "favorites",
               "feed": storyData.storyData.feed,
               "aspectRatio": self.storiesAPI.cellRatio,
+              "slidesCount": storyData.storyData.slidesCount,
+              "statTitle": storyData.storyData.title,
             ])
           }
   }
@@ -979,15 +977,15 @@ class RNInAppStorySDKModule: RCTEventEmitter {
         DispatchQueue.main.async {
             switch (value) {
                 case "bottomLeft":
-                  InAppStory.shared.closeButtonPosition = .bottomLeft
+              InAppStory.shared.closeButtonPosition = .leadingBottom
                 case "bottomRight":
-                  InAppStory.shared.closeButtonPosition = .bottomRight
+              InAppStory.shared.closeButtonPosition = .trailingBottom
                 case "left":
-                  InAppStory.shared.closeButtonPosition = .left
+              InAppStory.shared.closeButtonPosition = .leading
                 case "right":
-                  InAppStory.shared.closeButtonPosition = .right
+              InAppStory.shared.closeButtonPosition = .trailing
                 default:
-                  InAppStory.shared.closeButtonPosition = .right
+              InAppStory.shared.closeButtonPosition = .trailing
             }
         }
   }
