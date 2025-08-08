@@ -271,6 +271,9 @@ export class StoryManager {
     if (config.defaultMuted) {
       this.soundEnabled = false;
       InAppStorySDK.changeSound(false);
+    } else {
+      this.soundEnabled = true;
+      InAppStorySDK.changeSound(true);
     }
 
     if (
