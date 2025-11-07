@@ -4,6 +4,7 @@ import * as React from 'react';
 import { NativeEventEmitter, NativeModules } from 'react-native';
 import { useStore } from './useStore';
 import InAppStorySDK from '@inappstory/react-native-sdk';
+import { nativeEventList } from '../nativeEventList';
 let init = false;
 export const useEvents = () => {
   const addEvent = useStore((state) => state.addEvent);
@@ -22,59 +23,8 @@ export const useEvents = () => {
       NativeModules.RNInAppStorySDKModule
     );
     let eventListeners: Array<any> = [];
-    const storiesEvents = [
-      'storiesLoaded',
-      'ugcStoriesLoaded',
-      'showStory',
-      'closeStory',
-      'showSlide',
-      'likeStory',
-      'dislikeStory',
-      'favoriteStory',
-      'clickOnShareStory',
-      'storyWidgetEvent',
-    ];
-    const gameEvents = [
-      'startGame',
-      'finishGame',
-      'closeGame',
-      'eventGame',
-      'gameFailure',
-      'gameReaderWillShow',
-      'gameReaderDidClose',
-      'gameComplete',
-    ];
-    const storyListEvents = [
-      'storyListUpdate',
-      'storyUpdate',
-      'favoritesUpdate',
-    ];
-    const goodsEvents = ['getGoodsObject'];
-    const systemEvents = [
-      'storyReaderWillShow',
-      'storyReaderDidClose',
-      'sessionFailure',
-      'storyFailure',
-      'currentStoryFailure',
-      'networkFailure',
-      'requestFailure',
-      'favoriteCellDidSelect',
-      'editorCellDidSelect',
-      'customShare',
-      'onActionWith',
-      'storiesDidUpdated',
-      'goodItemSelected',
-      'favoritesUpdate',
-      'scrollUpdate',
-      'handleCTA',
-    ];
-    [
-      ...storiesEvents,
-      ...gameEvents,
-      ...storyListEvents,
-      ...goodsEvents,
-      ...systemEvents,
-    ].forEach((eventName) => {
+
+    nativeEventList.forEach((eventName) => {
       eventListeners.push(
         eventEmitter.addListener(eventName, async (event) => {
           if (eventName == 'storyReaderWillShow') {

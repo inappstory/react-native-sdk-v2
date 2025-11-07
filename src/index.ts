@@ -9,6 +9,7 @@ import { isFunction } from './helpers/isFunction';
 import type { StyleProp } from 'react-native/Libraries/StyleSheet/StyleSheet';
 import type { ViewStyle } from 'react-native/Libraries/StyleSheet/StyleSheetTypes';
 import React from 'react';
+import { nativeEventList } from './nativeEventList';
 
 export {
   StoriesList,
@@ -388,16 +389,20 @@ export class StoryManager {
   on(eventName: string | symbol, listener: any) {
     //super.on(eventName, listener);
 
-    eventEmitter.addListener(getEventName(eventName), async (event) => {
-      listener(event);
-    });
+    if (nativeEventList.includes(getEventName(eventName))) {
+      eventEmitter.addListener(getEventName(eventName), async (event) => {
+        listener(event);
+      });
+    }
     return this;
   }
   once(eventName: string | symbol, listener: any) {
     //super.on(eventName, listener);
-    eventEmitter.addListener(getEventName(eventName), async (event) => {
-      listener(event);
-    });
+    if (nativeEventList.includes(getEventName(eventName))) {
+      eventEmitter.addListener(getEventName(eventName), async (event) => {
+        listener(event);
+      });
+    }
     return this;
   }
 
