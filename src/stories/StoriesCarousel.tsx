@@ -130,7 +130,15 @@ export const StoriesCarousel = ({
     }
   };
 
-  if (typeof stories === 'undefined' || !stories.length)
+  let emptyList = false;
+  if (typeof stories === 'undefined' || !stories.length) {
+    emptyList = true;
+  }
+  if (emptyList && showFavorites && favoriteStories?.length) {
+    emptyList = false;
+  }
+
+  if (emptyList)
     return (
       <View
         style={{
@@ -166,6 +174,9 @@ export const StoriesCarousel = ({
       ref={flatListRef}
       onEndReached={() => {
         if (Platform.OS === 'android') flatListRef?.current?.scrollToEnd();
+      }}
+      style={{
+        minHeight: appearanceManager?.storiesListOptions.card.height + 7,
       }}
     />
   );

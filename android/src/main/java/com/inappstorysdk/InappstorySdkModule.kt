@@ -110,7 +110,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
 
     @ReactMethod
     fun getStories(feed: String) {
-        Log.d("InappstorySdkModule", "getStories");
+        Log.d("InappstorySdkModule", "getStories for feed: " + feed);
         this.api?.storyList?.load(
             feed,
             "feed",
@@ -1068,9 +1068,9 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
             sandbox,
         )
         this.ias?.let {
-            val f1: Field = it.javaClass.getDeclaredField("sendStatistic")
-            f1.isAccessible = true
-            f1.set(it, sendStatistic)
+            val method = it.javaClass.getDeclaredMethod("sendStatistic", Boolean::class.java)
+            method.isAccessible = true
+            method.invoke(it, sendStatistic)
         }
     }
     fun subscribeLists(inAppStoryAPI: InAppStoryAPI, feed: String) {
@@ -1108,6 +1108,12 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                 Log.e(TAG, "$feed updateStoriesData: $stories")
                 val aspectRatio = sessionData.previewAspectRatio();
                 Log.e(TAG, "aspect ratio return $aspectRatio ")
+
+                var storiesFeed = sessionData.feed();
+                if (feed == "favorites") {
+                    storiesFeed = "default"
+                }
+
                 val storiesList = ArrayList<WritableNativeMap>()
                 val iterator = stories.listIterator()
                 for (item in iterator) {
@@ -1146,7 +1152,8 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
                 }*/
                 val payload:WritableMap = Arguments.createMap()
                 payload.putArray("stories", Arguments.makeNativeArray(storiesList));
-                payload.putString("feed", "default")
+             //   payload.putString("feed", "default")
+                payload.putString("feed", storiesFeed)
                 payload.putString("list", feed)
                 //map.putString("key1", "Value1");
                 sendEvent(reactContext,"storyListUpdate", payload)

@@ -58,7 +58,7 @@ export const StoriesList = ({
     if (updateVersion < 1) {
       onLoadStart();
     }
-    if (!feedEvents || !feedEvents.length) return;
+    if (!feedEvents) return;
     onLoadEnd({
       defaultListLength: feedEvents.length || 0,
       favoriteListLength: feedFavoriteEvents.length || 0,
