@@ -12,7 +12,7 @@ import android.os.Looper;
 
 import com.inappstory.sdk.InAppStoryManager;
 import com.inappstory.sdk.AppearanceManager;
-import com.inappstory.sdk.ugc.UGCInAppStoryManager;
+//import com.inappstory.sdk.ugc.UGCInAppStoryManager;
 
 import com.inappstory.sdk.externalapi.InAppStoryAPI;
 import com.inappstory.sdk.externalapi.StoryAPIData;
@@ -1047,9 +1047,9 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
     @ReactMethod
     fun showEditor() {
         Log.d("IAS","openEditor")
-        this.appearanceManager?.csHasUGC(true)
-        UGCInAppStoryManager.init(reactContext.currentActivity as Context)
-        UGCInAppStoryManager.openEditor(reactContext.currentActivity as Context)
+        //this.appearanceManager?.csHasUGC(true)
+        //UGCInAppStoryManager.init(reactContext.currentActivity as Context)
+        //UGCInAppStoryManager.openEditor(reactContext.currentActivity as Context)
         //promise.resolve(true)
     }
     private fun createManager(apiKey: String, userID: String, userIdSign: String?, sandbox: Boolean, sendStatistic: Boolean, inAppStoryAPI: InAppStoryAPI) {
