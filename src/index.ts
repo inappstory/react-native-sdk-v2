@@ -59,6 +59,11 @@ export enum AndroidWindowSoftInputMode {
   Unchanged = 'Unchanged',
 }
 
+export enum CoverQuality {
+  MEDIUM = 'medium',
+  HIGH = 'high',
+}
+
 export declare type ClickPayload = {
   id: number;
   index: number;
@@ -375,7 +380,7 @@ export class StoryManager {
   async fetchFeed(feed: string) {
     InAppStorySDK.getStories(feed);
     //if (include_favorites) {
-    InAppStorySDK.getFavoriteStories(feed);
+    // InAppStorySDK.getFavoriteStories(feed);
     //}
   }
   async fetchFavorites(feed) {
@@ -534,6 +539,7 @@ export class AppearanceManager {
   storiesListOptions: any = null;
   storyReaderOptions: any = null;
   storyFavoriteReaderOptions: any = null;
+  coverQuality = CoverQuality.MEDIUM;
   commonOptions: any = null;
   //TODO: Migrate the APIs from JS to Native
   setCommonOptions(
@@ -543,6 +549,7 @@ export class AppearanceManager {
       hasLikeButton: boolean;
       hasDislikeButton: boolean;
       hasShare: boolean;
+      coverQuality: CoverQuality;
     }>
   ) {
     this.commonOptions = deepmerge(this.commonOptions, options);
@@ -550,6 +557,7 @@ export class AppearanceManager {
     //InAppStorySDK.setHasDislike(options.hasDislikeButton);
     InAppStorySDK.setHasFavorites(this.commonOptions.hasFavorite);
     InAppStorySDK.setHasShare(this.commonOptions.hasShare);
+    InAppStorySDK.setCoverQuality(this.commonOptions.coverQuality.valueOf());
     return this;
   }
   setStoryFavoriteReaderOptions(
