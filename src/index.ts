@@ -59,6 +59,11 @@ export enum AndroidWindowSoftInputMode {
   Unchanged = 'Unchanged',
 }
 
+export enum CoverQuality {
+  MEDIUM = 'medium',
+  HIGH = 'high',
+}
+
 export declare type ClickPayload = {
   id: number;
   index: number;
@@ -527,14 +532,24 @@ export class StoryManager {
   };
 }
 export class AppearanceManager {
-  hasLike = true;
-  hasDislike = true;
-  hasFavorites = true;
-  hasShare = true;
   storiesListOptions: any = null;
   storyReaderOptions: any = null;
   storyFavoriteReaderOptions: any = null;
-  commonOptions: any = null;
+  commonOptions: {
+    hasFavorite: boolean;
+    hasLike: boolean;
+    hasLikeButton: boolean;
+    hasDislikeButton: boolean;
+    hasShare: boolean;
+    coverQuality: CoverQuality;
+  } = {
+    hasFavorite: true,
+    hasLike: true,
+    hasLikeButton: true,
+    hasDislikeButton: true,
+    hasShare: true,
+    coverQuality: CoverQuality.MEDIUM,
+  };
   //TODO: Migrate the APIs from JS to Native
   setCommonOptions(
     options: Partial<{
@@ -543,13 +558,23 @@ export class AppearanceManager {
       hasLikeButton: boolean;
       hasDislikeButton: boolean;
       hasShare: boolean;
+      coverQuality: CoverQuality;
     }>
   ) {
     this.commonOptions = deepmerge(this.commonOptions, options);
-    InAppStorySDK.setHasLike(this.commonOptions.hasLike);
+    if (this.commonOptions.hasLike != null) {
+      InAppStorySDK.setHasLike(this.commonOptions.hasLike);
+    }
     //InAppStorySDK.setHasDislike(options.hasDislikeButton);
-    InAppStorySDK.setHasFavorites(this.commonOptions.hasFavorite);
-    InAppStorySDK.setHasShare(this.commonOptions.hasShare);
+    if (this.commonOptions.hasFavorite != null) {
+      InAppStorySDK.setHasFavorites(this.commonOptions.hasFavorite);
+    }
+    if (this.commonOptions.hasShare != null) {
+      InAppStorySDK.setHasShare(this.commonOptions.hasShare);
+    }
+    if (this.commonOptions.coverQuality != null) {
+      InAppStorySDK.setCoverQuality(this.commonOptions.coverQuality);
+    }
     return this;
   }
   setStoryFavoriteReaderOptions(

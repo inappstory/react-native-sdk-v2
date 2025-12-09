@@ -73,6 +73,8 @@ import com.inappstory.sdk.stories.api.models.ImagePlaceholderValue;
 import java.lang.reflect.Field;
 import com.inappstory.sdk.UseManagerInstanceCallback;
 import com.inappstory.sdk.stories.api.models.CachedSessionData;
+import com.inappstory.sdk.core.network.content.models.Image.QUALITY_HIGH
+import com.inappstory.sdk.core.network.content.models.Image.QUALITY_MEDIUM
 
 /*
 idgetEventName,
@@ -823,6 +825,15 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
       this.appearanceManager?.csTimerGradientEnable(value)
   }
 
+  @ReactMethod
+  fun setCoverQuality(value:String) {
+      Log.d("InappstorySdkModule", "setCoverQuality")
+      when (value) {
+        "medium" -> appearanceManager?.csCoverQuality(QUALITY_MEDIUM)
+        "high" -> appearanceManager?.csCoverQuality(QUALITY_HIGH)
+      }
+  }
+
 
 /*
   @ReactMethod
@@ -848,8 +859,6 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
       Log.d("InappstorySdkModule", "removeTags")
       ///this.ias?.removeTags(tags)
   }
-
-
 
   @ReactMethod
   fun getFavoritesCount() {
