@@ -1140,13 +1140,13 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
         Log.d("InappstorySdkModule", "setGoodsCellOldPriceTextColor")
         //TODO
     }
-
+  */
     @ReactMethod
     fun clearCache() {
         Log.d("InappstorySdkModule", "clearCache")
         this.ias?.clearCache()
     }
-
+  /* 
     @ReactMethod
     fun setLogging(value: Boolean) {
         Log.d("InappstorySdkModule", "setLogging")

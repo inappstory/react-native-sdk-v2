@@ -586,6 +586,10 @@ export class StoryManager {
     });
   }
 
+  clearCache() {
+    return InAppStorySDK.clearCache();
+  }
+
   protected _callbacks: Dict<any> = {};
 
   public set storyLinkClickHandler(callback: Function) {
