@@ -185,7 +185,8 @@ export function MainScreen({
           style={styles.button}
           styleDisabled={styles.buttonDisabled}
           onPress={async () => {
-            const showed = await InAppStorySDK.showSingle('5663');
+            var abortController = new AbortController();
+            const showed = await InAppStorySDK.showSingle('5663', abortController.signal);
             console.error('single show', showed);
           }}
         >
@@ -196,10 +197,12 @@ export function MainScreen({
           style={styles.button}
           styleDisabled={styles.buttonDisabled}
           onPress={async () => {
+            var abortController = new AbortController();
             const showed = await InAppStorySDK.showOnboardings(
               'default',
               10,
-              []
+              [],
+              abortController.signal
             );
             if (!showed) {
               Toast.show('No more onboarding stories, switch user to test');
@@ -218,6 +221,30 @@ export function MainScreen({
           }}
         >
           Open game
+        </Button>
+        <Button
+          containerStyle={styles.buttonContainer}
+          style={styles.button}
+          styleDisabled={styles.buttonDisabled}
+          onPress={async () => {
+            var abortController = new AbortController();
+            const showed = await storyManager.showIAMById('749', false, abortController.signal);
+            console.error('Showed IAM = ', showed);
+          }}
+        >
+          Open IAM
+        </Button>
+        <Button
+          containerStyle={styles.buttonContainer}
+          style={styles.button}
+          styleDisabled={styles.buttonDisabled}
+          onPress={async () => {
+            var abortController = new AbortController();
+            const showed = await storyManager.showIAMByEvent('test', false, abortController.signal);
+            console.error('Showed IAM event = ', showed);
+          }}
+        >
+          Open IAM event
         </Button>
         {/*<Button
           containerStyle={styles.buttonContainer}
