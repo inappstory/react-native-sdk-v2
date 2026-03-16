@@ -525,12 +525,12 @@ export class StoryManager {
   ): Promise<Boolean> {
     return new Promise((resolve, reject) => {
       if (signal?.aborted) {
-        return reject(null);
+        return reject(false);
       }
       const operationId = generateId();
       const onAbort = () => {
         InAppStorySDK.cancelOperation(operationId);
-        reject(null);
+        reject(false);
       };
       signal?.addEventListener('abort', onAbort);
       InAppStorySDK.showIAMById(id, onlyPreloaded, operationId).then(
@@ -553,12 +553,12 @@ export class StoryManager {
   ): Promise<Boolean> {
     return new Promise((resolve, reject) => {
       if (signal?.aborted) {
-        return reject(null);
+        return reject(false);
       }
       const operationId = generateId();
       const onAbort = () => {
         InAppStorySDK.cancelOperation(operationId);
-        reject(null);
+        reject(false);
       };
       signal?.addEventListener('abort', onAbort);
       InAppStorySDK.showIAMByEvent(event, onlyPreloaded, operationId).then(
