@@ -21,6 +21,7 @@ import com.inappstory.sdk.externalapi.subscribers.InAppStoryAPIListSubscriber;
 import com.inappstory.sdk.externalapi.storylist.IASStoryListSessionData;
 import com.inappstory.sdk.stories.ui.list.StoryFavoriteImage;
 import com.inappstory.sdk.core.api.IASDataSettingsHolder;
+import com.inappstory.sdk.lrudiskcache.CacheSize
 
 import com.inappstory.sdk.stories.outercallbacks.common.errors.ErrorCallback;
 import com.inappstory.sdk.stories.outercallbacks.common.gamereader.GameReaderCallback;
@@ -1283,10 +1284,10 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
       null,
       null,
       null,
-      null,
+      false,
       true,
-      null,
-      sandbox,
+      CacheSize.MEDIUM,
+      false,
     )
     this.ias?.let {
       val method = it.javaClass.getDeclaredMethod("sendStatistic", Boolean::class.java)
