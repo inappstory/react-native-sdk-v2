@@ -134,13 +134,13 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
   @ReactMethod
   fun getFavoriteStories(feed: String) {
     Log.d("InappstorySdkModule", "getFavoriteStories");
-    this.favoritesApi?.storyList?.load(
-      feed,
-      "favorites",
-      true,
-      true,
-      this.ias?.getTags()
-    )
+    // this.favoritesApi?.storyList?.load(
+    //   feed,
+    //   "favorites",
+    //   true,
+    //   true,
+    //   this.ias?.getTags()
+    // )
   }
 
   @ReactMethod
@@ -188,15 +188,15 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
     //this.ias = this.createInAppStoryManager(apiKey, userID)
     this.appearanceManager = AppearanceManager()
     this.api = InAppStoryAPI()
-    this.favoritesApi = InAppStoryAPI()
-    this.createManager(
-      apiKey,
-      userID,
-      userIdSign,
-      sandbox,
-      sendStatistics,
-      this.favoritesApi as InAppStoryAPI
-    )
+    //this.favoritesApi = InAppStoryAPI()
+    // this.createManager(
+    //   apiKey,
+    //   userID,
+    //   userIdSign,
+    //   sandbox,
+    //   sendStatistics,
+    //   this.favoritesApi as InAppStoryAPI
+    // )
     this.createManager(
       apiKey,
       userID,
@@ -206,7 +206,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
       this.api as InAppStoryAPI
     )
     this.subscribeLists(this.api as InAppStoryAPI, "feed")
-    this.subscribeLists(this.favoritesApi as InAppStoryAPI, "favorites")
+    //this.subscribeLists(this.favoritesApi as InAppStoryAPI, "favorites")
     setupListeners()
   }
 
