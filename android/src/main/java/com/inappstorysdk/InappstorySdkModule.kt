@@ -1388,8 +1388,8 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
         val payload: WritableMap = Arguments.createMap()
         payload.putArray("stories", Arguments.makeNativeArray(storiesList));
         //   payload.putString("feed", "default")
-        payload.putString("feed", storiesFeed)
-        payload.putString("list", feed)
+        payload.putString("feed", feed)
+        payload.putString("list", storiesFeed)
         //map.putString("key1", "Value1");
         sendEvent(reactContext, "storyListUpdate", payload)
         //stories.clear()
