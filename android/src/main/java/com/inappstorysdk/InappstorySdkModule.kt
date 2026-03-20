@@ -206,7 +206,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
       sendStatistics,
       this.api as InAppStoryAPI
     )
-    this.subscribeLists(this.api as InAppStoryAPI, "feed")
+    //this.subscribeLists(this.api as InAppStoryAPI, "feed")
     //this.subscribeLists(this.favoritesApi as InAppStoryAPI, "favorites")
     setupListeners()
   }
@@ -1295,6 +1295,11 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
       method.isAccessible = true
       method.invoke(it, sendStatistic)
     }
+  }
+
+  @ReactMethod 
+  fun createSubscriberList(feed: String) {
+     this.subscribeLists(this.api as InAppStoryAPI, feed)
   }
 
   fun subscribeLists(inAppStoryAPI: InAppStoryAPI, feed: String) {

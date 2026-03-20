@@ -373,10 +373,15 @@ export class StoryManager {
       this.sendStatistics
     );
   }
+
+  async createSubscriberList(feed: string) {
+    InAppStorySDK.createSubscriberList(feed)
+  }
+
   async fetchFeed(feed: string) {
     InAppStorySDK.getStories(feed);
     //if (include_favorites) {
-    InAppStorySDK.getFavoriteStories(feed);
+    //InAppStorySDK.getFavoriteStories(feed);
     //}
   }
   async fetchFavorites(feed) {

@@ -47,6 +47,9 @@ export const StoriesList = ({
   React.useEffect(() => {
     updateVersion;
   }, [updateVersion]);
+  const createSubscriberList = React.useCallback(async () => {
+    storyManager.createSubscriberList(feed);
+  }, [feed, storyManager]);
   const fetchFeed = React.useCallback(async () => {
     storyManager.fetchFeed(feed);
   }, [feed, storyManager]);
@@ -84,6 +87,7 @@ export const StoriesList = ({
   }, []);
   React.useEffect(() => {
     setTimeout(() => {
+      createSubscriberList();
       if (favoritesOnly) {
         fetchFavoriteFeed();
       } else {
