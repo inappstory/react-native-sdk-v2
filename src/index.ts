@@ -254,7 +254,7 @@ export class StoryManager {
       this.sandbox,
       this.sendStatistics
     );
-    InAppStorySDK.setUserID(userId, userIdSign);
+    //InAppStorySDK.setUserID(userId, userIdSign);
     this.apiKey = config.apiKey;
     this.userId = userId;
     this.userIdSign = userIdSign;
