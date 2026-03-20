@@ -110,7 +110,7 @@ export const StoriesList = ({
         time: +Date.now(),
       });
 
-      InAppStorySDK.selectStoryCellWith(String(story.storyID));
+      InAppStorySDK.selectStoryCellWith(String(story.storyID), feed);
     },
     [addEvent, feed]
   );

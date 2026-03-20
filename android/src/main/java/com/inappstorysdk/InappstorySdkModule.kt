@@ -1203,11 +1203,11 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
   }
 
   @ReactMethod
-  fun selectStoryCellWith(storyID: String) {
+  fun selectStoryCellWith(storyID: String, feed: String) {
     Log.d("InappstorySdkModule", "selectStoryCellWith")
     this.api?.storyList?.openStoryReader(
       reactContext.currentActivity,
-      "feed",
+      feed,
       storyID.toInt(),
       this.appearanceManager
     );
