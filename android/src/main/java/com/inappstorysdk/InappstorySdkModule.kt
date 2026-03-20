@@ -124,7 +124,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
     Log.d("InappstorySdkModule", "getStories for feed: " + feed);
     this.api?.storyList?.load(
       feed,
-      "feed",
+      feed,
       true,
       false,
       this.ias?.getTags()
@@ -1148,7 +1148,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
         Log.d("InappstorySdkModule", "clearCache")
         this.ias?.clearCache()
     }
-  /* 
+  /*
     @ReactMethod
     fun setLogging(value: Boolean) {
         Log.d("InappstorySdkModule", "setLogging")
@@ -1297,7 +1297,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
     }
   }
 
-  @ReactMethod 
+  @ReactMethod
   fun createSubscriberList(feed: String) {
      Log.e(TAG, "createSubscriberList: $feed")
      this.subscribeLists(this.api as InAppStoryAPI, feed)
