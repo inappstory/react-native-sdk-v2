@@ -781,7 +781,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
           }
 
           override fun readerOpenError(p0: String?) {
-            Log.d("InappstorySdkModule", "IAM reader open error: p0")
+            Log.d("InappstorySdkModule", "IAM reader open error: $p0")
             //fragmentActivity?.backPressManager?.isManagerEnabled = false
           }
 
