@@ -90,6 +90,7 @@ idgetEventName,
                      int slideIndex,
                      String tags) */
 fun sendEvent(reactContext: ReactContext, eventName: String, params: WritableMap?) {
+   Log.d("InappstorySdkModule", "sendEvent: " + eventName);
   reactContext
     .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
     .emit(eventName, params)
