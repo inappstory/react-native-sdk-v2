@@ -238,7 +238,7 @@ export class StoryManager {
   imagePlaceholders: any = '';
   lang: string = '';
   soundEnabled: boolean = true;
-  getGoodsCallback: Function = () => {};
+  getGoodsCallback: Function = () => { };
   sandbox: boolean = false;
   sendStatistics: boolean = true;
   listeners: any = [];
@@ -258,11 +258,11 @@ export class StoryManager {
     this.apiKey = config.apiKey;
     this.userId = userId;
     this.userIdSign = userIdSign;
-    if (config.tags) {
+    if (config.tags && config.tags.length > 0) {
       this.tags = config.tags;
       InAppStorySDK.setTags(config.tags);
     }
-    if (config.placeholders) {
+    if (config.placeholders && Object.keys(config.placeholders).length > 0) {
       this.placeholders = config.placeholders;
       InAppStorySDK.setPlaceholders(config.placeholders);
     }
@@ -489,10 +489,10 @@ export class StoryManager {
     signal: AbortSignal | null,
     options?:
       | {
-          feed?: Option<string>;
-          customTags?: string[] | undefined;
-          limit?: Option<number>;
-        }
+        feed?: Option<string>;
+        customTags?: string[] | undefined;
+        limit?: Option<number>;
+      }
       | undefined
   ): Promise<OnboardingLoadStatus> {
     return new Promise((resolve, reject) => {
