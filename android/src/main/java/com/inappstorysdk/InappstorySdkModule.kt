@@ -1324,7 +1324,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
             "titleColor" to story.titleColor,
             "opened" to story.opened,
             "hasAudio" to story.hasAudio,
-            "list" to feed,
+            "list" to "feed",
             "feed" to story.storyData.feed,
             "aspectRatio" to aspectRatio,
             "slidesCount" to story.storyData.slidesCount,
