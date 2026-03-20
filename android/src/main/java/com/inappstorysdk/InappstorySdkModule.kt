@@ -776,14 +776,17 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
         android.R.id.content,
         object : InAppMessageScreenActions {
           override fun readerIsOpened() {
+            Log.d("InappstorySdkModule", "IAM reader opened")
             //fragmentActivity?.backPressManager?.isManagerEnabled = true
           }
 
           override fun readerOpenError(p0: String?) {
+            Log.d("InappstorySdkModule", "IAM reader open error: p0")
             //fragmentActivity?.backPressManager?.isManagerEnabled = false
           }
 
           override fun readerIsClosed() {
+            Log.d("InappstorySdkModule", "IAM reader closed")
             //fragmentActivity?.backPressManager?.isManagerEnabled = false
           }
         })
