@@ -1299,6 +1299,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
 
   @ReactMethod 
   fun createSubscriberList(feed: String) {
+     Log.e(TAG, "createSubscriberList: $feed")
      this.subscribeLists(this.api as InAppStoryAPI, feed)
   }
 

@@ -375,7 +375,7 @@ export class StoryManager {
   }
 
   async createSubscriberList(feed: string) {
-    InAppStorySDK.createSubscriberList(feed)
+    InAppStorySDK.createSubscriberList(feed);
   }
 
   async fetchFeed(feed: string) {
