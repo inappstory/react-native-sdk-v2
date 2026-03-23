@@ -71,6 +71,9 @@ import androidx.recyclerview.widget.RecyclerView
 import java.util.Locale
 import android.view.View
 import com.facebook.react.bridge.WritableMap;
+import android.app.Activity
+import android.view.ViewGroup
+import android.widget.FrameLayout
 
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.WritableNativeMap
@@ -1426,6 +1429,28 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
       .apiKey(apiKey)
       .userId(userId)
       .create()
+  }
+
+  fun addFragmentContainer(reactContext: ReactApplicationContext): Int {
+    val activity = reactContext.currentActivity as? FragmentActivity ?: return View.NO_ID
+
+    val containerId = View.generateViewId()
+    val container = FrameLayout(activity).apply {
+      id = containerId
+      layoutParams = ViewGroup.LayoutParams(
+        ViewGroup.LayoutParams.MATCH_PARENT,
+        ViewGroup.LayoutParams.MATCH_PARENT
+      )
+    }
+
+    // Добавляем поверх контента
+    val decorContent = activity.findViewById<ViewGroup>(android.R.id.content)
+
+    activity.runOnUiThread {
+      decorContent.addView(container)
+    }
+
+    return containerId
   }
 }
 /*
