@@ -790,59 +790,59 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
       return
 
 
-      val idContent = addFragmentContainer()
-      //val idContent = android.R.id.content
-      Log.d("InappstorySdkModule", "fragmentId: $idContent")
+//      val idContent = addFragmentContainer()
+//      //val idContent = android.R.id.content
+//      Log.d("InappstorySdkModule", "fragmentId: $idContent")
 
-      val iamController = InAppMessageViewController()
+//      val iamController = InAppMessageViewController()
 
-      val cancellationToken = this.ias?.showInAppMessage(
-        settings,
-        object : InAppMessageContainerProvider {
-          override fun provideContainer(messageData: InAppMessageData?):
-            InAppMessageContainerSettings {
-            return if (messageData?.messageType() == InAppMessageType.TOAST) {
-              val frame = FrameLayout((getCurrentActivity() as FragmentActivity)).apply {
-                id = View.generateViewId()
-                layoutParams = ViewGroup.LayoutParams(
-                  ViewGroup.LayoutParams.MATCH_PARENT,
-                  ViewGroup.LayoutParams.MATCH_PARENT
-                )
-              }
-              InAppMessageContainerSettings().layout(frame)
-            } else {
-              InAppMessageContainerSettings().fragment(
-                (getCurrentActivity() as FragmentActivity).supportFragmentManager,
-                idContent,
-              )
-            }
-          }
-
-          override fun layoutController(): IAMViewController? {
-            return iamController
-          }
-        },
-        object : InAppMessageScreenActions {
-          override fun readerIsOpened() {
-            Log.d("InappstorySdkModule", "IAM reader opened")
-            //fragmentActivity?.backPressManager?.isManagerEnabled = true
-          }
-
-          override fun readerOpenError(p0: String?) {
-            Log.d("InappstorySdkModule", "IAM reader open error: $p0")
-            iamController.closeView()
-            removeFragmentContainer(id)
-            //fragmentActivity?.backPressManager?.isManagerEnabled = false
-          }
-
-          override fun readerIsClosed() {
-            Log.d("InappstorySdkModule", "IAM reader closed")
-            iamController.closeView()
-            //removeFragmentContainer(id)
-            //fragmentActivity?.backPressManager?.isManagerEnabled = false
-          }
-        })
-      cancellationTokenMap[operationId] = cancellationToken
+//      val cancellationToken = this.ias?.showInAppMessage(
+//        settings,
+//        object : InAppMessageContainerProvider {
+//          override fun provideContainer(messageData: InAppMessageData?):
+//            InAppMessageContainerSettings {
+//            return if (messageData?.messageType() == InAppMessageType.TOAST) {
+//              val frame = FrameLayout((getCurrentActivity() as FragmentActivity)).apply {
+//                id = View.generateViewId()
+//                layoutParams = ViewGroup.LayoutParams(
+//                  ViewGroup.LayoutParams.MATCH_PARENT,
+//                  ViewGroup.LayoutParams.MATCH_PARENT
+//                )
+//              }
+//              InAppMessageContainerSettings().layout(frame)
+//            } else {
+//              InAppMessageContainerSettings().fragment(
+//                (getCurrentActivity() as FragmentActivity).supportFragmentManager,
+//                idContent,
+//              )
+//            }
+//          }
+//
+//          override fun layoutController(): IAMViewController? {
+//            return iamController
+//          }
+//        },
+//        object : InAppMessageScreenActions {
+//          override fun readerIsOpened() {
+//            Log.d("InappstorySdkModule", "IAM reader opened")
+//            //fragmentActivity?.backPressManager?.isManagerEnabled = true
+//          }
+//
+//          override fun readerOpenError(p0: String?) {
+//            Log.d("InappstorySdkModule", "IAM reader open error: $p0")
+//            iamController.closeView()
+//            removeFragmentContainer(idContent)
+//            //fragmentActivity?.backPressManager?.isManagerEnabled = false
+//          }
+//
+//          override fun readerIsClosed() {
+//            Log.d("InappstorySdkModule", "IAM reader closed")
+//            iamController.closeView()
+//            //removeFragmentContainer(id)
+//            //fragmentActivity?.backPressManager?.isManagerEnabled = false
+//          }
+//        })
+//      cancellationTokenMap[operationId] = cancellationToken
     } catch (e: Throwable) {
       promise.reject("showIAMById error", e)
     }
