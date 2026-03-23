@@ -776,7 +776,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
       val id = addFragmentContainer()
       Log.d("InappstorySdkModule", "fragmentId: $id")
       val id2 = getReactRootViewId()
-      Log.d("InappstorySdkModule", "fragmentId: $id2")
+      Log.d("InappstorySdkModule", "react root fragmentId: $id2")
       val cancellationToken = this.ias?.showInAppMessage(
         settings,
         (getCurrentActivity() as FragmentActivity).supportFragmentManager,
