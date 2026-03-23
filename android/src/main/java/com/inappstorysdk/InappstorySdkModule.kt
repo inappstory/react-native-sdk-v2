@@ -588,23 +588,23 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
           }
         }
 
-        override fun finishGame(
-          content: ContentData?,
-          result: String?,
-          id: String?
-        ) {
-          if (content is GameStoryData) {
-            var payload = Arguments.makeNativeMap(
-              mutableMapOf(
-                "storyID" to content?.slideData?.story?.id,
-                "index" to content?.slideData?.index,
-                "result" to result,
-                "id" to id
-              ) as Map<String, Any>
-            )
-            sendEvent(reactContext, "finishGame", payload)
-          }
-        }
+//        override fun finishGame(
+//          content: ContentData?,
+//          result: String?,
+//          id: String?
+//        ) {
+//          if (content is GameStoryData) {
+//            var payload = Arguments.makeNativeMap(
+//              mutableMapOf(
+//                "storyID" to content?.slideData?.story?.id,
+//                "index" to content?.slideData?.index,
+//                "result" to result,
+//                "id" to id
+//              ) as Map<String, Any>
+//            )
+//            sendEvent(reactContext, "finishGame", payload)
+//          }
+//        }
 
         override fun closeGame(
           content: ContentData?,
@@ -780,7 +780,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
         InAppMessageOpenSettings().id(iamId.toInt()).showOnlyIfLoaded(onlyPreloaded)
 
       //val id = addFragmentContainer()
-      val id = android.R.id.content
+      val idContent = android.R.id.content
       Log.d("InappstorySdkModule", "fragmentId: $id")
 
       val iamController = InAppMessageViewController()
@@ -791,7 +791,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
           override fun provideContainer(messageData: InAppMessageData?):
             InAppMessageContainerSettings {
             return if (messageData?.messageType() == InAppMessageType.TOAST) {
-              val frame = FrameLayout(activity).apply {
+              val frame = FrameLayout(getCurrentActivity()).apply {
                 id = View.generateViewId()
                 layoutParams = ViewGroup.LayoutParams(
                   ViewGroup.LayoutParams.MATCH_PARENT,
@@ -802,7 +802,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
             } else {
               InAppMessageContainerSettings().fragment(
                 (getCurrentActivity() as FragmentActivity).supportFragmentManager,
-                id,
+                idContent,
               )
             }
           }
