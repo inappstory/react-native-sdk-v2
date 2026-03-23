@@ -773,7 +773,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
     try {
       val settings =
         InAppMessageOpenSettings().id(iamId.toInt()).showOnlyIfLoaded(onlyPreloaded)
-      val id = addFragmentContainer(getCurrentActivity())
+      val id = addFragmentContainer()
       val cancellationToken = this.ias?.showInAppMessage(
         settings,
         (getCurrentActivity() as FragmentActivity).supportFragmentManager,
@@ -786,13 +786,13 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
 
           override fun readerOpenError(p0: String?) {
             Log.d("InappstorySdkModule", "IAM reader open error: $p0")
-            removeFragmentContainer(getCurrentActivity(), id)
+            removeFragmentContainer(id)
             //fragmentActivity?.backPressManager?.isManagerEnabled = false
           }
 
           override fun readerIsClosed() {
             Log.d("InappstorySdkModule", "IAM reader closed")
-            removeFragmentContainer(getCurrentActivity(), id)
+            removeFragmentContainer(id)
             //fragmentActivity?.backPressManager?.isManagerEnabled = false
           }
         })
@@ -1435,8 +1435,8 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
       .create()
   }
 
-  fun addFragmentContainer(reactContext: ReactApplicationContext): Int {
-    val activity = reactContext.currentActivity as? FragmentActivity ?: return View.NO_ID
+  fun addFragmentContainer(): Int {
+    val activity = getCurrentActivity() as? FragmentActivity ?: return View.NO_ID
 
     val containerId = View.generateViewId()
     val container = FrameLayout(activity).apply {
@@ -1456,8 +1456,8 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
     return containerId
   }
 
-  fun removeFragmentContainer(reactContext: ReactApplicationContext, containerId: Int) {
-    val activity = reactContext.currentActivity as? FragmentActivity ?: return
+  fun removeFragmentContainer(containerId: Int) {
+    val activity = getCurrentActivity() as? FragmentActivity ?: return
 
     activity.runOnUiThread {
       val fm = activity.supportFragmentManager
