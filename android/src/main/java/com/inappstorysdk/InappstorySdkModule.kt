@@ -774,10 +774,13 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
       val settings =
         InAppMessageOpenSettings().id(iamId.toInt()).showOnlyIfLoaded(onlyPreloaded)
       val id = addFragmentContainer()
+      Log.d("InappstorySdkModule", "fragmentId: $id")
+      val id2 = getReactRootViewId()
+      Log.d("InappstorySdkModule", "fragmentId: $id2")
       val cancellationToken = this.ias?.showInAppMessage(
         settings,
         (getCurrentActivity() as FragmentActivity).supportFragmentManager,
-        id,
+        id2,
         object : InAppMessageScreenActions {
           override fun readerIsOpened() {
             Log.d("InappstorySdkModule", "IAM reader opened")
@@ -786,13 +789,13 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
 
           override fun readerOpenError(p0: String?) {
             Log.d("InappstorySdkModule", "IAM reader open error: $p0")
-            removeFragmentContainer(id)
+            //removeFragmentContainer(id)
             //fragmentActivity?.backPressManager?.isManagerEnabled = false
           }
 
           override fun readerIsClosed() {
             Log.d("InappstorySdkModule", "IAM reader closed")
-            removeFragmentContainer(id)
+            //removeFragmentContainer(id)
             //fragmentActivity?.backPressManager?.isManagerEnabled = false
           }
         })
@@ -1435,10 +1438,32 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
       .create()
   }
 
+  fun getReactRootViewId(): Int {
+    val activity = getCurrentActivity() ?: return View.NO_ID
+
+    val decorView = activity.window.decorView
+    val rootView = findReactRootView(decorView)
+
+    return rootView?.parent?.let { parent ->
+      (parent as? View)?.id ?: View.NO_ID
+    } ?: View.NO_ID
+  }
+
+  private fun findReactRootView(view: View): View? {
+    if (view.javaClass.name.contains("ReactRootView")) return view
+    if (view !is ViewGroup) return null
+
+    for (i in 0 until view.childCount) {
+      findReactRootView(view.getChildAt(i))?.let { return it }
+    }
+    return null
+  }
+
   fun addFragmentContainer(): Int {
     val activity = getCurrentActivity() as? FragmentActivity ?: return View.NO_ID
 
     val containerId = View.generateViewId()
+    Log.d("InappstorySdkModule", "containerId: $containerId")
     val container = FrameLayout(activity).apply {
       id = containerId
       layoutParams = ViewGroup.LayoutParams(
