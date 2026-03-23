@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import com.inappstory.sdk.CancellationToken
 import com.inappstory.sdk.InAppStoryManager
@@ -42,6 +43,19 @@ class NativeOverlayFragment(
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+    requireActivity().onBackPressedDispatcher.addCallback(
+      viewLifecycleOwner,
+      object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+          InAppStoryManager.getInstance()?.let {
+            if (it.onBackPressed())
+              return
+          }
+          onReaderIsClosed?.invoke()
+          parentFragmentManager.popBackStack()
+        }
+      }
+    )
     val cancellationToken = this.ias?.showInAppMessage(
       settings,
       childFragmentManager,
