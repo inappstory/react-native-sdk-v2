@@ -779,8 +779,8 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
       val settings =
         InAppMessageOpenSettings().id(iamId.toInt()).showOnlyIfLoaded(onlyPreloaded)
 
-      //val id = addFragmentContainer()
-      val idContent = android.R.id.content
+      val idContent = addFragmentContainer()
+      //val idContent = android.R.id.content
       Log.d("InappstorySdkModule", "fragmentId: $idContent")
 
       val iamController = InAppMessageViewController()
@@ -820,7 +820,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
           override fun readerOpenError(p0: String?) {
             Log.d("InappstorySdkModule", "IAM reader open error: $p0")
             iamController.closeView()
-            //removeFragmentContainer(id)
+            removeFragmentContainer(id)
             //fragmentActivity?.backPressManager?.isManagerEnabled = false
           }
 
@@ -1495,7 +1495,6 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
     val activity = getCurrentActivity() as? FragmentActivity ?: return View.NO_ID
 
     val containerId = View.generateViewId()
-    Log.d("InappstorySdkModule", "containerId: $containerId")
     val container = FrameLayout(activity).apply {
       id = containerId
       layoutParams = ViewGroup.LayoutParams(
@@ -1517,17 +1516,18 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
     val activity = getCurrentActivity() as? FragmentActivity ?: return
 
     activity.runOnUiThread {
-      val fm = activity.supportFragmentManager
-      val fragment = fm.findFragmentById(containerId)
-      if (fragment != null) {
-        fm.beginTransaction()
-          .remove(fragment)
-          .commitAllowingStateLoss()
-      }
+//      val fm = activity.supportFragmentManager
+//      val fragment = fm.findFragmentById(containerId)
+//      if (fragment != null) {
+//        fm.beginTransaction()
+//          .remove(fragment)
+//          .commitAllowingStateLoss()
+//      }
 
       val decorContent = activity.findViewById<ViewGroup>(android.R.id.content)
       val container = decorContent.findViewById<View>(containerId)
       if (container != null) {
+        Log.d("InAppStoryManager", "container not null, removing");
         decorContent.removeView(container)
       }
     }
