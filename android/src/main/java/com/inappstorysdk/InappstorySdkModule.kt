@@ -779,14 +779,29 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
       val settings =
         InAppMessageOpenSettings().id(iamId.toInt()).showOnlyIfLoaded(onlyPreloaded)
 
-      val fragment = NativeOverlayFragment()
+      val fragment = NativeOverlayFragment(
+        ias = this.ias,
+        settings = settings,
+        onReaderIsClosed = {
+          Log.d("InappstorySdkModule", "IAM reader closed")
+          if (cancellationTokenMap.containsKey(operationId)) {
+            cancellationTokenMap.remove(operationId)
+          }
+        },
+        onReaderIsOpen = { cancellationToken ->
+          Log.d("InappstorySdkModule", "IAM reader opened")
+          cancellationTokenMap[operationId] = cancellationToken
+        },
+      )
+
 
       (getCurrentActivity() as FragmentActivity).supportFragmentManager
         .beginTransaction()
-        .add(android.R.id.content, fragment, "overlay_fragment") // поверх всего контента
+        .add(android.R.id.content, fragment, "overlay_fragment")
         .addToBackStack("overlay_fragment")
         .commit()
 
+      promise.resolve(true)
       return
 
 
