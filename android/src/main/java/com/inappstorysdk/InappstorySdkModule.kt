@@ -779,6 +779,17 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
       val settings =
         InAppMessageOpenSettings().id(iamId.toInt()).showOnlyIfLoaded(onlyPreloaded)
 
+      val fragment = NativeOverlayFragment()
+
+      (getCurrentActivity() as FragmentActivity).supportFragmentManager
+        .beginTransaction()
+        .add(android.R.id.content, fragment, "overlay_fragment") // поверх всего контента
+        .addToBackStack("overlay_fragment")
+        .commit()
+
+      return
+
+
       val idContent = addFragmentContainer()
       //val idContent = android.R.id.content
       Log.d("InappstorySdkModule", "fragmentId: $idContent")
