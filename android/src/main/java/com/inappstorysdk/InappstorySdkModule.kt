@@ -93,7 +93,7 @@ idgetEventName,
                      int slideIndex,
                      String tags) */
 fun sendEvent(reactContext: ReactContext, eventName: String, params: WritableMap?) {
-   Log.d("InappstorySdkModule", "sendEvent: " + eventName);
+  Log.d("InappstorySdkModule", "sendEvent: " + eventName);
   reactContext
     .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
     .emit(eventName, params)
@@ -773,10 +773,11 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
     try {
       val settings =
         InAppMessageOpenSettings().id(iamId.toInt()).showOnlyIfLoaded(onlyPreloaded)
+      val id = addFragmentContainer(getCurrentActivity())
       val cancellationToken = this.ias?.showInAppMessage(
         settings,
         (getCurrentActivity() as FragmentActivity).supportFragmentManager,
-        android.R.id.content,
+        id,
         object : InAppMessageScreenActions {
           override fun readerIsOpened() {
             Log.d("InappstorySdkModule", "IAM reader opened")
@@ -785,11 +786,13 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
 
           override fun readerOpenError(p0: String?) {
             Log.d("InappstorySdkModule", "IAM reader open error: $p0")
+            removeFragmentContainer(getCurrentActivity(), id)
             //fragmentActivity?.backPressManager?.isManagerEnabled = false
           }
 
           override fun readerIsClosed() {
             Log.d("InappstorySdkModule", "IAM reader closed")
+            removeFragmentContainer(getCurrentActivity(), id)
             //fragmentActivity?.backPressManager?.isManagerEnabled = false
           }
         })
@@ -1149,11 +1152,12 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
         //TODO
     }
   */
-    @ReactMethod
-    fun clearCache() {
-        Log.d("InappstorySdkModule", "clearCache")
-        this.ias?.clearCache()
-    }
+  @ReactMethod
+  fun clearCache() {
+    Log.d("InappstorySdkModule", "clearCache")
+    this.ias?.clearCache()
+  }
+
   /*
     @ReactMethod
     fun setLogging(value: Boolean) {
@@ -1305,8 +1309,8 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
 
   @ReactMethod
   fun createSubscriberList(feed: String) {
-     Log.e(TAG, "createSubscriberList: $feed")
-     this.subscribeLists(this.api as InAppStoryAPI, feed)
+    Log.e(TAG, "createSubscriberList: $feed")
+    this.subscribeLists(this.api as InAppStoryAPI, feed)
   }
 
   fun subscribeLists(inAppStoryAPI: InAppStoryAPI, feed: String) {
@@ -1443,7 +1447,6 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
       )
     }
 
-    // Добавляем поверх контента
     val decorContent = activity.findViewById<ViewGroup>(android.R.id.content)
 
     activity.runOnUiThread {
@@ -1451,6 +1454,26 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
     }
 
     return containerId
+  }
+
+  fun removeFragmentContainer(reactContext: ReactApplicationContext, containerId: Int) {
+    val activity = reactContext.currentActivity as? FragmentActivity ?: return
+
+    activity.runOnUiThread {
+      val fm = activity.supportFragmentManager
+      val fragment = fm.findFragmentById(containerId)
+      if (fragment != null) {
+        fm.beginTransaction()
+          .remove(fragment)
+          .commitAllowingStateLoss()
+      }
+
+      val decorContent = activity.findViewById<ViewGroup>(android.R.id.content)
+      val container = decorContent.findViewById<View>(containerId)
+      if (container != null) {
+        decorContent.removeView(container)
+      }
+    }
   }
 }
 /*
