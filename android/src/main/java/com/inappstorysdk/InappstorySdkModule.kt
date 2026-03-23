@@ -30,6 +30,11 @@ import com.inappstory.sdk.game.reader.GameStoryData;
 import com.inappstory.sdk.stories.outercallbacks.common.reader.StoryWidgetCallback;
 import com.inappstory.sdk.stories.outercallbacks.common.reader.SlideData;
 import com.inappstory.sdk.inappmessage.InAppMessageData;
+import com.inappstory.sdk.inappmessage.InAppMessageContainerProvider
+import com.inappstory.sdk.inappmessage.InAppMessageContainerSettings
+import com.inappstory.sdk.inappmessage.InAppMessageType
+import com.inappstory.sdk.inappmessage.InAppMessageViewController
+import com.inappstory.sdk.inappmessage.domain.reader.IAMViewController
 import com.inappstory.sdk.stories.outercallbacks.common.single.SingleLoadCallback;
 import com.inappstory.sdk.stories.outercallbacks.common.reader.StoryData;
 import com.inappstory.sdk.stories.outercallbacks.common.reader.ContentData;
@@ -773,14 +778,39 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
     try {
       val settings =
         InAppMessageOpenSettings().id(iamId.toInt()).showOnlyIfLoaded(onlyPreloaded)
-      val id = addFragmentContainer()
+
+      //val id = addFragmentContainer()
+      val id = android.R.id.content
       Log.d("InappstorySdkModule", "fragmentId: $id")
-      val id2 = getReactRootViewId()
-      Log.d("InappstorySdkModule", "react root fragmentId: $id2")
+
+      val iamController = InAppMessageViewController()
+
       val cancellationToken = this.ias?.showInAppMessage(
         settings,
-        (getCurrentActivity() as FragmentActivity).supportFragmentManager,
-        id2,
+        object : InAppMessageContainerProvider {
+          override fun provideContainer(messageData: InAppMessageData?):
+            InAppMessageContainerSettings {
+            return if (messageData?.messageType() == InAppMessageType.TOAST) {
+              val frame = FrameLayout(activity).apply {
+                id = View.generateViewId()
+                layoutParams = ViewGroup.LayoutParams(
+                  ViewGroup.LayoutParams.MATCH_PARENT,
+                  ViewGroup.LayoutParams.MATCH_PARENT
+                )
+              }
+              InAppMessageContainerSettings().layout(frame)
+            } else {
+              InAppMessageContainerSettings().fragment(
+                (getCurrentActivity() as FragmentActivity).supportFragmentManager,
+                id,
+              )
+            }
+          }
+
+          override fun layoutController(): IAMViewController? {
+            return iamController
+          }
+        },
         object : InAppMessageScreenActions {
           override fun readerIsOpened() {
             Log.d("InappstorySdkModule", "IAM reader opened")
@@ -789,12 +819,14 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
 
           override fun readerOpenError(p0: String?) {
             Log.d("InappstorySdkModule", "IAM reader open error: $p0")
+            iamController.closeView()
             //removeFragmentContainer(id)
             //fragmentActivity?.backPressManager?.isManagerEnabled = false
           }
 
           override fun readerIsClosed() {
             Log.d("InappstorySdkModule", "IAM reader closed")
+            iamController.closeView()
             //removeFragmentContainer(id)
             //fragmentActivity?.backPressManager?.isManagerEnabled = false
           }
