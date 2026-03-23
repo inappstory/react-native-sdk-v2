@@ -781,7 +781,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
 
       //val id = addFragmentContainer()
       val idContent = android.R.id.content
-      Log.d("InappstorySdkModule", "fragmentId: $id")
+      Log.d("InappstorySdkModule", "fragmentId: $idContent")
 
       val iamController = InAppMessageViewController()
 
@@ -791,7 +791,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
           override fun provideContainer(messageData: InAppMessageData?):
             InAppMessageContainerSettings {
             return if (messageData?.messageType() == InAppMessageType.TOAST) {
-              val frame = FrameLayout(getCurrentActivity()).apply {
+              val frame = FrameLayout((getCurrentActivity() as FragmentActivity)).apply {
                 id = View.generateViewId()
                 layoutParams = ViewGroup.LayoutParams(
                   ViewGroup.LayoutParams.MATCH_PARENT,
