@@ -17,7 +17,7 @@ class NativeOverlayFragment : Fragment() {
     savedInstanceState: Bundle?
   ): View {
     val root = FrameLayout(requireContext()).apply {
-      setBackgroundColor(0xCC000000.toInt())
+      setBackgroundColor(Color.TRANSPARENT.toInt())
       layoutParams = FrameLayout.LayoutParams(
         FrameLayout.LayoutParams.MATCH_PARENT,
         FrameLayout.LayoutParams.MATCH_PARENT
