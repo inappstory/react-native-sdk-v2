@@ -7,13 +7,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import com.inappstory.sdk.CancellationToken
 import com.inappstory.sdk.InAppStoryManager
 import com.inappstory.sdk.inappmessage.InAppMessageOpenSettings
 import com.inappstory.sdk.inappmessage.InAppMessageScreenActions
-import androidx.activity.addCallback
 
 class NativeOverlayFragment(
   private val ias: InAppStoryManager?,
@@ -24,49 +22,29 @@ class NativeOverlayFragment(
 
   private val contentId = View.generateViewId()
 
+  private val backPressManagerHost: BackPressManagerHost?
+    get() = activity as? BackPressManagerHost
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    if (activityHolder.activity is InAppStoryActivity) {
-      var fragmentActivity = getCurrentActivity() as FragmentActivity
+    backPressManagerHost?.backPressManager?.let { manager ->
+      manager.isManagerEnabled = true
+      manager.overlayHandler = BackPressManager.OverlayHandler {
+        ias?.onBackPressed() ?: false
+      }
+    } ?: Log.w(
+      "InappstorySdkModule",
+      "Activity does not implement BackPressManagerHost — back press won't be intercepted"
+    )
+  }
 
-      fragmentActivity?.backPressManager?.isManagerEnabled = false
-
-      fragmentActivity?.backPressManager?.overlayHandler =
-        object : BackPressManagerHandler() {
-          override fun handleBackPress(): Boolean {
-            iasManager.let {
-              return it.onBackPressed()
-            }
-          }
-        }
+  override fun onDestroy() {
+    super.onDestroy()
+    backPressManagerHost?.backPressManager?.let { manager ->
+      manager.isManagerEnabled = false
+      manager.overlayHandler = null
     }
-
-//    val callback2 = requireActivity().onBackPressedDispatcher.addCallback(this) {
-//      Log.d("InappstorySdkModule", "Back pressed in overlay fragment");
-//      ias?.let {
-//        if (it.onBackPressed()) {
-//          return@addCallback
-//        }
-//      }
-//      onReaderIsClosed?.invoke()
-//      parentFragmentManager.popBackStack()
-//    }
-
-//    val callback = requireActivity().onBackPressedDispatcher.addCallback(
-//      this,
-//      object : OnBackPressedCallback(true) {
-//        override fun handleOnBackPressed() {
-//          Log.d("InappstorySdkModule", "Back pressed in overlay fragment");
-//          this.ias?.let {
-//            if (it.onBackPressed())
-//              return
-//          }
-//          onReaderIsClosed?.invoke()
-//          parentFragmentManager.popBackStack()
-//        }
-//      }
-//    )
   }
 
   override fun onCreateView(
@@ -74,47 +52,42 @@ class NativeOverlayFragment(
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
-    val root = FrameLayout(requireContext()).apply {
+    return FrameLayout(requireContext()).apply {
       setBackgroundColor(Color.TRANSPARENT)
       layoutParams = FrameLayout.LayoutParams(
         FrameLayout.LayoutParams.MATCH_PARENT,
         FrameLayout.LayoutParams.MATCH_PARENT
       )
       id = contentId
+      setOnClickListener { parentFragmentManager.popBackStack() }
     }
-
-    root.setOnClickListener { parentFragmentManager.popBackStack() }
-    return root
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    val cancellationToken = this.ias?.showInAppMessage(
+    val cancellationToken = ias?.showInAppMessage(
       settings,
       childFragmentManager,
       contentId,
       object : InAppMessageScreenActions {
         override fun readerIsOpened() {
           Log.d("InappstorySdkModule", "IAM reader opened")
-          //fragmentActivity?.backPressManager?.isManagerEnabled = true
         }
 
         override fun readerOpenError(p0: String?) {
           Log.d("InappstorySdkModule", "IAM reader open error: $p0")
           onReaderIsClosed?.invoke()
           parentFragmentManager.popBackStack()
-          //fragmentActivity?.backPressManager?.isManagerEnabled = false
         }
 
         override fun readerIsClosed() {
           Log.d("InappstorySdkModule", "IAM reader closed")
           onReaderIsClosed?.invoke()
           parentFragmentManager.popBackStack()
-          //removeFragmentContainer(id)
-          //fragmentActivity?.backPressManager?.isManagerEnabled = false
         }
-      })
+      }
+    )
     onReaderIsOpen?.invoke(cancellationToken)
   }
 }
