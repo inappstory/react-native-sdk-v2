@@ -30,6 +30,7 @@ class NativeOverlayFragment(
 
     backPressManagerHost?.backPressManager?.let { manager ->
       manager.isManagerEnabled = true
+      // SAM-конверсия: BackPressManager.OverlayHandler — fun interface
       manager.overlayHandler = BackPressManager.OverlayHandler {
         ias?.onBackPressed() ?: false
       }
