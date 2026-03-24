@@ -13,6 +13,7 @@ import com.inappstory.sdk.CancellationToken
 import com.inappstory.sdk.InAppStoryManager
 import com.inappstory.sdk.inappmessage.InAppMessageOpenSettings
 import com.inappstory.sdk.inappmessage.InAppMessageScreenActions
+import androidx.activity.addCallback
 
 class NativeOverlayFragment(
   private val ias: InAppStoryManager?,
@@ -26,20 +27,31 @@ class NativeOverlayFragment(
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    val callback = requireActivity().onBackPressedDispatcher.addCallback(
-      this,
-      object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-          Log.d("InappstorySdkModule", "Back pressed in overlay fragment");
-          this.ias?.let {
-            if (it.onBackPressed())
-              return
-          }
-          onReaderIsClosed?.invoke()
-          parentFragmentManager.popBackStack()
+    val callback2 = requireActivity().onBackPressedDispatcher.addCallback(this) {
+      Log.d("InappstorySdkModule", "Back pressed in overlay fragment");
+      ias?.let {
+        if (it.onBackPressed()) {
+          return@addCallback
         }
       }
-    )
+      onReaderIsClosed?.invoke()
+      parentFragmentManager.popBackStack()
+    }
+
+//    val callback = requireActivity().onBackPressedDispatcher.addCallback(
+//      this,
+//      object : OnBackPressedCallback(true) {
+//        override fun handleOnBackPressed() {
+//          Log.d("InappstorySdkModule", "Back pressed in overlay fragment");
+//          this.ias?.let {
+//            if (it.onBackPressed())
+//              return
+//          }
+//          onReaderIsClosed?.invoke()
+//          parentFragmentManager.popBackStack()
+//        }
+//      }
+//    )
   }
 
   override fun onCreateView(
