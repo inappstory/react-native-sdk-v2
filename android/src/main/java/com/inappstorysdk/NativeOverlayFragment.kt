@@ -27,16 +27,16 @@ class NativeOverlayFragment(
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    val callback2 = requireActivity().onBackPressedDispatcher.addCallback(this) {
-      Log.d("InappstorySdkModule", "Back pressed in overlay fragment");
-      ias?.let {
-        if (it.onBackPressed()) {
-          return@addCallback
-        }
-      }
-      onReaderIsClosed?.invoke()
-      parentFragmentManager.popBackStack()
-    }
+//    val callback2 = requireActivity().onBackPressedDispatcher.addCallback(this) {
+//      Log.d("InappstorySdkModule", "Back pressed in overlay fragment");
+//      ias?.let {
+//        if (it.onBackPressed()) {
+//          return@addCallback
+//        }
+//      }
+//      onReaderIsClosed?.invoke()
+//      parentFragmentManager.popBackStack()
+//    }
 
 //    val callback = requireActivity().onBackPressedDispatcher.addCallback(
 //      this,
@@ -74,6 +74,14 @@ class NativeOverlayFragment(
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+
+    requireActivity().onBackPressedDispatcher.addCallback(
+      viewLifecycleOwner,
+      object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+          Log.d("InappstorySdkModule", "Back pressed in overlay fragment");
+        }
+      })
 
     val cancellationToken = this.ias?.showInAppMessage(
       settings,
