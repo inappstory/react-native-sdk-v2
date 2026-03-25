@@ -803,61 +803,6 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
 
       promise.resolve(true)
       return
-
-
-//      val idContent = addFragmentContainer()
-//      //val idContent = android.R.id.content
-//      Log.d("InappstorySdkModule", "fragmentId: $idContent")
-
-//      val iamController = InAppMessageViewController()
-
-//      val cancellationToken = this.ias?.showInAppMessage(
-//        settings,
-//        object : InAppMessageContainerProvider {
-//          override fun provideContainer(messageData: InAppMessageData?):
-//            InAppMessageContainerSettings {
-//            return if (messageData?.messageType() == InAppMessageType.TOAST) {
-//              val frame = FrameLayout((getCurrentActivity() as FragmentActivity)).apply {
-//                id = View.generateViewId()
-//                layoutParams = ViewGroup.LayoutParams(
-//                  ViewGroup.LayoutParams.MATCH_PARENT,
-//                  ViewGroup.LayoutParams.MATCH_PARENT
-//                )
-//              }
-//              InAppMessageContainerSettings().layout(frame)
-//            } else {
-//              InAppMessageContainerSettings().fragment(
-//                (getCurrentActivity() as FragmentActivity).supportFragmentManager,
-//                idContent,
-//              )
-//            }
-//          }
-//
-//          override fun layoutController(): IAMViewController? {
-//            return iamController
-//          }
-//        },
-//        object : InAppMessageScreenActions {
-//          override fun readerIsOpened() {
-//            Log.d("InappstorySdkModule", "IAM reader opened")
-//            //fragmentActivity?.backPressManager?.isManagerEnabled = true
-//          }
-//
-//          override fun readerOpenError(p0: String?) {
-//            Log.d("InappstorySdkModule", "IAM reader open error: $p0")
-//            iamController.closeView()
-//            removeFragmentContainer(idContent)
-//            //fragmentActivity?.backPressManager?.isManagerEnabled = false
-//          }
-//
-//          override fun readerIsClosed() {
-//            Log.d("InappstorySdkModule", "IAM reader closed")
-//            iamController.closeView()
-//            //removeFragmentContainer(id)
-//            //fragmentActivity?.backPressManager?.isManagerEnabled = false
-//          }
-//        })
-//      cancellationTokenMap[operationId] = cancellationToken
     } catch (e: Throwable) {
       promise.reject("showIAMById error", e)
     }
@@ -874,24 +819,28 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
     try {
       val settings =
         InAppMessageOpenSettings().event(iamEvent).showOnlyIfLoaded(onlyPreloaded)
-      val cancellationToken = this.ias?.showInAppMessage(
-        settings,
-        (getCurrentActivity() as FragmentActivity).supportFragmentManager,
-        android.R.id.content,
-        object : InAppMessageScreenActions {
-          override fun readerIsOpened() {
-            //fragmentActivity?.backPressManager?.isManagerEnabled = true
+      val fragment = NativeOverlayFragment(
+        ias = this.ias,
+        settings = settings,
+        onReaderIsClosed = {
+          Log.d("InappstorySdkModule", "IAM reader closed")
+          if (cancellationTokenMap.containsKey(operationId)) {
+            cancellationTokenMap.remove(operationId)
           }
+        },
+        onReaderIsOpen = { cancellationToken ->
+          Log.d("InappstorySdkModule", "IAM reader opened")
+          cancellationTokenMap[operationId] = cancellationToken
+        },
+      )
 
-          override fun readerOpenError(p0: String?) {
-            //fragmentActivity?.backPressManager?.isManagerEnabled = false
-          }
+      (getCurrentActivity() as FragmentActivity).supportFragmentManager
+        .beginTransaction()
+        .add(android.R.id.content, fragment, "overlay_fragment")
+        .addToBackStack("overlay_fragment")
+        .commit()
 
-          override fun readerIsClosed() {
-            //fragmentActivity?.backPressManager?.isManagerEnabled = false
-          }
-        })
-      cancellationTokenMap[operationId] = cancellationToken
+      promise.resolve(true)
     } catch (e: Throwable) {
       promise.reject("showIAMById error", e)
     }

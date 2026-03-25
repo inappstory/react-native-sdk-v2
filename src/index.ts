@@ -238,7 +238,7 @@ export class StoryManager {
   imagePlaceholders: any = '';
   lang: string = '';
   soundEnabled: boolean = true;
-  getGoodsCallback: Function = () => { };
+  getGoodsCallback: Function = () => {};
   sandbox: boolean = false;
   sendStatistics: boolean = true;
   listeners: any = [];
@@ -489,10 +489,10 @@ export class StoryManager {
     signal: AbortSignal | null,
     options?:
       | {
-        feed?: Option<string>;
-        customTags?: string[] | undefined;
-        limit?: Option<number>;
-      }
+          feed?: Option<string>;
+          customTags?: string[] | undefined;
+          limit?: Option<number>;
+        }
       | undefined
   ): Promise<OnboardingLoadStatus> {
     return new Promise((resolve, reject) => {

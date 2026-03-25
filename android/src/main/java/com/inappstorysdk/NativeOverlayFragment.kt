@@ -25,21 +25,6 @@ class NativeOverlayFragment(
   private val backPressManagerHost: BackPressManagerHost?
     get() = activity as? BackPressManagerHost
 
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-
-//    backPressManagerHost?.backPressManager?.let { manager ->
-//      manager.isManagerEnabled = true
-//      // SAM-конверсия: BackPressManager.OverlayHandler — fun interface
-//      manager.overlayHandler = BackPressManager.OverlayHandler {
-//        ias?.onBackPressed() ?: false
-//      }
-//    } ?: Log.w(
-//      "InappstorySdkModule",
-//      "Activity does not implement BackPressManagerHost — back press won't be intercepted"
-//    )
-  }
-
   override fun onDestroy() {
     super.onDestroy()
     backPressManagerHost?.backPressManager?.let { manager ->
@@ -69,7 +54,6 @@ class NativeOverlayFragment(
 
     backPressManagerHost?.backPressManager?.let { manager ->
       manager.isManagerEnabled = true
-      // SAM-конверсия: BackPressManager.OverlayHandler — fun interface
       manager.overlayHandler = BackPressManager.OverlayHandler {
         ias?.onBackPressed() ?: false
       }
