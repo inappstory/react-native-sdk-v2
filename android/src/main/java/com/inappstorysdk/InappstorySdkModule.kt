@@ -940,6 +940,9 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
   @ReactMethod
   fun setHasLike(value: Boolean) {
     Log.d("InappstorySdkModule", "setHasLike")
+    if (appearanceManager == null) {
+          Log.d("InappstorySdkModule", "setHasLike null")
+    }
     this.appearanceManager?.csHasLike(value);
   }
 
