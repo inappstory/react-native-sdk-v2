@@ -254,15 +254,15 @@ export class StoryManager {
       this.sandbox,
       this.sendStatistics
     );
-    InAppStorySDK.setUserID(userId, userIdSign);
+    //InAppStorySDK.setUserID(userId, userIdSign);
     this.apiKey = config.apiKey;
     this.userId = userId;
     this.userIdSign = userIdSign;
-    if (config.tags) {
+    if (config.tags && config.tags.length > 0) {
       this.tags = config.tags;
       InAppStorySDK.setTags(config.tags);
     }
-    if (config.placeholders) {
+    if (config.placeholders && Object.keys(config.placeholders).length > 0) {
       this.placeholders = config.placeholders;
       InAppStorySDK.setPlaceholders(config.placeholders);
     }
@@ -373,10 +373,15 @@ export class StoryManager {
       this.sendStatistics
     );
   }
+
+  async createSubscriberList(feed: string) {
+    InAppStorySDK.createSubscriberList(feed);
+  }
+
   async fetchFeed(feed: string) {
     InAppStorySDK.getStories(feed);
     //if (include_favorites) {
-    InAppStorySDK.getFavoriteStories(feed);
+    //InAppStorySDK.getFavoriteStories(feed);
     //}
   }
   async fetchFavorites(feed) {

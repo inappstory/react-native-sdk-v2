@@ -30,6 +30,11 @@ import com.inappstory.sdk.game.reader.GameStoryData;
 import com.inappstory.sdk.stories.outercallbacks.common.reader.StoryWidgetCallback;
 import com.inappstory.sdk.stories.outercallbacks.common.reader.SlideData;
 import com.inappstory.sdk.inappmessage.InAppMessageData;
+import com.inappstory.sdk.inappmessage.InAppMessageContainerProvider
+import com.inappstory.sdk.inappmessage.InAppMessageContainerSettings
+import com.inappstory.sdk.inappmessage.InAppMessageType
+import com.inappstory.sdk.inappmessage.InAppMessageViewController
+import com.inappstory.sdk.inappmessage.domain.reader.IAMViewController
 import com.inappstory.sdk.stories.outercallbacks.common.single.SingleLoadCallback;
 import com.inappstory.sdk.stories.outercallbacks.common.reader.StoryData;
 import com.inappstory.sdk.stories.outercallbacks.common.reader.ContentData;
@@ -71,6 +76,9 @@ import androidx.recyclerview.widget.RecyclerView
 import java.util.Locale
 import android.view.View
 import com.facebook.react.bridge.WritableMap;
+import android.app.Activity
+import android.view.ViewGroup
+import android.widget.FrameLayout
 
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.WritableNativeMap
@@ -90,6 +98,7 @@ idgetEventName,
                      int slideIndex,
                      String tags) */
 fun sendEvent(reactContext: ReactContext, eventName: String, params: WritableMap?) {
+  Log.d("InappstorySdkModule", "sendEvent: " + eventName);
   reactContext
     .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
     .emit(eventName, params)
@@ -123,7 +132,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
     Log.d("InappstorySdkModule", "getStories for feed: " + feed);
     this.api?.storyList?.load(
       feed,
-      "feed",
+      feed,
       true,
       false,
       this.ias?.getTags()
@@ -134,13 +143,13 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
   @ReactMethod
   fun getFavoriteStories(feed: String) {
     Log.d("InappstorySdkModule", "getFavoriteStories");
-    this.favoritesApi?.storyList?.load(
-      feed,
-      "favorites",
-      true,
-      true,
-      this.ias?.getTags()
-    )
+    // this.favoritesApi?.storyList?.load(
+    //   feed,
+    //   "favorites",
+    //   true,
+    //   true,
+    //   this.ias?.getTags()
+    // )
   }
 
   @ReactMethod
@@ -188,15 +197,15 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
     //this.ias = this.createInAppStoryManager(apiKey, userID)
     this.appearanceManager = AppearanceManager()
     this.api = InAppStoryAPI()
-    this.favoritesApi = InAppStoryAPI()
-    this.createManager(
-      apiKey,
-      userID,
-      userIdSign,
-      sandbox,
-      sendStatistics,
-      this.favoritesApi as InAppStoryAPI
-    )
+    //this.favoritesApi = InAppStoryAPI()
+    // this.createManager(
+    //   apiKey,
+    //   userID,
+    //   userIdSign,
+    //   sandbox,
+    //   sendStatistics,
+    //   this.favoritesApi as InAppStoryAPI
+    // )
     this.createManager(
       apiKey,
       userID,
@@ -205,8 +214,8 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
       sendStatistics,
       this.api as InAppStoryAPI
     )
-    this.subscribeLists(this.api as InAppStoryAPI, "feed")
-    this.subscribeLists(this.favoritesApi as InAppStoryAPI, "favorites")
+    //this.subscribeLists(this.api as InAppStoryAPI, "feed")
+    //this.subscribeLists(this.favoritesApi as InAppStoryAPI, "favorites")
     setupListeners()
   }
 
@@ -579,23 +588,23 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
           }
         }
 
-        override fun finishGame(
-          content: ContentData?,
-          result: String?,
-          id: String?
-        ) {
-          if (content is GameStoryData) {
-            var payload = Arguments.makeNativeMap(
-              mutableMapOf(
-                "storyID" to content?.slideData?.story?.id,
-                "index" to content?.slideData?.index,
-                "result" to result,
-                "id" to id
-              ) as Map<String, Any>
-            )
-            sendEvent(reactContext, "finishGame", payload)
-          }
-        }
+//        override fun finishGame(
+//          content: ContentData?,
+//          result: String?,
+//          id: String?
+//        ) {
+//          if (content is GameStoryData) {
+//            var payload = Arguments.makeNativeMap(
+//              mutableMapOf(
+//                "storyID" to content?.slideData?.story?.id,
+//                "index" to content?.slideData?.index,
+//                "result" to result,
+//                "id" to id
+//              ) as Map<String, Any>
+//            )
+//            sendEvent(reactContext, "finishGame", payload)
+//          }
+//        }
 
         override fun closeGame(
           content: ContentData?,
@@ -769,24 +778,31 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
     try {
       val settings =
         InAppMessageOpenSettings().id(iamId.toInt()).showOnlyIfLoaded(onlyPreloaded)
-      val cancellationToken = this.ias?.showInAppMessage(
-        settings,
-        (getCurrentActivity() as FragmentActivity).supportFragmentManager,
-        android.R.id.content,
-        object : InAppMessageScreenActions {
-          override fun readerIsOpened() {
-            //fragmentActivity?.backPressManager?.isManagerEnabled = true
-          }
 
-          override fun readerOpenError(p0: String?) {
-            //fragmentActivity?.backPressManager?.isManagerEnabled = false
+      val fragment = NativeOverlayFragment(
+        ias = this.ias,
+        settings = settings,
+        onReaderIsClosed = {
+          Log.d("InappstorySdkModule", "IAM reader closed")
+          if (cancellationTokenMap.containsKey(operationId)) {
+            cancellationTokenMap.remove(operationId)
           }
+        },
+        onReaderIsOpen = { cancellationToken ->
+          Log.d("InappstorySdkModule", "IAM reader opened")
+          cancellationTokenMap[operationId] = cancellationToken
+        },
+      )
 
-          override fun readerIsClosed() {
-            //fragmentActivity?.backPressManager?.isManagerEnabled = false
-          }
-        })
-      cancellationTokenMap[operationId] = cancellationToken
+
+      (getCurrentActivity() as FragmentActivity).supportFragmentManager
+        .beginTransaction()
+        .add(android.R.id.content, fragment, "overlay_fragment")
+        .addToBackStack("overlay_fragment")
+        .commit()
+
+      promise.resolve(true)
+      return
     } catch (e: Throwable) {
       promise.reject("showIAMById error", e)
     }
@@ -803,24 +819,28 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
     try {
       val settings =
         InAppMessageOpenSettings().event(iamEvent).showOnlyIfLoaded(onlyPreloaded)
-      val cancellationToken = this.ias?.showInAppMessage(
-        settings,
-        (getCurrentActivity() as FragmentActivity).supportFragmentManager,
-        android.R.id.content,
-        object : InAppMessageScreenActions {
-          override fun readerIsOpened() {
-            //fragmentActivity?.backPressManager?.isManagerEnabled = true
+      val fragment = NativeOverlayFragment(
+        ias = this.ias,
+        settings = settings,
+        onReaderIsClosed = {
+          Log.d("InappstorySdkModule", "IAM reader closed")
+          if (cancellationTokenMap.containsKey(operationId)) {
+            cancellationTokenMap.remove(operationId)
           }
+        },
+        onReaderIsOpen = { cancellationToken ->
+          Log.d("InappstorySdkModule", "IAM reader opened")
+          cancellationTokenMap[operationId] = cancellationToken
+        },
+      )
 
-          override fun readerOpenError(p0: String?) {
-            //fragmentActivity?.backPressManager?.isManagerEnabled = false
-          }
+      (getCurrentActivity() as FragmentActivity).supportFragmentManager
+        .beginTransaction()
+        .add(android.R.id.content, fragment, "overlay_fragment")
+        .addToBackStack("overlay_fragment")
+        .commit()
 
-          override fun readerIsClosed() {
-            //fragmentActivity?.backPressManager?.isManagerEnabled = false
-          }
-        })
-      cancellationTokenMap[operationId] = cancellationToken
+      promise.resolve(true)
     } catch (e: Throwable) {
       promise.reject("showIAMById error", e)
     }
@@ -1142,12 +1162,13 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
         //TODO
     }
   */
-    @ReactMethod
-    fun clearCache() {
-        Log.d("InappstorySdkModule", "clearCache")
-        this.ias?.clearCache()
-    }
-  /* 
+  @ReactMethod
+  fun clearCache() {
+    Log.d("InappstorySdkModule", "clearCache")
+    this.ias?.clearCache()
+  }
+
+  /*
     @ReactMethod
     fun setLogging(value: Boolean) {
         Log.d("InappstorySdkModule", "setLogging")
@@ -1202,11 +1223,11 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
   }
 
   @ReactMethod
-  fun selectStoryCellWith(storyID: String) {
+  fun selectStoryCellWith(storyID: String, feed: String) {
     Log.d("InappstorySdkModule", "selectStoryCellWith")
     this.api?.storyList?.openStoryReader(
       reactContext.currentActivity,
-      "feed",
+      feed,
       storyID.toInt(),
       this.appearanceManager
     );
@@ -1296,6 +1317,12 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
     }
   }
 
+  @ReactMethod
+  fun createSubscriberList(feed: String) {
+    Log.e(TAG, "createSubscriberList: $feed")
+    this.subscribeLists(this.api as InAppStoryAPI, feed)
+  }
+
   fun subscribeLists(inAppStoryAPI: InAppStoryAPI, feed: String) {
     inAppStoryAPI.addSubscriber(object : InAppStoryAPIListSubscriber(feed) {
       override fun updateFavoriteItemData(favorites: List<StoryFavoriteItemAPIData>) {
@@ -1317,7 +1344,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
             "titleColor" to story.titleColor,
             "opened" to story.opened,
             "hasAudio" to story.hasAudio,
-            "list" to feed,
+            "list" to "feed",
             "feed" to story.storyData.feed,
             "aspectRatio" to aspectRatio,
             "slidesCount" to story.storyData.slidesCount,
@@ -1381,8 +1408,8 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
         val payload: WritableMap = Arguments.createMap()
         payload.putArray("stories", Arguments.makeNativeArray(storiesList));
         //   payload.putString("feed", "default")
-        payload.putString("feed", storiesFeed)
-        payload.putString("list", feed)
+        payload.putString("feed", feed)
+        payload.putString("list", storiesFeed)
         //map.putString("key1", "Value1");
         sendEvent(reactContext, "storyListUpdate", payload)
         //stories.clear()
@@ -1416,6 +1443,69 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
       .apiKey(apiKey)
       .userId(userId)
       .create()
+  }
+
+  fun getReactRootViewId(): Int {
+    val activity = getCurrentActivity() ?: return View.NO_ID
+
+    val decorView = activity.window.decorView
+    val rootView = findReactRootView(decorView)
+
+    return rootView?.parent?.let { parent ->
+      (parent as? View)?.id ?: View.NO_ID
+    } ?: View.NO_ID
+  }
+
+  private fun findReactRootView(view: View): View? {
+    if (view.javaClass.name.contains("ReactRootView")) return view
+    if (view !is ViewGroup) return null
+
+    for (i in 0 until view.childCount) {
+      findReactRootView(view.getChildAt(i))?.let { return it }
+    }
+    return null
+  }
+
+  fun addFragmentContainer(): Int {
+    val activity = getCurrentActivity() as? FragmentActivity ?: return View.NO_ID
+
+    val containerId = View.generateViewId()
+    val container = FrameLayout(activity).apply {
+      id = containerId
+      layoutParams = ViewGroup.LayoutParams(
+        ViewGroup.LayoutParams.MATCH_PARENT,
+        ViewGroup.LayoutParams.MATCH_PARENT
+      )
+    }
+
+    val decorContent = activity.findViewById<ViewGroup>(android.R.id.content)
+
+    activity.runOnUiThread {
+      decorContent.addView(container)
+    }
+
+    return containerId
+  }
+
+  fun removeFragmentContainer(containerId: Int) {
+    val activity = getCurrentActivity() as? FragmentActivity ?: return
+
+    activity.runOnUiThread {
+//      val fm = activity.supportFragmentManager
+//      val fragment = fm.findFragmentById(containerId)
+//      if (fragment != null) {
+//        fm.beginTransaction()
+//          .remove(fragment)
+//          .commitAllowingStateLoss()
+//      }
+
+      val decorContent = activity.findViewById<ViewGroup>(android.R.id.content)
+      val container = decorContent.findViewById<View>(containerId)
+      if (container != null) {
+        Log.d("InAppStoryManager", "container not null, removing");
+        decorContent.removeView(container)
+      }
+    }
   }
 }
 /*

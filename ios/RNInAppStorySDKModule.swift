@@ -22,7 +22,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
       "storiesLoaded", "ugcStoriesLoaded", "showStory", "closeStory",
       "showSlide", "likeStory", "dislikeStory", "favoriteStory",
       "clickOnShareStory", "storyWidgetEvent",
-      "startGame", "finishGame", "closeGame", "eventGame", "gameFailure",
+      "startGame", "closeGame", "eventGame", "gameFailure",
       "gameReaderWillShow", "gameReaderDidClose", "gameComplete",
       "getGoodsObject",
       "storyListUpdate", "storyUpdate",
