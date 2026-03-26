@@ -35,7 +35,7 @@ RCT_EXTERN_METHOD(removeAllFavorites)
 RCT_EXTERN_METHOD(selectFavoriteStoryCellWith:(NSString *)storyID)
 RCT_EXTERN_METHOD(onFavoriteCell)
 
-RCT_EXTERN_METHOD(selectStoryCellWith:(NSString *)storyID)
+RCT_EXTERN_METHOD(selectStoryCellWith:(NSString *)storyID, feed:(NSString *)feed)
 RCT_EXTERN_METHOD(setVisibleWith:(NSArray<NSString *> *)storyIDs)
 
 RCT_EXTERN_METHOD(setTags:(NSArray<NSString *> *)tags)

@@ -713,7 +713,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   }
 
   @objc
-  func selectStoryCellWith(_ storyID: String) {
+  func selectStoryCellWith(_ storyID: String, feed: String) {
     DispatchQueue.main.async {
       self.storiesAPI.selectStoryCellWith(id: storyID)
     }
