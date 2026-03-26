@@ -7,11 +7,11 @@ import {
   StoryReaderSwipeStyle,
   StoriesListCardTitleTextAlign,
   type StoryManagerConfig,
+  CoverQuality,
 } from '@inappstory/react-native-sdk';
 
 import { Linking, Platform } from 'react-native';
 import Toast from 'react-native-simple-toast';
-import InAppStorySDK from '@inappstory/react-native-sdk';
 
 const apiKey =
   'BewAAAAAAAAAAAAAABUaIThgHB0BP1FQNAZCQgVBAn8yIRY3g7XgQVkYvY_giYUG-0MTPizcaZlrbUbY9FjNevAAqg';
@@ -104,6 +104,7 @@ const createAppearanceManager = () => {
       hasDislikeButton: false,
       hasFavorite: true,
       hasShare: true,
+      coverQuality: CoverQuality.MEDIUM,
     })
     .setStoriesListOptions({
       card: {
@@ -189,7 +190,7 @@ export const storyManager = createStoryManager();
 
 export const appearanceManager = createAppearanceManager();
 
-InAppStorySDK.setFavoriteImage('icon_favorite', 'icon_favorite_active');
+// InAppStorySDK.setFavoriteImage('icon_favorite', 'icon_favorite_active');
 // InAppStorySDK.setLikeImage('like', 'like_active');
 // InAppStorySDK.setDislikeImage(image, activeImage);
 // InAppStorySDK.setFavoriteImage(image, activeImage);
