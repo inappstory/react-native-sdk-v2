@@ -701,6 +701,11 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   }
 
   @objc
+  func createSubscriberList(_ feed: String) {
+    // used in android
+  }
+
+  @objc
   func getFavoriteStories(_ feed: String) {
     DispatchQueue.main.async {
       self.favoriteStoriesAPI.getStoriesList()

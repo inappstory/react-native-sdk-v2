@@ -13,6 +13,7 @@
 RCT_EXTERN_METHOD(initWith:(NSString *)apiKey userID:(NSString *)userID userIdSign:(nullable NSString *)userIdSign sandbox:(BOOL *)sandbox sendStats:(BOOL *)sendStats)
 
 RCT_EXTERN_METHOD(getStories:(NSString *)feed)
+RCT_EXTERN_METHOD(createSubscriberList:(NSString *)feed)
 RCT_EXTERN_METHOD(getFavoriteStories:(NSString *)feed)
 RCT_EXTERN_METHOD(getCellRatio:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 
