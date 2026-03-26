@@ -198,6 +198,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
     Log.d("InappstorySdkModule", "initWith")
     //this.ias = this.createInAppStoryManager(apiKey, userID)
     this.appearanceManager = AppearanceManager()
+    AppearanceManager.setCommonInstance(appearanceManager);
     this.api = InAppStoryAPI()
     //this.favoritesApi = InAppStoryAPI()
     // this.createManager(
@@ -939,7 +940,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
 
   @ReactMethod
   fun setHasLike(value: Boolean) {
-    Log.d("InappstorySdkModule", "setHasLike")
+    Log.d("InappstorySdkModule", "setHasLike " + value)
     if (appearanceManager == null) {
           Log.d("InappstorySdkModule", "setHasLike null")
     }
