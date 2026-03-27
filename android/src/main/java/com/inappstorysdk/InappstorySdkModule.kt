@@ -118,8 +118,8 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
   override fun getName() = "RNInAppStorySDKModule"
   var ias: InAppStoryManager? = null
-  var appearanceManager: AppearanceManager? = null;
-  var api: InAppStoryAPI? = null;
+  var appearanceManager: AppearanceManager = AppearanceManager();
+  var api: InAppStoryAPI = InAppStoryAPI();
   var favoritesApi: InAppStoryAPI? = null;
   var TAG: String = "IAS_SDK_API";
 
@@ -196,11 +196,11 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
     sendStatistics: Boolean
   ) {
     Log.d("InappstorySdkModule", "initWith")
-    //this.ias = this.createInAppStoryManager(apiKey, userID)
-    this.appearanceManager = AppearanceManager()
-    AppearanceManager.setCommonInstance(appearanceManager);
-    this.api = InAppStoryAPI()
-    //this.favoritesApi = InAppStoryAPI()
+    // this.ias = this.createInAppStoryManager(apiKey, userID)
+    // this.appearanceManager = AppearanceManager()
+    // AppearanceManager.setCommonInstance(appearanceManager);
+    // this.api = InAppStoryAPI()
+    // this.favoritesApi = InAppStoryAPI()
     // this.createManager(
     //   apiKey,
     //   userID,
