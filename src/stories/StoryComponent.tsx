@@ -7,7 +7,7 @@ import {
   View,
   Platform,
 } from 'react-native';
-import Video from 'react-native-video';
+import Video, { ViewType } from 'react-native-video';
 import { AppearanceManager, type RenderCell, StoryManager } from '../index';
 
 export const StoryComponent = ({
@@ -95,7 +95,7 @@ export const StoryComponent = ({
         playWhenInactive={true}
         // only TextureView allow to be animated, transformed or scaled
         // need for set card.opened.opacity 0.5 for instance
-        useTextureView={true}
+        viewType={ViewType.TEXTURE}
         disableFocus={true}
       />
       {coverOverlay}
