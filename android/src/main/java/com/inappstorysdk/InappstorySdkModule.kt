@@ -1334,6 +1334,9 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
   fun createSubscriberList(feed: String) {
     Log.e(TAG, "createSubscriberList: $feed")
     this.subscribeLists(this.api as InAppStoryAPI, feed)
+    if (feed != "favorites") {
+      this.subscribeLists(this.api as InAppStoryAPI, "favorites")
+    }
   }
 
   fun subscribeLists(inAppStoryAPI: InAppStoryAPI, feed: String) {
