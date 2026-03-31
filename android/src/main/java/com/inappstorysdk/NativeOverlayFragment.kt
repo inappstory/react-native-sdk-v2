@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
+import com.inappstorysdk.BackPressManager.BackPressManagerHandler
 import com.inappstory.sdk.CancellationToken
 import com.inappstory.sdk.InAppStoryManager
 import com.inappstory.sdk.inappmessage.InAppMessageOpenSettings
