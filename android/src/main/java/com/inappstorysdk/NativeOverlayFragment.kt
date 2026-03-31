@@ -57,7 +57,7 @@ class NativeOverlayFragment(
       manager.isManagerEnabled = true
       manager.overlayHandler = object : BackPressManagerHandler() {
                     override fun handleBackPress(): Boolean {
-                        iasManager.let {
+                        ias.let {
                             return it.onBackPressed()
                         }
                     }

@@ -2,11 +2,11 @@ package com.inappstorysdk
 
 import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler
 
-class BackPressManager {
-  fun interface BackPressManagerHandler {
-    fun handleBackPress(): Boolean
-  }
+abstract class BackPressManagerHandler {
+    abstract fun handleBackPress(): Boolean
+}
 
+class BackPressManager {
   var overlayHandler: BackPressManagerHandler? = null
   var isManagerEnabled = false
 
