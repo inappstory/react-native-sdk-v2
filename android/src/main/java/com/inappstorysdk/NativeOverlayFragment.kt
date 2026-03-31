@@ -8,7 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
-import com.inappstorysdk.BackPressManager.BackPressManagerHandler
+import com.inappstorysdk.BackPressManagerHandler
 import com.inappstory.sdk.CancellationToken
 import com.inappstory.sdk.InAppStoryManager
 import com.inappstory.sdk.inappmessage.InAppMessageOpenSettings
@@ -57,7 +57,7 @@ class NativeOverlayFragment(
       manager.isManagerEnabled = true
       manager.overlayHandler = object : BackPressManagerHandler() {
                     override fun handleBackPress(): Boolean {
-                        ias.let {
+                        ias?.let {
                             return it.onBackPressed()
                         }
                     }
