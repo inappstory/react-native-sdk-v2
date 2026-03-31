@@ -7,7 +7,7 @@ import {
   View,
   Platform,
 } from 'react-native';
-import Video, { ViewType } from 'react-native-video';
+import Video, { MixWithOthersType, ViewType } from 'react-native-video';
 import { AppearanceManager, type RenderCell, StoryManager } from '../index';
 
 export const StoryComponent = ({
@@ -84,15 +84,16 @@ export const StoryComponent = ({
     <View style={[styles.cover, { borderRadius }]}>
       <Video
         source={{
-          uri: (Platform.OS === 'android' ? '' : '') + story?.coverVideoPath,
+          uri: (Platform.OS === 'android' ? 'file://' : '') + story?.coverVideoPath,
         }}
         style={[styles.cover, { borderRadius, overflow: 'hidden' }]}
         repeat={true}
         volume={0}
         resizeMode={'cover'}
         paused={false}
-        playInBackground={true}
-        playWhenInactive={true}
+        mixWithOthers={MixWithOthersType.MIX}
+        playInBackground={false}
+        playWhenInactive={false}
         // only TextureView allow to be animated, transformed or scaled
         // need for set card.opened.opacity 0.5 for instance
         viewType={ViewType.TEXTURE}
