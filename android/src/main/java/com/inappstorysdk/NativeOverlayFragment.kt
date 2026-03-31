@@ -55,11 +55,13 @@ class NativeOverlayFragment(
 
     backPressManagerHost?.backPressManager?.let { manager ->
       manager.isManagerEnabled = true
-      manager.overlayHandler = object : BackPressManagerHandler() {
+      manager.overlayHandler =
+                object : BackPressManagerHandler() {
                     override fun handleBackPress(): Boolean {
                         ias?.let {
                             return it.onBackPressed()
                         }
+                        return false
                     }
                 }
     } ?: Log.w(
