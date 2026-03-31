@@ -84,7 +84,9 @@ export const StoryComponent = ({
     <View style={[styles.cover, { borderRadius }]}>
       <Video
         source={{
-          uri: (Platform.OS === 'android' ? 'file://' : '') + story?.coverVideoPath,
+          uri:
+            (Platform.OS === 'android' ? '' : '') +
+            story?.coverVideoPath,
         }}
         style={[styles.cover, { borderRadius, overflow: 'hidden' }]}
         repeat={true}

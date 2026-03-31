@@ -54,9 +54,13 @@ class NativeOverlayFragment(
 
     backPressManagerHost?.backPressManager?.let { manager ->
       manager.isManagerEnabled = true
-      manager.overlayHandler = BackPressManager.OverlayHandler {
-        ias?.onBackPressed() ?: false
-      }
+      manager.overlayHandler = object : BackPressManagerHandler() {
+                    override fun handleBackPress(): Boolean {
+                        iasManager.let {
+                            return it.onBackPressed()
+                        }
+                    }
+                }
     } ?: Log.w(
       "InappstorySdkModule",
       "Activity does not implement BackPressManagerHost — back press won't be intercepted"
