@@ -55,6 +55,7 @@ RCT_EXTERN_METHOD(setHasShare:(BOOL *)value)
 RCT_EXTERN_METHOD(setUserID:(NSString *)userID userIdSign:(nullable NSString *)userIdSign)
 RCT_EXTERN_METHOD(setLang:(NSString *)lang)
 
+RCT_EXTERN_METHOD(setSendStatistics:(BOOL *)value)
 
 RCT_EXTERN_METHOD(getFavoritesCount:(NSString *)userID resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 

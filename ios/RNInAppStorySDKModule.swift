@@ -701,6 +701,13 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   }
 
   @objc
+  func setSendStatistics(_ value: Bool) {
+    DispatchQueue.main.async {
+      InAppStory.shared.isStatisticDisabled = !value
+    }
+  }
+
+  @objc
   func createSubscriberList(_ feed: String) {
     // used in android
   }

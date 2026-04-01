@@ -370,13 +370,7 @@ export class StoryManager {
   }
   setSendStatistics(sendStatistics: boolean): void {
     this.sendStatistics = sendStatistics;
-    InAppStorySDK.initWith(
-      this.apiKey,
-      this.userId,
-      this.userIdSign,
-      this.sandbox,
-      this.sendStatistics
-    );
+    InAppStorySDK.setSendStatistics(this.sendStatistics);
   }
 
   async createSubscriberList(feed: string) {
