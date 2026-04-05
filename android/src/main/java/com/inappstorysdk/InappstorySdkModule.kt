@@ -201,14 +201,14 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
     // AppearanceManager.setCommonInstance(appearanceManager);
     // this.api = InAppStoryAPI()
     // this.favoritesApi = InAppStoryAPI()
-    this.createManager(
-      apiKey,
-      userID,
-      userIdSign,
-      sandbox,
-      sendStatistics,
-      this.favoritesApi as InAppStoryAPI
-    )
+    // this.createManager(
+    //   apiKey,
+    //   userID,
+    //   userIdSign,
+    //   sandbox,
+    //   sendStatistics,
+    //   this.favoritesApi as InAppStoryAPI
+    // )
     this.createManager(
       apiKey,
       userID,
@@ -217,8 +217,8 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
       sendStatistics,
       this.api as InAppStoryAPI
     )
-    this.subscribeLists(this.api as InAppStoryAPI, "feed")
-    this.subscribeLists(this.favoritesApi as InAppStoryAPI, "favorites")
+    // this.subscribeLists(this.api as InAppStoryAPI, "feed")
+    // this.subscribeLists(this.favoritesApi as InAppStoryAPI, "favorites")
     setupListeners()
   }
 
@@ -1332,11 +1332,11 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
 
   @ReactMethod
   fun createSubscriberList(feed: String) {
-    // Log.e(TAG, "createSubscriberList: $feed")
-    // this.subscribeLists(this.api as InAppStoryAPI, feed)
-    // if (feed != "favorites") {
-    //   this.subscribeLists(this.api as InAppStoryAPI, "favorites")
-    // }
+    Log.e(TAG, "createSubscriberList: $feed")
+    this.subscribeLists(this.api as InAppStoryAPI, feed)
+    if (feed != "favorites") {
+      this.subscribeLists(this.api as InAppStoryAPI, "favorites")
+    }
   }
 
   fun subscribeLists(inAppStoryAPI: InAppStoryAPI, feed: String) {
@@ -1414,7 +1414,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
         val aspectRatio = sessionData.previewAspectRatio();
         Log.e(TAG, "aspect ratio return $aspectRatio ")
 
-        var storiesFeed = sessionData.feed();
+        var storiesFeed = "feed";
         if (feed == "favorites") {
           storiesFeed = "default"
         }
@@ -1459,8 +1459,8 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
         val payload: WritableMap = Arguments.createMap()
         payload.putArray("stories", Arguments.makeNativeArray(storiesList));
         //   payload.putString("feed", "default")
-        payload.putString("feed", storiesFeed)
-        payload.putString("list", feed)
+        payload.putString("feed", feed)
+        payload.putString("list", storiesFeed)
         //map.putString("key1", "Value1");
         sendEvent(reactContext, "storyListUpdate", payload)
         //stories.clear()
