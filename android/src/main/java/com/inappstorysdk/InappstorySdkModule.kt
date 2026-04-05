@@ -1342,7 +1342,42 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
   fun subscribeLists(inAppStoryAPI: InAppStoryAPI, feed: String) {
     inAppStoryAPI.addSubscriber(object : InAppStoryAPIListSubscriber(feed) {
       override fun updateFavoriteItemData(favorites: List<StoryFavoriteItemAPIData>) {
+        
         Log.e(TAG, "$feed updateFavoriteItemData: $favorites")
+        
+        val storiesList = ArrayList<WritableNativeMap>()
+        val iterator = favorites.listIterator()
+        for (item in iterator) {
+          var storyData = Arguments.makeNativeMap(
+            mutableMapOf(
+              "storyID" to item.id,
+              //"storyData" to item.storyData,
+              "title" to "",
+              "coverImagePath" to item.imageFilePath,
+              "coverVideoPath" to null,
+              "backgroundColor" to item.backgroundColor,
+              "titleColor" to null,
+              "opened" to item.opened,
+              "hasAudio" to false,
+              "list" to feed,
+              "feed" to item.storyData.feed,
+              "aspectRatio" to 1,
+              "slidesCount" to 0,
+              "statTitle" to "",
+            ) as Map<String, Any>
+          )
+          Log.e(TAG, "Item = $item")
+
+          storiesList.add(storyData)
+        }
+
+        val payload: WritableMap = Arguments.createMap()
+        payload.putArray("stories", Arguments.makeNativeArray(storiesList));
+        //   payload.putString("feed", "default")
+        payload.putString("feed", feed)
+        payload.putString("list", "favorites")
+        //map.putString("key1", "Value1");
+        sendEvent(reactContext, "storyListUpdate", payload)
       }
 
       override fun updateStoryData(story: StoryAPIData, sessionData: IASStoryListSessionData) {
