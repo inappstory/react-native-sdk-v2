@@ -1335,9 +1335,9 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
   fun createSubscriberList(feed: String) {
     Log.e(TAG, "createSubscriberList: $feed")
     this.subscribeLists(this.api as InAppStoryAPI, feed)
-    if (feed != "favorites") {
-      this.subscribeLists(this.api as InAppStoryAPI, "favorites")
-    }
+    // if (feed != "favorites") {
+    //   this.subscribeLists(this.api as InAppStoryAPI, "favorites")
+    // }
   }
 
   fun subscribeLists(inAppStoryAPI: InAppStoryAPI, feed: String) {
@@ -1346,39 +1346,39 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
         
         Log.e(TAG, "$feed updateFavoriteItemData: $favorites")
         
-        // val storiesList = ArrayList<WritableNativeMap>()
-        // val iterator = favorites.listIterator()
-        // for (item in iterator) {
-        //   var storyData = Arguments.makeNativeMap(
-        //     mutableMapOf(
-        //       "storyID" to item.id,
-        //       //"storyData" to item.storyData,
-        //       "title" to "",
-        //       "coverImagePath" to item.imageFilePath,
-        //       "coverVideoPath" to null,
-        //       "backgroundColor" to item.backgroundColor,
-        //       "titleColor" to null,
-        //       "opened" to false,
-        //       "hasAudio" to false,
-        //       "list" to feed,
-        //       "feed" to "default",
-        //       "aspectRatio" to 1,
-        //       "slidesCount" to 0,
-        //       "statTitle" to "",
-        //     ) as Map<String, Any>
-        //   )
-        //   Log.e(TAG, "Item = $item")
+        val storiesList = ArrayList<WritableNativeMap>()
+        val iterator = favorites.listIterator()
+        for (item in iterator) {
+          var storyData = Arguments.makeNativeMap(
+            mutableMapOf(
+              "storyID" to item.id,
+              //"storyData" to item.storyData,
+              "title" to "",
+              "coverImagePath" to item.imageFilePath,
+              "coverVideoPath" to null,
+              "backgroundColor" to item.backgroundColor,
+              "titleColor" to null,
+              "opened" to false,
+              "hasAudio" to false,
+              "list" to feed,
+              "feed" to "default",
+              "aspectRatio" to 1,
+              "slidesCount" to 0,
+              "statTitle" to "",
+            ) as Map<String, Any>
+          )
+          Log.e(TAG, "Item = $item")
 
-        //   storiesList.add(storyData)
-        // }
+          storiesList.add(storyData)
+        }
 
-        // val payload: WritableMap = Arguments.createMap()
-        // payload.putArray("stories", Arguments.makeNativeArray(storiesList));
-        // //   payload.putString("feed", "default")
-        // payload.putString("feed", feed)
-        // payload.putString("list", "favorites")
-        // //map.putString("key1", "Value1");
-        // sendEvent(reactContext, "storyListUpdate", payload)
+        val payload: WritableMap = Arguments.createMap()
+        payload.putArray("stories", Arguments.makeNativeArray(storiesList));
+        //   payload.putString("feed", "default")
+        payload.putString("feed", feed)
+        payload.putString("list", "favorites")
+        //map.putString("key1", "Value1");
+        sendEvent(reactContext, "storyListUpdate", payload)
       }
 
       override fun updateStoryData(story: StoryAPIData, sessionData: IASStoryListSessionData) {
