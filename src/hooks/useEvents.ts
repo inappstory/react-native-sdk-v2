@@ -26,10 +26,7 @@ export const useEvents = () => {
       function () {
         console.log('BackHandler hardwareBackPress');
         try {
-          return (
-            InAppStorySDK.handleHardwareBackPress() ===
-            true
-          );
+          return InAppStorySDK.handleHardwareBackPress() === true;
         } catch {
           return false;
         }

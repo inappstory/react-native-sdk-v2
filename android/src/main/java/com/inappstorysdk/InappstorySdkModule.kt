@@ -210,7 +210,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
     //   sendStatistics,
     //   this.favoritesApi as InAppStoryAPI
     // )
-    this.favoritesApi = this.api
+    this.favoritesApi = this.api as InAppStoryAPI
     this.createManager(
       apiKey,
       userID,
@@ -787,7 +787,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
       val fragment = NativeOverlayFragment(
         ias = this.ias,
         settings = settings,
-        backPressManager = backPressManager,
+        backPressManager = this.backPressManager,
         onReaderIsClosed = {
           Log.d("InappstorySdkModule", "IAM reader closed")
           if (cancellationTokenMap.containsKey(operationId)) {
@@ -827,7 +827,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
       val fragment = NativeOverlayFragment(
         ias = this.ias,
         settings = settings,
-        backPressManager = backPressManager,
+        backPressManager = this.backPressManager,
         onReaderIsClosed = {
           Log.d("InappstorySdkModule", "IAM reader closed")
           if (cancellationTokenMap.containsKey(operationId)) {
@@ -889,7 +889,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
 
   @ReactMethod(isBlockingSynchronousMethod = true)
   fun handleHardwareBackPress(): Boolean {
-    return backPressManager.handleBackPress()
+    return this.backPressManager.handleBackPress()
   }
 
   @ReactMethod
