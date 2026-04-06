@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import * as React from 'react';
 
-import { NativeEventEmitter, NativeModules } from 'react-native';
+import { BackHandler, NativeEventEmitter, NativeModules } from 'react-native';
 import { useStore } from './useStore';
 import InAppStorySDK from '@inappstory/react-native-sdk';
 import { nativeEventList } from '../nativeEventList';
@@ -16,9 +16,38 @@ export const useEvents = () => {
   const [readerOpen, setReaderOpen] = React.useState<any>(false);
   const imageCoverCache = React.useRef<any>({});
   const videoCoverCache = React.useRef<any>({});
+
   React.useEffect(() => {
     if (init) return;
     init = true;
+
+    const subscription = BackHandler.addEventListener(
+      'hardwareBackPress',
+      function () {
+        /**
+         * this.onMainScreen and this.goBack are just examples,
+         * you need to use your own implementation here.
+         *
+         * Typically you would use the navigator here to go to the last state.
+         */
+        console.log('hardwareBackPress event received');
+
+        // if (!this.onMainScreen()) {
+        //   this.goBack();
+        //   /**
+        //    * When true is returned the event will not be bubbled up
+        //    * & no other back action will execute
+        //    */
+        //   return true;
+        // }
+        /**
+         * Returning false will let the event to bubble up & let other event listeners
+         * or the system's default back action to be executed.
+         */
+        return false;
+      }
+    );
+
     const eventEmitter = new NativeEventEmitter(
       NativeModules.RNInAppStorySDKModule
     );
@@ -71,6 +100,7 @@ export const useEvents = () => {
         eventListener.remove();
       });
       init = false;
+      subscription.remove();
     };
   }, []);
   return { readerOpen };
