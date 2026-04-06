@@ -18,6 +18,7 @@ export const useEvents = () => {
   const videoCoverCache = React.useRef<any>({});
 
   React.useEffect(() => {
+    console.log('useEvents init: ', init);
     if (init) return;
     init = true;
     console.log('BackHandler hardwareBackPress init');
