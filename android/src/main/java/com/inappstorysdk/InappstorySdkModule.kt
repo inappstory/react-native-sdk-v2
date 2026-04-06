@@ -117,6 +117,7 @@ class InAppStory {
 class InappstorySdkModule(var reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
   override fun getName() = "RNInAppStorySDKModule"
+  val backPressManager = BackPressManager()
   var ias: InAppStoryManager? = null
   var appearanceManager: AppearanceManager = AppearanceManager();
   var api: InAppStoryAPI = InAppStoryAPI();
@@ -786,6 +787,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
       val fragment = NativeOverlayFragment(
         ias = this.ias,
         settings = settings,
+        backPressManager = backPressManager,
         onReaderIsClosed = {
           Log.d("InappstorySdkModule", "IAM reader closed")
           if (cancellationTokenMap.containsKey(operationId)) {
@@ -805,7 +807,6 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
         .addToBackStack("overlay_fragment")
         .commit()
 
-      //promise.resolve(true)
       return
     } catch (e: Throwable) {
       promise.reject("showIAMById error", e)
@@ -826,6 +827,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
       val fragment = NativeOverlayFragment(
         ias = this.ias,
         settings = settings,
+        backPressManager = backPressManager,
         onReaderIsClosed = {
           Log.d("InappstorySdkModule", "IAM reader closed")
           if (cancellationTokenMap.containsKey(operationId)) {
@@ -887,8 +889,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
 
   @ReactMethod(isBlockingSynchronousMethod = true)
   fun handleHardwareBackPress(): Boolean {
-    val host = getCurrentActivity() as? BackPressManagerHost ?: return false
-    return host.backPressManager.shouldInterceptBackPress()
+    return backPressManager.handleBackPress()
   }
 
   @ReactMethod

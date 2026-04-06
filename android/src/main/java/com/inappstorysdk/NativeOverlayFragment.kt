@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
-import com.inappstorysdk.BackPressManagerHandler
 import com.inappstory.sdk.CancellationToken
 import com.inappstory.sdk.InAppStoryManager
 import com.inappstory.sdk.inappmessage.InAppMessageOpenSettings
@@ -17,57 +16,19 @@ import com.inappstory.sdk.inappmessage.InAppMessageScreenActions
 class NativeOverlayFragment(
   private val ias: InAppStoryManager?,
   private val settings: InAppMessageOpenSettings,
+  private val backPressManager: BackPressManager,
   private val onReaderIsClosed: (() -> Unit)? = null,
   private val onReaderIsOpen: ((CancellationToken?) -> Unit)? = null
 ) : Fragment() {
 
   private val contentId = View.generateViewId()
 
-  private val backPressManagerHost: BackPressManagerHost?
-    get() = activity as? BackPressManagerHost
-
-  override fun onDestroy() {
-    super.onDestroy()
-    backPressManagerHost?.backPressManager?.let { manager ->
-      manager.isManagerEnabled = false
-      manager.overlayHandler = null
-    }
-  }
-
-  override fun onCreateView(
-    inflater: LayoutInflater,
-    container: ViewGroup?,
-    savedInstanceState: Bundle?
-  ): View {
-    return FrameLayout(requireContext()).apply {
-      setBackgroundColor(Color.TRANSPARENT)
-      layoutParams = FrameLayout.LayoutParams(
-        FrameLayout.LayoutParams.MATCH_PARENT,
-        FrameLayout.LayoutParams.MATCH_PARENT
-      )
-      id = contentId
-      setOnClickListener { parentFragmentManager.popBackStack() }
-    }
-  }
-
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    backPressManagerHost?.backPressManager?.let { manager ->
-      manager.isManagerEnabled = true
-      manager.overlayHandler =
-                object : BackPressManagerHandler() {
-                    override fun handleBackPress(): Boolean {
-                        ias?.let {
-                            return it.onBackPressed()
-                        }
-                        return false
-                    }
-                }
-    } ?: Log.w(
-      "InappstorySdkModule",
-      "Activity does not implement BackPressManagerHost — back press won't be intercepted"
-    )
+    backPressManager.register {
+      ias?.onBackPressed() == true
+    }
 
     val cancellationToken = ias?.showInAppMessage(
       settings,
@@ -92,5 +53,26 @@ class NativeOverlayFragment(
       }
     )
     onReaderIsOpen?.invoke(cancellationToken)
+  }
+
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View {
+    return FrameLayout(requireContext()).apply {
+      setBackgroundColor(Color.TRANSPARENT)
+      layoutParams = FrameLayout.LayoutParams(
+        FrameLayout.LayoutParams.MATCH_PARENT,
+        FrameLayout.LayoutParams.MATCH_PARENT
+      )
+      id = contentId
+      setOnClickListener { parentFragmentManager.popBackStack() }
+    }
+  }
+
+  override fun onDestroyView() {
+    super.onDestroyView()
+    backPressManager.unregister()
   }
 }

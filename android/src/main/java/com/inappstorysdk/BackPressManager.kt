@@ -1,32 +1,17 @@
 package com.inappstorysdk
 
-import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler
-
-abstract class BackPressManagerHandler {
-    abstract fun handleBackPress(): Boolean
-}
-
 class BackPressManager {
-  var overlayHandler: BackPressManagerHandler? = null
-  var isManagerEnabled = false
+  private var handler: (() -> Boolean)? = null
 
-  fun shouldInterceptBackPress(): Boolean {
-        if (isManagerEnabled) {
-            if (overlayHandler?.handleBackPress() == true) {
-                return true
-            }
-            return false
-        }
-        return false
-    }
-}
+  fun register(handler: () -> Boolean) {
+    this.handler = handler
+  }
 
-interface BackPressManagerHost : DefaultHardwareBackBtnHandler {
+  fun unregister() {
+    this.handler = null
+  }
 
-  val backPressManager: BackPressManager
-    get() = managers.getOrPut(this) { BackPressManager() }
-
-  companion object {
-    private val managers = java.util.WeakHashMap<BackPressManagerHost, BackPressManager>()
+  fun handleBackPress(): Boolean {
+    return handler?.invoke() == true
   }
 }

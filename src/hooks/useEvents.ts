@@ -25,7 +25,10 @@ export const useEvents = () => {
       'hardwareBackPress',
       function () {
         try {
-          return NativeModules.RNInAppStorySDKModule.handleHardwareBackPress() === true;
+          return (
+            NativeModules.RNInAppStorySDKModule.handleHardwareBackPress() ===
+            true
+          );
         } catch {
           return false;
         }
