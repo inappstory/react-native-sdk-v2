@@ -885,6 +885,12 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
     }
   }
 
+  @ReactMethod(isBlockingSynchronousMethod = true)
+  fun handleHardwareBackPress(): Boolean {
+    val host = getCurrentActivity() as? BackPressManagerHost ?: return false
+    return host.backPressManager.shouldInterceptBackPress()
+  }
+
   @ReactMethod
   fun cancelOperation(operationId: String) {
     Log.d("InappstorySdkModule", "cancelOperation")
