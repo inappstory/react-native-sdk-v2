@@ -887,9 +887,9 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
     }
   }
 
-  @ReactMethod(isBlockingSynchronousMethod = true)
-  fun handleHardwareBackPress(): Boolean {
-    return this.backPressManager.handleBackPress()
+  @ReactMethod
+  fun handleHardwareBackPress(promise: Promise) {
+    promise.resolve(backPressManager.handleBackPress())
   }
 
   @ReactMethod

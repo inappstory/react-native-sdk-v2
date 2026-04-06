@@ -21,16 +21,14 @@ export const useEvents = () => {
     console.log('useEvents init: ', init);
     if (init) return;
     init = true;
-    console.log('BackHandler hardwareBackPress init');
     const subscription = BackHandler.addEventListener(
       'hardwareBackPress',
       function () {
-        console.log('BackHandler hardwareBackPress');
-        try {
-          return InAppStorySDK.handleHardwareBackPress() === true;
-        } catch {
-          return false;
-        }
+        (async () => {
+          const handled: boolean = await InAppStorySDK.handleHardwareBackPress();
+          console.log('hardwareBackPress handled:', handled);
+        })();
+        return true;
       }
     );
 
