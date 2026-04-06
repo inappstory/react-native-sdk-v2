@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
+import com.inappstorysdk.InAppStoryActivity
 import com.inappstory.sdk.CancellationToken
 import com.inappstory.sdk.InAppStoryManager
 import com.inappstory.sdk.inappmessage.InAppMessageOpenSettings
@@ -63,15 +64,15 @@ class NativeOverlayFragment(
     savedInstanceState: Bundle?
   ): View {
 
-    if (getCurrentActivity() is InAppStoryActivity) {
-          val fragmentActivity = (getCurrentActivity() as InAppStoryActivity)
+    if (getActivity() is InAppStoryActivity) {
+          val fragmentActivity = (getActivity() as InAppStoryActivity)
 
           fragmentActivity?.backPressManager?.isManagerEnabled = false
 
           fragmentActivity?.backPressManager?.overlayHandler =
             object : BackPressManagerHandler() {
               override fun handleBackPress(): Boolean {
-                iasManager.let {
+                this.ias?.let {
                   return it.onBackPressed()
                 }
               }
@@ -90,8 +91,8 @@ class NativeOverlayFragment(
   }
 
   override fun onDestroyView() {
-     if (getCurrentActivity() is InAppStoryActivity) {
-            val fragmentActivity = (getCurrentActivity() as InAppStoryActivity)
+     if (getActivity() is InAppStoryActivity) {
+            val fragmentActivity = (getActivity() as InAppStoryActivity)
 
             fragmentActivity?.backPressManager?.isManagerEnabled = false
             fragmentActivity?.backPressManager?.overlayHandler = null 
