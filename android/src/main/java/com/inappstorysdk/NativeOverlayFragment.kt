@@ -65,6 +65,7 @@ class NativeOverlayFragment(
   ): View {
 
     if (getActivity() is InAppStoryActivity) {
+        Log.d("InappstorySdkModule", "Registering back press handler in NativeOverlayFragment")
           val fragmentActivity = (getActivity() as InAppStoryActivity)
 
           fragmentActivity?.backPressManager?.isManagerEnabled = false
@@ -72,9 +73,8 @@ class NativeOverlayFragment(
           fragmentActivity?.backPressManager?.overlayHandler =
             object : BackPressManagerHandler() {
               override fun handleBackPress(): Boolean {
-                this.ias?.let {
-                  return it.onBackPressed()
-                }
+                Log.d("InappstorySdkModule", "Back press handled by NativeOverlayFragment")
+                return ias?.onBackPressed() ?: false
               }
             }
     }
@@ -98,6 +98,5 @@ class NativeOverlayFragment(
             fragmentActivity?.backPressManager?.overlayHandler = null 
      }
     super.onDestroyView()
-    backPressManager.unregister()
   }
 }
