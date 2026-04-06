@@ -24,9 +24,10 @@ export const useEvents = () => {
     const subscription = BackHandler.addEventListener(
       'hardwareBackPress',
       function () {
+        console.log('BackHandler hardwareBackPress');
         try {
           return (
-            NativeModules.RNInAppStorySDKModule.handleHardwareBackPress() ===
+            InAppStorySDK.handleHardwareBackPress() ===
             true
           );
         } catch {
