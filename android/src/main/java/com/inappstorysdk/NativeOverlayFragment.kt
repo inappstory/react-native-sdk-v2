@@ -68,7 +68,7 @@ class NativeOverlayFragment(
         Log.d("InappstorySdkModule", "Registering back press handler in NativeOverlayFragment")
           val fragmentActivity = (getActivity() as InAppStoryActivity)
 
-          fragmentActivity?.backPressManager?.isManagerEnabled = false
+          fragmentActivity?.backPressManager?.isManagerEnabled = true
 
           fragmentActivity?.backPressManager?.overlayHandler =
             object : BackPressManagerHandler() {
