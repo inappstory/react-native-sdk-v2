@@ -62,6 +62,22 @@ class NativeOverlayFragment(
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
+
+    if (getCurrentActivity() is InAppStoryActivity) {
+          val fragmentActivity = (getCurrentActivity() as InAppStoryActivity)
+
+          fragmentActivity?.backPressManager?.isManagerEnabled = false
+
+          fragmentActivity?.backPressManager?.overlayHandler =
+            object : BackPressManagerHandler() {
+              override fun handleBackPress(): Boolean {
+                iasManager.let {
+                  return it.onBackPressed()
+                }
+              }
+            }
+    }
+
     return FrameLayout(requireContext()).apply {
       setBackgroundColor(Color.TRANSPARENT)
       layoutParams = FrameLayout.LayoutParams(
@@ -73,8 +89,14 @@ class NativeOverlayFragment(
     }
   }
 
-  // override fun onDestroyView() {
-  //   super.onDestroyView()
-  //   backPressManager.unregister()
-  // }
+  override fun onDestroyView() {
+     if (getCurrentActivity() is InAppStoryActivity) {
+            val fragmentActivity = (getCurrentActivity() as InAppStoryActivity)
+
+            fragmentActivity?.backPressManager?.isManagerEnabled = false
+            fragmentActivity?.backPressManager?.overlayHandler = null 
+     }
+    super.onDestroyView()
+    backPressManager.unregister()
+  }
 }

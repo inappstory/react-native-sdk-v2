@@ -10,7 +10,7 @@ import com.facebook.react.defaults.DefaultReactActivityDelegate
 import com.inappstorysdk.BackPressManager
 import android.util.Log
 
-class InAppStoryActivity : ReactActivity() {
+open class InAppStoryActivity : ReactActivity() {
 
     val backPressManager = BackPressManager() 
     
