@@ -1,17 +1,20 @@
 package com.inappstorysdk
 
 class BackPressManager {
-  private var handler: (() -> Boolean)? = null
+    var overlayHandler: BackPressManagerHandler? = null
+    var isManagerEnabled = false
 
-  fun register(handler: () -> Boolean) {
-    this.handler = handler
-  }
+    fun shouldInterceptBackPress(): Boolean {
+        if (isManagerEnabled) {
+            if (overlayHandler?.handleBackPress() == true) {
+                return true
+            }
+            return false
+        }
+        return false
+    }
+}
 
-  fun unregister() {
-    this.handler = null
-  }
-
-  fun handleBackPress(): Boolean {
-    return handler?.invoke() == true
-  }
+abstract class BackPressManagerHandler {
+    abstract fun handleBackPress(): Boolean
 }

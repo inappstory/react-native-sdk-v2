@@ -26,11 +26,11 @@ class NativeOverlayFragment(
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    backPressManager.register {
-      val result = ias?.onBackPressed()
-      Log.d("InappstorySdkModule", "Back press handled: $result")
-      return result
-    }
+    // backPressManager.register {
+    //   val result = ias?.onBackPressed()
+    //   Log.d("InappstorySdkModule", "Back press handled: $result")
+    //   return result
+    // }
 
     val cancellationToken = ias?.showInAppMessage(
       settings,
@@ -73,8 +73,8 @@ class NativeOverlayFragment(
     }
   }
 
-  override fun onDestroyView() {
-    super.onDestroyView()
-    backPressManager.unregister()
-  }
+  // override fun onDestroyView() {
+  //   super.onDestroyView()
+  //   backPressManager.unregister()
+  // }
 }
