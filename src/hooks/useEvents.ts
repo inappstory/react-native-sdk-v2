@@ -25,7 +25,8 @@ export const useEvents = () => {
       'hardwareBackPress',
       function () {
         (async () => {
-          const handled: boolean = await InAppStorySDK.handleHardwareBackPress();
+          const handled: boolean =
+            await InAppStorySDK.handleHardwareBackPress();
           console.log('hardwareBackPress handled:', handled);
         })();
         return true;

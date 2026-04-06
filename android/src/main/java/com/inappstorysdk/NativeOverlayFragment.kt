@@ -27,7 +27,9 @@ class NativeOverlayFragment(
     super.onViewCreated(view, savedInstanceState)
 
     backPressManager.register {
-      ias?.onBackPressed() == true
+      val result = ias?.onBackPressed()
+      Log.d("InappstorySdkModule", "Back press handled: $result")
+      return result
     }
 
     val cancellationToken = ias?.showInAppMessage(

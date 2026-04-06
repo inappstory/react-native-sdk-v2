@@ -889,6 +889,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
 
   @ReactMethod
   fun handleHardwareBackPress(promise: Promise) {
+     Log.d("InappstorySdkModule", "handleHardwareBackPress")
     promise.resolve(backPressManager.handleBackPress())
   }
 
