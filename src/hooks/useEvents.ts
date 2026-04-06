@@ -20,7 +20,7 @@ export const useEvents = () => {
   React.useEffect(() => {
     if (init) return;
     init = true;
-
+    console.log('BackHandler hardwareBackPress init');
     const subscription = BackHandler.addEventListener(
       'hardwareBackPress',
       function () {
@@ -84,8 +84,8 @@ export const useEvents = () => {
       eventListeners.forEach((eventListener) => {
         eventListener.remove();
       });
-      init = false;
       subscription.remove();
+      init = false;
     };
   }, []);
   return { readerOpen };
