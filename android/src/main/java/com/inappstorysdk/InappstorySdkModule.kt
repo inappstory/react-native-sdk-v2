@@ -424,7 +424,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
             var payload = Arguments.makeNativeMap(
               mutableMapOf(
                 "action" to null,
-                "id" to content.id,
+                "id" to content.id(),
                 "url" to url
               ) as Map<String, Any>
             )
