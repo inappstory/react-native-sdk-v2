@@ -423,7 +423,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
 
             var payload = Arguments.makeNativeMap(
               mutableMapOf(
-                "action" to null
+                "action" to null,
                 "id" to content.id,
                 "url" to url
               ) as Map<String, Any>
@@ -431,7 +431,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
           } else {
             var payload = Arguments.makeNativeMap(
               mutableMapOf(
-                "action" to null
+                "action" to null,
                 "url" to url
               ) as Map<String, Any>
             )
