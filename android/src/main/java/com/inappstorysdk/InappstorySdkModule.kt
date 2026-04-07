@@ -440,6 +440,11 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
                 "url" to url
               ) as Map<String, Any>
             )
+            Log.d(
+              "InappstorySdkModule",
+              "callToAction Unknown content = $content url = $url action= $action"
+            );
+            sendEvent(reactContext, "handleCTA", payload)
           }
         }
       }
