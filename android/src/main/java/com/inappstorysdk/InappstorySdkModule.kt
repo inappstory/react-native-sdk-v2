@@ -428,6 +428,11 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
                 "url" to url
               ) as Map<String, Any>
             )
+            Log.d(
+              "InappstorySdkModule",
+              "callToAction InAppMessageData = $content url = $url action= $action"
+            );
+            sendEvent(reactContext, "handleCTA", payload)
           } else {
             var payload = Arguments.makeNativeMap(
               mutableMapOf(
