@@ -420,6 +420,21 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
             //val inAppMessageId: Int = content.id
             //val title: String? = content.title
             //val event: String? = content.event
+
+            var payload = Arguments.makeNativeMap(
+              mutableMapOf(
+                "action" to null
+                "id" to content.id,
+                "url" to url
+              ) as Map<String, Any>
+            )
+          } else {
+            var payload = Arguments.makeNativeMap(
+              mutableMapOf(
+                "action" to null
+                "url" to url
+              ) as Map<String, Any>
+            )
           }
         }
       }

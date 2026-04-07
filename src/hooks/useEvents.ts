@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import * as React from 'react';
 
-import { BackHandler, NativeEventEmitter, NativeModules } from 'react-native';
+import { NativeEventEmitter, NativeModules } from 'react-native';
 import { useStore } from './useStore';
 import InAppStorySDK from '@inappstory/react-native-sdk';
 import { nativeEventList } from '../nativeEventList';
@@ -21,17 +21,6 @@ export const useEvents = () => {
     console.log('useEvents init: ', init);
     if (init) return;
     init = true;
-    const subscription = BackHandler.addEventListener(
-      'hardwareBackPress',
-      function () {
-        (async () => {
-          const handled: boolean =
-            await InAppStorySDK.handleHardwareBackPress();
-          console.log('hardwareBackPress handled:', handled);
-        })();
-        return true;
-      }
-    );
 
     const eventEmitter = new NativeEventEmitter(
       NativeModules.RNInAppStorySDKModule
@@ -84,7 +73,6 @@ export const useEvents = () => {
       eventListeners.forEach((eventListener) => {
         eventListener.remove();
       });
-      subscription.remove();
       init = false;
     };
   }, []);
