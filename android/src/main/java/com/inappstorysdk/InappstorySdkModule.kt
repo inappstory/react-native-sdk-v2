@@ -146,7 +146,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
   @ReactMethod
   fun getFavoriteStories(feed: String) {
     Log.d("InappstorySdkModule", "getFavoriteStories");
-    this.favoritesApi?.storyList?.load(
+    this.api?.storyList?.storyList?.load(
       feed,
       "favorites",
       true,
@@ -423,7 +423,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
 
             var payload = Arguments.makeNativeMap(
               mutableMapOf(
-                "action" to null,
+                "action" to "unknown",
                 "id" to content.id(),
                 "url" to url
               ) as Map<String, Any>
@@ -436,7 +436,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
           } else {
             var payload = Arguments.makeNativeMap(
               mutableMapOf(
-                "action" to null,
+                "action" to "unknown",
                 "url" to url
               ) as Map<String, Any>
             )
@@ -1393,7 +1393,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
               "titleColor" to null,
               "opened" to false,
               "hasAudio" to false,
-              "list" to feed,
+              "list" to "favorites",
               "feed" to "default",
               "aspectRatio" to 1,
               "slidesCount" to 0,
@@ -1401,14 +1401,13 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
             ) as Map<String, Any>
           )
           Log.e(TAG, "Item = $item")
-
           storiesList.add(storyData)
         }
 
         val payload: WritableMap = Arguments.createMap()
         payload.putArray("stories", Arguments.makeNativeArray(storiesList));
         //   payload.putString("feed", "default")
-        payload.putString("feed", feed)
+        payload.putString("feed", "default")
         payload.putString("list", "favorites")
         //map.putString("key1", "Value1");
         sendEvent(reactContext, "storyListUpdate", payload)
