@@ -146,7 +146,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
   @ReactMethod
   fun getFavoriteStories(feed: String) {
     Log.d("InappstorySdkModule", "getFavoriteStories");
-    this.api?.storyList?.storyList?.load(
+    this.api?.storyList?.load(
       feed,
       "favorites",
       true,
