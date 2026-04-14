@@ -113,7 +113,7 @@ export const StoriesCarousel = ({
           {story.favorites.map((story) => {
             return (
               <StoryComponent
-                key={story.storyID}
+                key={'favorite_' + story.storyID}
                 story={story}
                 storyManager={storyManager}
                 appearanceManager={appearanceManager}
