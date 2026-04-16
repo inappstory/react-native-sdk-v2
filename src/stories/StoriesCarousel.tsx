@@ -107,13 +107,13 @@ export const StoriesCarousel = ({
               alignSelf: 'baseline',
             }
           }
-          key="pressable"
+          key="pressable_favorites"
           onPress={() => onFavoritePress(feed)}
         >
           {story.favorites.map((story) => {
             return (
               <StoryComponent
-                key={'favorite_' + story.storyID}
+                key={story.storyID}
                 story={story}
                 storyManager={storyManager}
                 appearanceManager={appearanceManager}

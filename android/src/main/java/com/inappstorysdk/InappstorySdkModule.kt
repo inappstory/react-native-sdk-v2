@@ -1396,7 +1396,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
               "list" to "favorites",
               "feed" to "default",
               "aspectRatio" to 1,
-              "slidesCount" to 0,
+              "slidesCount" to 1,
               "statTitle" to "",
             ) as Map<String, Any>
           )
