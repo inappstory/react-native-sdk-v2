@@ -1391,7 +1391,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
               "coverVideoPath" to null,
               "backgroundColor" to item.backgroundColor,
               "titleColor" to null,
-              "opened" to false,
+              "opened" to true,
               "hasAudio" to false,
               "list" to "favorites",
               "feed" to "default",
