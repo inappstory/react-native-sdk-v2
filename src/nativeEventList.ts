@@ -12,7 +12,6 @@ const storiesEvents = [
 ];
 const gameEvents = [
   'startGame',
-  'finishGame',
   'closeGame',
   'eventGame',
   'gameFailure',

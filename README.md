@@ -57,7 +57,8 @@ import {
   StoryReaderCloseButtonPosition,
   StoryReaderSwipeStyle,
   StoriesListCardTitleTextAlign,
-  type StoryManagerConfig,
+  type StoryManagerConfig, 
+  CoverQuality
 } from '@inappstory/react-native-sdk';
 
 import { Linking } from 'react-native';
@@ -135,6 +136,7 @@ const createAppearanceManager = () => {
       hasDislikeButton: false,
       hasFavorite: true,
       hasShare: true,
+      coverQuality: CoverQuality.MEDIUM,
     })
     .setStoriesListOptions({
       card: {

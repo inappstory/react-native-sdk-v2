@@ -6,6 +6,7 @@ type StoreState = {
   clearUpdate: () => void;
   addEvent: (event: any) => void;
   clearFeed: (feed: String) => void;
+  clearAllFeeds: () => void;
   addToFeed: (feed: String, events: Array<any>) => void;
   setFavorite: (storyID: String, isFavorite: Boolean) => void;
   replaceInFeed: (feed: String, event: any) => void;
@@ -29,6 +30,18 @@ export const useStore = create<StoreState>((set) => ({
       return { events: state.events.concat([newEvent]) };
     }),
 
+  clearAllFeeds: () =>
+    set((state) => {
+      const newState: any = { ...state };
+      state.feeds.forEach((feed) => {
+        delete newState[`feeds_${feed}`];
+      });
+      newState.feeds = [];
+      newState.feeds_default_feed = [];
+      newState.feeds_default_favorites = [];
+      newState.update = newState.update + 1;
+      return newState;
+    }, true),
   clearFeed: (feed) =>
     set((state) => {
       const newState = state;

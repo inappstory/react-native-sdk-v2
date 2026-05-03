@@ -6,6 +6,7 @@ import { useStore } from './hooks/useStore';
 import deepmerge from 'deepmerge';
 import parseSides from 'parse-css-sides';
 import { isFunction } from './helpers/isFunction';
+import { generateId } from './helpers/idGenerator';
 import type { StyleProp } from 'react-native/Libraries/StyleSheet/StyleSheet';
 import type { ViewStyle } from 'react-native/Libraries/StyleSheet/StyleSheetTypes';
 import React from 'react';
@@ -57,6 +58,11 @@ export enum AndroidWindowSoftInputMode {
   Visible = 'Visible',
   Hidden = 'Hidden',
   Unchanged = 'Unchanged',
+}
+
+export enum CoverQuality {
+  MEDIUM = 'medium',
+  HIGH = 'high',
 }
 
 export declare type ClickPayload = {
@@ -253,15 +259,15 @@ export class StoryManager {
       this.sandbox,
       this.sendStatistics
     );
-    InAppStorySDK.setUserID(userId, userIdSign);
+    //InAppStorySDK.setUserID(userId, userIdSign);
     this.apiKey = config.apiKey;
     this.userId = userId;
     this.userIdSign = userIdSign;
-    if (config.tags) {
+    if (config.tags && config.tags.length > 0) {
       this.tags = config.tags;
       InAppStorySDK.setTags(config.tags);
     }
-    if (config.placeholders) {
+    if (config.placeholders && Object.keys(config.placeholders).length > 0) {
       this.placeholders = config.placeholders;
       InAppStorySDK.setPlaceholders(config.placeholders);
     }
@@ -287,6 +293,8 @@ export class StoryManager {
         config.appVersion.build
       );
     }
+
+    useStore.getState().clearAllFeeds();
 
     eventEmitter.addListener('getGoodsObject', (event) => {
       this.fetchGoods(event.skus);
@@ -364,18 +372,17 @@ export class StoryManager {
   }
   setSendStatistics(sendStatistics: boolean): void {
     this.sendStatistics = sendStatistics;
-    InAppStorySDK.initWith(
-      this.apiKey,
-      this.userId,
-      this.userIdSign,
-      this.sandbox,
-      this.sendStatistics
-    );
+    InAppStorySDK.setSendStatistics(this.sendStatistics);
   }
+
+  async createSubscriberList(feed: string) {
+    InAppStorySDK.createSubscriberList(feed);
+  }
+
   async fetchFeed(feed: string) {
     InAppStorySDK.getStories(feed);
     //if (include_favorites) {
-    InAppStorySDK.getFavoriteStories(feed);
+    //InAppStorySDK.getFavoriteStories(feed);
     //}
   }
   async fetchFavorites(feed) {
@@ -420,23 +427,32 @@ export class StoryManager {
 
     InAppStorySDK.setUserID(this.userId, this.userIdSign);
   }
+
   setLang(lang: string): void {
     this.lang = lang;
     InAppStorySDK.setLang(lang);
   }
+
   setPlaceholders(placeholders: any): void {
     this.placeholders = placeholders;
     InAppStorySDK.setPlaceholders(placeholders);
   }
+
   setImagePlaceholders(placeholders: any): void {
     this.imagePlaceholders = placeholders;
     InAppStorySDK.setImagesPlaceholders(placeholders);
   }
+
   showStory(
     storyId: string | number,
+    signal: AbortSignal | null,
     appearanceManager: AppearanceManagerV1
   ): Promise<{ loaded: boolean }> {
     return new Promise((resolve, reject) => {
+      const operationId = generateId();
+      if (signal?.aborted) {
+        return reject(null);
+      }
       if (appearanceManager.commonOptions.hasLike) {
         InAppStorySDK.setHasLike(appearanceManager.commonOptions.hasLikeButton);
         InAppStorySDK.setHasFavorites(
@@ -444,23 +460,34 @@ export class StoryManager {
         );
         InAppStorySDK.setHasShare(appearanceManager.commonOptions.hasShare);
       }
-      InAppStorySDK.showSingle(storyId).then((success: boolean) => {
-        if (success) {
-          resolve({ loaded: true });
-        } else {
-          reject({ loaded: false });
+      const onAbort = () => {
+        InAppStorySDK.cancelOperation(operationId);
+        reject(null);
+      };
+      InAppStorySDK.showSingle(storyId, operationId).then(
+        (success: boolean) => {
+          signal?.removeEventListener('abort', onAbort);
+          if (success) {
+            resolve({ loaded: true });
+          } else {
+            reject({ loaded: false });
+          }
         }
-      });
+      );
     });
   }
+
   async closeStoryReader() {
     return InAppStorySDK.closeReader();
   }
+
   showGame(id: string) {
     return InAppStorySDK.showGame(id);
   }
+
   showOnboardingStories(
     _appearanceManager: AppearanceManagerV1,
+    signal: AbortSignal | null,
     options?:
       | {
           feed?: Option<string>;
@@ -470,11 +497,24 @@ export class StoryManager {
       | undefined
   ): Promise<OnboardingLoadStatus> {
     return new Promise((resolve, reject) => {
+      if (signal?.aborted) {
+        return reject(null);
+      }
+      const operationId = generateId();
+      const onAbort = () => {
+        InAppStorySDK.cancelOperation(operationId);
+        reject(null);
+      };
+
+      signal?.addEventListener('abort', onAbort);
+
       InAppStorySDK.showOnboardings(
         options?.feed,
         options?.limit || 10,
-        options?.customTags
+        options?.customTags,
+        operationId
       ).then((success) => {
+        signal?.removeEventListener('abort', onAbort);
         if (success) {
           resolve(success);
         } else {
@@ -482,6 +522,78 @@ export class StoryManager {
         }
       });
     });
+  }
+
+  showIAMById(
+    id: string,
+    onlyPreloaded: boolean,
+    signal: AbortSignal | null
+  ): Promise<Boolean> {
+    return new Promise((resolve, reject) => {
+      if (signal?.aborted) {
+        return reject(false);
+      }
+      const operationId = generateId();
+      const onAbort = () => {
+        InAppStorySDK.cancelOperation(operationId);
+        reject(false);
+      };
+      signal?.addEventListener('abort', onAbort);
+      InAppStorySDK.showIAMById(id, onlyPreloaded, operationId).then(
+        (success) => {
+          signal?.removeEventListener('abort', onAbort);
+          if (success) {
+            resolve(success);
+          } else {
+            reject(false);
+          }
+        }
+      );
+    });
+  }
+
+  showIAMByEvent(
+    event: string,
+    onlyPreloaded: boolean,
+    signal: AbortSignal | null
+  ): Promise<Boolean> {
+    return new Promise((resolve, reject) => {
+      if (signal?.aborted) {
+        return reject(false);
+      }
+      const operationId = generateId();
+      const onAbort = () => {
+        InAppStorySDK.cancelOperation(operationId);
+        reject(false);
+      };
+      signal?.addEventListener('abort', onAbort);
+      InAppStorySDK.showIAMByEvent(event, onlyPreloaded, operationId).then(
+        (success) => {
+          signal?.removeEventListener('abort', onAbort);
+          if (success) {
+            resolve(success);
+          } else {
+            reject(false);
+          }
+        }
+      );
+    });
+  }
+
+  preloadIAM(ids?: string[], tags?: string[]): Promise<Boolean> {
+    return new Promise((resolve, reject) => {
+      InAppStorySDK.preloadIAM(ids, tags).then((success) => {
+        if (success) {
+          resolve(success);
+        } else {
+          reject(false);
+        }
+      });
+    });
+  }
+
+  clearCache() {
+    return InAppStorySDK.clearCache();
   }
 
   protected _callbacks: Dict<any> = {};
@@ -534,6 +646,7 @@ export class AppearanceManager {
   storiesListOptions: any = null;
   storyReaderOptions: any = null;
   storyFavoriteReaderOptions: any = null;
+  coverQuality = CoverQuality.MEDIUM;
   commonOptions: any = null;
   //TODO: Migrate the APIs from JS to Native
   setCommonOptions(
@@ -543,6 +656,7 @@ export class AppearanceManager {
       hasLikeButton: boolean;
       hasDislikeButton: boolean;
       hasShare: boolean;
+      coverQuality: CoverQuality;
     }>
   ) {
     this.commonOptions = deepmerge(this.commonOptions, options);
@@ -550,6 +664,7 @@ export class AppearanceManager {
     //InAppStorySDK.setHasDislike(options.hasDislikeButton);
     InAppStorySDK.setHasFavorites(this.commonOptions.hasFavorite);
     InAppStorySDK.setHasShare(this.commonOptions.hasShare);
+    InAppStorySDK.setCoverQuality(this.commonOptions.coverQuality.valueOf());
     return this;
   }
   setStoryFavoriteReaderOptions(
