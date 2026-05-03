@@ -107,7 +107,7 @@ export const StoriesCarousel = ({
               alignSelf: 'baseline',
             }
           }
-          key="pressable"
+          key="pressable_favorites"
           onPress={() => onFavoritePress(feed)}
         >
           {story.favorites.map((story) => {

@@ -37,6 +37,8 @@
 	<string>Description shown in the system permission window</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Description shown in the system permission window</string>
+	<key>RCTNewArchEnabled</key>
+	<true/>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
