@@ -216,7 +216,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
       sendStatistics,
       this.api as InAppStoryAPI
     )
-    // this.subscribeLists(this.api as InAppStoryAPI, "feed")
+    this.subscribeLists(this.api as InAppStoryAPI, "feed")
     this.subscribeLists(this.favoritesApi as InAppStoryAPI, "favorites")
     setupListeners()
   }
@@ -1346,7 +1346,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
   @ReactMethod
   fun createSubscriberList(feed: String) {
     Log.e(TAG, "createSubscriberList: $feed")
-    this.subscribeLists(this.api as InAppStoryAPI, feed)
+    //this.subscribeLists(this.api as InAppStoryAPI, feed)
     // if (feed != "favorites") {
     //   this.subscribeLists(this.api as InAppStoryAPI, "favorites")
     // }
