@@ -133,7 +133,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
     Log.d("InappstorySdkModule", "getStories for feed: " + feed);
     this.api?.storyList?.load(
       feed,
-      "feed",
+      feed,
       true,
       false,
       this.ias?.getTags()
@@ -216,7 +216,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
       sendStatistics,
       this.api as InAppStoryAPI
     )
-    this.subscribeLists(this.api as InAppStoryAPI, "feed")
+    //this.subscribeLists(this.api as InAppStoryAPI, "feed")
     this.subscribeLists(this.favoritesApi as InAppStoryAPI, "favorites")
     setupListeners()
   }
@@ -1346,7 +1346,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
   @ReactMethod
   fun createSubscriberList(feed: String) {
     Log.e(TAG, "createSubscriberList: $feed")
-    //this.subscribeLists(this.api as InAppStoryAPI, feed)
+    this.subscribeLists(this.api as InAppStoryAPI, feed)
     // if (feed != "favorites") {
     //   this.subscribeLists(this.api as InAppStoryAPI, "favorites")
     // }
@@ -1407,7 +1407,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
             "titleColor" to story.titleColor,
             "opened" to story.opened,
             "hasAudio" to story.hasAudio,
-            "list" to "feed",
+            "list" to feed,
             "feed" to story.storyData.feed,
             "aspectRatio" to aspectRatio,
             "slidesCount" to story.storyData.slidesCount,
