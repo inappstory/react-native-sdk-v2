@@ -1474,7 +1474,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
         payload.putString("feed", feed)
         payload.putString("list", storiesFeed)
         //map.putString("key1", "Value1");
-        sendEvent(reactContext, "storyListUpdate", payload)
+        sendEvent(reactContext, "storyListUpdate $feed", payload)
         //stories.clear()
         //stories.addAll(stories)
         /*Handler(Looper.getMainLooper()).post {
