@@ -1,0 +1,50 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+#      version:
+#        description: 'Version to release ("major", "minor", "patch", or "pre*" version; or specify version like "5.3.3")'
+#        required: false
+#        type: string
+      args:
+        description: 'Additional arguments to pass to release-it (e.g. "--dry-run" or "-i version"). See docs: https://github.com/release-it/release-it/blob/main/docs/git.md#configuration-options'
+        required: false
+        type: string
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # For git operations
+      packages: write
+      id-token: write # < REQUIRED FOR OIDC
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24' # OIDC requires npm v11.5.1 or later - so use node24 with npm v11.12.*
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+      # Build all packages
+      - name: Build package
+        run: npm run build
+
+      # Release
+      - name: Release package
+        run: npm run release -- --ci ${{ github.event.inputs.args }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
