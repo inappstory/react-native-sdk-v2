@@ -12,7 +12,6 @@ import android.os.Looper;
 
 import com.inappstory.sdk.InAppStoryManager;
 import com.inappstory.sdk.AppearanceManager;
-//import com.inappstory.sdk.ugc.UGCInAppStoryManager;
 
 import com.inappstory.sdk.externalapi.InAppStoryAPI;
 import com.inappstory.sdk.externalapi.StoryAPIData;
@@ -21,6 +20,7 @@ import com.inappstory.sdk.externalapi.subscribers.InAppStoryAPIListSubscriber;
 import com.inappstory.sdk.externalapi.storylist.IASStoryListSessionData;
 import com.inappstory.sdk.stories.ui.list.StoryFavoriteImage;
 import com.inappstory.sdk.core.api.IASDataSettingsHolder;
+import com.inappstory.sdk.lrudiskcache.CacheSize
 
 import com.inappstory.sdk.stories.outercallbacks.common.errors.ErrorCallback;
 import com.inappstory.sdk.stories.outercallbacks.common.gamereader.GameReaderCallback;
@@ -28,7 +28,12 @@ import com.inappstory.sdk.game.reader.GameStoryData;
 
 import com.inappstory.sdk.stories.outercallbacks.common.reader.StoryWidgetCallback;
 import com.inappstory.sdk.stories.outercallbacks.common.reader.SlideData;
-import com.inappstory.sdk.stories.outercallbacks.common.reader.InAppMessageData;
+import com.inappstory.sdk.inappmessage.InAppMessageData;
+import com.inappstory.sdk.inappmessage.InAppMessageContainerProvider
+import com.inappstory.sdk.inappmessage.InAppMessageContainerSettings
+import com.inappstory.sdk.inappmessage.InAppMessageType
+import com.inappstory.sdk.inappmessage.InAppMessageViewController
+import com.inappstory.sdk.inappmessage.domain.reader.IAMViewController
 import com.inappstory.sdk.stories.outercallbacks.common.single.SingleLoadCallback;
 import com.inappstory.sdk.stories.outercallbacks.common.reader.StoryData;
 import com.inappstory.sdk.stories.outercallbacks.common.reader.ContentData;
@@ -53,7 +58,12 @@ import com.inappstory.sdk.stories.ui.views.goodswidget.ICustomGoodsWidget;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableNativeMap;
-
+import com.inappstory.sdk.CancellationToken
+import com.inappstory.sdk.inappmessage.InAppMessagePreloadSettings
+import com.inappstory.sdk.inappmessage.InAppMessageLoadCallback
+import com.inappstory.sdk.inappmessage.InAppMessageOpenSettings
+import com.inappstory.sdk.inappmessage.InAppMessageScreenActions
+import androidx.fragment.app.FragmentActivity
 
 import com.facebook.react.bridge.Promise;
 import com.inappstory.sdk.stories.ui.views.goodswidget.GetGoodsDataCallback;
@@ -65,6 +75,9 @@ import androidx.recyclerview.widget.RecyclerView
 import java.util.Locale
 import android.view.View
 import com.facebook.react.bridge.WritableMap;
+import android.app.Activity
+import android.view.ViewGroup
+import android.widget.FrameLayout
 
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.WritableNativeMap
@@ -86,602 +99,814 @@ idgetEventName,
                      int slideIndex,
                      String tags) */
 fun sendEvent(reactContext: ReactContext, eventName: String, params: WritableMap?) {
-    reactContext
+  Log.d("InappstorySdkModule", "sendEvent: " + eventName);
+  reactContext
     .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
     .emit(eventName, params)
 }
+
 class InAppStory {
-    companion object {
-        fun initSDK(context:Context) {
-            InAppStoryManager.initSDK(context)
-        }
-     }
+  companion object {
+    fun initSDK(context: Context) {
+      InAppStoryManager.initSDK(context)
+    }
+  }
 }
 
-class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
-    override fun getName() = "RNInAppStorySDKModule"
-    var ias: InAppStoryManager? = null
-    var appearanceManager: AppearanceManager? = null;
-    var api:InAppStoryAPI?  = null;
-    var favoritesApi:InAppStoryAPI?  = null;
-    var TAG:String = "IAS_SDK_API";
+class InappstorySdkModule(var reactContext: ReactApplicationContext) :
+  ReactContextBaseJavaModule(reactContext) {
+  override fun getName() = "RNInAppStorySDKModule"
+  var ias: InAppStoryManager? = null
+  var appearanceManager: AppearanceManager = AppearanceManager();
+  var api: InAppStoryAPI = InAppStoryAPI();
+  var favoritesApi: InAppStoryAPI? = null;
+  var TAG: String = "IAS_SDK_API";
 
-    var stories: ArrayList<String>? = null;
-    var goodsCache: ArrayList<GoodsItemData> = ArrayList<GoodsItemData>()
-    private var listenerCount = 0
+  var stories: ArrayList<String>? = null;
+  var goodsCache: ArrayList<GoodsItemData> = ArrayList<GoodsItemData>()
+  private var listenerCount = 0
 
-    @ReactMethod
-    fun getStories(feed: String) {
-        Log.d("InappstorySdkModule", "getStories for feed: " + feed);
-        this.api?.storyList?.load(
-            feed,
-            "feed",
-            true,
-            false,
-            this.ias?.getTags()
-        )
-        //this.api.getStories()
-    }
-    @ReactMethod
-    fun getFavoriteStories(feed: String) {
-        Log.d("InappstorySdkModule", "getFavoriteStories");
-        this.favoritesApi?.storyList?.load(
-            feed,
-            "favorites",
-            true,
-            true,
-            this.ias?.getTags()
-        )
-    }
+  val cancellationTokenMap = mutableMapOf<String, CancellationToken?>()
 
-    @ReactMethod
-    fun onFavoriteCell() {
-        val payload:WritableMap = Arguments.createMap()
-        sendEvent(reactContext,"favoriteCellDidSelect", payload)
-    }
+  @ReactMethod
+  fun getStories(feed: String) {
+    Log.d("InappstorySdkModule", "getStories for feed: " + feed);
+    this.api?.storyList?.load(
+      feed,
+      feed,
+      true,
+      false,
+      this.ias?.getTags()
+    )
+  }
 
-    @ReactMethod
-    fun addListener(eventName: String) {
+  @ReactMethod
+  fun getFavoriteStories(feed: String) {
+    Log.d("InappstorySdkModule", "getFavoriteStories");
+    this.favoritesApi?.storyList?.load(
+      feed,
+      "favorites",
+      true,
+      true,
+      this.ias?.getTags()
+    )
+  }
+
+  @ReactMethod
+  fun onFavoriteCell() {
+    val payload: WritableMap = Arguments.createMap()
+    sendEvent(reactContext, "favoriteCellDidSelect", payload)
+  }
+
+  @ReactMethod
+  fun addListener(eventName: String) {
     if (listenerCount == 0) {
-        // Set up any upstream listeners or background tasks as necessary
+      // Set up any upstream listeners or background tasks as necessary
     }
 
     listenerCount += 1
-    }
+  }
 
-    @ReactMethod
-    fun selectFavoriteStoryCellWith(storyID: String) {
-        this.favoritesApi?.storyList?.openStoryReader(
-            reactContext.currentActivity,
-            "favorites",
-            storyID.toInt(),
-            this.appearanceManager
-        );
-    }
-    @ReactMethod
-    fun removeListeners(count: Int) {
+  @ReactMethod
+  fun selectFavoriteStoryCellWith(storyID: String) {
+    this.favoritesApi?.storyList?.openStoryReader(
+      reactContext.currentActivity,
+      "favorites",
+      storyID.toInt(),
+      this.appearanceManager
+    );
+  }
+
+  @ReactMethod
+  fun removeListeners(count: Int) {
     listenerCount -= count
     if (listenerCount == 0) {
-        // Remove upstream listeners, stop unnecessary background tasks
+      // Remove upstream listeners, stop unnecessary background tasks
     }
-    }
+  }
+
   @ReactMethod
-  fun initWith(apiKey: String, userID: String, userIdSign: String?, sandbox: Boolean, sendStatistics: Boolean) {
-      Log.d("InappstorySdkModule", "initWith")
-      //this.ias = this.createInAppStoryManager(apiKey, userID)
-      this.appearanceManager = AppearanceManager()
-      this.api = InAppStoryAPI()
-      this.favoritesApi = InAppStoryAPI()
-      this.createManager(apiKey, userID, userIdSign, sandbox, sendStatistics, this.favoritesApi as InAppStoryAPI)
-      this.createManager(apiKey, userID, userIdSign, sandbox, sendStatistics, this.api as InAppStoryAPI)
-      this.subscribeLists(this.api as InAppStoryAPI, "feed")
-      this.subscribeLists(this.favoritesApi as InAppStoryAPI, "favorites")
-      setupListeners()
+  fun initWith(
+    apiKey: String,
+    userID: String,
+    userIdSign: String?,
+    sandbox: Boolean,
+    sendStatistics: Boolean
+  ) {
+    Log.d("InappstorySdkModule", "initWith")
+    // this.ias = this.createInAppStoryManager(apiKey, userID)
+    // this.appearanceManager = AppearanceManager()
+    // AppearanceManager.setCommonInstance(appearanceManager);
+    // this.api = InAppStoryAPI()
+    // this.favoritesApi = InAppStoryAPI()
+    // this.createManager(
+    //   apiKey,
+    //   userID,
+    //   userIdSign,
+    //   sandbox,
+    //   sendStatistics,
+    //   this.favoritesApi as InAppStoryAPI
+    // )
+    this.favoritesApi = this.api as InAppStoryAPI
+    this.createManager(
+      apiKey,
+      userID,
+      userIdSign,
+      sandbox,
+      sendStatistics,
+      this.api as InAppStoryAPI
+    )
+    //this.subscribeLists(this.api as InAppStoryAPI, "feed")
+    this.subscribeLists(this.favoritesApi as InAppStoryAPI, "favorites")
+    setupListeners()
   }
 
   @ReactMethod
   fun setUserID(userId: String, userIdSign: String?) {
-      Log.d("InappstorySdkModule", "setUserID")
-      this.ias?.setUserId(userId, userIdSign)
+    Log.d("InappstorySdkModule", "setUserID")
+    this.ias?.setUserId(userId, userIdSign)
   }
 
   @ReactMethod
   fun closeReader() {
     //this.ias?.closeStoryReader()
-    InAppStoryManager.closeStoryReader()
+    InAppStoryManager.closeStoryReader(true) {}
   }
 
   @ReactMethod
   fun setLang(lang: String) {
-      Log.d("InappstorySdkModule", "setLang")
-      this.ias?.setLang(Locale.forLanguageTag("en-US"))
-    }
+    Log.d("InappstorySdkModule", "setLang")
+    this.ias?.setLang(Locale.forLanguageTag("en-US"))
+  }
 
   fun setupListeners() {
 
-    val that:InappstorySdkModule = this;
+    val that: InappstorySdkModule = this;
     //Goods widget
     AppearanceManager.getCommonInstance().csCustomGoodsWidget(object : ICustomGoodsWidget {
-        override fun getWidgetView(context: Context): View? {
-            print("csCustomGoodsWidget getWidgetView");
-            return null;
+      override fun getWidgetView(context: Context): View? {
+        print("csCustomGoodsWidget getWidgetView");
+        return null;
+      }
+
+      override fun getItem(): ICustomGoodsItem? {
+        print("csCustomGoodsWidget getItem");
+        return null;
+      }
+
+      override fun getWidgetAppearance(): IGoodsWidgetAppearance? {
+        print("csCustomGoodsWidget getWidgetAppearance");
+        return null;
+      }
+
+      override fun getDecoration(): RecyclerView.ItemDecoration? {
+        print("csCustomGoodsWidget getDecoration");
+        return null;
+      }
+
+      public override fun getSkus(
+        widgetView: View,
+        skus: ArrayList<String>,
+        callback: GetGoodsDataCallback
+      ) {
+        print("csCustomGoodsWidget getSkus = $skus")
+        var payload = Arguments.makeNativeMap(
+          mutableMapOf(
+            "skus" to skus,
+          ) as Map<String, Any>
+        )
+        sendEvent(reactContext, "getGoodsObject", payload)
+        val handler = Handler()
+        val runnableCode: Runnable = Runnable {
+          if (that.goodsCache.size > 0) {
+            callback.onSuccess(that.goodsCache)
+            that.goodsCache.clear();
+          } else {
+            handler.postDelayed(this as Runnable, 250)
+          }
         }
-
-        override fun getItem(): ICustomGoodsItem? {
-            print("csCustomGoodsWidget getItem");
-            return null;
-        }
-
-        override fun getWidgetAppearance(): IGoodsWidgetAppearance? {
-            print("csCustomGoodsWidget getWidgetAppearance");
-            return null;
-        }
-
-        override fun getDecoration(): RecyclerView.ItemDecoration? {
-            print("csCustomGoodsWidget getDecoration");
-            return null;
-        }
-
-        public override fun getSkus(widgetView: View, skus: ArrayList<String>, callback: GetGoodsDataCallback) {
-            print("csCustomGoodsWidget getSkus = $skus")
-            var payload = Arguments.makeNativeMap(
-                mutableMapOf(
-                    "skus" to skus,
-                ) as Map<String, Any>)
-            sendEvent(reactContext,"getGoodsObject", payload)
-            val handler = Handler()
-            val runnableCode: Runnable = Runnable {
-                if (that.goodsCache.size > 0) {
-                    callback.onSuccess(that.goodsCache)
-                    that.goodsCache.clear();
-                } else {
-                    handler.postDelayed(this as Runnable, 250)
-                }
-            }
-            handler.post(runnableCode)
+        handler.post(runnableCode)
 
 
-        }
+      }
 
-        override fun onItemClick(
-            widgetView: View,
-            goodsItemView: View,
-            goodsItemData: GoodsItemData,
-            callback: GetGoodsDataCallback
-        ) {
-            var payload = Arguments.makeNativeMap(
-                mutableMapOf(
-                    "sku" to goodsItemData.sku,
-                ) as Map<String, Any>)
-            sendEvent(reactContext,"goodItemSelected", payload)
-            callback.onClose()
-            InAppStoryManager.closeStoryReader()
-            return;
-        }
+      override fun onItemClick(
+        widgetView: View,
+        goodsItemView: View,
+        goodsItemData: GoodsItemData,
+        callback: GetGoodsDataCallback
+      ) {
+        var payload = Arguments.makeNativeMap(
+          mutableMapOf(
+            "sku" to goodsItemData.sku,
+          ) as Map<String, Any>
+        )
+        sendEvent(reactContext, "goodItemSelected", payload)
+        callback.onClose()
+        InAppStoryManager.closeStoryReader()
+        return;
+      }
     });
 
     this.ias?.setShowStoryCallback(
-        object : ShowStoryCallback {
-            override fun showStory(
-                story: StoryData?,
-                showStoryAction: ShowStoryAction?
-            ) {
-                var payload = Arguments.makeNativeMap(
-                    mutableMapOf(
-                        "action" to when(showStoryAction){
-                            ShowStoryAction.OPEN -> "open"
-                            ShowStoryAction.TAP -> "tap"
-                            ShowStoryAction.SWIPE -> "swipe"
-                            ShowStoryAction.AUTO -> "auto"
-                            ShowStoryAction.CUSTOM -> "custom"
-                            null -> "unknown"
-                        },
-                        "feed" to story?.feed,
-                        "id" to story?.id,
-                        "slidesCount" to story?.slidesCount
+      object : ShowStoryCallback {
+        override fun showStory(
+          story: StoryData?,
+          showStoryAction: ShowStoryAction?
+        ) {
+          var payload = Arguments.makeNativeMap(
+            mutableMapOf(
+              "action" to when (showStoryAction) {
+                ShowStoryAction.OPEN -> "open"
+                ShowStoryAction.TAP -> "tap"
+                ShowStoryAction.SWIPE -> "swipe"
+                ShowStoryAction.AUTO -> "auto"
+                ShowStoryAction.CUSTOM -> "custom"
+                null -> "unknown"
+              },
+              "feed" to story?.feed,
+              "id" to story?.id,
+              "slidesCount" to story?.slidesCount
 
-                    ) as Map<String, Any>)
-                sendEvent(reactContext,"showStory", payload)
-            }
+            ) as Map<String, Any>
+          )
+          sendEvent(reactContext, "showStory", payload)
         }
+      }
     )
-      this.ias?.setShowSlideCallback(
-        object : ShowSlideCallback {
-            override fun showSlide(
-                slide: SlideData?
-            ) {
-                var payload = Arguments.makeNativeMap(
-                        mutableMapOf(
-                            "id" to slide?.story?.id,
-                            "index" to slide?.index,
-                            "slidesCount" to slide?.story?.slidesCount
+    this.ias?.setShowSlideCallback(
+      object : ShowSlideCallback {
+        override fun showSlide(
+          slide: SlideData?
+        ) {
+          var payload = Arguments.makeNativeMap(
+            mutableMapOf(
+              "id" to slide?.story?.id,
+              "index" to slide?.index,
+              "slidesCount" to slide?.story?.slidesCount
 
-                        ) as Map<String, Any>)
-                sendEvent(reactContext,"showSlide", payload)
-            }
+            ) as Map<String, Any>
+          )
+          sendEvent(reactContext, "showSlide", payload)
         }
+      }
     )
-      this.ias?.setCloseStoryCallback(
-        object : CloseStoryCallback {
-            override fun closeStory(
-                slide: SlideData?,
-                action: CloseReader?
-            ) {
-                var payload = Arguments.makeNativeMap(
-                        mutableMapOf(
-                            "action" to when(action){
-                                CloseReader.AUTO -> "auto"
-                                CloseReader.CLICK -> "click"
-                                CloseReader.SWIPE -> "swipe"
-                                CloseReader.CUSTOM -> "custom"
-                                null -> "unknown"
-                            },
-                            "feed" to slide?.story?.feed,
-                            "id" to slide?.story?.id
+    this.ias?.setCloseStoryCallback(
+      object : CloseStoryCallback {
+        override fun closeStory(
+          slide: SlideData?,
+          action: CloseReader?
+        ) {
+          var payload = Arguments.makeNativeMap(
+            mutableMapOf(
+              "action" to when (action) {
+                CloseReader.AUTO -> "auto"
+                CloseReader.CLICK -> "click"
+                CloseReader.SWIPE -> "swipe"
+                CloseReader.CUSTOM -> "custom"
+                null -> "unknown"
+              },
+              "feed" to slide?.story?.feed,
+              "id" to slide?.story?.id
 
-                        ) as Map<String, Any>)
-                sendEvent(reactContext,"closeStory", payload)
-            }
+            ) as Map<String, Any>
+          )
+          sendEvent(reactContext, "closeStory", payload)
         }
+      }
     )
 
     this.ias?.setCallToActionCallback(
-        object : CallToActionCallback {
-            override fun callToAction(
-                context: Context?, //Here context of story reader or context of storiesList if it calls from it's deeplinks
-                content: ContentData?,
-                url: String?,
-                action: ClickAction
-            ) {
+      object : CallToActionCallback {
+        override fun callToAction(
+          context: Context?, //Here context of story reader or context of storiesList if it calls from it's deeplinks
+          content: ContentData?,
+          url: String?,
+          action: ClickAction
+        ) {
 
-                if (content is SlideData) {
-                    var payload = Arguments.makeNativeMap(
-                                mutableMapOf(
-                                    "action" to when(action){
-                                        ClickAction.BUTTON -> "button"
-                                        ClickAction.SWIPE -> "swipe"
-                                        ClickAction.GAME -> "game"
-                                        ClickAction.DEEPLINK -> "deeplink"
-                                    },
-                                    "feed" to content?.story?.feed,
-                                    "index" to content?.index,
-                                    "id" to content?.story?.id,
-                                    "url" to url
+          if (content is SlideData) {
+            var payload = Arguments.makeNativeMap(
+              mutableMapOf(
+                "action" to when (action) {
+                  ClickAction.BUTTON -> "button"
+                  ClickAction.SWIPE -> "swipe"
+                  ClickAction.GAME -> "game"
+                  ClickAction.DEEPLINK -> "deeplink"
+                },
+                "feed" to content?.story?.feed,
+                "index" to content?.index,
+                "id" to content?.story?.id,
+                "url" to url
 
-                                ) as Map<String, Any>)
+              ) as Map<String, Any>
+            )
 
-                    Log.d("InappstorySdkModule","callToAction slide = $content url = $url action= $action");
-                    // currently not work two sendEvent simultaneously
-                    //if (action == ClickAction.BUTTON) {
-                        // just event
-                        //sendEvent(reactContext, "clickOnButton", payload)
-                    //}
-                    // CTA(link) handler
-                    sendEvent(reactContext, "handleCTA", payload)
-                } else if (content is InAppMessageData) {
-                    //val inAppMessageId: Int = content.id
-                    //val title: String? = content.title
-                    //val event: String? = content.event
-                }
-            }
-        }
-    )
-      this.ias?.setFavoriteStoryCallback(
-        object : FavoriteStoryCallback {
-            override fun favoriteStory(
-                slide: SlideData?,
-                value: Boolean
-            ) {
-                var payload = Arguments.makeNativeMap(
-                    mutableMapOf(
-                        "feed" to slide?.story?.feed,
-                        "index" to slide?.index,
-                        "storyID" to slide?.story?.id,
-                        "favorite" to value
-
-                    ) as Map<String, Any>)
-                sendEvent(reactContext,"favoriteStory", payload)
-            }
-        }
-    )
-      this.ias?.setLikeDislikeStoryCallback(
-        object : LikeDislikeStoryCallback {
-            override fun likeStory(
-                slide: SlideData?,
-                value: Boolean
-            ) {
-                var payload = Arguments.makeNativeMap(
-                        mutableMapOf(
-                            "feed" to slide?.story?.feed,
-                            "index" to slide?.index,
-                            "id" to slide?.story?.id,
-                            "value" to value
-
-                        ) as Map<String, Any>)
-                sendEvent(reactContext,"likeStory", payload)
-            }
-
-            override fun dislikeStory(
-                slide: SlideData?,
-                value: Boolean
-            ) {
-                var payload = Arguments.makeNativeMap(
-                        mutableMapOf(
-                            "feed" to slide?.story?.feed ,
-                            "index" to slide?.index,
-                            "id" to slide?.story?.id,
-                            "value" to value
-
-                        ) as Map<String, Any>)
-                sendEvent(reactContext,"dislikeStory", payload)
-            }
-        }
-    )
-      this.ias?.setClickOnShareStoryCallback(
-        object : ClickOnShareStoryCallback {
-            override fun shareClick(
-                slide: SlideData?
-            ) {
-                var payload = Arguments.makeNativeMap(
-                        mutableMapOf(
-                            "feed" to slide?.story?.feed,
-                            "index" to slide?.index,
-                            "id" to slide?.story?.id
-
-                        ) as Map<String, Any>)
-                sendEvent(reactContext,"clickOnShareStory", payload)
-                Log.d("InappstorySdkModule","clickOnShareStory slide = $slide");
-            }
-        }
-    )
-      this.ias?.setOnboardingLoadCallback(
-        object : OnboardingLoadCallback {
-            override fun onboardingLoadSuccess(count: Int, feed: String?) {
-                var payload = Arguments.makeNativeMap(
-                        mutableMapOf(
-                            "count" to count,
-                            "feed" to feed,
-
-                        ) as Map<String, Any>)
-                sendEvent(reactContext,"onboardingLoad", payload)
-                Log.d("InappstorySdkModule","onboardingLoadSuccess count = $count, feed = $feed");
-            }
-
-            override fun onboardingLoadError(feed: String?, reason: String?) {
-                var payload = Arguments.makeNativeMap(
-                    mutableMapOf(
-                        "feed" to feed,
-                        "reason" to reason,
-                    ) as Map<String, Any>)
-                sendEvent(reactContext,"loadOnboardingError", payload)
-                Log.d("InappstorySdkModule","loadOnboardingError reason = $reason, feed = $feed");
-            }
-
-        }
-    )
-      this.ias?.setSingleLoadCallback(
-        object : SingleLoadCallback {
-            override fun singleLoadSuccess(story: StoryData?) {
-                var payload = Arguments.makeNativeMap(
-                        mutableMapOf(
-                            "id" to story?.id,
-                            "feed" to story?.feed,
-
-                        ) as Map<String, Any>)
-                sendEvent(reactContext,"singleLoad", payload)
-                Log.d("InappstorySdkModule","singleLoadSuccess story = $story");
-            }
-
-            override fun singleLoadError(storyId: String?, reason: String?) {
-                //val payload:WritableMap = Arguments.createMap()
-                var payload = Arguments.makeNativeMap(
-                        mutableMapOf(
-                            "id" to storyId,
-                            "reason" to reason,
-
-                        ) as Map<String, Any>)
-                sendEvent(reactContext,"loadSingleError", payload)
-                Log.d("InappstorySdkModule","loadSingleError storyId = $storyId, reason = $reason");
-            }
-        }
-    )
-      this.ias?.setStoryWidgetCallback(
-        object : StoryWidgetCallback {
-            override fun widgetEvent(
-                slideData: SlideData?,
-                widgetEventName: String?,
-                widgetData: Map<String, String?>?,
-                //feed: String?
-            ) {
-                var payload = Arguments.makeNativeMap(
-                    mutableMapOf(
-                        "feed" to slideData?.story?.feed,
-                        "id" to slideData?.story?.id,
-                        "name" to widgetEventName,
-                        "data" to widgetData
-                    ) as Map<String, Any>)
-                sendEvent(reactContext,"storyWidgetEvent", payload)
-                Log.d("InappstorySdkModule","storyWidget story = $slideData, widgetEventName = $widgetEventName, widgetData = $widgetData");
-            }
-        }
-    )
-      this.ias?.setGameReaderCallback(
-        object : GameReaderCallback {
-            override fun startGame(
-                content: ContentData?,
-                id: String?
-            ) {
-                if (content is GameStoryData) {
-                    var payload = Arguments.makeNativeMap(
-                    mutableMapOf(
-                        "storyID" to content?.slideData?.story?.id,
-                        "index" to content?.slideData?.index,
-                        "id" to id
-                    ) as Map<String, Any>)
-                    sendEvent(reactContext,"startGame", payload)
-                }
-            }
-
-            override fun finishGame(
-                content: ContentData?,
-                result: String?,
-                id: String?
-            ) {
-               if (content is GameStoryData) {
-                    var payload = Arguments.makeNativeMap(
-                    mutableMapOf(
-                        "storyID" to content?.slideData?.story?.id,
-                        "index" to content?.slideData?.index,
-                        "result" to result,
-                        "id" to id
-                    ) as Map<String, Any>)
-                    sendEvent(reactContext,"finishGame", payload)
-                }
-            }
-
-            override fun closeGame(
-                content: ContentData?,
-                id: String?
-            ) {
-               if (content is GameStoryData) {
-                    var payload = Arguments.makeNativeMap(
-                    mutableMapOf(
-                        "storyID" to content?.slideData?.story?.id,
-                        "index" to content?.slideData?.index,
-                        "id" to id
-                    ) as Map<String, Any>)
-                    sendEvent(reactContext,"closeGame", payload)
-                }
-            }
-            override fun gameLoadError(
-                content: ContentData?,
-                id: String?
-            ) {
-                if (content is GameStoryData) {
-                    var payload = Arguments.makeNativeMap(
-                    mutableMapOf(
-                        "storyID" to content?.slideData?.story?.id,
-                        "index" to content?.slideData?.index,
-                        "id" to id
-                    ) as Map<String, Any>)
-                    sendEvent(reactContext,"gameFailure", payload)
-                    Log.d("InappstorySdkModule","gameLoadError gameStoryData = $content, id = $id");
-                }
-            }
-            override fun gameOpenError(
-              content: ContentData?,
-              id: String?
-          ) {
-              if (content is GameStoryData) {
-                var payload = Arguments.makeNativeMap(
-                    mutableMapOf(
-                        "storyID" to content?.slideData?.story?.id,
-                        "index" to content?.slideData?.index,
-                        "id" to id
-                    ) as Map<String, Any>)
-                sendEvent(reactContext,"gameFailure", payload)
-                Log.d("InappstorySdkModule","gameOpenError gameStoryData = $content, id = $id");
-            }
-          }
-            override fun eventGame(
-                content: ContentData?,
-                id: String?,
-                id2: String?,
-                id3: String?
-            ) {
-                if (content is GameStoryData) {
-                    var payload = Arguments.makeNativeMap(
-                        mutableMapOf(
-                            "storyID" to content?.slideData?.story?.id,
-                            "index" to content?.slideData?.index,
-                            "id" to id,
-                            "id2" to id2,
-                            "id3" to id3
-                        ) as Map<String, Any>)
-                    sendEvent(reactContext,"eventGame", payload)
-                    Log.d("InappstorySdkModule","eventGame gameStoryData = $content, id = $id , id2 = $id2 , id3 = $id3");
-                }
-            }
-        }
-    )
-      this.ias?.setErrorCallback(
-        object : ErrorCallback {
-            override fun loadListError(feed: String?) {
-                var payload = Arguments.makeNativeMap(
-                    mutableMapOf(
-                        "feed" to feed
-                    ) as Map<String, Any>)
-                sendEvent(reactContext,"loadListError", payload)
-                Log.d("InappstorySdkModule","loadListError feed = $feed");
-            }
-
-            override fun cacheError() {
-                val payload:WritableMap = Arguments.createMap()
-                sendEvent(reactContext,"cacheError", payload)
-                Log.d("InappstorySdkModule","cacheError");
-            }
-
-            //override fun readerError() {
-            //    val payload:WritableMap = Arguments.createMap()
-            //    sendEvent(reactContext,"readerError", payload)
-            //    Log.d("InappstorySdkModule","readerError");
+            Log.d(
+              "InappstorySdkModule",
+              "callToAction slide = $content url = $url action= $action"
+            );
+            // currently not work two sendEvent simultaneously
+            //if (action == ClickAction.BUTTON) {
+            // just event
+            //sendEvent(reactContext, "clickOnButton", payload)
             //}
+            // CTA(link) handler
+            sendEvent(reactContext, "handleCTA", payload)
+          } else if (content is InAppMessageData) {
+            //val inAppMessageId: Int = content.id
+            //val title: String? = content.title
+            //val event: String? = content.event
 
-            override fun emptyLinkError() {
-                val payload:WritableMap = Arguments.createMap()
-                sendEvent(reactContext,"emptyLinkError", payload)
-                Log.d("InappstorySdkModule","emptyLinkError");
-            }
-
-            override fun sessionError() {
-                val payload:WritableMap = Arguments.createMap()
-                sendEvent(reactContext,"sessionError", payload)
-                Log.d("InappstorySdkModule","sessionError");
-            }
-
-            override fun noConnection() {
-                val payload:WritableMap = Arguments.createMap()
-                sendEvent(reactContext,"noConnection", payload)
-                Log.d("InappstorySdkModule","noConnection");
-            }
-
+            var payload = Arguments.makeNativeMap(
+              mutableMapOf(
+                "action" to "unknown",
+                "id" to content.id(),
+                "url" to url
+              ) as Map<String, Any>
+            )
+            Log.d(
+              "InappstorySdkModule",
+              "callToAction InAppMessageData = $content url = $url action= $action"
+            );
+            sendEvent(reactContext, "handleCTA", payload)
+          } else {
+            var payload = Arguments.makeNativeMap(
+              mutableMapOf(
+                "action" to "unknown",
+                "url" to url
+              ) as Map<String, Any>
+            )
+            Log.d(
+              "InappstorySdkModule",
+              "callToAction Unknown content = $content url = $url action= $action"
+            );
+            sendEvent(reactContext, "handleCTA", payload)
+          }
         }
+      }
+    )
+    this.ias?.setFavoriteStoryCallback(
+      object : FavoriteStoryCallback {
+        override fun favoriteStory(
+          slide: SlideData?,
+          value: Boolean
+        ) {
+          var payload = Arguments.makeNativeMap(
+            mutableMapOf(
+              "feed" to slide?.story?.feed,
+              "index" to slide?.index,
+              "storyID" to slide?.story?.id,
+              "favorite" to value
+
+            ) as Map<String, Any>
+          )
+          sendEvent(reactContext, "favoriteStory", payload)
+        }
+      }
+    )
+    this.ias?.setLikeDislikeStoryCallback(
+      object : LikeDislikeStoryCallback {
+        override fun likeStory(
+          slide: SlideData?,
+          value: Boolean
+        ) {
+          var payload = Arguments.makeNativeMap(
+            mutableMapOf(
+              "feed" to slide?.story?.feed,
+              "index" to slide?.index,
+              "id" to slide?.story?.id,
+              "value" to value
+
+            ) as Map<String, Any>
+          )
+          sendEvent(reactContext, "likeStory", payload)
+        }
+
+        override fun dislikeStory(
+          slide: SlideData?,
+          value: Boolean
+        ) {
+          var payload = Arguments.makeNativeMap(
+            mutableMapOf(
+              "feed" to slide?.story?.feed,
+              "index" to slide?.index,
+              "id" to slide?.story?.id,
+              "value" to value
+
+            ) as Map<String, Any>
+          )
+          sendEvent(reactContext, "dislikeStory", payload)
+        }
+      }
+    )
+    this.ias?.setClickOnShareStoryCallback(
+      object : ClickOnShareStoryCallback {
+        override fun shareClick(
+          slide: SlideData?
+        ) {
+          var payload = Arguments.makeNativeMap(
+            mutableMapOf(
+              "feed" to slide?.story?.feed,
+              "index" to slide?.index,
+              "id" to slide?.story?.id
+
+            ) as Map<String, Any>
+          )
+          sendEvent(reactContext, "clickOnShareStory", payload)
+          Log.d("InappstorySdkModule", "clickOnShareStory slide = $slide");
+        }
+      }
+    )
+    this.ias?.setOnboardingLoadCallback(
+      object : OnboardingLoadCallback {
+        override fun onboardingLoadSuccess(count: Int, feed: String?) {
+          var payload = Arguments.makeNativeMap(
+            mutableMapOf(
+              "count" to count,
+              "feed" to feed,
+
+              ) as Map<String, Any>
+          )
+          sendEvent(reactContext, "onboardingLoad", payload)
+          Log.d("InappstorySdkModule", "onboardingLoadSuccess count = $count, feed = $feed");
+        }
+
+        override fun onboardingLoadError(feed: String?, reason: String?) {
+          var payload = Arguments.makeNativeMap(
+            mutableMapOf(
+              "feed" to feed,
+              "reason" to reason,
+            ) as Map<String, Any>
+          )
+          sendEvent(reactContext, "loadOnboardingError", payload)
+          Log.d("InappstorySdkModule", "loadOnboardingError reason = $reason, feed = $feed");
+        }
+
+      }
+    )
+    this.ias?.setSingleLoadCallback(
+      object : SingleLoadCallback {
+        override fun singleLoadSuccess(story: StoryData?) {
+          var payload = Arguments.makeNativeMap(
+            mutableMapOf(
+              "id" to story?.id,
+              "feed" to story?.feed,
+
+              ) as Map<String, Any>
+          )
+          sendEvent(reactContext, "singleLoad", payload)
+          Log.d("InappstorySdkModule", "singleLoadSuccess story = $story");
+        }
+
+        override fun singleLoadError(storyId: String?, reason: String?) {
+          //val payload:WritableMap = Arguments.createMap()
+          var payload = Arguments.makeNativeMap(
+            mutableMapOf(
+              "id" to storyId,
+              "reason" to reason,
+
+              ) as Map<String, Any>
+          )
+          sendEvent(reactContext, "loadSingleError", payload)
+          Log.d("InappstorySdkModule", "loadSingleError storyId = $storyId, reason = $reason");
+        }
+      }
+    )
+    this.ias?.setStoryWidgetCallback(
+      object : StoryWidgetCallback {
+        override fun widgetEvent(
+          slideData: SlideData?,
+          widgetEventName: String?,
+          widgetData: Map<String, String?>?,
+          //feed: String?
+        ) {
+          var payload = Arguments.makeNativeMap(
+            mutableMapOf(
+              "feed" to slideData?.story?.feed,
+              "id" to slideData?.story?.id,
+              "name" to widgetEventName,
+              "data" to widgetData
+            ) as Map<String, Any>
+          )
+          sendEvent(reactContext, "storyWidgetEvent", payload)
+          Log.d(
+            "InappstorySdkModule",
+            "storyWidget story = $slideData, widgetEventName = $widgetEventName, widgetData = $widgetData"
+          );
+        }
+      }
+    )
+    this.ias?.setGameReaderCallback(
+      object : GameReaderCallback {
+        override fun startGame(
+          content: ContentData?,
+          id: String?
+        ) {
+          if (content is GameStoryData) {
+            var payload = Arguments.makeNativeMap(
+              mutableMapOf(
+                "storyID" to content?.slideData?.story?.id,
+                "index" to content?.slideData?.index,
+                "id" to id
+              ) as Map<String, Any>
+            )
+            sendEvent(reactContext, "startGame", payload)
+          }
+        }
+
+        override fun closeGame(
+          content: ContentData?,
+          id: String?
+        ) {
+          if (content is GameStoryData) {
+            var payload = Arguments.makeNativeMap(
+              mutableMapOf(
+                "storyID" to content?.slideData?.story?.id,
+                "index" to content?.slideData?.index,
+                "id" to id
+              ) as Map<String, Any>
+            )
+            sendEvent(reactContext, "closeGame", payload)
+          }
+        }
+
+        override fun gameLoadError(
+          content: ContentData?,
+          id: String?
+        ) {
+          if (content is GameStoryData) {
+            var payload = Arguments.makeNativeMap(
+              mutableMapOf(
+                "storyID" to content?.slideData?.story?.id,
+                "index" to content?.slideData?.index,
+                "id" to id
+              ) as Map<String, Any>
+            )
+            sendEvent(reactContext, "gameFailure", payload)
+            Log.d("InappstorySdkModule", "gameLoadError gameStoryData = $content, id = $id");
+          }
+        }
+
+        override fun gameOpenError(
+          content: ContentData?,
+          id: String?
+        ) {
+          if (content is GameStoryData) {
+            var payload = Arguments.makeNativeMap(
+              mutableMapOf(
+                "storyID" to content?.slideData?.story?.id,
+                "index" to content?.slideData?.index,
+                "id" to id
+              ) as Map<String, Any>
+            )
+            sendEvent(reactContext, "gameFailure", payload)
+            Log.d("InappstorySdkModule", "gameOpenError gameStoryData = $content, id = $id");
+          }
+        }
+
+        override fun eventGame(
+          content: ContentData?,
+          id: String?,
+          id2: String?,
+          id3: String?
+        ) {
+          if (content is GameStoryData) {
+            var payload = Arguments.makeNativeMap(
+              mutableMapOf(
+                "storyID" to content?.slideData?.story?.id,
+                "index" to content?.slideData?.index,
+                "id" to id,
+                "id2" to id2,
+                "id3" to id3
+              ) as Map<String, Any>
+            )
+            sendEvent(reactContext, "eventGame", payload)
+            Log.d(
+              "InappstorySdkModule",
+              "eventGame gameStoryData = $content, id = $id , id2 = $id2 , id3 = $id3"
+            );
+          }
+        }
+      }
+    )
+    this.ias?.setErrorCallback(
+      object : ErrorCallback {
+        override fun loadListError(feed: String?) {
+          var payload = Arguments.makeNativeMap(
+            mutableMapOf(
+              "feed" to feed
+            ) as Map<String, Any>
+          )
+          sendEvent(reactContext, "loadListError", payload)
+          Log.d("InappstorySdkModule", "loadListError feed = $feed");
+        }
+
+        override fun cacheError() {
+          val payload: WritableMap = Arguments.createMap()
+          sendEvent(reactContext, "cacheError", payload)
+          Log.d("InappstorySdkModule", "cacheError");
+        }
+
+        //override fun readerError() {
+        //    val payload:WritableMap = Arguments.createMap()
+        //    sendEvent(reactContext,"readerError", payload)
+        //    Log.d("InappstorySdkModule","readerError");
+        //}
+
+        override fun emptyLinkError() {
+          val payload: WritableMap = Arguments.createMap()
+          sendEvent(reactContext, "emptyLinkError", payload)
+          Log.d("InappstorySdkModule", "emptyLinkError");
+        }
+
+        override fun sessionError() {
+          val payload: WritableMap = Arguments.createMap()
+          sendEvent(reactContext, "sessionError", payload)
+          Log.d("InappstorySdkModule", "sessionError");
+        }
+
+        override fun noConnection() {
+          val payload: WritableMap = Arguments.createMap()
+          sendEvent(reactContext, "noConnection", payload)
+          Log.d("InappstorySdkModule", "noConnection");
+        }
+
+      }
     )
   }
+
   @ReactMethod
-  fun addProductToCache(sku: String, title: String, subtitle: String, imageURL: String, price: String, oldPrice: String) {
+  fun addProductToCache(
+    sku: String,
+    title: String,
+    subtitle: String,
+    imageURL: String,
+    price: String,
+    oldPrice: String
+  ) {
     val data = GoodsItemData(
-        sku,
-        title,
-        subtitle,
-        imageURL,
-        price,
-        oldPrice,
-        sku
+      sku,
+      title,
+      subtitle,
+      imageURL,
+      price,
+      oldPrice,
+      sku
     )
     this.goodsCache.add(data)
   }
 
   @ReactMethod
   fun showGame(gameID: String, promise: Promise) {
-      Log.d("InappstorySdkModule", "showGame")
-      try {
-        this.ias?.openGame(gameID, getCurrentActivity() as Context)
-        promise.resolve(gameID)
-      } catch (e: Throwable) {
-        promise.reject("showGame error", e)
-      }
+    Log.d("InappstorySdkModule", "showGame")
+    try {
+      this.ias?.openGame(gameID, getCurrentActivity() as Context)
+      promise.resolve(gameID)
+    } catch (e: Throwable) {
+      promise.reject("showGame error", e)
+    }
   }
 
   @ReactMethod
-  fun showSingle(storyID: String, promise: Promise) {
-      Log.d("InappstorySdkModule", "showSingle")
-      try {
+  fun showSingle(storyID: String, operationId: String, promise: Promise) {
+    Log.d("InappstorySdkModule", "showSingle")
+    try {
+      var cancellationToken: CancellationToken? =
         this.ias?.showStory(storyID, getCurrentActivity(), this.appearanceManager)
-        promise.resolve(true)
-      } catch (e: Throwable) {
-        promise.reject("showGame error", e)
+      cancellationTokenMap[operationId] = cancellationToken
+      promise.resolve(true)
+    } catch (e: Throwable) {
+      promise.reject("showGame error", e)
+    }
+  }
+
+  @ReactMethod
+  fun showIAMById(iamId: String, onlyPreloaded: Boolean, operationId: String, promise: Promise) {
+    Log.d("InappstorySdkModule", "showIAMById")
+    try {
+      val settings =
+        InAppMessageOpenSettings().id(iamId.toInt()).showOnlyIfLoaded(onlyPreloaded)
+
+      val fragment = NativeOverlayFragment(
+        ias = this.ias,
+        settings = settings,
+        //backPressManager = this.backPressManager,
+        onReaderIsClosed = {
+          Log.d("InappstorySdkModule", "IAM reader closed")
+          if (cancellationTokenMap.containsKey(operationId)) {
+            cancellationTokenMap.remove(operationId)
+          }
+        },
+        onReaderIsOpen = { cancellationToken ->
+          Log.d("InappstorySdkModule", "IAM reader opened")
+          cancellationTokenMap[operationId] = cancellationToken
+          promise.resolve(true)
+        },
+      )
+
+      (getCurrentActivity() as FragmentActivity).supportFragmentManager
+        .beginTransaction()
+        .add(android.R.id.content, fragment, "overlay_fragment")
+        .addToBackStack("overlay_fragment")
+        .commit()
+
+      return
+    } catch (e: Throwable) {
+      promise.reject("showIAMById error", e)
+    }
+  }
+
+  @ReactMethod
+  fun showIAMByEvent(
+    iamEvent: String,
+    onlyPreloaded: Boolean,
+    operationId: String,
+    promise: Promise
+  ) {
+    Log.d("InappstorySdkModule", "showIAMByEvent")
+    try {
+      val settings =
+        InAppMessageOpenSettings().event(iamEvent).showOnlyIfLoaded(onlyPreloaded)
+      val fragment = NativeOverlayFragment(
+        ias = this.ias,
+        settings = settings,
+        //backPressManager = this.backPressManager,
+        onReaderIsClosed = {
+          Log.d("InappstorySdkModule", "IAM reader closed")
+          if (cancellationTokenMap.containsKey(operationId)) {
+            cancellationTokenMap.remove(operationId)
+          }
+        },
+        onReaderIsOpen = { cancellationToken ->
+          Log.d("InappstorySdkModule", "IAM reader opened")
+          cancellationTokenMap[operationId] = cancellationToken
+        },
+      )
+
+      (getCurrentActivity() as FragmentActivity).supportFragmentManager
+        .beginTransaction()
+        .add(android.R.id.content, fragment, "overlay_fragment")
+        .addToBackStack("overlay_fragment")
+        .commit()
+
+      promise.resolve(true)
+    } catch (e: Throwable) {
+      promise.reject("showIAMById error", e)
+    }
+  }
+
+  @ReactMethod
+  fun preloadIAM(ids: ReadableArray?, tags: ReadableArray?, promise: Promise) {
+    Log.d("InappstorySdkModule", "preloadIAM")
+    var settings = InAppMessagePreloadSettings()
+    if (ids != null)
+      settings = settings.inAppMessageIds(ids.toArrayList().toMutableList() as List<String>)
+    if (tags != null)
+      settings = settings.tags(tags.toArrayList().toMutableList() as List<String>)
+    try {
+      this.ias?.preloadInAppMessages(settings, object : InAppMessageLoadCallback {
+        override fun loaded(id: Int) {
+
+        }
+
+        override fun allLoaded() {
+          promise.resolve(true)
+        }
+
+        override fun loadError(id: Int) {
+
+        }
+
+        override fun loadError() {
+          promise.resolve(false)
+        }
+
+        override fun isEmpty() {
+          promise.resolve(true)
+        }
+      })
+    } catch (e: Throwable) {
+      promise.reject("preloadIAM error", e)
+    }
+  }
+
+  @ReactMethod
+  fun handleHardwareBackPress(promise: Promise) {
+     Log.d("InappstorySdkModule", "handleHardwareBackPress")
+    //promise.resolve(backPressManager.handleBackPress())
+  }
+
+  @ReactMethod
+  fun cancelOperation(operationId: String) {
+    Log.d("InappstorySdkModule", "cancelOperation")
+    try {
+      if (cancellationTokenMap.containsKey(operationId)) {
+        cancellationTokenMap[operationId]?.cancel()
+        cancellationTokenMap.remove(operationId)
       }
+    } catch (e: Throwable) {
+    }
   }
 
   @ReactMethod
@@ -693,30 +918,31 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
 
   @ReactMethod
   fun setPlaceholders(placeholders: ReadableMap) {
-      Log.d("InappstorySdkModule", "setPlaceholders $placeholders")
-      var nativeMap:ReadableNativeMap = placeholders as ReadableNativeMap;
-      this.ias?.setPlaceholders(nativeMap.toHashMap() as Map<String, String>)
+    Log.d("InappstorySdkModule", "setPlaceholders $placeholders")
+    var nativeMap: ReadableNativeMap = placeholders as ReadableNativeMap;
+    this.ias?.setPlaceholders(nativeMap.toHashMap() as Map<String, String>)
   }
 
   @ReactMethod
   fun setImagesPlaceholders(imagePlaceholders: ReadableArray) {
-      Log.d("InappstorySdkModule", "setImagesPlaceholders")
-      var nativeMap:ReadableNativeMap = imagePlaceholders as ReadableNativeMap;
-      var imageMap: Map<String, ImagePlaceholderValue> = nativeMap.toHashMap().mapValues { ImagePlaceholderValue.createByUrl(it.value as String) }
-      this.ias?.setImagePlaceholders(imageMap)
+    Log.d("InappstorySdkModule", "setImagesPlaceholders")
+    var nativeMap: ReadableNativeMap = imagePlaceholders as ReadableNativeMap;
+    var imageMap: Map<String, ImagePlaceholderValue> =
+      nativeMap.toHashMap().mapValues { ImagePlaceholderValue.createByUrl(it.value as String) }
+    this.ias?.setImagePlaceholders(imageMap)
   }
 
   @ReactMethod
   fun changeSound(value: Boolean) {
-      Log.d("InappstorySdkModule", "changeSound")
-      this.ias?.soundOn(value)
+    Log.d("InappstorySdkModule", "changeSound")
+    this.ias?.soundOn(value)
   }
 
   @ReactMethod
   fun getSound(promise: Promise) {
-      Log.d("InappstorySdkModule", "getSound")
-      // promise.resolve(this.ias?.soundOn())
-      promise.resolve((this.ias?.iasCore()?.settingsAPI() as IASDataSettingsHolder).isSoundOn())
+    Log.d("InappstorySdkModule", "getSound")
+    // promise.resolve(this.ias?.soundOn())
+    promise.resolve((this.ias?.iasCore()?.settingsAPI() as IASDataSettingsHolder).isSoundOn())
   }
 
   @ReactMethod
@@ -727,102 +953,105 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
 
   @ReactMethod
   fun setHasLike(value: Boolean) {
-      Log.d("InappstorySdkModule", "setHasLike")
-      this.appearanceManager?.csHasLike(value);
+    Log.d("InappstorySdkModule", "setHasLike " + value)
+    if (appearanceManager == null) {
+          Log.d("InappstorySdkModule", "setHasLike null")
+    }
+    this.appearanceManager?.csHasLike(value);
   }
 
   @ReactMethod
   fun setHasFavorites(value: Boolean) {
-      Log.d("InappstorySdkModule", "setHasFavorites")
-      this.appearanceManager?.csHasFavorite(value);
+    Log.d("InappstorySdkModule", "setHasFavorites")
+    this.appearanceManager?.csHasFavorite(value);
   }
 
   @ReactMethod
   fun setHasShare(value: Boolean) {
-      Log.d("InappstorySdkModule", "setHasShare")
-      this.appearanceManager?.csHasShare(value);
+    Log.d("InappstorySdkModule", "setHasShare")
+    this.appearanceManager?.csHasShare(value);
   }
 
   @ReactMethod
   fun setPresentationStyle(style: String) {
-      Log.d("InappstorySdkModule", "setPresentationStyle")
-      if (style == "zoom") {
-        this.appearanceManager?.csStoryReaderPresentationStyle(0)
-      }
-      if (style == "fade") {
-        this.appearanceManager?.csStoryReaderPresentationStyle(1)
-      }
-      if (style == "popup") {
-        this.appearanceManager?.csStoryReaderPresentationStyle(2)
-      }
-      if (style == "disable") {
-        this.appearanceManager?.csStoryReaderPresentationStyle(-1)
-      }
+    Log.d("InappstorySdkModule", "setPresentationStyle")
+    if (style == "zoom") {
+      this.appearanceManager?.csStoryReaderPresentationStyle(0)
+    }
+    if (style == "fade") {
+      this.appearanceManager?.csStoryReaderPresentationStyle(1)
+    }
+    if (style == "popup") {
+      this.appearanceManager?.csStoryReaderPresentationStyle(2)
+    }
+    if (style == "disable") {
+      this.appearanceManager?.csStoryReaderPresentationStyle(-1)
+    }
   }
 
   @ReactMethod
   fun setScrollStyle(scrollStyle: String) {
-      Log.d("InappstorySdkModule", "setScrollStyle")
-      if (scrollStyle == "depth") {
-        this.appearanceManager?.csStoryReaderAnimation(1)
-      }
-      if (scrollStyle == "cube") {
-        this.appearanceManager?.csStoryReaderAnimation(2)
-      }
-      if (scrollStyle == "cover") {
-        this.appearanceManager?.csStoryReaderAnimation(3)
-      }
-      if (scrollStyle == "flat") {
-        this.appearanceManager?.csStoryReaderAnimation(4)
-      }
+    Log.d("InappstorySdkModule", "setScrollStyle")
+    if (scrollStyle == "depth") {
+      this.appearanceManager?.csStoryReaderAnimation(1)
+    }
+    if (scrollStyle == "cube") {
+      this.appearanceManager?.csStoryReaderAnimation(2)
+    }
+    if (scrollStyle == "cover") {
+      this.appearanceManager?.csStoryReaderAnimation(3)
+    }
+    if (scrollStyle == "flat") {
+      this.appearanceManager?.csStoryReaderAnimation(4)
+    }
   }
 
   @ReactMethod
   fun setSwipeToClose(value: Boolean) {
-      Log.d("InappstorySdkModule", "setSwipeToClose")
-      this.appearanceManager?.csCloseOnSwipe(value)
+    Log.d("InappstorySdkModule", "setSwipeToClose")
+    this.appearanceManager?.csCloseOnSwipe(value)
   }
 
   @ReactMethod
   fun setOverScrollToClose(value: Boolean) {
-      Log.d("InappstorySdkModule", "setOverScrollToClose")
-      this.appearanceManager?.csCloseOnOverscroll(value)
+    Log.d("InappstorySdkModule", "setOverScrollToClose")
+    this.appearanceManager?.csCloseOnOverscroll(value)
   }
 
   @ReactMethod
   fun setCloseButtonPosition(value: String) {
-      Log.d("InappstorySdkModule", "setCloseButtonPosition")
-      if (value == "left") {
-        this.appearanceManager?.csClosePosition(1)
-      }
-      if (value == "right") {
-        this.appearanceManager?.csClosePosition(2)
-      }
-      if (value == "bottomLeft") {
-        this.appearanceManager?.csClosePosition(3)
-      }
-      if (value == "bottomRight") {
-        this.appearanceManager?.csClosePosition(4)
-      }
+    Log.d("InappstorySdkModule", "setCloseButtonPosition")
+    if (value == "left") {
+      this.appearanceManager?.csClosePosition(1)
+    }
+    if (value == "right") {
+      this.appearanceManager?.csClosePosition(2)
+    }
+    if (value == "bottomLeft") {
+      this.appearanceManager?.csClosePosition(3)
+    }
+    if (value == "bottomRight") {
+      this.appearanceManager?.csClosePosition(4)
+    }
 
   }
 
   @ReactMethod
   fun setReaderCornerRadius(radius: Int) {
-      Log.d("InappstorySdkModule", "setReaderCornerRadius")
-      this.appearanceManager?.csReaderRadius(radius);
+    Log.d("InappstorySdkModule", "setReaderCornerRadius")
+    this.appearanceManager?.csReaderRadius(radius);
   }
 
   @ReactMethod
   fun setReaderBackgroundColor(color: String) {
-      Log.d("InappstorySdkModule", "setReaderBackgroundColor")
-      //TODO
+    Log.d("InappstorySdkModule", "setReaderBackgroundColor")
+    //TODO
   }
 
   @ReactMethod
   fun setTimerGradientEnable(value: Boolean) {
-      Log.d("InappstorySdkModule", "setTimerGradientEnable")
-      this.appearanceManager?.csTimerGradientEnable(value)
+    Log.d("InappstorySdkModule", "setTimerGradientEnable")
+    this.appearanceManager?.csTimerGradientEnable(value)
   }
 
   @ReactMethod
@@ -835,30 +1064,30 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
   }
 
 
-/*
-  @ReactMethod
-  fun removeFromFavorite(storyID: String) {
-      Log.d("InappstorySdkModule", "removeFromFavorite")
-      //TODO
-  }
+  /*
+    @ReactMethod
+    fun removeFromFavorite(storyID: String) {
+        Log.d("InappstorySdkModule", "removeFromFavorite")
+        //TODO
+    }
 
-  @ReactMethod
-  fun removeAllFavorites() {
-      Log.d("InappstorySdkModule", "removeAllFavorites")
-      //TODO
-  }
+    @ReactMethod
+    fun removeAllFavorites() {
+        Log.d("InappstorySdkModule", "removeAllFavorites")
+        //TODO
+    }
 
-  @ReactMethod
-  fun addTags() {
-      Log.d("InappstorySdkModule", "addTags")
-      //this.ias?.addTags(tags)
-  }
+    @ReactMethod
+    fun addTags() {
+        Log.d("InappstorySdkModule", "addTags")
+        //this.ias?.addTags(tags)
+    }
 
-  @ReactMethod
-  fun removeTags() {
-      Log.d("InappstorySdkModule", "removeTags")
-      ///this.ias?.removeTags(tags)
-  }
+    @ReactMethod
+    fun removeTags() {
+        Log.d("InappstorySdkModule", "removeTags")
+        ///this.ias?.removeTags(tags)
+    }
 
   @ReactMethod
   fun getFavoritesCount() {
@@ -866,336 +1095,480 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) : ReactCont
       //TODO
   }
 
-  @ReactMethod
-  fun getFrameworkInfo() {
-      Log.d("InappstorySdkModule", "getFrameworkInfo")
-      //TODO
-  }
+    @ReactMethod
+    fun getFrameworkInfo() {
+        Log.d("InappstorySdkModule", "getFrameworkInfo")
+        //TODO
+    }
 
-  @ReactMethod
-  fun getBuildNumber() {
-      Log.d("InappstorySdkModule", "getBuildNumber")
-      //TODO
-  }
+    @ReactMethod
+    fun getBuildNumber() {
+        Log.d("InappstorySdkModule", "getBuildNumber")
+        //TODO
+    }
 
-  @ReactMethod
-  fun getVersion() {
-      Log.d("InappstorySdkModule", "getVersion")
-      //TODO
-  }
-
-
-  @ReactMethod
-  fun setTimerGradient() {
-      Log.d("InappstorySdkModule", "setTimerGradient")
-      //TODO
-  }
-
-  @ReactMethod
-  fun setPlaceholderElementColor() {
-      Log.d("InappstorySdkModule", "setPlaceholderElementColor")
-      //TODO
-  }
-
-  @ReactMethod
-  fun setPlaceholderBackgroundColor() {
-      Log.d("InappstorySdkModule", "setPlaceholderBackgroundColor")
-      //TODO
-  }
+    @ReactMethod
+    fun getVersion() {
+        Log.d("InappstorySdkModule", "getVersion")
+        //TODO
+    }
 
 
+    @ReactMethod
+    fun setTimerGradient() {
+        Log.d("InappstorySdkModule", "setTimerGradient")
+        //TODO
+    }
 
-  @ReactMethod
-  fun setCoverQuality() {
-      Log.d("InappstorySdkModule", "setCoverQuality")
-      //TODO
-  }
+    @ReactMethod
+    fun setPlaceholderElementColor() {
+        Log.d("InappstorySdkModule", "setPlaceholderElementColor")
+        //TODO
+    }
 
-  @ReactMethod
-  fun setShowCellTitle() {
-      Log.d("InappstorySdkModule", "setShowCellTitle")
-      //TODO
-  }
+    @ReactMethod
+    fun setPlaceholderBackgroundColor() {
+        Log.d("InappstorySdkModule", "setPlaceholderBackgroundColor")
+        //TODO
+    }
 
-  @ReactMethod
-  fun setCellGradientEnabled() {
-      Log.d("InappstorySdkModule", "setCellGradientEnabled")
-      //TODO
-  }
 
-  @ReactMethod
-  fun setCellGradientRadius() {
-      Log.d("InappstorySdkModule", "setCellGradientRadius")
-      //TODO
-  }
 
-  @ReactMethod
-  fun setCellBorderColor() {
-      Log.d("InappstorySdkModule", "setCellBorderColor")
-      //TODO
-  }
+    @ReactMethod
+    fun setCoverQuality() {
+        Log.d("InappstorySdkModule", "setCoverQuality")
+        //TODO
+    }
 
-  @ReactMethod
-  fun setGoodsCellImageBackgroundColor() {
-      Log.d("InappstorySdkModule", "setGoodsCellImageBackgroundColor")
-      //TODO
-  }
+    @ReactMethod
+    fun setShowCellTitle() {
+        Log.d("InappstorySdkModule", "setShowCellTitle")
+        //TODO
+    }
 
-  @ReactMethod
-  fun setGoodsCellImageCornerRadius() {
-      Log.d("InappstorySdkModule", "setGoodsCellImageCornerRadius")
-      //TODO
-  }
+    @ReactMethod
+    fun setCellGradientEnabled() {
+        Log.d("InappstorySdkModule", "setCellGradientEnabled")
+        //TODO
+    }
 
-  @ReactMethod
-  fun setGoodsCellMainTextColor() {
-      Log.d("InappstorySdkModule", "setGoodsCellMainTextColor")
-      //TODO
-  }
+    @ReactMethod
+    fun setCellGradientRadius() {
+        Log.d("InappstorySdkModule", "setCellGradientRadius")
+        //TODO
+    }
 
-  @ReactMethod
-  fun setGoodsCellOldPriceTextColor() {
-      Log.d("InappstorySdkModule", "setGoodsCellOldPriceTextColor")
-      //TODO
-  }
+    @ReactMethod
+    fun setCellBorderColor() {
+        Log.d("InappstorySdkModule", "setCellBorderColor")
+        //TODO
+    }
 
+    @ReactMethod
+    fun setGoodsCellImageBackgroundColor() {
+        Log.d("InappstorySdkModule", "setGoodsCellImageBackgroundColor")
+        //TODO
+    }
+
+    @ReactMethod
+    fun setGoodsCellImageCornerRadius() {
+        Log.d("InappstorySdkModule", "setGoodsCellImageCornerRadius")
+        //TODO
+    }
+
+    @ReactMethod
+    fun setGoodsCellMainTextColor() {
+        Log.d("InappstorySdkModule", "setGoodsCellMainTextColor")
+        //TODO
+    }
+
+    @ReactMethod
+    fun setGoodsCellOldPriceTextColor() {
+        Log.d("InappstorySdkModule", "setGoodsCellOldPriceTextColor")
+        //TODO
+    }
+  */
   @ReactMethod
   fun clearCache() {
-      Log.d("InappstorySdkModule", "clearCache")
-      this.ias?.clearCache()
+    Log.d("InappstorySdkModule", "clearCache")
+    this.ias?.clearCache()
+  }
+
+  /*
+    @ReactMethod
+    fun setLogging(value: Boolean) {
+        Log.d("InappstorySdkModule", "setLogging")
+
+      //this.ias.enableLogging = value
+    }
+
+    @ReactMethod
+    fun useDeviceID() {
+        Log.d("InappstorySdkModule", "useDeviceID")
+        //TODO
+    }
+  */
+  @ReactMethod
+  fun showOnboardings(
+    feed: String,
+    operationId: String,
+    limit: Int,
+    tags: ReadableArray,
+    promise: Promise
+  ) {
+    var tags: List<String>? = null; //FIXME
+    Log.d("InappstorySdkModule", "showOnboardings")
+    var cancelToken: CancellationToken?
+    if (limit != null) {
+      cancelToken = this.ias?.showOnboardingStories(
+        limit,
+        feed,
+        tags,
+        reactContext.currentActivity,
+        this.appearanceManager
+      )
+    } else {
+      cancelToken = this.ias?.showOnboardingStories(
+        feed,
+        tags,
+        reactContext.currentActivity,
+        this.appearanceManager
+      )
+    }
+    cancellationTokenMap[operationId] = cancelToken
+    promise.resolve(feed)
   }
 
   @ReactMethod
-  fun setLogging(value: Boolean) {
-      Log.d("InappstorySdkModule", "setLogging")
-
-    //this.ias.enableLogging = value
+  fun setVisibleWith(storyIDs: ReadableArray) {
+    Log.d("InappstorySdkModule", "setVisibleWith")
+    val stringIds: ArrayList<String> = storyIDs.toArrayList() as ArrayList<String>
+    var ids: List<Int> = stringIds.map { it.toInt() }
+    Log.d("InappstorySdkModule", "ids: $ids")
+    this.api?.storyList?.updateVisiblePreviews(ids, "feed")
   }
 
   @ReactMethod
-  fun useDeviceID() {
-      Log.d("InappstorySdkModule", "useDeviceID")
-      //TODO
+  fun selectStoryCellWith(storyID: String, feed: String) {
+    Log.d("InappstorySdkModule", "selectStoryCellWith")
+    this.api?.storyList?.openStoryReader(
+      reactContext.currentActivity,
+      feed,
+      storyID.toInt(),
+      this.appearanceManager
+    );
   }
-*/
-    @ReactMethod
-    fun showOnboardings(feed: String, limit:Int, tags: ReadableArray, promise: Promise) {
-        var tags: List<String>? = null; //FIXME
-        Log.d("InappstorySdkModule", "showOnboardings")
-        if (limit != null) {
-            this.ias?.showOnboardingStories(limit, feed, tags, reactContext.currentActivity, this.appearanceManager)
-        } else {
-            this.ias?.showOnboardingStories(feed, tags, reactContext.currentActivity, this.appearanceManager)
-        }
-        promise.resolve(feed)
-    }
 
-    @ReactMethod
-    fun setVisibleWith(storyIDs: ReadableArray) {
-        Log.d("InappstorySdkModule", "setVisibleWith")
-        val stringIds: ArrayList<String> = storyIDs.toArrayList() as ArrayList<String>
-        var ids: List<Int> = stringIds.map{it.toInt()}
-        Log.d("InappstorySdkModule", "ids: $ids")
-        this.api?.storyList?.updateVisiblePreviews(ids, "feed")
-    }
-    @ReactMethod
-    fun selectStoryCellWith(storyID: String) {
-        Log.d("InappstorySdkModule", "selectStoryCellWith")
-        this.api?.storyList?.openStoryReader(
-            reactContext.currentActivity,
-            "feed",
-            storyID.toInt(),
-            this.appearanceManager
-        );
-    }
+  fun getImageID(imgName: String): Int {
+    var id: Int = reactContext.getResources()
+      .getIdentifier(imgName, "drawable", reactContext.currentActivity?.getPackageName());
+    return id;
+  }
 
-    fun getImageID(imgName:String):Int {
-        var id: Int = reactContext.getResources().getIdentifier(imgName, "drawable", reactContext.currentActivity?.getPackageName());
-        return id;
-    }
-    @ReactMethod
-    fun setLikeImage(image: String, selectedImage: String) {
-        this.appearanceManager?.csLikeIcon(this.getImageID(image));
-    }
+  @ReactMethod
+  fun setLikeImage(image: String, selectedImage: String) {
+    this.appearanceManager?.csLikeIcon(this.getImageID(image));
+  }
 
-    @ReactMethod
-    fun setDislikeImage(image: String, selectedImage: String) {
-        this.appearanceManager?.csDislikeIcon(this.getImageID(image));
-    }
+  @ReactMethod
+  fun setDislikeImage(image: String, selectedImage: String) {
+    this.appearanceManager?.csDislikeIcon(this.getImageID(image));
+  }
 
-    @ReactMethod
-    fun setFavoriteImage(image: String, selectedImage: String) {
-        this.appearanceManager?.csFavoriteIcon(this.getImageID(image));
-    }
+  @ReactMethod
+  fun setFavoriteImage(image: String, selectedImage: String) {
+    this.appearanceManager?.csFavoriteIcon(this.getImageID(image));
+  }
 
-    @ReactMethod
-    fun setShareImage(image: String, selectedImage: String) {
-        this.appearanceManager?.csShareIcon(this.getImageID(image));
-    }
+  @ReactMethod
+  fun setShareImage(image: String, selectedImage: String) {
+    this.appearanceManager?.csShareIcon(this.getImageID(image));
+  }
 
-    @ReactMethod
-    fun setSoundImage(image: String, selectedImage: String) {
-        this.appearanceManager?.csSoundIcon(this.getImageID(image));
-    }
+  @ReactMethod
+  fun setSoundImage(image: String, selectedImage: String) {
+    this.appearanceManager?.csSoundIcon(this.getImageID(image));
+  }
 
-    @ReactMethod
-    fun setCloseReaderImage(image: String) {
-        this.appearanceManager?.csCloseIcon(this.getImageID(image));
-    }
+  @ReactMethod
+  fun setCloseReaderImage(image: String) {
+    this.appearanceManager?.csCloseIcon(this.getImageID(image));
+  }
 
-    @ReactMethod
-    fun setCloseGoodsImage(image: String) {
-        this.appearanceManager?.csCloseIcon(this.getImageID(image));
-    }
+  @ReactMethod
+  fun setCloseGoodsImage(image: String) {
+    this.appearanceManager?.csCloseIcon(this.getImageID(image));
+  }
 
-    @ReactMethod
-    fun setRefreshImage(image: String) {
-        this.appearanceManager?.csRefreshIcon(this.getImageID(image));
-    }
+  @ReactMethod
+  fun setRefreshImage(image: String) {
+    this.appearanceManager?.csRefreshIcon(this.getImageID(image));
+  }
 
-    @ReactMethod
-    fun showEditor() {
-        Log.d("IAS","openEditor")
-        //this.appearanceManager?.csHasUGC(true)
-        //UGCInAppStoryManager.init(reactContext.currentActivity as Context)
-        //UGCInAppStoryManager.openEditor(reactContext.currentActivity as Context)
-        //promise.resolve(true)
+  @ReactMethod
+  fun showEditor() {
+    Log.d("IAS", "openEditor")
+    //this.appearanceManager?.csHasUGC(true)
+    //UGCInAppStoryManager.init(reactContext.currentActivity as Context)
+    //UGCInAppStoryManager.openEditor(reactContext.currentActivity as Context)
+    //promise.resolve(true)
+  }
+
+  private fun createManager(
+    apiKey: String,
+    userID: String,
+    userIdSign: String?,
+    sandbox: Boolean,
+    sendStatistic: Boolean,
+    inAppStoryAPI: InAppStoryAPI
+  ) {
+    this.ias = inAppStoryAPI.inAppStoryManager.create(
+      apiKey,
+      userID,
+      userIdSign,
+      null,
+      null,
+      null,
+      null,
+      null,
+      false,
+      true,
+      CacheSize.MEDIUM,
+      false,
+    )
+    this.ias?.let {
+      val method = it.javaClass.getDeclaredMethod("sendStatistic", Boolean::class.java)
+      method.isAccessible = true
+      method.invoke(it, sendStatistic)
     }
-    private fun createManager(apiKey: String, userID: String, userIdSign: String?, sandbox: Boolean, sendStatistic: Boolean, inAppStoryAPI: InAppStoryAPI) {
-        this.ias = inAppStoryAPI.inAppStoryManager.create(
-            apiKey,
-            userID,
-            userIdSign,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            true,
-            null,
-            sandbox,
+  }
+
+  @ReactMethod
+  fun createSubscriberList(feed: String) {
+    Log.e(TAG, "createSubscriberList: $feed")
+    this.subscribeLists(this.api as InAppStoryAPI, feed)
+    // if (feed != "favorites") {
+    //   this.subscribeLists(this.api as InAppStoryAPI, "favorites")
+    // }
+  }
+
+  fun subscribeLists(inAppStoryAPI: InAppStoryAPI, feed: String) {
+    inAppStoryAPI.addSubscriber(object : InAppStoryAPIListSubscriber(feed) {
+      override fun updateFavoriteItemData(favorites: List<StoryFavoriteItemAPIData>) {
+
+        // Log.e(TAG, "$feed updateFavoriteItemData: $favorites")
+
+        // val storiesList = ArrayList<WritableNativeMap>()
+        // val iterator = favorites.listIterator()
+        // for (item in iterator) {
+        //   var storyData = Arguments.makeNativeMap(
+        //     mutableMapOf(
+        //       "storyID" to item.id,
+        //       //"storyData" to item.storyData,
+        //       "title" to "",
+        //       "coverImagePath" to item.imageFilePath,
+        //       "coverVideoPath" to null,
+        //       "backgroundColor" to item.backgroundColor,
+        //       "titleColor" to null,
+        //       "opened" to true,
+        //       "hasAudio" to false,
+        //       "list" to "favorites",
+        //       "feed" to "default",
+        //       "aspectRatio" to 1,
+        //       "slidesCount" to 1,
+        //       "statTitle" to "",
+        //     ) as Map<String, Any>
+        //   )
+        //   Log.e(TAG, "Item = $item")
+        //   storiesList.add(storyData)
+        // }
+
+        // val payload: WritableMap = Arguments.createMap()
+        // payload.putArray("stories", Arguments.makeNativeArray(storiesList));
+        // //   payload.putString("feed", "default")
+        // payload.putString("feed", "default")
+        // payload.putString("list", "favorites")
+        // //map.putString("key1", "Value1");
+        // sendEvent(reactContext, "storyListUpdate", payload)
+      }
+
+      override fun updateStoryData(story: StoryAPIData, sessionData: IASStoryListSessionData) {
+        val aspectRatio = sessionData.previewAspectRatio();
+        Log.e(TAG, "aspect ratio return $aspectRatio ")
+        Log.e(TAG, "updateStoryData: $story")
+        var payload = Arguments.makeNativeMap(
+          mutableMapOf(
+            "storyID" to story.id,
+            //"storyData" to item.storyData,
+            "title" to story.title,
+            "coverImagePath" to story.imageFilePath,
+            "coverVideoPath" to story.videoFilePath,
+            "backgroundColor" to story.backgroundColor,
+            "titleColor" to story.titleColor,
+            "opened" to story.opened,
+            "hasAudio" to story.hasAudio,
+            "list" to feed,
+            "feed" to story.storyData.feed,
+            "aspectRatio" to aspectRatio,
+            "slidesCount" to story.storyData.slidesCount,
+            "statTitle" to story.storyData.title,
+          ) as Map<String, Any>
         )
-        this.ias?.let {
-            val method = it.javaClass.getDeclaredMethod("sendStatistic", Boolean::class.java)
-            method.isAccessible = true
-            method.invoke(it, sendStatistic)
+        Log.e(TAG, "Item = $story")
+        sendEvent(reactContext, "storyUpdate", payload)
+      }
+
+      override fun updateStoriesData(
+        stories: List<StoryAPIData>,
+        sessionData: IASStoryListSessionData
+      ) {
+        Log.e(TAG, "$feed updateStoriesData: $stories")
+        val aspectRatio = sessionData.previewAspectRatio();
+        Log.e(TAG, "aspect ratio return $aspectRatio ")
+
+        var storiesFeed = "feed";
+        if (feed == "favorites") {
+          storiesFeed = "default"
         }
-    }
-    fun subscribeLists(inAppStoryAPI: InAppStoryAPI, feed: String) {
-        inAppStoryAPI.addSubscriber(object : InAppStoryAPIListSubscriber(feed) {
-            override fun updateFavoriteItemData(favorites: List<StoryFavoriteItemAPIData>) {
-                Log.e(TAG, "$feed updateFavoriteItemData: $favorites")
-            }
 
-            override fun updateStoryData(story: StoryAPIData, sessionData: IASStoryListSessionData) {
-                val aspectRatio = sessionData.previewAspectRatio();
-                Log.e(TAG, "aspect ratio return $aspectRatio ")
-                Log.e(TAG, "updateStoryData: $story")
-                var payload = Arguments.makeNativeMap(
-                        mutableMapOf(
-                            "storyID" to story.id,
-                            //"storyData" to item.storyData,
-                            "title" to story.title,
-                            "coverImagePath" to story.imageFilePath,
-                            "coverVideoPath" to story.videoFilePath,
-                            "backgroundColor" to story.backgroundColor,
-                            "titleColor" to story.titleColor,
-                            "opened" to story.opened,
-                            "hasAudio" to story.hasAudio,
-                            "list" to feed,
-                            "feed" to story.storyData.feed,
-                            "aspectRatio" to aspectRatio,
-                            "slidesCount" to story.storyData.slidesCount,
-                            "statTitle" to story.storyData.title,
-                        ) as Map<String, Any>)
-                    Log.e(TAG, "Item = $story")
-                sendEvent(reactContext,"storyUpdate", payload)
-            }
+        val storiesList = ArrayList<WritableNativeMap>()
+        val iterator = stories.listIterator()
+        for (item in iterator) {
+          var storyData = Arguments.makeNativeMap(
+            mutableMapOf(
+              "storyID" to item.id,
+              //"storyData" to item.storyData,
+              "title" to item.title,
+              "coverImagePath" to item.imageFilePath,
+              "coverVideoPath" to item.videoFilePath,
+              "backgroundColor" to item.backgroundColor,
+              "titleColor" to item.titleColor,
+              "opened" to item.opened,
+              "hasAudio" to item.hasAudio,
+              "list" to storiesFeed,
+              "feed" to item.storyData.feed,
+              "aspectRatio" to aspectRatio,
+              "slidesCount" to item.storyData.slidesCount,
+              "statTitle" to item.storyData.title,
+            ) as Map<String, Any>
+          )
+          Log.e(TAG, "Item = $item")
 
-            override fun updateStoriesData(stories: List<StoryAPIData>, sessionData: IASStoryListSessionData) {
-                Log.e(TAG, "$feed updateStoriesData: $stories")
-                val aspectRatio = sessionData.previewAspectRatio();
-                Log.e(TAG, "aspect ratio return $aspectRatio ")
+          storiesList.add(storyData)
+        }
 
-                var storiesFeed = sessionData.feed();
-                if (feed == "favorites") {
-                    storiesFeed = "default"
-                }
+        /* val action =
 
-                val storiesList = ArrayList<WritableNativeMap>()
-                val iterator = stories.listIterator()
-                for (item in iterator) {
-                    var storyData = Arguments.makeNativeMap(
-                        mutableMapOf(
-                            "storyID" to item.id,
-                            //"storyData" to item.storyData,
-                            "title" to item.title,
-                            "coverImagePath" to item.imageFilePath,
-                            "coverVideoPath" to item.videoFilePath,
-                            "backgroundColor" to item.backgroundColor,
-                            "titleColor" to item.titleColor,
-                            "opened" to item.opened,
-                            "hasAudio" to item.hasAudio,
-                            "list" to feed,
-                            "feed" to item.storyData.feed,
-                            "aspectRatio" to aspectRatio,
-                            "slidesCount" to item.storyData.slidesCount,
-                            "statTitle" to item.storyData.title,
-                        ) as Map<String, Any>)
-                    Log.e(TAG, "Item = $item")
+         val actionArray = Arguments.makeNativeArray(listOf(action))
 
-                    storiesList.add(storyData)
-                }
+         val arguments = Arguments.createMap().apply {
+             putString("path", "general/authentication")
+             putArray("actions",actionArray)
+         }
+         val array = Array(stories.size) { index ->
+             stories[index]
+         }*/
+        val payload: WritableMap = Arguments.createMap()
+        payload.putArray("stories", Arguments.makeNativeArray(storiesList));
+        //   payload.putString("feed", "default")
+        payload.putString("feed", feed)
+        payload.putString("list", storiesFeed)
+        //map.putString("key1", "Value1");
+        sendEvent(reactContext, "storyListUpdate $feed", payload)
+        //stories.clear()
+        //stories.addAll(stories)
+        /*Handler(Looper.getMainLooper()).post {
+            inAppStoryAPI.storyList.updateVisiblePreviews(ids, uniqueId1)
+            inAppStoryAPI.storyList.showFavoriteItem(uniqueId1)
+        }*/
+      }
 
-               /* val action =
+      override fun storyIsOpened(storyId: Int) {
+        Log.e(TAG, "$feed storyIsOpened: $storyId")
+      }
 
-                val actionArray = Arguments.makeNativeArray(listOf(action))
+      override fun readerIsClosed() {
+        Log.e(TAG, "$feed readerIsClosed")
+      }
 
-                val arguments = Arguments.createMap().apply {
-                    putString("path", "general/authentication")
-                    putArray("actions",actionArray)
-                }
-                val array = Array(stories.size) { index ->
-                    stories[index]
-                }*/
-                val payload:WritableMap = Arguments.createMap()
-                payload.putArray("stories", Arguments.makeNativeArray(storiesList));
-             //   payload.putString("feed", "default")
-                payload.putString("feed", storiesFeed)
-                payload.putString("list", feed)
-                //map.putString("key1", "Value1");
-                sendEvent(reactContext,"storyListUpdate", payload)
-                //stories.clear()
-                //stories.addAll(stories)
-                /*Handler(Looper.getMainLooper()).post {
-                    inAppStoryAPI.storyList.updateVisiblePreviews(ids, uniqueId1)
-                    inAppStoryAPI.storyList.showFavoriteItem(uniqueId1)
-                }*/
-            }
+      override fun readerIsOpened() {
+        Log.e(TAG, "$feed readerIsOpened")
+      }
+    })
+  }
 
-            override fun storyIsOpened(storyId: Int) {
-                Log.e(TAG, "$feed storyIsOpened: $storyId")
-            }
-
-            override fun readerIsClosed() {
-                Log.e(TAG, "$feed readerIsClosed")
-            }
-
-            override fun readerIsOpened() {
-                Log.e(TAG, "$feed readerIsOpened")
-            }
-        })
-    }
   fun createInAppStoryManager(
     apiKey: String,
     userId: String
   ): InAppStoryManager {
-      Log.d("InAppStoryManager", "createInAppStoryManager");
-      return InAppStoryManager.Builder()
+    Log.d("InAppStoryManager", "createInAppStoryManager");
+    return InAppStoryManager.Builder()
       .apiKey(apiKey)
       .userId(userId)
       .create()
+  }
+
+  fun getReactRootViewId(): Int {
+    val activity = getCurrentActivity() ?: return View.NO_ID
+
+    val decorView = activity.window.decorView
+    val rootView = findReactRootView(decorView)
+
+    return rootView?.parent?.let { parent ->
+      (parent as? View)?.id ?: View.NO_ID
+    } ?: View.NO_ID
+  }
+
+  private fun findReactRootView(view: View): View? {
+    if (view.javaClass.name.contains("ReactRootView")) return view
+    if (view !is ViewGroup) return null
+
+    for (i in 0 until view.childCount) {
+      findReactRootView(view.getChildAt(i))?.let { return it }
+    }
+    return null
+  }
+
+  fun addFragmentContainer(): Int {
+    val activity = getCurrentActivity() as? FragmentActivity ?: return View.NO_ID
+
+    val containerId = View.generateViewId()
+    val container = FrameLayout(activity).apply {
+      id = containerId
+      layoutParams = ViewGroup.LayoutParams(
+        ViewGroup.LayoutParams.MATCH_PARENT,
+        ViewGroup.LayoutParams.MATCH_PARENT
+      )
+    }
+
+    val decorContent = activity.findViewById<ViewGroup>(android.R.id.content)
+
+    activity.runOnUiThread {
+      decorContent.addView(container)
+    }
+
+    return containerId
+  }
+
+  fun removeFragmentContainer(containerId: Int) {
+    val activity = getCurrentActivity() as? FragmentActivity ?: return
+
+    activity.runOnUiThread {
+//      val fm = activity.supportFragmentManager
+//      val fragment = fm.findFragmentById(containerId)
+//      if (fragment != null) {
+//        fm.beginTransaction()
+//          .remove(fragment)
+//          .commitAllowingStateLoss()
+//      }
+
+      val decorContent = activity.findViewById<ViewGroup>(android.R.id.content)
+      val container = decorContent.findViewById<View>(containerId)
+      if (container != null) {
+        Log.d("InAppStoryManager", "container not null, removing");
+        decorContent.removeView(container)
+      }
+    }
   }
 }
 /*

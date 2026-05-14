@@ -16,9 +16,11 @@ export const useEvents = () => {
   const [readerOpen, setReaderOpen] = React.useState<any>(false);
   const imageCoverCache = React.useRef<any>({});
   const videoCoverCache = React.useRef<any>({});
+
   React.useEffect(() => {
     if (init) return;
     init = true;
+
     const eventEmitter = new NativeEventEmitter(
       NativeModules.RNInAppStorySDKModule
     );
