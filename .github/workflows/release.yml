@@ -41,6 +41,6 @@ jobs:
 
       # Release
       - name: Release package
-        run: npm run release -- --ci ${{ github.event.inputs.args }}
+        run: node ./node_modules/release-it/bin/release-it.js --ci ${{ github.event.inputs.args }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
