@@ -39,10 +39,6 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
 
-      # Build all packages
-      - name: Build package
-        run: npm run build
-
       # Release
       - name: Release package
         run: npm run release -- --ci ${{ github.event.inputs.args }}
