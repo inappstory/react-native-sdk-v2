@@ -190,7 +190,7 @@ export function MainScreen({
             const showed = await storyManager.showStory(
               '5663',
               abortController.signal,
-              appearanceManager,
+              appearanceManager
             );
             console.error('single show', showed);
           }}
@@ -209,9 +209,8 @@ export function MainScreen({
               {
                 feed: 'default',
                 limit: 10,
-                customTags: []
+                customTags: [],
               }
-              
             );
             if (!showed) {
               Toast.show('No more onboarding stories, switch user to test');
