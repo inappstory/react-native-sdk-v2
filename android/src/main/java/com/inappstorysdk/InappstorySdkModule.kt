@@ -63,10 +63,8 @@ import com.inappstory.sdk.inappmessage.InAppMessagePreloadSettings
 import com.inappstory.sdk.inappmessage.InAppMessageLoadCallback
 import com.inappstory.sdk.inappmessage.InAppMessageOpenSettings
 import com.inappstory.sdk.inappmessage.InAppMessageScreenActions
-import com.inappstory.sdk.inappmessage.InAppMessageData
 import com.inappstory.sdk.inappmessage.ShowInAppMessageCallback
 import com.inappstory.sdk.inappmessage.CloseInAppMessageCallback
-import com.inappstory.sdk.inappmessage.ShowInAppMessageCallback
 import androidx.fragment.app.FragmentActivity
 
 import com.facebook.react.bridge.Promise;
@@ -742,7 +740,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
       override fun showInAppMessage(iamData: InAppMessageData?) {
         var payload = Arguments.makeNativeMap(
           mutableMapOf(
-            "title" to iamData.?title(),
+            "title" to iamData.? title (),
             "event" to iamData?.event(),
             "id" to iamData?.id()
           ) as Map<String, Any>
@@ -756,25 +754,25 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
           mutableMapOf(
             "title" to iamData?.title(),
             "event" to iamData?.event(),
-            "id" to iamData?.id()
+            "id" to iamData?.id,
           ) as Map<String, Any>
         )
         sendEvent(reactContext, "closeInAppMessage", payload)
       }
     })
 
-    inAppStoryManager.setInAppMessageWidgetCallback { inAppMessageData, name, data ->
+    this.ias?.setInAppMessageWidgetCallback { inAppMessageData, name, data ->
       val iamData = Arguments.makeNativeMap(
         mutableMapOf(
           "title" to inAppMessageData?.title(),
           "event" to inAppMessageData?.event(),
-          "id" to inAppMessageData?.id()
+          "id" to inAppMessageData?.id,
         ) as Map<String, Any>
       )
       val payload = Arguments.makeNativeMap(
         "data" to data,
         "name" to name,
-        "inAppMessageData" to iamData
+        "inAppMessageData" to iamData,
       )
       sendEvent(reactContext, "inAppMessageWidgetEvent", payload)
     }
