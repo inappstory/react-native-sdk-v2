@@ -738,9 +738,9 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
       override fun showInAppMessage(iamData: InAppMessageData?) {
         var payload = Arguments.makeNativeMap(
           mutableMapOf(
-            "title" to iamData.title(),
-            "event" to iamData.event(),
-            "id" to iamData.id()
+            "title" to iamData.?title(),
+            "event" to iamData?.event(),
+            "id" to iamData?.id()
           ) as Map<String, Any>
         )
         sendEvent(reactContext, "showInAppMessage", payload)
@@ -750,9 +750,9 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
       override fun closeInAppMessage(iamData: InAppMessageData?) {
         var payload = Arguments.makeNativeMap(
           mutableMapOf(
-            "title" to iamData.title(),
-            "event" to iamData.event(),
-            "id" to iamData.id()
+            "title" to iamData?.title(),
+            "event" to iamData?.event(),
+            "id" to iamData?.id()
           ) as Map<String, Any>
         )
         sendEvent(reactContext, "closeInAppMessage", payload)
@@ -762,9 +762,9 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
     inAppStoryManager.setInAppMessageWidgetCallback { inAppMessageData, name, data ->
       val iamData = Arguments.makeNativeMap(
         mutableMapOf(
-          "title" to inAppMessageData.title(),
-          "event" to inAppMessageData.event(),
-          "id" to id
+          "title" to inAppMessageData?.title(),
+          "event" to inAppMessageData?.event(),
+          "id" to inAppMessageData?.id()
         ) as Map<String, Any>
       )
       val payload = Arguments.makeNativeMap(
