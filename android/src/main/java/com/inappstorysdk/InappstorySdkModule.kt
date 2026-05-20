@@ -63,6 +63,8 @@ import com.inappstory.sdk.inappmessage.InAppMessagePreloadSettings
 import com.inappstory.sdk.inappmessage.InAppMessageLoadCallback
 import com.inappstory.sdk.inappmessage.InAppMessageOpenSettings
 import com.inappstory.sdk.inappmessage.InAppMessageScreenActions
+import com.inappstory.sdk.inappmessage.ShowInAppMessageCallback
+import com.inappstory.sdk.inappmessage.CloseInAppMessageCallback
 import androidx.fragment.app.FragmentActivity
 
 import com.facebook.react.bridge.Promise;
@@ -734,6 +736,48 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
 
       }
     )
+    this.ias?.setShowInAppMessageCallback(object : ShowInAppMessageCallback {
+      override fun showInAppMessage(iamData: InAppMessageData?) {
+        var payload = Arguments.makeNativeMap(
+          mutableMapOf(
+            "title" to iamData?.title(),
+            "event" to iamData?.event(),
+            "id" to iamData?.id()
+          ) as Map<String, Any>
+        )
+        sendEvent(reactContext, "showInAppMessage", payload)
+      }
+    })
+    this.ias?.setCloseInAppMessageCallback(object : CloseInAppMessageCallback {
+      override fun closeInAppMessage(iamData: InAppMessageData?) {
+        var payload = Arguments.makeNativeMap(
+          mutableMapOf(
+            "title" to iamData?.title(),
+            "event" to iamData?.event(),
+            "id" to iamData?.id(),
+          ) as Map<String, Any>
+        )
+        sendEvent(reactContext, "closeInAppMessage", payload)
+      }
+    })
+
+    this.ias?.setInAppMessageWidgetCallback { inAppMessageData, name, data ->
+      val iamData = Arguments.makeNativeMap(
+        mutableMapOf(
+          "title" to inAppMessageData?.title(),
+          "event" to inAppMessageData?.event(),
+          "id" to inAppMessageData?.id(),
+        ) as Map<String, Any>
+      )
+      val payload = Arguments.makeNativeMap(
+        mutableMapOf(
+          "data" to data,
+          "name" to name,
+          "inAppMessageData" to iamData,
+        ) as Map<String, Any>
+      )
+      sendEvent(reactContext, "inAppMessageWidgetEvent", payload)
+    }
   }
 
   @ReactMethod
@@ -893,7 +937,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
 
   @ReactMethod
   fun handleHardwareBackPress(promise: Promise) {
-     Log.d("InappstorySdkModule", "handleHardwareBackPress")
+    Log.d("InappstorySdkModule", "handleHardwareBackPress")
     //promise.resolve(backPressManager.handleBackPress())
   }
 
@@ -955,7 +999,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
   fun setHasLike(value: Boolean) {
     Log.d("InappstorySdkModule", "setHasLike " + value)
     if (appearanceManager == null) {
-          Log.d("InappstorySdkModule", "setHasLike null")
+      Log.d("InappstorySdkModule", "setHasLike null")
     }
     this.appearanceManager?.csHasLike(value);
   }
@@ -1055,12 +1099,12 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
   }
 
   @ReactMethod
-  fun setCoverQuality(value:String) {
-      Log.d("InappstorySdkModule", "setCoverQuality")
-      when (value) {
-        "medium" -> appearanceManager?.csCoverQuality(QUALITY_MEDIUM)
-        "high" -> appearanceManager?.csCoverQuality(QUALITY_HIGH)
-      }
+  fun setCoverQuality(value: String) {
+    Log.d("InappstorySdkModule", "setCoverQuality")
+    when (value) {
+      "medium" -> appearanceManager?.csCoverQuality(QUALITY_MEDIUM)
+      "high" -> appearanceManager?.csCoverQuality(QUALITY_HIGH)
+    }
   }
 
 

@@ -22,8 +22,7 @@ import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { type StoriesListViewModel } from '@inappstory/react-native-sdk';
 
 import { StoryListComponent } from '../components/StoryListComponent';
-import { storyManager } from '../services/StoryService';
-import InAppStorySDK from '@inappstory/react-native-sdk';
+import { appearanceManager, storyManager } from '../services/StoryService';
 
 export function MainScreen({
   navigation,
@@ -116,14 +115,16 @@ export function MainScreen({
         >
           Reload StoriesList
         </Button>
-        {/*<Button
+        <Button
           containerStyle={styles.buttonContainer}
           style={styles.button}
           styleDisabled={styles.buttonDisabled}
-          onPress={onFeedChangePress}
+          onPress={async () => {
+            await storyManager.preloadIAM(['749', '744', '559']);
+          }}
         >
-          Change feed
-        </Button>*/}
+          preloadIAM
+        </Button>
         <Button
           containerStyle={styles.buttonContainer}
           style={styles.button}
@@ -186,9 +187,10 @@ export function MainScreen({
           styleDisabled={styles.buttonDisabled}
           onPress={async () => {
             var abortController = new AbortController();
-            const showed = await InAppStorySDK.showSingle(
+            const showed = await storyManager.showStory(
               '5663',
-              abortController.signal
+              abortController.signal,
+              appearanceManager
             );
             console.error('single show', showed);
           }}
@@ -201,11 +203,14 @@ export function MainScreen({
           styleDisabled={styles.buttonDisabled}
           onPress={async () => {
             var abortController = new AbortController();
-            const showed = await InAppStorySDK.showOnboardings(
-              'default',
-              10,
-              [],
-              abortController.signal
+            const showed = await storyManager.showOnboardingStories(
+              appearanceManager,
+              abortController.signal,
+              {
+                feed: 'default',
+                limit: 10,
+                customTags: [],
+              }
             );
             if (!showed) {
               Toast.show('No more onboarding stories, switch user to test');

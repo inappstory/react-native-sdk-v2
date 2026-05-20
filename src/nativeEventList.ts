@@ -19,6 +19,11 @@ const gameEvents = [
   'gameReaderDidClose',
   'gameComplete',
 ];
+const iamEvents = [
+  'showInAppMessage',
+  'closeInAppMessage',
+  'inAppMessageWidgetEvent',
+];
 const storyListEvents = ['storyListUpdate', 'storyUpdate', 'favoritesUpdate'];
 const goodsEvents = ['getGoodsObject'];
 const systemEvents = [
@@ -44,6 +49,7 @@ export const nativeEventList = [
   ...storiesEvents,
   ...gameEvents,
   ...storyListEvents,
+  ...iamEvents,
   ...goodsEvents,
   ...systemEvents,
 ];
