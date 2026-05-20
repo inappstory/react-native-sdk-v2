@@ -740,7 +740,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
       override fun showInAppMessage(iamData: InAppMessageData?) {
         var payload = Arguments.makeNativeMap(
           mutableMapOf(
-            "title" to iamData.? title(),
+            "title" to iamData?.title(),
             "event" to iamData?.event(),
             "id" to iamData?.id()
           ) as Map<String, Any>
@@ -770,9 +770,11 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
         ) as Map<String, Any>
       )
       val payload = Arguments.makeNativeMap(
-        "data" to data,
-        "name" to name,
-        "inAppMessageData" to iamData,
+        mutableMapOf(
+          "data" to data,
+          "name" to name,
+          "inAppMessageData" to iamData,
+        ) as Map<String, Any>
       )
       sendEvent(reactContext, "inAppMessageWidgetEvent", payload)
     }
