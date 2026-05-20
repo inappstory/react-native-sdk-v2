@@ -14,7 +14,7 @@ import { Linking, Platform } from 'react-native';
 import Toast from 'react-native-simple-toast';
 
 const apiKey =
-  'BewAAAAAAAAAAAAAABUaIThgHB0BP1FQNAZCQgVBAn8yIRY3g7XgQVkYvY_giYUG-0MTPizcaZlrbUbY9FjNevAAqg';
+  'test-key';
 const storyManagerConfig: StoryManagerConfig = {
   apiKey,
   userId: '420702',
@@ -83,6 +83,15 @@ const createStoryManager = () => {
   );
   storyManager.on('shareStoryWithPath', (payload: any) =>
     console.log('shareStoryWithPath', { payload })
+  );
+  storyManager.on('showInAppMessage', (payload: any) =>
+    console.log('showInAppMessage', { payload })
+  );
+  storyManager.on('closeInAppMessage', (payload: any) =>
+    console.log('closeInAppMessage', { payload })
+  );
+  storyManager.on('inAppMessageWidgetEvent', (payload: any) =>
+    console.log('inAppMessageWidgetEvent', { payload })
   );
 
   // btn handler
