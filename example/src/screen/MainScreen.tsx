@@ -116,14 +116,16 @@ export function MainScreen({
         >
           Reload StoriesList
         </Button>
-        {/*<Button
+        <Button
           containerStyle={styles.buttonContainer}
           style={styles.button}
           styleDisabled={styles.buttonDisabled}
-          onPress={onFeedChangePress}
+          onPress={async () => {
+            await storyManager.preloadIAM(['749', '744', '559']);
+          }}
         >
-          Change feed
-        </Button>*/}
+          preloadIAM
+        </Button>
         <Button
           containerStyle={styles.buttonContainer}
           style={styles.button}

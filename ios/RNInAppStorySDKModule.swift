@@ -32,7 +32,8 @@ class RNInAppStorySDKModule: RCTEventEmitter {
       "favoriteCellDidSelect", "editorCellDidSelect",
       "customShare", "onActionWith", "storiesDidUpdated", "goodItemSelected",
       "openStoryReader", "openStoryFavoriteReader", "clickOnFavoriteCell",
-      "shareStoryWithPath", "handleCTA",
+      "shareStoryWithPath", "handleCTA", "showInAppMessage",
+      "closeInAppMessage", "inAppMessageWidgetEvent",
     ]  // etc.
   }
   @objc private var _hasLike: Bool = true
@@ -566,18 +567,18 @@ class RNInAppStorySDKModule: RCTEventEmitter {
     //FIXME: customization of goods cell
     /*InAppStory.shared.goodsCellMainTextColor: UIColor     = .black //color of cell labels
     InAppStory.shared.goodsCellDiscountTextColor: UIColor = .red //color of discount label
-    
+
     //fonts of cell's labels
     InAppStory.shared.goodCellTitleFont: UIFont    = UIFont.systemFont(ofSize: 14.0, weight: .medium)
     InAppStory.shared.goodCellSubtitleFont: UIFont = UIFont.systemFont(ofSize: 12.0)
     InAppStory.shared.goodCellPriceFont: UIFont    = UIFont.systemFont(ofSize: 14.0, weight: .medium)
     InAppStory.shared.goodCellDiscountFont: UIFont = UIFont.systemFont(ofSize: 14.0, weight: .medium)
-    
+
     //background color of close button
     InAppStory.shared.goodsCloseBackgroundColor: UIColor  = .white
     //goods list background color
     InAppStory.shared.goodsSubstrateColor: UIColor        = .white
-    
+
     //image for refresh button
     InAppStory.shared.refreshGoodsImage: UIImage = UIImage(named: "refreshIcon")!
     //image for close button
@@ -680,6 +681,60 @@ class RNInAppStorySDKModule: RCTEventEmitter {
           "statTitle": storyData.storyData.title,
         ]
       )
+    }
+
+    InAppStory.shared.inAppMessagesEvent = { event in
+      switch event {
+      case .preloaded(let messages):
+        break
+      case .show(let iamData):
+        RNInAppStorySDKModule.emitter.sendEvent(
+          withName: "showInAppMessage",
+          body: [
+            "id": Int64(iamData.id ?? "0") ?? 0,
+            "title": nil,
+            "event": iamData.campaign,
+          ]
+        )
+        break
+      case .showSlide(let iamSlideData):
+        break
+      case .close(let iamData):
+        RNInAppStorySDKModule.emitter.sendEvent(
+          withName: "closeInAppMessage",
+          body: [
+            "id": Int64(iamData.id ?? "0") ?? 0,
+            "title": nil,
+            "event": iamData.campaign,
+          ]
+        )
+        break
+      case .clickOnButton(let iamData, let link):
+        RNInAppStorySDKModule.emitter.sendEvent(
+          withName: "handleCTA",
+          body: [
+            "url": link,
+            "action": nil,
+          ]
+        )
+        break
+      case .widgetEvent(let iamData, let name, let data):
+        RNInAppStorySDKModule.emitter.sendEvent(
+          withName: "inAppMessageWidgetEvent",
+          body: [
+            "inAppMessageData": [
+              "id": Int64(iamData.id ?? "0") ?? 0,
+              "title": nil,
+              "event": iamData.campaign,
+            ],
+            "name": name,
+            "data": data,
+          ]
+        )
+      @unknown default:
+        NSLog("WARNING: unknown inAppMessagesEvent")
+        return
+      }
     }
   }
 
