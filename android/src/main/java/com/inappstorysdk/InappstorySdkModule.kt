@@ -63,6 +63,10 @@ import com.inappstory.sdk.inappmessage.InAppMessagePreloadSettings
 import com.inappstory.sdk.inappmessage.InAppMessageLoadCallback
 import com.inappstory.sdk.inappmessage.InAppMessageOpenSettings
 import com.inappstory.sdk.inappmessage.InAppMessageScreenActions
+import com.inappstory.sdk.inappmessage.InAppMessageData
+import com.inappstory.sdk.inappmessage.ShowInAppMessageCallback
+import com.inappstory.sdk.inappmessage.CloseInAppMessageCallback
+import com.inappstory.sdk.inappmessage.ShowInAppMessageCallback
 import androidx.fragment.app.FragmentActivity
 
 import com.facebook.react.bridge.Promise;
