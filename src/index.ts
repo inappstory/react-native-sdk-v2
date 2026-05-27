@@ -11,9 +11,11 @@ import type { StyleProp } from 'react-native/Libraries/StyleSheet/StyleSheet';
 import type { ViewStyle } from 'react-native/Libraries/StyleSheet/StyleSheetTypes';
 import React from 'react';
 import { nativeEventList } from './nativeEventList';
+import BannerViewComponent from './BannerViewComponent';
 
 export {
   StoriesList,
+  BannerViewComponent,
   useStore,
   StoriesListCardTitlePosition,
   StoriesListCardViewVariant,

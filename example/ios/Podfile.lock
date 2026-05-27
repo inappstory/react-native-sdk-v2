@@ -940,7 +940,7 @@ PODS:
     - React-Core
   - react-native-safe-area-context (4.14.1):
     - React-Core
-  - react-native-sdk (0.27.0):
+  - react-native-sdk (0.27.1):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1567,7 +1567,7 @@ SPEC CHECKSUMS:
   React-Mapbuffer: 8d1f0fc6e7280a8ed6da70ece5f283ac5c8032cb
   react-native-get-random-values: d16467cf726c618e9c7a8c3c39c31faa2244bbba
   react-native-safe-area-context: 758e894ca5a9bd1868d2a9cfbca7326a2b6bf9dc
-  react-native-sdk: 80564b4ca862d9eea2a568a7d701e588a0ed296b
+  react-native-sdk: 37c09760aa848b2c9aebab54782d6f72fda2cefa
   react-native-simple-toast: 4c9cc976cb92b6e5fb555e7c57fce38b90a56d07
   react-native-video: 68f3227bfe06dc369d81af7b7f5355f20d0e5723
   React-nativeconfig: 9f223cd321823afdecf59ed00861ab2d69ee0fc1
