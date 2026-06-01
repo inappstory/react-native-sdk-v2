@@ -5,6 +5,22 @@ import UIKit
 
 class BannerView: UIView {
 
+  // On the New Architecture (Fabric) the view is created by the legacy
+  // view-manager interop and is NOT registered in the Paper UIManager's
+  // viewRegistry, so resolving it by reactTag through `addUIBlock` fails.
+  // We keep our own reactTag -> view registry to dispatch commands reliably
+  // on both architectures.
+  private final class WeakRef {
+    weak var view: BannerView?
+    init(_ view: BannerView) { self.view = view }
+  }
+  private static var registry: [Int: WeakRef] = [:]
+  private var registeredTag: Int?
+
+  static func view(forReactTag reactTag: NSNumber) -> BannerView? {
+    return registry[reactTag.intValue]?.view
+  }
+
   private var _bannersView: IASBannersView?
 
   private var bannersAppearance: IASBannersAppearance?
@@ -63,6 +79,20 @@ class BannerView: UIView {
 
   required init?(coder: NSCoder) {
     super.init(coder: coder)
+  }
+
+  override func didMoveToWindow() {
+    super.didMoveToWindow()
+    // reactTag is assigned at creation time, so it is available here.
+    guard window != nil, let tag = reactTag?.intValue else { return }
+    registeredTag = tag
+    BannerView.registry[tag] = WeakRef(self)
+  }
+
+  deinit {
+    if let tag = registeredTag {
+      BannerView.registry.removeValue(forKey: tag)
+    }
   }
 
   func updateComponent() {

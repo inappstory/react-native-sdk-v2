@@ -8,38 +8,30 @@ class BannerViewManager: RCTViewManager {
 
   override static func requiresMainQueueSetup() -> Bool { return true }
 
-  @objc func pause(_ reactTag: NSNumber) {
-    self.bridge.uiManager.addUIBlock { _, viewRegistry in
-      guard let view = viewRegistry?[reactTag] as? BannerView else { return }
-      view.pause()
+  private func withView(_ reactTag: NSNumber, _ action: @escaping (BannerView) -> Void) {
+    DispatchQueue.main.async {
+      guard let view = BannerView.view(forReactTag: reactTag) else { return }
+      action(view)
     }
+  }
+
+  @objc func pause(_ reactTag: NSNumber) {
+    withView(reactTag) { $0.pause() }
   }
 
   @objc func resume(_ reactTag: NSNumber) {
-    self.bridge.uiManager.addUIBlock { _, viewRegistry in
-      guard let view = viewRegistry?[reactTag] as? BannerView else { return }
-      view.resume()
-    }
+    withView(reactTag) { $0.resume() }
   }
 
   @objc func showNext(_ reactTag: NSNumber) {
-    self.bridge.uiManager.addUIBlock { _, viewRegistry in
-      guard let view = viewRegistry?[reactTag] as? BannerView else { return }
-      view.showNext()
-    }
+    withView(reactTag) { $0.showNext() }
   }
 
   @objc func showPrevious(_ reactTag: NSNumber) {
-    self.bridge.uiManager.addUIBlock { _, viewRegistry in
-      guard let view = viewRegistry?[reactTag] as? BannerView else { return }
-      view.showPrevious()
-    }
+    withView(reactTag) { $0.showPrevious() }
   }
 
   @objc func showBannerWith(_ reactTag: NSNumber, index: NSInteger) {
-    self.bridge.uiManager.addUIBlock { _, viewRegistry in
-      guard let view = viewRegistry?[reactTag] as? BannerView else { return }
-      view.showBannerWith(index: index)
-    }
+    withView(reactTag) { $0.showBannerWith(index: index) }
   }
 }

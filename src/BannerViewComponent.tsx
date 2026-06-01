@@ -2,7 +2,7 @@ import React, { forwardRef, useImperativeHandle, useRef } from 'react';
 import {
   type HostComponent,
   requireNativeComponent,
-  type NativeSyntheticEvent
+  type NativeSyntheticEvent,
 } from 'react-native';
 import codegenNativeCommands from 'react-native/Libraries/Utilities/codegenNativeCommands';
 
