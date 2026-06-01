@@ -2,10 +2,9 @@ import React, { forwardRef, useImperativeHandle, useRef } from 'react';
 import {
   type HostComponent,
   requireNativeComponent,
-  type NativeSyntheticEvent,
-  UIManager,
-  findNodeHandle,
+  type NativeSyntheticEvent
 } from 'react-native';
+import codegenNativeCommands from 'react-native/Libraries/Utilities/codegenNativeCommands';
 
 import { cacheNativeView, getCachedNativeView } from './GlobalsWrapper';
 
@@ -49,30 +48,60 @@ export type BannerViewRef = {
 
 export type BannerViewProps = BannerNativeViewProps;
 
-const dispatchCommand = (
-  ref: React.RefObject<any>,
-  command: string,
-  args: any[] = []
-) => {
-  const tag = findNodeHandle(ref.current);
-  if (tag == null) return;
-  const commands = UIManager.getViewManagerConfig('BannerView').Commands;
-  const commandId = commands[command];
-  if (commandId == null) return;
-  UIManager.dispatchViewManagerCommand(tag, commandId as string | number, args);
-};
+type NativeViewRef = React.ComponentRef<typeof NativeBannerView>;
+
+// Commands are dispatched by name through the renderer, which works on both
+// the legacy (Paper) and the New (Fabric) architecture. On Fabric the legacy
+// view-manager interop matches the command name to the native method and
+// prepends the reactTag for us.
+interface NativeCommands {
+  pause: (viewRef: NativeViewRef) => void;
+  resume: (viewRef: NativeViewRef) => void;
+  showNext: (viewRef: NativeViewRef) => void;
+  showPrevious: (viewRef: NativeViewRef) => void;
+  showBannerWith: (viewRef: NativeViewRef, index: number) => void;
+}
+
+const Commands = codegenNativeCommands<NativeCommands>({
+  supportedCommands: [
+    'pause',
+    'resume',
+    'showNext',
+    'showPrevious',
+    'showBannerWith',
+  ],
+});
 
 const BannerViewComponent = forwardRef<BannerViewRef, BannerViewProps>(
   (props, ref) => {
-    const nativeRef = useRef<any>(null);
+    const nativeRef = useRef<NativeViewRef>(null);
 
     useImperativeHandle(ref, () => ({
-      pause: () => dispatchCommand(nativeRef, 'pause'),
-      resume: () => dispatchCommand(nativeRef, 'resume'),
-      showNext: () => dispatchCommand(nativeRef, 'showNext'),
-      showPrevious: () => dispatchCommand(nativeRef, 'showPrevious'),
-      showBannerWith: (index: number) =>
-        dispatchCommand(nativeRef, 'showBannerWith', [index]),
+      pause: () => {
+        if (nativeRef.current) {
+          Commands.pause(nativeRef.current);
+        }
+      },
+      resume: () => {
+        if (nativeRef.current) {
+          Commands.resume(nativeRef.current);
+        }
+      },
+      showNext: () => {
+        if (nativeRef.current) {
+          Commands.showNext(nativeRef.current);
+        }
+      },
+      showPrevious: () => {
+        if (nativeRef.current) {
+          Commands.showPrevious(nativeRef.current);
+        }
+      },
+      showBannerWith: (index: number) => {
+        if (nativeRef.current) {
+          Commands.showBannerWith(nativeRef.current, index);
+        }
+      },
     }));
 
     return <NativeBannerView ref={nativeRef} {...props} />;
