@@ -1,5 +1,4 @@
 #import <Foundation/Foundation.h>
-#import <React/RCTEventEmitter.h>
 #import <React/RCTUIManager.h>
 #import <React/RCTViewManager.h>
 
@@ -14,9 +13,4 @@ RCT_EXPORT_VIEW_PROPERTY(cornerRadius, CGFloat)
 RCT_EXPORT_VIEW_PROPERTY(onScroll, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onPlaceLoaded, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onActionWith, RCTDirectEventBlock)
-RCT_EXTERN_METHOD(pause:(nonnull NSNumber *)reactTag)
-RCT_EXTERN_METHOD(resume:(nonnull NSNumber *)reactTag)
-RCT_EXTERN_METHOD(showNext:(nonnull NSNumber *)reactTag)
-RCT_EXTERN_METHOD(showPrevious:(nonnull NSNumber *)reactTag)
-RCT_EXTERN_METHOD(showBannerWith:(nonnull NSNumber *)reactTag index:(NSInteger)index)
 @end
