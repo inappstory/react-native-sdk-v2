@@ -93,6 +93,6 @@ class BannerViewComponentViewManager : SimpleViewManager<BannerViewComponent>() 
         return MapBuilder.builder<String, Any>()
             .put("onScroll", MapBuilder.of("registrationName", "onScroll"))
             .put("onPlaceLoaded", MapBuilder.of("registrationName", "onPlaceLoaded"))
-            .build()
+            .build() as MutableMap<String, Any>
     }
 }

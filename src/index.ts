@@ -761,7 +761,8 @@ export class AppearanceManager {
         cardTitlePaddingParsed.paddingBottom = parseFloat(sides.bottom);
         cardTitlePaddingParsed.paddingLeft = parseFloat(sides.left);
       } else if (cardTitlePadding && typeof cardTitlePadding === 'object') {
-        cardTitlePaddingParsed = cardTitlePadding as typeof cardTitlePaddingParsed;
+        cardTitlePaddingParsed =
+          cardTitlePadding as typeof cardTitlePaddingParsed;
       }
     } catch (e) {
       console.error(e);
