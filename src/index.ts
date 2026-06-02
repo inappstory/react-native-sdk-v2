@@ -108,6 +108,7 @@ export declare type StoryManagerConfig = {
   placeholders?: Option<Dict<string>>;
   lang?: string;
   defaultMuted?: boolean;
+  sendStatistics?: boolean;
   appVersion?: {
     version: string;
     build: number;
@@ -254,17 +255,20 @@ export class StoryManager {
     const userId = config.userId != null ? String(config.userId) : '';
     const userIdSign =
       config.userIdSign != null ? String(config.userIdSign) : null;
+    const sendStatistics =
+      config.sendStatistics != null ? config.sendStatistics : true;
     InAppStorySDK.initWith(
       config.apiKey,
       userId,
       userIdSign,
       this.sandbox,
-      this.sendStatistics
+      sendStatistics
     );
     //InAppStorySDK.setUserID(userId, userIdSign);
     this.apiKey = config.apiKey;
     this.userId = userId;
     this.userIdSign = userIdSign;
+    this.sendStatistics = sendStatistics;
     if (config.tags && config.tags.length > 0) {
       this.tags = config.tags;
       InAppStorySDK.setTags(config.tags);
