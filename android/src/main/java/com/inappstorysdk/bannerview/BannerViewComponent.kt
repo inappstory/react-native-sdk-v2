@@ -2,18 +2,17 @@ package com.inappstorysdk.bannerview
 
 
 import com.inappstory.sdk.AppearanceManager
-import com.inappstory.sdk.InAppStoryManager
 import com.inappstory.sdk.banners.BannerCarouselNavigationCallback
 import com.inappstory.sdk.banners.BannerData
 import com.inappstory.sdk.banners.BannerPlaceLoadCallback
-import com.inappstory.sdk.banners.BannerPlaceLoadSettings
-import com.inappstory.sdk.banners.BannerPlacePreloadCallback
 import com.inappstory.sdk.banners.ui.carousel.BannerCarousel
-import com.inappstory.sdk.banners.ui.carousel.DefaultBannerCarouselAppearance
 
 import android.annotation.SuppressLint
 import android.widget.LinearLayout
+import com.facebook.react.bridge.Arguments
+import com.facebook.react.bridge.WritableMap
 import com.facebook.react.uimanager.ThemedReactContext
+import com.facebook.react.uimanager.events.RCTEventEmitter
 
 @SuppressLint("ViewConstructor")
 class BannerViewComponent(context: ThemedReactContext) : LinearLayout(context) {
@@ -21,20 +20,129 @@ class BannerViewComponent(context: ThemedReactContext) : LinearLayout(context) {
 
     private val bannerCarousel: BannerCarousel = BannerCarousel(rContext)
 
+    // Props received from React. Stored as-is and turned into appearance in
+    // applyAppearanceAndLoad(), which runs once per update transaction.
+    var placeId: String? = null
+    var shouldLoop: Boolean? = null
+    var sideInset: Float? = null
+    var leadingInset: Float? = null
+    var trailingInset: Float? = null
+    var interItemSpacing: Float? = null
+    var cornerRadius: Float? = null
+
     init {
+        bannerCarousel.layoutParams = LayoutParams(
+            LayoutParams.MATCH_PARENT,
+            LayoutParams.MATCH_PARENT
+        )
         addView(bannerCarousel)
+        registerCallbacks()
     }
 
-    fun setPlaceId(placeId: String) {
-        bannerCarousel.setPlaceId(placeId)
+    // RN/Yoga lays out this view but never re-measures/lays out the native
+    // children we add, so the BannerCarousel stays 0x0 (empty banner + an
+    // autoscroll NPE because no banner views are bound). Force a measure/layout
+    // pass on every requestLayout — the standard RN fix for embedded native views.
+    private val measureAndLayout = Runnable {
+        measure(
+            MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
+            MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY)
+        )
+        layout(left, top, right, bottom)
+    }
+
+    override fun requestLayout() {
+        super.requestLayout()
+        post(measureAndLayout)
+    }
+
+    // Bridge the carousel's native callbacks to React direct events. Mirrors the
+    // iOS BannerView (onScroll / onPlaceLoaded). onActionWith is not wired yet —
+    // the Android SDK only exposes it as a global callback.
+    private fun registerCallbacks() {
+        bannerCarousel.navigationCallback(object : BannerCarouselNavigationCallback {
+            override fun onPageScrolled(
+                position: Int,
+                total: Int,
+                positionOffset: Float,
+                positionOffsetPixels: Int
+            ) {
+            }
+
+            override fun onPageSelected(position: Int, total: Int) {
+                val payload = Arguments.createMap()
+                payload.putInt("index", position)
+                emitEvent("onScroll", payload)
+            }
+        })
+
+        bannerCarousel.loadCallback(object : BannerPlaceLoadCallback() {
+            override fun bannerPlaceLoaded(
+                size: Int,
+                bannerData: MutableList<BannerData>,
+                widgetHeight: Int
+            ) {
+                val payload = Arguments.createMap()
+                payload.putInt("size", size)
+                payload.putInt("widgetHeight", widgetHeight)
+                emitEvent("onPlaceLoaded", payload)
+            }
+
+            override fun loadError() {}
+
+            override fun bannerLoaded(bannerId: Int, isFirst: Boolean) {}
+
+            override fun bannerLoadError(bannerId: Int, isFirst: Boolean) {}
+        })
+    }
+
+    // SDK callbacks may fire on a background thread (e.g. bannerPlaceLoaded from
+    // the load thread). RCTEventEmitter must be invoked on the UI thread, so
+    // marshal there — otherwise the event is silently dropped. Mirrors iOS, which
+    // wraps these callbacks in DispatchQueue.main.async.
+    private fun emitEvent(eventName: String, payload: WritableMap) {
+        post {
+            rContext.getJSModule(RCTEventEmitter::class.java)
+                .receiveEvent(id, eventName, payload)
+        }
+    }
+
+    private fun dpToPx(dp: Float?): Int? {
+        if (dp == null) return null
+        return (dp * resources.displayMetrics.density).toInt()
+    }
+
+    // Called once from the view manager's onAfterUpdateTransaction, after the
+    // whole batch of props has been written. The appearance is immutable, so we
+    // rebuild it from scratch and (re)load the banners.
+    fun applyAppearanceAndLoad() {
+        // sideInset applies to both sides; leading/trailing override per side.
+        val prevOffset = dpToPx(leadingInset ?: sideInset)
+        val nextOffset = dpToPx(trailingInset ?: sideInset)
+
+        val appearance = CustomBannerViewAppearance(
+            prevBannerOffset = prevOffset,
+            nextBannerOffset = nextOffset,
+            bannersGap = dpToPx(interItemSpacing),
+            cornerRadius = dpToPx(cornerRadius),
+            loop = shouldLoop
+        )
+
+        // Appearance must be applied before loading the banners.
+        AppearanceManager().csBannerCarouselInterface(appearance)
+
+        placeId?.let {
+            bannerCarousel.setPlaceId(it)
+            bannerCarousel.loadBanners()
+        }
     }
 
     fun pause() {
-        bannerCarousel.pause()
+        bannerCarousel.pauseAutoscroll()
     }
 
     fun resume() {
-        bannerCarousel.resume()
+        bannerCarousel.resumeAutoscroll()
     }
 
     fun showNext() {
@@ -46,6 +154,6 @@ class BannerViewComponent(context: ThemedReactContext) : LinearLayout(context) {
     }
 
     fun showBannerWith(index: Int) {
-        bannerCarousel.showBannerWith(index)
+        bannerCarousel.showByIndex(index)
     }
 }

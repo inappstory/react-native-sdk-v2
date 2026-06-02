@@ -7,6 +7,7 @@ import com.facebook.react.uimanager.ThemedReactContext
 import com.facebook.react.uimanager.annotations.ReactProp
 
 class BannerViewComponentViewManager : SimpleViewManager<BannerViewComponent>() {
+
     override fun getName(): String {
         return "BannerView"
     }
@@ -15,9 +16,47 @@ class BannerViewComponentViewManager : SimpleViewManager<BannerViewComponent>() 
         return BannerViewComponent(reactContext)
     }
 
+    // Prop setters only store values on the view. The appearance is rebuilt and
+    // applied once in onAfterUpdateTransaction, after the whole batch is set.
+
     @ReactProp(name = "placeId")
     fun setPlaceId(view: BannerViewComponent, placeId: String) {
-        view.setPlaceId(placeId)
+        view.placeId = placeId
+    }
+
+    @ReactProp(name = "shouldLoop")
+    fun setShouldLoop(view: BannerViewComponent, shouldLoop: Boolean) {
+        view.shouldLoop = shouldLoop
+    }
+
+    @ReactProp(name = "sideInset")
+    fun setSideInset(view: BannerViewComponent, sideInset: Float) {
+        view.sideInset = sideInset
+    }
+
+    @ReactProp(name = "leadingInset")
+    fun setLeadingInset(view: BannerViewComponent, leadingInset: Float) {
+        view.leadingInset = leadingInset
+    }
+
+    @ReactProp(name = "trailingInset")
+    fun setTrailingInset(view: BannerViewComponent, trailingInset: Float) {
+        view.trailingInset = trailingInset
+    }
+
+    @ReactProp(name = "interItemSpacing")
+    fun setInterItemSpacing(view: BannerViewComponent, interItemSpacing: Float) {
+        view.interItemSpacing = interItemSpacing
+    }
+
+    @ReactProp(name = "cornerRadius")
+    fun setCornerRadius(view: BannerViewComponent, cornerRadius: Float) {
+        view.cornerRadius = cornerRadius
+    }
+
+    override fun onAfterUpdateTransaction(view: BannerViewComponent) {
+        super.onAfterUpdateTransaction(view)
+        view.applyAppearanceAndLoad()
     }
 
     override fun getCommandsMap(): Map<String, Int> {
@@ -51,8 +90,9 @@ class BannerViewComponentViewManager : SimpleViewManager<BannerViewComponent>() 
     }
 
     override fun getExportedCustomDirectEventTypeConstants(): MutableMap<String, Any> {
-        return MapBuilder.of(
-            "onUpdate", MapBuilder.of("registrationName", "onUpdate")
-        )
+        return MapBuilder.builder<String, Any>()
+            .put("onScroll", MapBuilder.of("registrationName", "onScroll"))
+            .put("onPlaceLoaded", MapBuilder.of("registrationName", "onPlaceLoaded"))
+            .build()
     }
 }

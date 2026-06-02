@@ -34,6 +34,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
       "openStoryReader", "openStoryFavoriteReader", "clickOnFavoriteCell",
       "shareStoryWithPath", "handleCTA", "showInAppMessage",
       "closeInAppMessage", "inAppMessageWidgetEvent",
+      "bannerWidgetEvent",
     ]  // etc.
   }
   @objc private var _hasLike: Bool = true
@@ -681,6 +682,40 @@ class RNInAppStorySDKModule: RCTEventEmitter {
           "statTitle": storyData.storyData.title,
         ]
       )
+    }
+
+    InAppStory.shared.iasBannerEvent = { event in
+      switch event {
+      case .bannersLoaded:
+        break
+      case .preloaded:
+        break
+      case .show:
+        break
+      case .clickOnButton(_, let link):
+        RNInAppStorySDKModule.emitter.sendEvent(
+          withName: "handleCTA",
+          body: [
+            "url": link,
+            "action": "deeplink",
+          ]
+        )
+      case .widgetEvent(let bannerData, let name, let data):
+        RNInAppStorySDKModule.emitter.sendEvent(
+          withName: "bannerWidgetEvent",
+          body: [
+            "bannerData": [
+              "id": bannerData.id,
+              "bannerPlace": bannerData.placeID,
+              "payload": nil,
+            ],
+            "name": name,
+            "data": data as Any,
+          ]
+        )
+      @unknown default:
+        break
+      }
     }
 
     InAppStory.shared.inAppMessagesEvent = { event in

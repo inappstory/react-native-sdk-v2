@@ -9,6 +9,7 @@ import com.facebook.react.bridge.ReactMethod
 import android.util.Log
 import android.os.Handler;
 import android.os.Looper;
+import android.app.Application
 
 import com.inappstory.sdk.InAppStoryManager;
 import com.inappstory.sdk.AppearanceManager;
@@ -109,8 +110,8 @@ fun sendEvent(reactContext: ReactContext, eventName: String, params: WritableMap
 
 class InAppStory {
   companion object {
-    fun initSDK(context: Context) {
-      InAppStoryManager.initSDK(context)
+    fun initSDK(application: Application) {
+      InAppStoryManager.initSDK(application, false)
     }
   }
 }
@@ -138,6 +139,17 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
       feed,
       true,
       false,
+      this.ias?.getTags()
+    )
+    // Also load the favorites list so the favorites cell gets real cover
+    // images. updateFavoriteItemData only reports IDs (imageFilePath=null);
+    // covers arrive via the favorites subscriber's updateStoryData. Mirrors iOS,
+    // where the favorite stories list is loaded for the main screen too.
+    this.favoritesApi?.storyList?.load(
+      feed,
+      "favorites",
+      true,
+      true,
       this.ias?.getTags()
     )
   }
@@ -209,7 +221,10 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
     //   sendStatistics,
     //   this.favoritesApi as InAppStoryAPI
     // )
-    this.favoritesApi = this.api as InAppStoryAPI
+    // Favorites must use a SEPARATE api instance (like iOS' favoriteStoriesAPI).
+    // Sharing one api with the main feed makes the two list loads fight over the
+    // same storyList, so favorites-only covers never download.
+    this.favoritesApi = InAppStoryAPI()
     this.createManager(
       apiKey,
       userID,
@@ -778,6 +793,23 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
       )
       sendEvent(reactContext, "inAppMessageWidgetEvent", payload)
     }
+
+    this.ias?.setBannerWidgetCallback { bannerData, name, data ->
+      val payload = Arguments.makeNativeMap(
+        mutableMapOf(
+          "data" to data,
+          "name" to name,
+          "bannerData" to Arguments.makeNativeMap(
+            mutableMapOf(
+              "id" to bannerData?.id(),
+              "bannerPlace" to bannerData?.bannerPlace(),
+              "payload" to bannerData?.payload(),
+            ) as Map<String, Any>
+          )
+        ) as Map<String, Any>
+      )
+      sendEvent(reactContext, "bannerWidgetEvent", payload)
+    }
   }
 
   @ReactMethod
@@ -1287,7 +1319,9 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
   fun setVisibleWith(storyIDs: ReadableArray) {
     Log.d("InappstorySdkModule", "setVisibleWith")
     val stringIds: ArrayList<String> = storyIDs.toArrayList() as ArrayList<String>
-    var ids: List<Int> = stringIds.map { it.toInt() }
+    // Ignore non-numeric ids (e.g. the favorites cell key) so a bad entry can't
+    // crash the bridge with NumberFormatException.
+    var ids: List<Int> = stringIds.mapNotNull { it.toIntOrNull() }
     Log.d("InappstorySdkModule", "ids: $ids")
     this.api?.storyList?.updateVisiblePreviews(ids, "feed")
   }
@@ -1398,48 +1432,25 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
 
   fun subscribeLists(inAppStoryAPI: InAppStoryAPI, feed: String) {
     inAppStoryAPI.addSubscriber(object : InAppStoryAPIListSubscriber(feed) {
-      override fun updateFavoriteItemData(favorites: List<StoryFavoriteItemAPIData>) {
-
-        // Log.e(TAG, "$feed updateFavoriteItemData: $favorites")
-
-        // val storiesList = ArrayList<WritableNativeMap>()
-        // val iterator = favorites.listIterator()
-        // for (item in iterator) {
-        //   var storyData = Arguments.makeNativeMap(
-        //     mutableMapOf(
-        //       "storyID" to item.id,
-        //       //"storyData" to item.storyData,
-        //       "title" to "",
-        //       "coverImagePath" to item.imageFilePath,
-        //       "coverVideoPath" to null,
-        //       "backgroundColor" to item.backgroundColor,
-        //       "titleColor" to null,
-        //       "opened" to true,
-        //       "hasAudio" to false,
-        //       "list" to "favorites",
-        //       "feed" to "default",
-        //       "aspectRatio" to 1,
-        //       "slidesCount" to 1,
-        //       "statTitle" to "",
-        //     ) as Map<String, Any>
-        //   )
-        //   Log.e(TAG, "Item = $item")
-        //   storiesList.add(storyData)
-        // }
-
-        // val payload: WritableMap = Arguments.createMap()
-        // payload.putArray("stories", Arguments.makeNativeArray(storiesList));
-        // //   payload.putString("feed", "default")
-        // payload.putString("feed", "default")
-        // payload.putString("list", "favorites")
-        // //map.putString("key1", "Value1");
-        // sendEvent(reactContext, "storyListUpdate", payload)
+      override fun updateFavoriteItemData(favorites: MutableList<StoryFavoriteItemAPIData>) {
+        // No-op: this snapshot only carries favorite IDs (imageFilePath is null).
+        // The favorites cell (with covers) is populated from the favorites list
+        // load — updateStoriesData/updateStoryData under the "favorites" feed,
+        // same as the iOS module. Emitting here would overwrite the loaded covers
+        // with imageless entries.
       }
 
       override fun updateStoryData(story: StoryAPIData, sessionData: IASStoryListSessionData) {
         val aspectRatio = sessionData.previewAspectRatio();
         Log.e(TAG, "aspect ratio return $aspectRatio ")
         Log.e(TAG, "updateStoryData: $story")
+
+        // Feed key in JS is `feed + '_' + list`. Must match updateStoriesData
+        // and the iOS module: main feed -> feed=<feed>, list="feed";
+        // favorites -> feed="default", list="favorites".
+        val payloadFeed = if (feed == "favorites") "default" else feed
+        val payloadList = if (feed == "favorites") "favorites" else "feed"
+
         var payload = Arguments.makeNativeMap(
           mutableMapOf(
             "storyID" to story.id,
@@ -1451,8 +1462,8 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
             "titleColor" to story.titleColor,
             "opened" to story.opened,
             "hasAudio" to story.hasAudio,
-            "list" to feed,
-            "feed" to story.storyData.feed,
+            "list" to payloadList,
+            "feed" to payloadFeed,
             "aspectRatio" to aspectRatio,
             "slidesCount" to story.storyData.slidesCount,
             "statTitle" to story.storyData.title,
@@ -1463,17 +1474,18 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
       }
 
       override fun updateStoriesData(
-        stories: List<StoryAPIData>,
+        stories: MutableList<StoryAPIData>,
         sessionData: IASStoryListSessionData
       ) {
         Log.e(TAG, "$feed updateStoriesData: $stories")
         val aspectRatio = sessionData.previewAspectRatio();
         Log.e(TAG, "aspect ratio return $aspectRatio ")
 
-        var storiesFeed = "feed";
-        if (feed == "favorites") {
-          storiesFeed = "default"
-        }
+        // Feed key in JS is `feed + '_' + list`. Must match the iOS module:
+        // main feed -> feed=<feed>, list="feed"; favorites -> feed="default",
+        // list="favorites".
+        val payloadFeed = if (feed == "favorites") "default" else feed
+        val payloadList = if (feed == "favorites") "favorites" else "feed"
 
         val storiesList = ArrayList<WritableNativeMap>()
         val iterator = stories.listIterator()
@@ -1489,8 +1501,8 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
               "titleColor" to item.titleColor,
               "opened" to item.opened,
               "hasAudio" to item.hasAudio,
-              "list" to storiesFeed,
-              "feed" to item.storyData.feed,
+              "list" to payloadList,
+              "feed" to payloadFeed,
               "aspectRatio" to aspectRatio,
               "slidesCount" to item.storyData.slidesCount,
               "statTitle" to item.storyData.title,
@@ -1514,11 +1526,17 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
          }*/
         val payload: WritableMap = Arguments.createMap()
         payload.putArray("stories", Arguments.makeNativeArray(storiesList));
-        //   payload.putString("feed", "default")
-        payload.putString("feed", feed)
-        payload.putString("list", storiesFeed)
-        //map.putString("key1", "Value1");
-        sendEvent(reactContext, "storyListUpdate $feed", payload)
+        payload.putString("feed", payloadFeed)
+        payload.putString("list", payloadList)
+        sendEvent(reactContext, "storyListUpdate", payload)
+
+        // The SDK only downloads covers for previews reported as visible. For the
+        // main feed JS does this via setVisibleWith; the favorites cell never
+        // reports visibility, so mark the loaded favorites visible here to make
+        // their covers download (arriving later via updateStoryData).
+        if (feed == "favorites") {
+          inAppStoryAPI.storyList.updateVisiblePreviews(stories.map { it.id }, "favorites")
+        }
         //stories.clear()
         //stories.addAll(stories)
         /*Handler(Looper.getMainLooper()).post {

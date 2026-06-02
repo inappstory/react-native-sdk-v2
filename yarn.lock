@@ -3975,6 +3975,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/react-test-renderer@npm:^19.1.0":
+  version: 19.1.0
+  resolution: "@types/react-test-renderer@npm:19.1.0"
+  dependencies:
+    "@types/react": "*"
+  checksum: 2ef3aec0f2fd638902cda606d70c8531d66f8e8944334427986b99dcac9755ee60b700c5c3a19ac354680f9c45669e98077b84f79cac60e950bdb7d38aebffde
+  languageName: node
+  linkType: hard
+
 "@types/react@npm:^19.0.0":
   version: 19.2.15
   resolution: "@types/react@npm:19.2.15"
@@ -12050,17 +12059,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-gesture-handler@npm:~2.24.0":
-  version: 2.24.0
-  resolution: "react-native-gesture-handler@npm:2.24.0"
+"react-native-gesture-handler@npm:^2.21.0":
+  version: 2.31.2
+  resolution: "react-native-gesture-handler@npm:2.31.2"
   dependencies:
     "@egjs/hammerjs": ^2.0.17
+    "@types/react-test-renderer": ^19.1.0
     hoist-non-react-statics: ^3.3.0
     invariant: ^2.2.4
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 65abaeef68180fee2811d01d88ff50c231a91faca05279222fcaaa55349e758b68a7d6a9ac3eddfb1887f6b4c4790ac195b99989f1ad8a2a1f3f3bdff3ba0a76
+  checksum: 0caa56d14b4deadf776e48c73084a69e19e9e0e86e6c6b2bbb97cb44190cfa25806bf8aff35782410ae33e2d3d429068013602a5a011ae1c47fe52cebb7b0df8
   languageName: node
   linkType: hard
 
@@ -12101,14 +12111,14 @@ __metadata:
     react-native-device-info: ^11.1.0
     react-native-dropdown-picker: ^5.4.6
     react-native-element-dropdown: ^2.12.0
-    react-native-gesture-handler: ~2.24.0
+    react-native-gesture-handler: ^2.21.0
     react-native-get-random-values: ^1.11.0
     react-native-network-logger: ^1.16.1
-    react-native-reanimated: 3.17.5
-    react-native-safe-area-context: ^5.2.0
+    react-native-reanimated: ^3.16.0
+    react-native-safe-area-context: ^5.0.0
     react-native-screens: ~4.10.0
     react-native-select-dropdown: ^4.0.1
-    react-native-share: ^10.2.1
+    react-native-share: ^12.3.1
     react-native-simple-toast: ^3.3.1
     react-native-svg: ^15.3.0
     react-native-video: ^6.2.0
@@ -12139,9 +12149,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-reanimated@npm:3.17.5":
-  version: 3.17.5
-  resolution: "react-native-reanimated@npm:3.17.5"
+"react-native-reanimated@npm:^3.16.0":
+  version: 3.19.5
+  resolution: "react-native-reanimated@npm:3.19.5"
   dependencies:
     "@babel/plugin-transform-arrow-functions": ^7.0.0-0
     "@babel/plugin-transform-class-properties": ^7.0.0-0
@@ -12159,11 +12169,11 @@ __metadata:
     "@babel/core": ^7.0.0-0
     react: "*"
     react-native: "*"
-  checksum: fe667e4764f691b2e752eaedb7527fd8ac251637ae9e7dd9ab124abae85627839b5daea064befc5e09ca710ef673d5501ed11286eb39dfcb04f5d57b2d47e49c
+  checksum: d3e5e38c23bd0f86e19110c1e16353a3b58166cb3a13ec1b600b5bbe287d8c57ab199023231b7960fd11b5c605f2a78428d7b80f28818e74eaecde1360dec4f6
   languageName: node
   linkType: hard
 
-"react-native-safe-area-context@npm:^5.2.0":
+"react-native-safe-area-context@npm:^5.0.0":
   version: 5.8.0
   resolution: "react-native-safe-area-context@npm:5.8.0"
   peerDependencies:
@@ -12193,10 +12203,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-share@npm:^10.2.1":
-  version: 10.2.1
-  resolution: "react-native-share@npm:10.2.1"
-  checksum: 9dd4e0329b344668e04ff5421ab982e319dc3ba988d0b7990a619bd1c551beb6012623abe238a80e427f86f2bb03dd21b7afc0e957ee7348e0bd9fb39956912e
+"react-native-share@npm:^12.3.1":
+  version: 12.3.1
+  resolution: "react-native-share@npm:12.3.1"
+  checksum: 57ad39b11efd501908acd2a20cfee8989630c6aac5fbceb5adb804b5d5bc49b8ffb6a0b15301c2dea5c2d3e880376db7a8bfdd14207510d2c2b8cc25a2d1d379
   languageName: node
   linkType: hard
 

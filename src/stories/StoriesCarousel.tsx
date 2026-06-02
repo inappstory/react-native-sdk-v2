@@ -49,7 +49,10 @@ export const StoriesCarousel = ({
         .filter((i) => i.isViewable)
         .map((i) => String(i.key))
         .filter((id) => !visibleIds.current.includes(id))
-        .filter((f) => f !== 'undefined');
+        .filter((f) => f !== 'undefined')
+        // The favorites cell is not a story — never report it as a visible
+        // preview (native setVisibleWith does parseInt on the ids).
+        .filter((f) => f !== 'favorites_cell');
       newIDs.map((id) => {
         visibleIds.current.push(id);
       });
@@ -170,7 +173,9 @@ export const StoriesCarousel = ({
       // onViewableItemsChanged={onViewableItemsChanged}
       viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
       showsHorizontalScrollIndicator={false}
-      keyExtractor={(item, _index) => item.storyID}
+      keyExtractor={(item, _index) =>
+        item.favorites ? 'favorites_cell' : String(item.storyID)
+      }
       ref={flatListRef}
       onEndReached={() => {
         if (Platform.OS === 'android') flatListRef?.current?.scrollToEnd();

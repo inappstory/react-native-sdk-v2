@@ -26,6 +26,7 @@ const iamEvents = [
 ];
 const storyListEvents = ['storyListUpdate', 'storyUpdate', 'favoritesUpdate'];
 const goodsEvents = ['getGoodsObject'];
+const bannerEvents = ['bannerWidgetEvent'];
 const systemEvents = [
   'storyReaderWillShow',
   'storyReaderDidClose',
@@ -52,4 +53,5 @@ export const nativeEventList = [
   ...iamEvents,
   ...goodsEvents,
   ...systemEvents,
+  ...bannerEvents,
 ];

@@ -11,11 +11,12 @@ import type { StyleProp } from 'react-native/Libraries/StyleSheet/StyleSheet';
 import type { ViewStyle } from 'react-native/Libraries/StyleSheet/StyleSheetTypes';
 import React from 'react';
 import { nativeEventList } from './nativeEventList';
-import BannerViewComponent from './BannerViewComponent';
+export type { BannerViewRef } from './banners/BannerViewComponent';
+export { BannerCarousel } from './banners/BannerCarousel';
+export type { BannerCarouselProps } from './banners/BannerCarousel';
 
 export {
   StoriesList,
-  BannerViewComponent,
   useStore,
   StoriesListCardTitlePosition,
   StoriesListCardViewVariant,
@@ -753,12 +754,14 @@ export class AppearanceManager {
         cardTitlePaddingParsed.paddingRight = cardTitlePadding;
         cardTitlePaddingParsed.paddingBottom = cardTitlePadding;
         cardTitlePaddingParsed.paddingLeft = cardTitlePadding;
-      } else {
-        const sides = parseSides(cardTitlePadding ?? '0px');
+      } else if (typeof cardTitlePadding === 'string') {
+        const sides = parseSides(cardTitlePadding);
         cardTitlePaddingParsed.paddingTop = parseFloat(sides.top);
         cardTitlePaddingParsed.paddingRight = parseFloat(sides.right);
         cardTitlePaddingParsed.paddingBottom = parseFloat(sides.bottom);
         cardTitlePaddingParsed.paddingLeft = parseFloat(sides.left);
+      } else if (cardTitlePadding && typeof cardTitlePadding === 'object') {
+        cardTitlePaddingParsed = cardTitlePadding as typeof cardTitlePaddingParsed;
       }
     } catch (e) {
       console.error(e);

@@ -3,10 +3,12 @@ import {
   type HostComponent,
   requireNativeComponent,
   type NativeSyntheticEvent,
+  type StyleProp,
+  type ViewStyle,
 } from 'react-native';
 import codegenNativeCommands from 'react-native/Libraries/Utilities/codegenNativeCommands';
 
-import { cacheNativeView, getCachedNativeView } from './GlobalsWrapper';
+import { cacheNativeView, getCachedNativeView } from '../GlobalsWrapper';
 
 let NativeBannerView: HostComponent<BannerNativeViewProps>;
 const globalView = getCachedNativeView();
@@ -30,12 +32,11 @@ type BannerNativeViewProps = {
   trailingInset: number;
   interItemSpacing: number;
   cornerRadius: number;
-  style: object;
+  style: StyleProp<ViewStyle>;
   onScroll: (e: NativeSyntheticEvent<{ index: number }>) => void;
   onPlaceLoaded: (
     e: NativeSyntheticEvent<{ size: number; widgetHeight: number }>
   ) => void;
-  onActionWith: (e: NativeSyntheticEvent<{ url: string }>) => void;
 };
 
 export type BannerViewRef = {
@@ -46,7 +47,7 @@ export type BannerViewRef = {
   showBannerWith: (index: number) => void;
 };
 
-export type BannerViewProps = BannerNativeViewProps;
+type BannerViewProps = BannerNativeViewProps;
 
 type NativeViewRef = React.ComponentRef<typeof NativeBannerView>;
 

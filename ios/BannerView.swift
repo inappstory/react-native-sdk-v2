@@ -27,7 +27,6 @@ class BannerView: UIView {
 
   @objc var onScroll: RCTDirectEventBlock?
   @objc var onPlaceLoaded: RCTDirectEventBlock?
-  @objc var onActionWith: RCTDirectEventBlock?
 
   @objc var placeId: NSString = "default" {
     didSet {
@@ -148,16 +147,6 @@ class BannerView: UIView {
         guard let self else { return }
         if onPlaceLoaded != nil {
           onPlaceLoaded!(["size": count, "widgetHeight": listHeight])
-        }
-      }
-    }
-
-    self._bannersView?.onActionWith = { [weak self] target in
-      guard let self else { return }
-      DispatchQueue.main.async { [weak self] in
-        guard let self else { return }
-        if self.onActionWith != nil {
-          self.onActionWith!(["url": "\(target)"])
         }
       }
     }
