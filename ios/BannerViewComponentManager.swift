@@ -34,9 +34,6 @@ class BannerViewManager: RCTViewManager {
   @objc func showBannerWith(_ reactTag: NSNumber, index: NSInteger) {
     withView(reactTag) { $0.showBannerWith(index: index) }
   }
-  @objc func showBannerWith(_ reactTag: NSNumber, index: NSInteger) {
-    withView(reactTag) { $0.showBannerWith(index: index) }
-  }
 
   @objc func refresh(_ reactTag: NSNumber) {
     withView(reactTag) { $0.refresh() }
