@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { View, Platform } from 'react-native';
 import { StoryComponent } from './StoryComponent';
-import { FlatList, Pressable } from 'react-native';
+import { Pressable } from 'react-native';
 import InAppStorySDK, {
   type RenderCell,
   type RenderFavoriteCell,
@@ -12,6 +12,7 @@ import type {
   ViewabilityConfigCallbackPair,
   ViewabilityConfigCallbackPairs,
 } from '@react-native/virtualized-lists/Lists/VirtualizedList';
+import { FlatList } from 'react-native-gesture-handler';
 
 export const StoriesCarousel = ({
   feed,
