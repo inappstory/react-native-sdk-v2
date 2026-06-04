@@ -33,7 +33,7 @@ class BannerViewComponent(context: ThemedReactContext) : LinearLayout(context) {
     init {
         bannerCarousel.layoutParams = LayoutParams(
             LayoutParams.MATCH_PARENT,
-            LayoutParams.MATCH_PARENT
+            LayoutParams.WRAP_CONTENT
         )
         addView(bannerCarousel)
         registerCallbacks()
