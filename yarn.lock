@@ -2591,7 +2591,7 @@ __metadata:
   peerDependencies:
     react: "*"
     react-native: "*"
-    react-native-gesture-handler: ^2.21.2
+    react-native-gesture-handler: ^2.21.0
     react-native-video: ^6.16.0
   languageName: unknown
   linkType: soft
@@ -12076,19 +12076,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-gesture-handler@npm:^3.0.0":
-  version: 3.0.0
-  resolution: "react-native-gesture-handler@npm:3.0.0"
-  dependencies:
-    "@types/react-test-renderer": ^19.1.0
-    invariant: ^2.2.4
-  peerDependencies:
-    react: "*"
-    react-native: "*"
-  checksum: c796d981eb4522813917e3486b0bbf56629394053cc2236de0dc2af4bfc01045f638666f697dd98e7fdf786ce710d96f8479e02b31fdffdf09c114dc4b07fa6a
-  languageName: node
-  linkType: hard
-
 "react-native-get-random-values@npm:^1.11.0":
   version: 1.11.0
   resolution: "react-native-get-random-values@npm:1.11.0"
@@ -12126,7 +12113,7 @@ __metadata:
     react-native-device-info: ^11.1.0
     react-native-dropdown-picker: ^5.4.6
     react-native-element-dropdown: ^2.12.0
-    react-native-gesture-handler: ^3.0.0
+    react-native-gesture-handler: ^2.21.2
     react-native-get-random-values: ^1.11.0
     react-native-network-logger: ^1.16.1
     react-native-reanimated: ^3.16.0

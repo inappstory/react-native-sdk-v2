@@ -6,6 +6,7 @@ import com.inappstory.sdk.banners.BannerCarouselNavigationCallback
 import com.inappstory.sdk.banners.BannerData
 import com.inappstory.sdk.banners.BannerPlaceLoadCallback
 import com.inappstory.sdk.banners.ui.carousel.BannerCarousel
+import android.util.TypedValue
 
 import android.annotation.SuppressLint
 import android.widget.LinearLayout
@@ -84,7 +85,7 @@ class BannerViewComponent(context: ThemedReactContext) : LinearLayout(context) {
             ) {
                 val payload = Arguments.createMap()
                 payload.putInt("size", size)
-                payload.putInt("widgetHeight", widgetHeight)
+                payload.putInt("widgetHeight", toDp(widgetHeight).toInt())
                 emitEvent("onPlaceLoaded", payload)
             }
 
@@ -105,6 +106,12 @@ class BannerViewComponent(context: ThemedReactContext) : LinearLayout(context) {
             rContext.getJSModule(RCTEventEmitter::class.java)
                 .receiveEvent(id, eventName, payload)
         }
+    }
+
+    private fun toDp(px: Int): Float {
+        return TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_PX, px.toFloat(), resources.displayMetrics
+        ) / resources.displayMetrics.density
     }
 
     private fun dpToPx(dp: Float?): Int? {
