@@ -16,5 +16,6 @@ RCT_EXTERN_METHOD(pause:(nonnull NSNumber *)reactTag)
 RCT_EXTERN_METHOD(resume:(nonnull NSNumber *)reactTag)
 RCT_EXTERN_METHOD(showNext:(nonnull NSNumber *)reactTag)
 RCT_EXTERN_METHOD(showPrevious:(nonnull NSNumber *)reactTag)
+RCT_EXTERN_METHOD(refresh:(nonnull NSNumber *)reactTag)
 RCT_EXTERN_METHOD(showBannerWith:(nonnull NSNumber *)reactTag index:(NSInteger)index)
 @end

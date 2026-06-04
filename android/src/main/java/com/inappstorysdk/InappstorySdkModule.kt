@@ -14,6 +14,7 @@ import android.app.Application
 import com.inappstory.sdk.InAppStoryManager;
 import com.inappstory.sdk.AppearanceManager;
 
+import com.inappstory.sdk.externalapi.ExternalPlatforms
 import com.inappstory.sdk.externalapi.InAppStoryAPI;
 import com.inappstory.sdk.externalapi.StoryAPIData;
 import com.inappstory.sdk.externalapi.StoryFavoriteItemAPIData;
@@ -1269,6 +1270,12 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
     Log.d("InappstorySdkModule", "clearCache")
     this.ias?.clearCache()
   }
+  
+  @ReactMethod
+  fun setSendStatistics(sendStatistic: Boolean) {
+    Log.d("InappstorySdkModule", "setSendStatistics")
+    this.api.settings.sendStatistic(sendStatistic)
+  }
 
   /*
     @ReactMethod
@@ -1400,6 +1407,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
     sendStatistic: Boolean,
     inAppStoryAPI: InAppStoryAPI
   ) {
+    inAppStoryAPI.setExternalPlatform(ExternalPlatforms.REACT_NATIVE_SDK);
     this.ias = inAppStoryAPI.inAppStoryManager.create(
       apiKey,
       userID,
@@ -1414,11 +1422,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
       CacheSize.MEDIUM,
       false,
     )
-    this.ias?.let {
-      val method = it.javaClass.getDeclaredMethod("sendStatistic", Boolean::class.java)
-      method.isAccessible = true
-      method.invoke(it, sendStatistic)
-    }
+    inAppStoryAPI.settings.sendStatistic(sendStatistic)
   }
 
   @ReactMethod

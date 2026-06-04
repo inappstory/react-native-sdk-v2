@@ -40,6 +40,7 @@ type BannerNativeViewProps = {
 };
 
 export type BannerViewRef = {
+  refresh: () => void;
   pause: () => void;
   resume: () => void;
   showNext: () => void;
@@ -56,6 +57,7 @@ type NativeViewRef = React.ComponentRef<typeof NativeBannerView>;
 // view-manager interop matches the command name to the native method and
 // prepends the reactTag for us.
 interface NativeCommands {
+  refresh: (viewRef: NativeViewRef) => void;
   pause: (viewRef: NativeViewRef) => void;
   resume: (viewRef: NativeViewRef) => void;
   showNext: (viewRef: NativeViewRef) => void;
@@ -70,6 +72,7 @@ const Commands = codegenNativeCommands<NativeCommands>({
     'showNext',
     'showPrevious',
     'showBannerWith',
+    'refresh',
   ],
 });
 
@@ -78,6 +81,11 @@ const BannerViewComponent = forwardRef<BannerViewRef, BannerViewProps>(
     const nativeRef = useRef<NativeViewRef>(null);
 
     useImperativeHandle(ref, () => ({
+      refresh: () => {
+        if (nativeRef.current) {
+          Commands.refresh(nativeRef.current);
+        }
+      },
       pause: () => {
         if (nativeRef.current) {
           Commands.pause(nativeRef.current);

@@ -1,4 +1,4 @@
-import React, { forwardRef, useState } from 'react';
+import React, { forwardRef } from 'react';
 import { type StyleProp, type ViewStyle } from 'react-native';
 import BannerViewComponent, { type BannerViewRef } from './BannerViewComponent';
 
@@ -33,8 +33,6 @@ export const BannerCarousel = forwardRef<BannerViewRef, BannerCarouselProps>(
     },
     ref
   ) => {
-    const [widgetHeight, setWidgetHeight] = useState(height);
-
     return (
       <BannerViewComponent
         placeId={placeId}
@@ -45,12 +43,9 @@ export const BannerCarousel = forwardRef<BannerViewRef, BannerCarouselProps>(
         trailingInset={trailingInset}
         interItemSpacing={interItemSpacing}
         cornerRadius={cornerRadius}
-        style={[{ height: widgetHeight, width: '100%' }, style]}
+        style={[{ height: height, width: '100%' }, style]}
         onScroll={(e) => onScroll?.(e.nativeEvent.index)}
         onPlaceLoaded={(e) => {
-          if (e.nativeEvent.widgetHeight > 0) {
-            setWidgetHeight(e.nativeEvent.widgetHeight);
-          }
           onPlaceLoaded?.(e.nativeEvent.size, e.nativeEvent.widgetHeight);
         }}
       />

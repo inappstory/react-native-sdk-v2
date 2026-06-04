@@ -137,6 +137,10 @@ class BannerViewComponent(context: ThemedReactContext) : LinearLayout(context) {
         }
     }
 
+    fun refresh() {
+        bannerCarousel.loadBanners(true)
+    }
+    
     fun pause() {
         bannerCarousel.pauseAutoscroll()
     }

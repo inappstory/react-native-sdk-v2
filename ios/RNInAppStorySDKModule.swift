@@ -84,6 +84,8 @@ class RNInAppStorySDKModule: RCTEventEmitter {
     // the parameter is responsible for animation of the reader display when you tap on a story cell
     InAppStory.shared.presentationStyle = .zoom
 
+    InAppStoryAPI.shared.plaform = ExternalPlatforms.reactNative
+
     InAppStory.shared.sandBox = sandbox
     InAppStory.shared.isStatisticDisabled = !sendStats
     InAppStory.shared.initWith(
