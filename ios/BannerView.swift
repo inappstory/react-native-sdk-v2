@@ -201,4 +201,8 @@ class BannerView: UIView {
   @objc func showBannerWith(index: Int) {
     _bannersView?.showBannerWith(index: index)
   }
+
+  @objc func refresh() {
+    _bannersView?.refresh()
+  }
 }
