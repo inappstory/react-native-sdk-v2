@@ -85,7 +85,7 @@ class BannerViewComponent(context: ThemedReactContext) : LinearLayout(context) {
             ) {
                 val payload = Arguments.createMap()
                 payload.putInt("size", size)
-                payload.putInt("widgetHeight", toDp(widgetHeight).toInt())
+                payload.putDouble("widgetHeight", toDp(widgetHeight).toDouble())
                 emitEvent("onPlaceLoaded", payload)
             }
 

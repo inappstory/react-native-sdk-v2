@@ -1423,6 +1423,8 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
       false,
     )
     inAppStoryAPI.settings.sendStatistic(sendStatistic)
+
+    InAppStoryManager.logger = IASLoggerImpl()
   }
 
   @ReactMethod
