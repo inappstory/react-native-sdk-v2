@@ -19,7 +19,7 @@ import com.facebook.react.uimanager.events.RCTEventEmitter
 class BannerViewComponent(context: ThemedReactContext) : LinearLayout(context) {
     private var rContext: ThemedReactContext = context
 
-    private val bannerCarousel: BannerCarousel = BannerCarousel(rContext)
+    private val bannerCarousel: BannerCarousel = BannerCarousel(rContext.currentActivity ?: rContext)
 
     // Props received from React. Stored as-is and turned into appearance in
     // applyAppearanceAndLoad(), which runs once per update transaction.
