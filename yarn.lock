@@ -2583,7 +2583,7 @@ __metadata:
     react-native: 0.78.3
     react-native-builder-bob: ^0.20.0
     react-native-gesture-handler: ^2.21.2
-    react-native-video: ^6.3.0
+    react-native-video: ^6.19.2
     release-it: ^15.0.0
     turbo: ^1.10.7
     typescript: ^5.2.2
@@ -2592,7 +2592,7 @@ __metadata:
     react: "*"
     react-native: "*"
     react-native-gesture-handler: ^2.21.0
-    react-native-video: ^6.16.0
+    react-native-video: ^6.19.2
   languageName: unknown
   linkType: soft
 
@@ -12123,7 +12123,7 @@ __metadata:
     react-native-share: ^12.3.1
     react-native-simple-toast: ^3.3.1
     react-native-svg: ^15.3.0
-    react-native-video: ^6.2.0
+    react-native-video: ^6.19.2
     react-native-vision-camera: ^4.3.2
     react-native-wheel-color-picker: ^1.3.1
     rn-android-keyboard-adjust: ^2.1.2
@@ -12236,13 +12236,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-video@npm:^6.2.0, react-native-video@npm:^6.3.0":
-  version: 6.19.0
-  resolution: "react-native-video@npm:6.19.0"
+"react-native-video@npm:^6.19.2":
+  version: 6.19.2
+  resolution: "react-native-video@npm:6.19.2"
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: fd320422b57e850d907a8db2849cbd695a0d33c55ce45b603ad5b3e4133f19cac49ffad24bb87e6fc53e472f53d2d5a6799b10969347d116db204a741f5959ea
+  checksum: 6397f1db84b49d854c238a53b92f8ef44fad8bca0dbe31c270e7ba07d0ece2ed3566f3146163e54fc8327b681036cb3bf945712a65c560e52851768cfcffb366
   languageName: node
   linkType: hard
 

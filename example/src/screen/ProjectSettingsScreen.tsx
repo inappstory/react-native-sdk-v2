@@ -174,6 +174,16 @@ export function ProjectSettingsScreen({
           >
             Change user
           </Button>
+          <Button
+            containerStyle={styles.buttonContainer}
+            style={styles.button}
+            styleDisabled={styles.buttonDisabled}
+            onPress={() => {
+              storyManager.clearCache();
+            }}
+          >
+            Clear cache
+          </Button>
           <Text>Tags:</Text>
           <TextInput
             onChangeText={(value) => setTags(value.split(','))}

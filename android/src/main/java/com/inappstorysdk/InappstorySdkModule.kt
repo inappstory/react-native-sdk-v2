@@ -850,7 +850,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
     Log.d("InappstorySdkModule", "showSingle")
     try {
       var cancellationToken: CancellationToken? =
-        this.ias?.showStory(storyID, getCurrentActivity(), this.appearanceManager)
+        this.ias?.showStory(storyID, getCurrentActivity(), this.appearanceManager, null)
       cancellationTokenMap[operationId] = cancellationToken
       promise.resolve(true)
     } catch (e: Throwable) {
