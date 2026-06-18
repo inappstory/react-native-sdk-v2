@@ -13,6 +13,7 @@ import com.inappstory.sdk.CancellationToken
 import com.inappstory.sdk.InAppStoryManager
 import com.inappstory.sdk.inappmessage.InAppMessageOpenSettings
 import com.inappstory.sdk.inappmessage.InAppMessageScreenActions
+import androidx.core.view.doOnLayout 
 
 class NativeOverlayFragment(
   private val ias: InAppStoryManager?,
@@ -26,31 +27,30 @@ class NativeOverlayFragment(
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-
-    val cancellationToken = ias?.showInAppMessage(
-      settings,
-      childFragmentManager,
-      contentId,
-      object : InAppMessageScreenActions {
-        override fun readerIsOpened() {
-          Log.d("InappstorySdkModule", "IAM reader opened")
-        }
-
-        override fun readerOpenError(p0: String?) {
-          Log.d("InappstorySdkModule", "IAM reader open error: $p0")
-          onReaderIsClosed?.invoke()
-          parentFragmentManager.popBackStack()
-        }
-
-        override fun readerIsClosed() {
-          Log.d("InappstorySdkModule", "IAM reader closed")
-          onReaderIsClosed?.invoke()
-          parentFragmentManager.popBackStack()
-        }
-      }
-    )
-    onReaderIsOpen?.invoke(cancellationToken)
-  }
+    view.doOnLayout {
+        val cancellationToken = ias?.showInAppMessage(
+            settings,
+            childFragmentManager,
+            contentId,
+            object : InAppMessageScreenActions {
+                override fun readerIsOpened() {
+                    Log.d("InappstorySdkModule", "IAM reader opened")
+                }
+                override fun readerOpenError(p0: String?) {
+                    Log.d("InappstorySdkModule", "IAM reader open error: $p0")
+                    onReaderIsClosed?.invoke()
+                    parentFragmentManager.popBackStack()
+                }
+                override fun readerIsClosed() {
+                    Log.d("InappstorySdkModule", "IAM reader closed")
+                    onReaderIsClosed?.invoke()
+                    parentFragmentManager.popBackStack()
+                }
+            }
+        )
+        onReaderIsOpen?.invoke(cancellationToken)
+    }
+}
 
   override fun onCreateView(
     inflater: LayoutInflater,

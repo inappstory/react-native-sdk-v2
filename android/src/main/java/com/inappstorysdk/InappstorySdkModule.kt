@@ -887,8 +887,8 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
         .add(android.R.id.content, fragment, "overlay_fragment")
         .addToBackStack("overlay_fragment")
         .commit()
-
-      return
+        
+      promise.resolve(true)
     } catch (e: Throwable) {
       promise.reject("showIAMById error", e)
     }
