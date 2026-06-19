@@ -18,7 +18,6 @@ import androidx.core.view.doOnLayout
 class NativeOverlayFragment(
   private val ias: InAppStoryManager?,
   private val settings: InAppMessageOpenSettings,
-  //private val backPressManager: BackPressManager,
   private val onReaderIsClosed: (() -> Unit)? = null,
   private val onReaderIsOpen: ((CancellationToken?) -> Unit)? = null
 ) : Fragment() {

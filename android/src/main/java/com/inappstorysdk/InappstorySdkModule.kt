@@ -126,6 +126,10 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
   var favoritesApi: InAppStoryAPI? = null;
   var TAG: String = "IAS_SDK_API";
 
+  // Last favorites set seen via updateFavoriteItemData. Used to avoid reloading
+  // (and looping) when the SDK re-reports the same set.
+  private var lastFavoriteIds: Set<Int>? = null
+
   var stories: ArrayList<String>? = null;
   var goodsCache: ArrayList<GoodsItemData> = ArrayList<GoodsItemData>()
   private var listenerCount = 0
@@ -1439,11 +1443,16 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
   fun subscribeLists(inAppStoryAPI: InAppStoryAPI, feed: String) {
     inAppStoryAPI.addSubscriber(object : InAppStoryAPIListSubscriber(feed) {
       override fun updateFavoriteItemData(favorites: MutableList<StoryFavoriteItemAPIData>) {
-        // No-op: this snapshot only carries favorite IDs (imageFilePath is null).
-        // The favorites cell (with covers) is populated from the favorites list
-        // load — updateStoriesData/updateStoryData under the "favorites" feed,
-        // same as the iOS module. Emitting here would overwrite the loaded covers
-        // with imageless entries.
+        // Push model (like the Flutter SDK): the SDK fires this whenever the
+        // favorites set changes (e.g. toggled in the reader). The snapshot only
+        // carries ids (imageFilePath is null), so we use it as a trigger and
+        // reload the favorites list, which repopulates the cell with real covers
+        // and aspectRatio via the existing storyListUpdate/storyUpdate path.
+        // Guard on the id set so the reload's own callbacks can't loop.
+        val ids = favorites.map { it.id }.toSet()
+        if (ids == lastFavoriteIds) return
+        lastFavoriteIds = ids
+        getFavoriteStories("default")
       }
 
       override fun updateStoryData(story: StoryAPIData, sessionData: IASStoryListSessionData) {

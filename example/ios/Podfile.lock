@@ -1351,7 +1351,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - Toast (~> 4)
     - Yoga
-  - react-native-video (6.19.0):
+  - react-native-video (6.19.2):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1364,7 +1364,7 @@ PODS:
     - React-featureflags
     - React-graphics
     - React-ImageManager
-    - react-native-video/Video (= 6.19.0)
+    - react-native-video/Video (= 6.19.2)
     - React-NativeModulesApple
     - React-RCTFabric
     - React-rendererdebug
@@ -1373,7 +1373,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-video/Fabric (6.19.0):
+  - react-native-video/Fabric (6.19.2):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1394,7 +1394,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-video/Video (6.19.0):
+  - react-native-video/Video (6.19.2):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2278,7 +2278,7 @@ SPEC CHECKSUMS:
   react-native-safe-area-context: 9f222476ea9d3481726746476bde3013868cee05
   react-native-sdk: 057965c9052df306a214f637359c0a45901a1874
   react-native-simple-toast: 5e6be69d0badbd6f262cf74c63984d1e3439920f
-  react-native-video: a504577800c6acacc320cfae04afca2364120b85
+  react-native-video: e9c4584c724b46ddda7c57cdea1dedfb988ca791
   React-NativeModulesApple: c8bb2bc56d39bd122c56ef58a55c3f34d53f1585
   React-perflogger: d06f0fd0727356651a5535f6d717130187aeb667
   React-performancetimeline: 7afc2307ffc4047cef95eb711ea39a12fd90d533
