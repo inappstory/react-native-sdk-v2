@@ -382,8 +382,8 @@ export class StoryManager {
     InAppStorySDK.setSendStatistics(this.sendStatistics);
   }
 
-  async createSubscriberList(feed: string) {
-    InAppStorySDK.createSubscriberList(feed);
+  async createSubscriberList(feed: string, uniqueId?: string) {
+    InAppStorySDK.createSubscriberList(feed, uniqueId);
   }
 
   async fetchFeed(feed: string, uniqueId?: string) {

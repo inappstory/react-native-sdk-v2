@@ -1338,11 +1338,11 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
   }
 
   @ReactMethod
-  fun selectStoryCellWith(storyID: String, feed: String) {
-    Log.d("InappstorySdkModule", "selectStoryCellWith")
+  fun selectStoryCellWith(storyID: String, feed: String, uniqueId: String) {
+    Log.d("InappstorySdkModule", "selectStoryCellWith uniqueId: $uniqueId")
     this.api?.storyList?.openStoryReader(
       reactContext.currentActivity,
-      feed,
+      uniqueId,
       storyID.toInt(),
       this.appearanceManager
     );
@@ -1432,16 +1432,16 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
   }
 
   @ReactMethod
-  fun createSubscriberList(feed: String) {
-    Log.e(TAG, "createSubscriberList: $feed")
-    this.subscribeLists(this.api as InAppStoryAPI, feed)
+  fun createSubscriberList(feed: String, uniqueId: String) {
+    Log.e(TAG, "createSubscriberList: $feed, uniqueId: $uniqueId")
+    this.subscribeLists(this.api as InAppStoryAPI, feed, uniqueId)
     // if (feed != "favorites") {
     //   this.subscribeLists(this.api as InAppStoryAPI, "favorites")
     // }
   }
 
-  fun subscribeLists(inAppStoryAPI: InAppStoryAPI, feed: String) {
-    inAppStoryAPI.addSubscriber(object : InAppStoryAPIListSubscriber(feed) {
+  fun subscribeLists(inAppStoryAPI: InAppStoryAPI, feed: String, uniqueId: String = feed) {
+    inAppStoryAPI.addSubscriber(object : InAppStoryAPIListSubscriber(uniqueId) {
       override fun updateFavoriteItemData(favorites: MutableList<StoryFavoriteItemAPIData>) {
         // Push model (like the Flutter SDK): the SDK fires this whenever the
         // favorites set changes (e.g. toggled in the reader). The snapshot only

@@ -800,7 +800,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   }
 
   @objc
-  func createSubscriberList(_ feed: String) {
+  func createSubscriberList(_ feed: String, uniqueId: String) {
     // used in android
   }
 
@@ -812,7 +812,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   }
 
   @objc
-  func selectStoryCellWith(_ storyID: String, feed: String) {
+  func selectStoryCellWith(_ storyID: String, feed: String, uniqueId: String) {
     DispatchQueue.main.async {
       self.storiesAPI.selectStoryCellWith(id: storyID)
     }

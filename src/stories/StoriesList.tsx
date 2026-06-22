@@ -49,8 +49,8 @@ export const StoriesList = ({
     updateVersion;
   }, [updateVersion]);
   const createSubscriberList = React.useCallback(async () => {
-    storyManager.createSubscriberList(feed);
-  }, [feed, storyManager]);
+    storyManager.createSubscriberList(feed, uniqueId);
+  }, [feed, storyManager, uniqueId]);
   const fetchFeed = React.useCallback(async () => {
     storyManager.fetchFeed(feed, uniqueId);
   }, [feed, storyManager, uniqueId]);
@@ -111,9 +111,9 @@ export const StoriesList = ({
         time: +Date.now(),
       });
 
-      InAppStorySDK.selectStoryCellWith(String(story.storyID), feed);
+      InAppStorySDK.selectStoryCellWith(String(story.storyID), feed, uniqueId);
     },
-    [addEvent, feed]
+    [addEvent, feed, uniqueId]
   );
   const onFavoritePress = React.useCallback(
     (story, index) => {
