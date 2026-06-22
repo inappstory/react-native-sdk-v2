@@ -137,11 +137,11 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
   val cancellationTokenMap = mutableMapOf<String, CancellationToken?>()
 
   @ReactMethod
-  fun getStories(feed: String) {
-    Log.d("InappstorySdkModule", "getStories for feed: " + feed);
+  fun getStories(feed: String, uniqueId: String) {
+    Log.d("InappstorySdkModule", "getStories for feed: " + feed + ", uniqueId: " + uniqueId);
     this.api?.storyList?.load(
       feed,
-      feed,
+      uniqueId,
       true,
       false,
       this.ias?.getTags()

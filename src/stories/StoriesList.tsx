@@ -34,6 +34,7 @@ export const StoriesList = ({
   renderFavoriteCell?: RenderFavoriteCell;
   vertical?: any;
 }) => {
+  const uniqueId = React.useRef(Math.random().toString(36).slice(2)).current;
   const updateVersion = useStore((state) => state.update);
   const _feedEvents = useStore((state) => state[`feeds_${feed}_feed`]);
   const feedEvents = _feedEvents || [];
@@ -51,8 +52,8 @@ export const StoriesList = ({
     storyManager.createSubscriberList(feed);
   }, [feed, storyManager]);
   const fetchFeed = React.useCallback(async () => {
-    storyManager.fetchFeed(feed);
-  }, [feed, storyManager]);
+    storyManager.fetchFeed(feed, uniqueId);
+  }, [feed, storyManager, uniqueId]);
   const fetchFavoriteFeed = React.useCallback(async () => {
     storyManager.fetchFavorites(feed);
   }, [feed, storyManager]);

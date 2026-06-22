@@ -386,8 +386,8 @@ export class StoryManager {
     InAppStorySDK.createSubscriberList(feed);
   }
 
-  async fetchFeed(feed: string) {
-    InAppStorySDK.getStories(feed);
+  async fetchFeed(feed: string, uniqueId?: string) {
+    InAppStorySDK.getStories(feed, uniqueId);
     //if (include_favorites) {
     //InAppStorySDK.getFavoriteStories(feed);
     //}

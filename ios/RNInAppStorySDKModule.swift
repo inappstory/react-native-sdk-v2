@@ -786,7 +786,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   }
 
   @objc
-  func getStories(_ feed: String) {
+  func getStories(_ feed: String, uniqueId: String) {
     DispatchQueue.main.async {
       self.storiesAPI.setNewFeed(feed)
     }

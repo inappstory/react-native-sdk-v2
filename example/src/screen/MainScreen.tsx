@@ -44,9 +44,11 @@ export function MainScreen({
         return true;
       };
 
-      BackHandler.addEventListener('hardwareBackPress', backAction);
-      return () =>
-        BackHandler.removeEventListener('hardwareBackPress', backAction);
+      const subscription = BackHandler.addEventListener(
+        'hardwareBackPress',
+        backAction
+      );
+      return () => subscription.remove();
     }, [])
   );
 
@@ -188,11 +190,11 @@ export function MainScreen({
           onPress={async () => {
             var abortController = new AbortController();
             const showed = await storyManager.showStory(
-              '5663',
+              '1271',
               abortController.signal,
               appearanceManager
             );
-            console.error('single show', showed);
+            console.log('single show', showed);
           }}
         >
           Show single story
@@ -237,7 +239,7 @@ export function MainScreen({
           onPress={async () => {
             var abortController = new AbortController();
             const showed = await storyManager.showIAMById(
-              '749',
+              '430',
               false,
               abortController.signal
             );
