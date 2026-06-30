@@ -46,6 +46,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   @objc private var _lang: String = ""
   @objc private var _tags: [String] = [""]
   @objc private var goodsCache: [GoodObject] = []
+  private var goodsComplete: GoodsComplete?
 
   var storiesAPI = StoryListAPI()
   var favoriteStoriesAPI = StoryListAPI(isFavorite: true)
@@ -241,14 +242,8 @@ class RNInAppStorySDKModule: RCTEventEmitter {
         withName: "getGoodsObject",
         body: ["skus": skus]
       )
-      Timer.scheduledTimer(withTimeInterval: 0.25, repeats: true) { timer in
-        let goodsCount = self.goodsCache.count
-        if goodsCount > 0 {
-          timer.invalidate()
-          complete(.success(self.goodsCache))
-          self.goodsCache = []
-        }
-      }
+      self.goodsCache = []
+      self.goodsComplete = complete
     }
 
     InAppStory.shared.failureEvent = { failureEvent in
@@ -1472,6 +1467,13 @@ class RNInAppStorySDKModule: RCTEventEmitter {
       oldPrice: oldPrice
     )
     self.goodsCache.append(goodObject)
+  }
+
+  @objc
+  func commitGoods() {
+    self.goodsComplete?(.success(self.goodsCache))
+    self.goodsCache = []
+    self.goodsComplete = nil
   }
 
   @objc

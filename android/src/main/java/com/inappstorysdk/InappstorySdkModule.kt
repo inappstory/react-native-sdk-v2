@@ -132,6 +132,7 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
 
   var stories: ArrayList<String>? = null;
   var goodsCache: ArrayList<GoodsItemData> = ArrayList<GoodsItemData>()
+  private var goodsCallback: GetGoodsDataCallback? = null
   private var listenerCount = 0
 
   val cancellationTokenMap = mutableMapOf<String, CancellationToken?>()
@@ -297,19 +298,9 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
             "skus" to skus,
           ) as Map<String, Any>
         )
+        that.goodsCache.clear()
+        that.goodsCallback = callback
         sendEvent(reactContext, "getGoodsObject", payload)
-        val handler = Handler()
-        val runnableCode: Runnable = Runnable {
-          if (that.goodsCache.size > 0) {
-            callback.onSuccess(that.goodsCache)
-            that.goodsCache.clear();
-          } else {
-            handler.postDelayed(this as Runnable, 250)
-          }
-        }
-        handler.post(runnableCode)
-
-
       }
 
       override fun onItemClick(
@@ -836,6 +827,13 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
       sku
     )
     this.goodsCache.add(data)
+  }
+
+  @ReactMethod
+  fun commitGoods() {
+    this.goodsCallback?.onSuccess(this.goodsCache)
+    this.goodsCache.clear()
+    this.goodsCallback = null
   }
 
   @ReactMethod

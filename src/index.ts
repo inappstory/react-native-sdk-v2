@@ -358,6 +358,7 @@ export class StoryManager {
           good.oldPrice
         );
       });
+      InAppStorySDK.commitGoods();
     });
   }
   getGoods(callback: any) {
