@@ -831,8 +831,12 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
 
   @ReactMethod
   fun commitGoods() {
-    this.goodsCallback?.onSuccess(this.goodsCache)
-    this.goodsCache.clear()
+    val callback = this.goodsCallback
+    val cache = this.goodsCache
+    Handler(Looper.getMainLooper()).post {
+      callback?.onSuccess(cache)
+      cache.clear()
+    }
     this.goodsCallback = null
   }
 
