@@ -7,6 +7,7 @@ import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnabled
 import com.facebook.react.defaults.DefaultReactActivityDelegate
+import com.inappstory.sdk.InAppStoryManager
 
 open class InAppStoryActivity : ReactActivity() {
 
@@ -14,9 +15,10 @@ open class InAppStoryActivity : ReactActivity() {
 
     private val backCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            if (backPressManager.shouldInterceptBackPress()) return  
+            if (InAppStoryManager.getInstance()?.onBackPressed() == true) return
+            if (backPressManager.shouldInterceptBackPress()) return
             isEnabled = false
-            this@InAppStoryActivity.onBackPressed()  
+            this@InAppStoryActivity.onBackPressed()
             isEnabled = true
         }
     }
@@ -32,7 +34,6 @@ open class InAppStoryActivity : ReactActivity() {
             onBackPressedDispatcher.addCallback(this, backCallback)
         }
     }
-
 
     override fun invokeDefaultOnBackPressed() {
         backCallback.isEnabled = false

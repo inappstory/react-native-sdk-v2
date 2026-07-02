@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import com.inappstory.sdk.CancellationToken
 import com.inappstory.sdk.InAppStoryManager
@@ -48,20 +47,6 @@ class NativeOverlayFragment(
             }
         )
         onReaderIsOpen?.invoke(cancellationToken)
-       
-        requireActivity().onBackPressedDispatcher.addCallback(
-            viewLifecycleOwner,
-            object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
-                    Log.d("InappstorySdkModule", "Back press handled by NativeOverlayFragment")
-                    val handled = ias?.onBackPressed() ?: false
-                    if (!handled) {
-                        isEnabled = false
-                        parentFragmentManager.popBackStack()
-                    }
-                }
-            }
-        )
     }
   }
 
