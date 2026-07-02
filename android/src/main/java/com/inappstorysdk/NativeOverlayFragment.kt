@@ -7,13 +7,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
-import com.inappstorysdk.InAppStoryActivity
 import com.inappstory.sdk.CancellationToken
 import com.inappstory.sdk.InAppStoryManager
 import com.inappstory.sdk.inappmessage.InAppMessageOpenSettings
 import com.inappstory.sdk.inappmessage.InAppMessageScreenActions
-import androidx.core.view.doOnLayout 
+import androidx.core.view.doOnLayout
 
 class NativeOverlayFragment(
   private val ias: InAppStoryManager?,
@@ -48,30 +48,28 @@ class NativeOverlayFragment(
             }
         )
         onReaderIsOpen?.invoke(cancellationToken)
+       
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    Log.d("InappstorySdkModule", "Back press handled by NativeOverlayFragment")
+                    val handled = ias?.onBackPressed() ?: false
+                    if (!handled) {
+                        isEnabled = false
+                        parentFragmentManager.popBackStack()
+                    }
+                }
+            }
+        )
     }
-}
+  }
 
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
-
-    if (getActivity() is InAppStoryActivity) {
-        Log.d("InappstorySdkModule", "Registering back press handler in NativeOverlayFragment")
-          val fragmentActivity = (getActivity() as InAppStoryActivity)
-
-          fragmentActivity?.backPressManager?.isManagerEnabled = true
-
-          fragmentActivity?.backPressManager?.overlayHandler =
-            object : BackPressManagerHandler() {
-              override fun handleBackPress(): Boolean {
-                Log.d("InappstorySdkModule", "Back press handled by NativeOverlayFragment")
-                return ias?.onBackPressed() ?: false
-              }
-            }
-    }
-
     return FrameLayout(requireContext()).apply {
       setBackgroundColor(Color.TRANSPARENT)
       layoutParams = FrameLayout.LayoutParams(
@@ -81,15 +79,5 @@ class NativeOverlayFragment(
       id = contentId
       setOnClickListener { parentFragmentManager.popBackStack() }
     }
-  }
-
-  override fun onDestroyView() {
-     if (getActivity() is InAppStoryActivity) {
-            val fragmentActivity = (getActivity() as InAppStoryActivity)
-
-            fragmentActivity?.backPressManager?.isManagerEnabled = false
-            fragmentActivity?.backPressManager?.overlayHandler = null 
-     }
-    super.onDestroyView()
   }
 }
