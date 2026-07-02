@@ -15,8 +15,7 @@ open class InAppStoryActivity : ReactActivity() {
 
     private val backCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            if (InAppStoryManager.getInstance()?.onBackPressed() == true) return
-            if (backPressManager.shouldInterceptBackPress()) return
+            if (tryHandleOverlayBack()) return
             isEnabled = false
             this@InAppStoryActivity.onBackPressed()
             isEnabled = true
@@ -41,11 +40,18 @@ open class InAppStoryActivity : ReactActivity() {
         backCallback.isEnabled = true
     }
 
+    private fun tryHandleOverlayBack(): Boolean {
+        if (supportFragmentManager.findFragmentByTag("overlay_fragment") == null) return false
+        if (InAppStoryManager.getInstance()?.onBackPressed() != true) {
+            supportFragmentManager.popBackStack()
+        }
+        return true
+    }
+
     @Suppress("DEPRECATION")
     override fun onBackPressed() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-            if (backPressManager.shouldInterceptBackPress()) return
-        }
+        if (tryHandleOverlayBack()) return
+        if (backPressManager.shouldInterceptBackPress()) return
         super.onBackPressed()
     }
 }
