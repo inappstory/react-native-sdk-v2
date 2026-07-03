@@ -17,6 +17,7 @@ import {
   StoriesList,
   StoriesListViewModel,
 } from '@inappstory/react-native-sdk';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const Stack = createNativeStackNavigator();
 
@@ -29,11 +30,11 @@ export default function App() {
       sheetRef.current.open();
     });
   }, []);
-  const onLoadEnd = () => {};
-  const onLoadStart = () => {};
+  const onLoadEnd = () => { };
+  const onLoadStart = () => { };
   const sheetRef = React.useRef<BottomSheetMethods>({
-    open: () => {},
-    close: () => {},
+    open: () => { },
+    close: () => { },
   });
   const viewModelExporter = React.useCallback(
     (viewModel: StoriesListViewModel) =>
@@ -42,61 +43,65 @@ export default function App() {
   );
   return (
     <>
-      <NavigationContainer>
-        <Stack.Navigator
-          initialRouteName="Home"
-          screenOptions={{
-            /*animationEnabled: Platform.select({
-            ios: true,
-            android: true,
-          }),*/
-            animation: 'default',
-            presentation: 'card',
-            headerShown: true,
-            gestureEnabled: false,
-            //gestureResponseDistance: 500,
-            headerStyle: {
-              backgroundColor: '#0c62f3',
-            },
-            headerTintColor: '#fff',
-            headerTitleStyle: {
-              fontWeight: 'bold',
-            },
-          }}
-        >
-          <Stack.Screen name="Main" component={MainScreen} />
-          <Stack.Screen name="NetworkLogger" component={NetworkLogger} />
+      <GestureHandlerRootView style={{ flex: 1 }}>
 
-          <Stack.Screen name="RNWelcome" component={RNWelcome} />
-          <Stack.Screen name="SettingsScreen" component={SettingsScreen} />
-          <Stack.Screen name="EventsScreen" component={EventsScreen} />
-          <Stack.Screen name="FavoritesScreen" component={FavoritesScreen} />
-          <Stack.Screen
-            name="ProjectSettingsScreen"
-            component={ProjectSettingsScreen}
-          />
-          <Stack.Screen
-            name="AppearanceSettingsScreen"
-            component={AppearanceSettingsScreen}
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
-      <BottomSheet ref={sheetRef}>
-        <View style={{ paddingHorizontal: 10 }}>
-          {!!favoritesOpen && (
-            <StoriesList
-              feed={'default'}
-              favoritesOnly={true}
-              storyManager={storyManager}
-              appearanceManager={appearanceManager}
-              onLoadEnd={onLoadEnd}
-              onLoadStart={onLoadStart}
-              viewModelExporter={viewModelExporter}
-              vertical={false}
+
+        <NavigationContainer>
+          <Stack.Navigator
+            initialRouteName="Home"
+            screenOptions={{
+              /*animationEnabled: Platform.select({
+              ios: true,
+              android: true,
+            }),*/
+              animation: 'default',
+              presentation: 'card',
+              headerShown: true,
+              gestureEnabled: false,
+              //gestureResponseDistance: 500,
+              headerStyle: {
+                backgroundColor: '#0c62f3',
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
+          >
+            <Stack.Screen name="Main" component={MainScreen} />
+            <Stack.Screen name="NetworkLogger" component={NetworkLogger} />
+
+            <Stack.Screen name="RNWelcome" component={RNWelcome} />
+            <Stack.Screen name="SettingsScreen" component={SettingsScreen} />
+            <Stack.Screen name="EventsScreen" component={EventsScreen} />
+            <Stack.Screen name="FavoritesScreen" component={FavoritesScreen} />
+            <Stack.Screen
+              name="ProjectSettingsScreen"
+              component={ProjectSettingsScreen}
             />
-          )}
-        </View>
-      </BottomSheet>
+            <Stack.Screen
+              name="AppearanceSettingsScreen"
+              component={AppearanceSettingsScreen}
+            />
+          </Stack.Navigator>
+        </NavigationContainer>
+        <BottomSheet ref={sheetRef}>
+          <View style={{ paddingHorizontal: 10 }}>
+            {!!favoritesOpen && (
+              <StoriesList
+                feed={'default'}
+                favoritesOnly={true}
+                storyManager={storyManager}
+                appearanceManager={appearanceManager}
+                onLoadEnd={onLoadEnd}
+                onLoadStart={onLoadStart}
+                viewModelExporter={viewModelExporter}
+                vertical={false}
+              />
+            )}
+          </View>
+        </BottomSheet>
+      </GestureHandlerRootView>
     </>
   );
 }

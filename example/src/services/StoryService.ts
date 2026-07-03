@@ -13,7 +13,8 @@ import {
 import { Linking, Platform } from 'react-native';
 import Toast from 'react-native-simple-toast';
 
-const apiKey = 'BewAAAAAAAAAAAAAABUaIThgHB0BP1FQNAZCQgVBAn8yIRY3g7XgQVkYvY_giYUG-0MTPizcaZlrbUbY9FjNevAAqg';
+const apiKey =
+  'BewAAAAAAAAAAAAAABUaIThgHB0BP1FQNAZCQgVBAn8yIRY3g7XgQVkYvY_giYUG-0MTPizcaZlrbUbY9FjNevAAqg';
 const storyManagerConfig: StoryManagerConfig = {
   apiKey,
   userId: '420702',
@@ -30,6 +31,7 @@ const storyManagerConfig: StoryManagerConfig = {
     version: '1.0.0',
     build: 1,
   },
+  sendStatistics: true,
 };
 
 const createStoryManager = () => {

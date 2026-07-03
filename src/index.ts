@@ -11,6 +11,9 @@ import type { StyleProp } from 'react-native/Libraries/StyleSheet/StyleSheet';
 import type { ViewStyle } from 'react-native/Libraries/StyleSheet/StyleSheetTypes';
 import React from 'react';
 import { nativeEventList } from './nativeEventList';
+export type { BannerViewRef } from './banners/BannerViewComponent';
+export { BannerCarousel } from './banners/BannerCarousel';
+export type { BannerCarouselProps } from './banners/BannerCarousel';
 
 export {
   StoriesList,
@@ -106,6 +109,7 @@ export declare type StoryManagerConfig = {
   placeholders?: Option<Dict<string>>;
   lang?: string;
   defaultMuted?: boolean;
+  sendStatistics?: boolean;
   appVersion?: {
     version: string;
     build: number;
@@ -252,17 +256,20 @@ export class StoryManager {
     const userId = config.userId != null ? String(config.userId) : '';
     const userIdSign =
       config.userIdSign != null ? String(config.userIdSign) : null;
+    const sendStatistics =
+      config.sendStatistics != null ? config.sendStatistics : true;
     InAppStorySDK.initWith(
       config.apiKey,
       userId,
       userIdSign,
       this.sandbox,
-      this.sendStatistics
+      sendStatistics
     );
     //InAppStorySDK.setUserID(userId, userIdSign);
     this.apiKey = config.apiKey;
     this.userId = userId;
     this.userIdSign = userIdSign;
+    this.sendStatistics = sendStatistics;
     if (config.tags && config.tags.length > 0) {
       this.tags = config.tags;
       InAppStorySDK.setTags(config.tags);
@@ -351,6 +358,7 @@ export class StoryManager {
           good.oldPrice
         );
       });
+      InAppStorySDK.commitGoods();
     });
   }
   getGoods(callback: any) {
@@ -375,12 +383,12 @@ export class StoryManager {
     InAppStorySDK.setSendStatistics(this.sendStatistics);
   }
 
-  async createSubscriberList(feed: string) {
-    InAppStorySDK.createSubscriberList(feed);
+  async createSubscriberList(feed: string, uniqueId?: string) {
+    InAppStorySDK.createSubscriberList(feed, uniqueId);
   }
 
-  async fetchFeed(feed: string) {
-    InAppStorySDK.getStories(feed);
+  async fetchFeed(feed: string, uniqueId?: string) {
+    InAppStorySDK.getStories(feed, uniqueId);
     //if (include_favorites) {
     //InAppStorySDK.getFavoriteStories(feed);
     //}
@@ -592,6 +600,18 @@ export class StoryManager {
     });
   }
 
+  preloadBannerPlace(placeId: string, tags?: string[]): Promise<Boolean> {
+    return new Promise((resolve, reject) => {
+      InAppStorySDK.preloadBannerPlace(placeId, tags).then((success) => {
+        if (success) {
+          resolve(success);
+        } else {
+          reject(false);
+        }
+      });
+    });
+  }
+
   clearCache() {
     return InAppStorySDK.clearCache();
   }
@@ -747,12 +767,15 @@ export class AppearanceManager {
         cardTitlePaddingParsed.paddingRight = cardTitlePadding;
         cardTitlePaddingParsed.paddingBottom = cardTitlePadding;
         cardTitlePaddingParsed.paddingLeft = cardTitlePadding;
-      } else {
-        const sides = parseSides(cardTitlePadding ?? '0px');
+      } else if (typeof cardTitlePadding === 'string') {
+        const sides = parseSides(cardTitlePadding);
         cardTitlePaddingParsed.paddingTop = parseFloat(sides.top);
         cardTitlePaddingParsed.paddingRight = parseFloat(sides.right);
         cardTitlePaddingParsed.paddingBottom = parseFloat(sides.bottom);
         cardTitlePaddingParsed.paddingLeft = parseFloat(sides.left);
+      } else if (cardTitlePadding && typeof cardTitlePadding === 'object') {
+        cardTitlePaddingParsed =
+          cardTitlePadding as typeof cardTitlePaddingParsed;
       }
     } catch (e) {
       console.error(e);
