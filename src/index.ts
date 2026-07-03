@@ -15,13 +15,7 @@ export type { BannerViewRef } from './banners/BannerViewComponent';
 export { BannerCarousel } from './banners/BannerCarousel';
 export type { BannerCarouselProps } from './banners/BannerCarousel';
 
-export {
-  StoriesList,
-  useStore,
-  StoriesListCardTitlePosition,
-  StoriesListCardViewVariant,
-  StoriesListCardTitleTextAlign,
-};
+export { StoriesList, useStore };
 export declare type StoriesListClickEvent = {
   id: number;
   index: number;
@@ -116,18 +110,18 @@ export declare type StoryManagerConfig = {
   };
 };
 
-enum StoriesListCardTitlePosition {
+export enum StoriesListCardTitlePosition {
   CARD_INSIDE_BOTTOM = 'cardInsideBottom',
   CARD_OUTSIDE_TOP = 'cardOutsideTop',
   CARD_OUTSIDE_BOTTOM = 'cardOutsideBottom',
 }
 
-enum StoriesListCardViewVariant {
+export enum StoriesListCardViewVariant {
   CIRCLE = 'circle',
   QUAD = 'quad',
   RECTANGLE = 'rectangle',
 }
-enum StoriesListCardTitleTextAlign {
+export enum StoriesListCardTitleTextAlign {
   LEFT = 'left',
   CENTER = 'center',
   RIGHT = 'right',
