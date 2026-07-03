@@ -10,7 +10,6 @@ export const useEvents = () => {
   const addEvent = useStore((state) => state.addEvent);
   const addToFeed = useStore((state) => state.addToFeed);
   const replaceInFeed = useStore((state) => state.replaceInFeed);
-  const setFavorite = useStore((state) => state.setFavorite);
   const clearFeed = useStore((state) => state.clearFeed);
 
   const [readerOpen, setReaderOpen] = React.useState<any>(false);
@@ -38,11 +37,8 @@ export const useEvents = () => {
           if (eventName == 'favoriteCellDidSelect') {
             //onFavoriteCell();
           }
-          if (eventName == 'favoriteStory') {
-            setFavorite(event.storyID, event.favorite);
-            if (!event.favorite) {
-              InAppStorySDK.getFavoriteStories('default');
-            }
+          if (eventName == 'favoritesUpdate') {
+            InAppStorySDK.getFavoriteStories('default');
           }
           if (eventName == 'storyListUpdate') {
             const feedName = event.feed + '_' + event.list;

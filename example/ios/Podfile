@@ -37,6 +37,20 @@ target 'InappstorySdkExample' do
       :mac_catalyst_enabled => false,
       #:ccache_enabled => true
     )
+    # fmt 11.0.2 re-enables consteval on Xcode 16+/iOS 26 SDK Apple clang, breaking
+    # format.cc & Folly. fmt already special-cases broken Apple clang but caps it at
+    # __apple_build_version__ < 14000029L; drop the cap so all Apple clang uses the
+    # constexpr fallback (FMT_USE_CONSTEVAL 0). base.h redefines the macro
+    # unconditionally, so a -D define can't win — patch the header instead.
+    fmt_base = File.join(__dir__, 'Pods/fmt/include/fmt/base.h')
+    if File.exist?(fmt_base)
+      text = File.read(fmt_base)
+      patched = text.sub(
+        "#elif defined(__apple_build_version__) && __apple_build_version__ < 14000029L",
+        "#elif defined(__apple_build_version__)"
+      )
+      File.write(fmt_base, patched) if patched != text
+    end
     #installer.pods_project.targets.each do |target|
     #  target.build_configurations.each do |config|
     #      config.build_settings['ONLY_ACTIVE_ARCH'] = 'YES'

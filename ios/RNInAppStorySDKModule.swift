@@ -34,6 +34,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
       "openStoryReader", "openStoryFavoriteReader", "clickOnFavoriteCell",
       "shareStoryWithPath", "handleCTA", "showInAppMessage",
       "closeInAppMessage", "inAppMessageWidgetEvent",
+      "bannerWidgetEvent",
     ]  // etc.
   }
   @objc private var _hasLike: Bool = true
@@ -45,6 +46,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   @objc private var _lang: String = ""
   @objc private var _tags: [String] = [""]
   @objc private var goodsCache: [GoodObject] = []
+  private var goodsComplete: GoodsComplete?
 
   var storiesAPI = StoryListAPI()
   var favoriteStoriesAPI = StoryListAPI(isFavorite: true)
@@ -82,6 +84,8 @@ class RNInAppStorySDKModule: RCTEventEmitter {
     )
     // the parameter is responsible for animation of the reader display when you tap on a story cell
     InAppStory.shared.presentationStyle = .zoom
+
+    InAppStoryAPI.shared.plaform = ExternalPlatforms.reactNative
 
     InAppStory.shared.sandBox = sandbox
     InAppStory.shared.isStatisticDisabled = !sendStats
@@ -238,14 +242,8 @@ class RNInAppStorySDKModule: RCTEventEmitter {
         withName: "getGoodsObject",
         body: ["skus": skus]
       )
-      Timer.scheduledTimer(withTimeInterval: 0.25, repeats: true) { timer in
-        let goodsCount = self.goodsCache.count
-        if goodsCount > 0 {
-          timer.invalidate()
-          complete(.success(self.goodsCache))
-          self.goodsCache = []
-        }
-      }
+      self.goodsCache = []
+      self.goodsComplete = complete
     }
 
     InAppStory.shared.failureEvent = { failureEvent in
@@ -683,6 +681,40 @@ class RNInAppStorySDKModule: RCTEventEmitter {
       )
     }
 
+    InAppStory.shared.iasBannerEvent = { event in
+      switch event {
+      case .bannersLoaded:
+        break
+      case .preloaded:
+        break
+      case .show:
+        break
+      case .clickOnButton(_, let link):
+        RNInAppStorySDKModule.emitter.sendEvent(
+          withName: "handleCTA",
+          body: [
+            "url": link,
+            "action": "deeplink",
+          ]
+        )
+      case .widgetEvent(let bannerData, let name, let data):
+        RNInAppStorySDKModule.emitter.sendEvent(
+          withName: "bannerWidgetEvent",
+          body: [
+            "bannerData": [
+              "id": bannerData.id,
+              "bannerPlace": bannerData.placeID,
+              "payload": nil,
+            ],
+            "name": name,
+            "data": data as Any,
+          ]
+        )
+      @unknown default:
+        break
+      }
+    }
+
     InAppStory.shared.inAppMessagesEvent = { event in
       switch event {
       case .preloaded(let messages):
@@ -749,7 +781,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   }
 
   @objc
-  func getStories(_ feed: String) {
+  func getStories(_ feed: String, uniqueId: String) {
     DispatchQueue.main.async {
       self.storiesAPI.setNewFeed(feed)
     }
@@ -763,7 +795,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   }
 
   @objc
-  func createSubscriberList(_ feed: String) {
+  func createSubscriberList(_ feed: String, uniqueId: String) {
     // used in android
   }
 
@@ -775,7 +807,7 @@ class RNInAppStorySDKModule: RCTEventEmitter {
   }
 
   @objc
-  func selectStoryCellWith(_ storyID: String, feed: String) {
+  func selectStoryCellWith(_ storyID: String, feed: String, uniqueId: String) {
     DispatchQueue.main.async {
       self.storiesAPI.selectStoryCellWith(id: storyID)
     }
@@ -1182,6 +1214,24 @@ class RNInAppStorySDKModule: RCTEventEmitter {
       }
     }
   }
+  @objc
+  func preloadBannerPlace(
+    _ placeId: String,
+    tags: [String]?,
+    resolver resolve: @escaping RCTPromiseResolveBlock,
+    rejecter reject: @escaping RCTPromiseRejectBlock
+  ) {
+    DispatchQueue.main.async {
+      InAppStory.shared.preloadBanners(placeID: placeId) { result in
+        switch result {
+        case .success:
+          resolve(true)
+        case .failure:
+          resolve(false)
+        }
+      }
+    }
+  }
   // MARK: - ReaderStyle
   @objc
   func setTimerGradientEnable(_ value: Bool) {
@@ -1435,6 +1485,13 @@ class RNInAppStorySDKModule: RCTEventEmitter {
       oldPrice: oldPrice
     )
     self.goodsCache.append(goodObject)
+  }
+
+  @objc
+  func commitGoods() {
+    self.goodsComplete?(.success(self.goodsCache))
+    self.goodsCache = []
+    self.goodsComplete = nil
   }
 
   @objc

@@ -12,8 +12,8 @@
 
 RCT_EXTERN_METHOD(initWith:(NSString *)apiKey userID:(NSString *)userID userIdSign:(nullable NSString *)userIdSign sandbox:(BOOL *)sandbox sendStats:(BOOL *)sendStats)
 
-RCT_EXTERN_METHOD(getStories:(NSString *)feed)
-RCT_EXTERN_METHOD(createSubscriberList:(NSString *)feed)
+RCT_EXTERN_METHOD(getStories:(NSString *)feed uniqueId:(NSString *)uniqueId)
+RCT_EXTERN_METHOD(createSubscriberList:(NSString *)feed uniqueId:(NSString *)uniqueId)
 RCT_EXTERN_METHOD(getFavoriteStories:(NSString *)feed)
 RCT_EXTERN_METHOD(getCellRatio:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 
@@ -26,6 +26,7 @@ RCT_EXTERN_METHOD(showSingle:(NSString *)storyID operationId:(NSString *)operati
 RCT_EXTERN_METHOD(showIAMById:(NSString *)iamID onlyPreloaded:(BOOL *)onlyPreloaded operationId:(NSString *)operationId  resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(showIAMByEvent:(NSString *)iamEvent onlyPreloaded:(BOOL *)onlyPreloaded operationId:(NSString *)operationId  resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(preloadIAM:(nullable NSArray<NSString *> *)ids tags:(nullable NSArray<NSString *> *)tags resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(preloadBannerPlace:(NSString *)placeId tags:(nullable NSArray<NSString *> *)tags resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(showEditor:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 
 RCT_EXTERN_METHOD(cancelOperation:(NSString *)operationId)
@@ -35,7 +36,7 @@ RCT_EXTERN_METHOD(removeAllFavorites)
 RCT_EXTERN_METHOD(selectFavoriteStoryCellWith:(NSString *)storyID)
 RCT_EXTERN_METHOD(onFavoriteCell)
 
-RCT_EXTERN_METHOD(selectStoryCellWith:(NSString *)storyID feed:(NSString *)feed)
+RCT_EXTERN_METHOD(selectStoryCellWith:(NSString *)storyID feed:(NSString *)feed uniqueId:(NSString *)uniqueId)
 RCT_EXTERN_METHOD(setVisibleWith:(NSArray<NSString *> *)storyIDs)
 
 RCT_EXTERN_METHOD(setTags:(NSArray<NSString *> *)tags)
@@ -105,6 +106,8 @@ RCT_EXTERN_METHOD(setRefreshGoodsImage:(NSString *)image)
 RCT_EXTERN_METHOD(setGoodsCloseImage:(NSString *)image)
 
 RCT_EXTERN_METHOD(addProductToCache:(NSString *)sku title:(NSString *)title subtitle:(NSString *)subtitle imageURL:(NSString *)imageURL price:(NSString *)price oldPrice:(NSString *)oldPrice)
+
+RCT_EXTERN_METHOD(commitGoods)
 
 RCT_EXTERN_METHOD(setLogging:(BOOL *)value)
 RCT_EXTERN_METHOD(useDeviceID:(BOOL *)value)
