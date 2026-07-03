@@ -26,6 +26,7 @@ RCT_EXTERN_METHOD(showSingle:(NSString *)storyID operationId:(NSString *)operati
 RCT_EXTERN_METHOD(showIAMById:(NSString *)iamID onlyPreloaded:(BOOL *)onlyPreloaded operationId:(NSString *)operationId  resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(showIAMByEvent:(NSString *)iamEvent onlyPreloaded:(BOOL *)onlyPreloaded operationId:(NSString *)operationId  resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(preloadIAM:(nullable NSArray<NSString *> *)ids tags:(nullable NSArray<NSString *> *)tags resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(preloadBannerPlace:(NSString *)placeId tags:(nullable NSArray<NSString *> *)tags resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(showEditor:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 
 RCT_EXTERN_METHOD(cancelOperation:(NSString *)operationId)

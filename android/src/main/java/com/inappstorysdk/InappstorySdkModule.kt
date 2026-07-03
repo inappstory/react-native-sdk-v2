@@ -17,6 +17,9 @@ import com.inappstory.sdk.AppearanceManager;
 import com.inappstory.sdk.externalapi.ExternalPlatforms
 import com.inappstory.sdk.externalapi.InAppStoryAPI;
 import com.inappstory.sdk.externalapi.StoryAPIData;
+import com.inappstory.sdk.banners.BannerPlacePreloadCallback
+import com.inappstory.sdk.banners.BannerPlaceLoadSettings
+import com.inappstory.sdk.banners.BannerData
 import com.inappstory.sdk.externalapi.StoryFavoriteItemAPIData;
 import com.inappstory.sdk.externalapi.subscribers.InAppStoryAPIListSubscriber;
 import com.inappstory.sdk.externalapi.storylist.IASStoryListSessionData;
@@ -874,7 +877,6 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
       val fragment = NativeOverlayFragment(
         ias = this.ias,
         settings = settings,
-        //backPressManager = this.backPressManager,
         onReaderIsClosed = {
           Log.d("InappstorySdkModule", "IAM reader closed")
           if (cancellationTokenMap.containsKey(operationId)) {
@@ -914,7 +916,6 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
       val fragment = NativeOverlayFragment(
         ias = this.ias,
         settings = settings,
-        //backPressManager = this.backPressManager,
         onReaderIsClosed = {
           Log.d("InappstorySdkModule", "IAM reader closed")
           if (cancellationTokenMap.containsKey(operationId)) {
@@ -975,9 +976,39 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
   }
 
   @ReactMethod
+  fun preloadBannerPlace(id: String, tags: ReadableArray?, promise: Promise) {
+    Log.d("InappstorySdkModule", "preloadBannerPlace")
+    var settings = BannerPlaceLoadSettings()
+        .placeId(id)
+    if (tags != null)
+      settings = settings.tags(tags.toArrayList().toMutableList() as List<String>)
+    try {
+      this.ias?.preloadBannerPlace(settings, object : BannerPlacePreloadCallback(id) {
+                    override fun bannerPlaceLoaded(
+                        size: Int, bannerData: List<BannerData>
+                    ) {
+                        promise.resolve(true)
+                    }
+
+                    override fun loadError() {
+                         promise.resolve(false)
+                    }
+
+                    override fun bannerContentLoaded(bannerId: Int, isFirst: Boolean) {
+
+                    }
+
+                    override fun bannerContentLoadError(bannerId: Int, isFirst: Boolean) {
+                    }
+                })
+    } catch (e: Throwable) {
+      promise.reject("preloadBannerPlace error", e)
+    }
+  }
+
+  @ReactMethod
   fun handleHardwareBackPress(promise: Promise) {
     Log.d("InappstorySdkModule", "handleHardwareBackPress")
-    //promise.resolve(backPressManager.handleBackPress())
   }
 
   @ReactMethod
@@ -1024,7 +1055,6 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
   @ReactMethod
   fun getSound(promise: Promise) {
     Log.d("InappstorySdkModule", "getSound")
-    // promise.resolve(this.ias?.soundOn())
     promise.resolve((this.ias?.iasCore()?.settingsAPI() as IASDataSettingsHolder).isSoundOn())
   }
 
@@ -1437,20 +1467,11 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
   fun createSubscriberList(feed: String, uniqueId: String) {
     Log.e(TAG, "createSubscriberList: $feed, uniqueId: $uniqueId")
     this.subscribeLists(this.api as InAppStoryAPI, feed, uniqueId)
-    // if (feed != "favorites") {
-    //   this.subscribeLists(this.api as InAppStoryAPI, "favorites")
-    // }
   }
 
   fun subscribeLists(inAppStoryAPI: InAppStoryAPI, feed: String, uniqueId: String = feed) {
     inAppStoryAPI.addSubscriber(object : InAppStoryAPIListSubscriber(uniqueId) {
       override fun updateFavoriteItemData(favorites: MutableList<StoryFavoriteItemAPIData>) {
-        // Push model (like the Flutter SDK): the SDK fires this whenever the
-        // favorites set changes (e.g. toggled in the reader). The snapshot only
-        // carries ids (imageFilePath is null), so we use it as a trigger and
-        // reload the favorites list, which repopulates the cell with real covers
-        // and aspectRatio via the existing storyListUpdate/storyUpdate path.
-        // Guard on the id set so the reload's own callbacks can't loop.
         val ids = favorites.map { it.id }.toSet()
         if (ids == lastFavoriteIds) return
         lastFavoriteIds = ids
@@ -1462,9 +1483,6 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
         Log.e(TAG, "aspect ratio return $aspectRatio ")
         Log.e(TAG, "updateStoryData: $story")
 
-        // Feed key in JS is `feed + '_' + list`. Must match updateStoriesData
-        // and the iOS module: main feed -> feed=<feed>, list="feed";
-        // favorites -> feed="default", list="favorites".
         val payloadFeed = if (feed == "favorites") "default" else feed
         val payloadList = if (feed == "favorites") "favorites" else "feed"
 
@@ -1498,9 +1516,6 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
         val aspectRatio = sessionData.previewAspectRatio();
         Log.e(TAG, "aspect ratio return $aspectRatio ")
 
-        // Feed key in JS is `feed + '_' + list`. Must match the iOS module:
-        // main feed -> feed=<feed>, list="feed"; favorites -> feed="default",
-        // list="favorites".
         val payloadFeed = if (feed == "favorites") "default" else feed
         val payloadList = if (feed == "favorites") "favorites" else "feed"
 
@@ -1547,10 +1562,6 @@ class InappstorySdkModule(var reactContext: ReactApplicationContext) :
         payload.putString("list", payloadList)
         sendEvent(reactContext, "storyListUpdate", payload)
 
-        // The SDK only downloads covers for previews reported as visible. For the
-        // main feed JS does this via setVisibleWith; the favorites cell never
-        // reports visibility, so mark the loaded favorites visible here to make
-        // their covers download (arriving later via updateStoryData).
         if (feed == "favorites") {
           inAppStoryAPI.storyList.updateVisiblePreviews(stories.map { it.id }, "favorites")
         }

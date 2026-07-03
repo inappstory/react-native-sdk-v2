@@ -21,8 +21,6 @@ class BannerViewComponent(context: ThemedReactContext) : LinearLayout(context) {
 
     private val bannerCarousel: BannerCarousel = BannerCarousel(rContext.currentActivity ?: rContext)
 
-    // Props received from React. Stored as-is and turned into appearance in
-    // applyAppearanceAndLoad(), which runs once per update transaction.
     var placeId: String? = null
     var shouldLoop: Boolean? = null
     var sideInset: Float? = null
@@ -40,10 +38,6 @@ class BannerViewComponent(context: ThemedReactContext) : LinearLayout(context) {
         registerCallbacks()
     }
 
-    // RN/Yoga lays out this view but never re-measures/lays out the native
-    // children we add, so the BannerCarousel stays 0x0 (empty banner + an
-    // autoscroll NPE because no banner views are bound). Force a measure/layout
-    // pass on every requestLayout — the standard RN fix for embedded native views.
     private val measureAndLayout = Runnable {
         measure(
             MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
@@ -57,9 +51,6 @@ class BannerViewComponent(context: ThemedReactContext) : LinearLayout(context) {
         post(measureAndLayout)
     }
 
-    // Bridge the carousel's native callbacks to React direct events. Mirrors the
-    // iOS BannerView (onScroll / onPlaceLoaded). onActionWith is not wired yet —
-    // the Android SDK only exposes it as a global callback.
     private fun registerCallbacks() {
         bannerCarousel.navigationCallback(object : BannerCarouselNavigationCallback {
             override fun onPageScrolled(
@@ -97,10 +88,6 @@ class BannerViewComponent(context: ThemedReactContext) : LinearLayout(context) {
         })
     }
 
-    // SDK callbacks may fire on a background thread (e.g. bannerPlaceLoaded from
-    // the load thread). RCTEventEmitter must be invoked on the UI thread, so
-    // marshal there — otherwise the event is silently dropped. Mirrors iOS, which
-    // wraps these callbacks in DispatchQueue.main.async.
     private fun emitEvent(eventName: String, payload: WritableMap) {
         post {
             rContext.getJSModule(RCTEventEmitter::class.java)
@@ -119,11 +106,7 @@ class BannerViewComponent(context: ThemedReactContext) : LinearLayout(context) {
         return (dp * resources.displayMetrics.density).toInt()
     }
 
-    // Called once from the view manager's onAfterUpdateTransaction, after the
-    // whole batch of props has been written. The appearance is immutable, so we
-    // rebuild it from scratch and (re)load the banners.
     fun applyAppearanceAndLoad() {
-        // sideInset applies to both sides; leading/trailing override per side.
         val prevOffset = dpToPx(leadingInset ?: sideInset)
         val nextOffset = dpToPx(trailingInset ?: sideInset)
 
@@ -135,7 +118,6 @@ class BannerViewComponent(context: ThemedReactContext) : LinearLayout(context) {
             loop = shouldLoop
         )
 
-        // Appearance must be applied before loading the banners.
         AppearanceManager().csBannerCarouselInterface(appearance)
 
         placeId?.let {

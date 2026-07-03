@@ -51,8 +51,6 @@ export const StoriesCarousel = ({
         .map((i) => String(i.key))
         .filter((id) => !visibleIds.current.includes(id))
         .filter((f) => f !== 'undefined')
-        // The favorites cell is not a story — never report it as a visible
-        // preview (native setVisibleWith does parseInt on the ids).
         .filter((f) => f !== 'favorites_cell');
       newIDs.map((id) => {
         visibleIds.current.push(id);

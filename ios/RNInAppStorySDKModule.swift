@@ -1214,6 +1214,24 @@ class RNInAppStorySDKModule: RCTEventEmitter {
       }
     }
   }
+  @objc
+  func preloadBannerPlace(
+    _ placeId: String,
+    tags: [String]?,
+    resolver resolve: @escaping RCTPromiseResolveBlock,
+    rejecter reject: @escaping RCTPromiseRejectBlock
+  ) {
+    DispatchQueue.main.async {
+      InAppStory.shared.preloadBanners(placeID: placeId) { result in
+        switch result {
+        case .success:
+          resolve(true)
+        case .failure:
+          resolve(false)
+        }
+      }
+    }
+  }
   // MARK: - ReaderStyle
   @objc
   func setTimerGradientEnable(_ value: Bool) {

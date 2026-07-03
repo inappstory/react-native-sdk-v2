@@ -5,11 +5,6 @@ import UIKit
 
 class BannerView: UIView {
 
-  // On the New Architecture (Fabric) the view is created by the legacy
-  // view-manager interop and is NOT registered in the Paper UIManager's
-  // viewRegistry, so resolving it by reactTag through `addUIBlock` fails.
-  // We keep our own reactTag -> view registry to dispatch commands reliably
-  // on both architectures.
   private final class WeakRef {
     weak var view: BannerView?
     init(_ view: BannerView) { self.view = view }
@@ -72,8 +67,6 @@ class BannerView: UIView {
 
   override init(frame: CGRect) {
     super.init(frame: frame)
-    //    createBannerView()
-
   }
 
   required init?(coder: NSCoder) {
@@ -82,7 +75,6 @@ class BannerView: UIView {
 
   override func didMoveToWindow() {
     super.didMoveToWindow()
-    // reactTag is assigned at creation time, so it is available here.
     guard window != nil, let tag = reactTag?.intValue else { return }
     registeredTag = tag
     BannerView.registry[tag] = WeakRef(self)
@@ -104,15 +96,6 @@ class BannerView: UIView {
       cornerRadius: self.cornerRadius
     )
     createBannerView()
-    //    guard let bannersView = _bannersView else { return }
-    //    _view?.addSubview(_bannersView!)
-    ////    NSLayoutConstraint.activate([
-    ////      bannersView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-    ////      bannersView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-    ////      bannersView.topAnchor.constraint(equalTo: view.topAnchor),
-    ////      bannersView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-    ////    ])
-    //    _bannersView?.create()
   }
 
   func setBannerAppearance(_ appearance: IASBannersAppearance) {

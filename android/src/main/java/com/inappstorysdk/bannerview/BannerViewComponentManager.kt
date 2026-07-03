@@ -16,9 +16,6 @@ class BannerViewComponentViewManager : SimpleViewManager<BannerViewComponent>() 
         return BannerViewComponent(reactContext)
     }
 
-    // Prop setters only store values on the view. The appearance is rebuilt and
-    // applied once in onAfterUpdateTransaction, after the whole batch is set.
-
     @ReactProp(name = "placeId")
     fun setPlaceId(view: BannerViewComponent, placeId: String) {
         view.placeId = placeId

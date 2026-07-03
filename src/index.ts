@@ -600,6 +600,18 @@ export class StoryManager {
     });
   }
 
+  preloadBannerPlace(placeId: string, tags?: string[]): Promise<Boolean> {
+    return new Promise((resolve, reject) => {
+      InAppStorySDK.preloadBannerPlace(placeId, tags).then((success) => {
+        if (success) {
+          resolve(success);
+        } else {
+          reject(false);
+        }
+      });
+    });
+  }
+
   clearCache() {
     return InAppStorySDK.clearCache();
   }

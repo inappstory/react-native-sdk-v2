@@ -52,10 +52,6 @@ type BannerViewProps = BannerNativeViewProps;
 
 type NativeViewRef = React.ComponentRef<typeof NativeBannerView>;
 
-// Commands are dispatched by name through the renderer, which works on both
-// the legacy (Paper) and the New (Fabric) architecture. On Fabric the legacy
-// view-manager interop matches the command name to the native method and
-// prepends the reactTag for us.
 interface NativeCommands {
   refresh: (viewRef: NativeViewRef) => void;
   pause: (viewRef: NativeViewRef) => void;
