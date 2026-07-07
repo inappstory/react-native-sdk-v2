@@ -5,6 +5,14 @@ import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.WritableMap
 import com.facebook.react.module.annotations.ReactModule
+import com.facebook.react.modules.core.DeviceEventManagerModule
+
+private fun sendLegacyEvent(name: String, payload: WritableMap) {
+  reactApplicationContext
+    .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
+    .emit(name, payload)
+}
+
 
 @ReactModule(name = FeedEventsModule.NAME)
 class FeedEventsModule(reactContext: ReactApplicationContext) :
@@ -44,7 +52,8 @@ class FeedEventsModule(reactContext: ReactApplicationContext) :
       putString("withName", "storyReaderWillShow")
       putMap("body", body)
     }
-    emitStoryReaderWillShow(payload)
+    if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) emitStoryReaderWillShow(payload)
+    else sendLegacyEvent("storyReaderWillShow", payload)
   }
 
   fun emitReaderDidClose(feed: String?) {
@@ -56,6 +65,7 @@ class FeedEventsModule(reactContext: ReactApplicationContext) :
       putString("withName", "storyReaderDidClose")
       putMap("body", body)
     }
-    emitStoryReaderDidClose(payload)
+    if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) emitStoryReaderDidClose(payload)
+    else sendLegacyEvent("storyReaderDidClose", payload)
   }
 }

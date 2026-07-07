@@ -8,6 +8,7 @@ import NativeStoryManager, {
   type StoryListDTO,
 } from '../NativeStoryManager';
 import NativeFeedEvents from '../specs/NativeFeedEvents';
+import { subscribeNativeEvent } from '../helpers/subscribeNativeEvent';
 
 let init = false;
 
@@ -33,7 +34,10 @@ export const useEvents = () => {
     if (init) return;
     init = true;
 
-    storyListUpdateSubscription.current = NativeStoryManager.onStoryListUpdate(
+    storyListUpdateSubscription.current = subscribeNativeEvent<StoryListDTO>(
+      NativeStoryManager,
+      'NativeStoryManager',
+      'onStoryListUpdate',
       (data: StoryListDTO) => {
         const feedName = data.feed + '_' + data.list;
         clearFeed(feedName);
@@ -47,7 +51,10 @@ export const useEvents = () => {
       }
     );
 
-    storyUpdateSubscription.current = NativeStoryManager.onStoryUpdate(
+    storyUpdateSubscription.current = subscribeNativeEvent<StoryDTO>(
+      NativeStoryManager,
+      'NativeStoryManager',
+      'onStoryUpdate',
       (data: StoryDTO) => {
         const feedName = data.feed + '_' + data.list;
         if (data.coverImagePath) {
@@ -65,8 +72,11 @@ export const useEvents = () => {
       }
     );
 
-    storyReaderWillShowSubscription.current =
-      NativeFeedEvents.storyReaderWillShow((event) => {
+    storyReaderWillShowSubscription.current = subscribeNativeEvent(
+      NativeFeedEvents,
+      'NativeFeedEvents',
+      'storyReaderWillShow',
+      (event) => {
         console.log('storyReaderWillShow');
         setReaderOpen(true);
         addEvent({
@@ -74,7 +84,8 @@ export const useEvents = () => {
           data: event,
           time: +Date.now(),
         });
-      });
+      }
+    );
 
     // ponytail: bulk event-name listener wiring was parked here (commented
     // forEach over storiesEvents/gameEvents/etc). Removed as dead; restore

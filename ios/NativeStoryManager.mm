@@ -4,6 +4,126 @@
 @implementation NativeStoryManager
 RCT_EXPORT_MODULE()
 
+- (void)notifyStoryListUpdate:(NSDictionary *)data {
+#ifdef RCT_NEW_ARCH_ENABLED
+  [self emitOnStoryListUpdate:data];
+#else
+  [self sendEventWithName:@"onStoryListUpdate" body:data];
+#endif
+}
+
+- (void)notifyStoryUpdate:(NSDictionary *)data {
+#ifdef RCT_NEW_ARCH_ENABLED
+  [self emitOnStoryUpdate:data];
+#else
+  [self sendEventWithName:@"onStoryUpdate" body:data];
+#endif
+}
+
+RCT_EXPORT_METHOD(initWith:(nonnull NSString *)apiKey
+                    userId:(nonnull NSString *)userId
+                userIdSign:(NSString *_Nullable)userIdSign
+                   sandbox:(BOOL)sandbox
+            sendStatistics:(BOOL)sendStatistics
+                   resolve:(RCTPromiseResolveBlock)resolve
+                    reject:(RCTPromiseRejectBlock)reject) {
+  [[NativeStoryManagerImpl shared] initWith:apiKey
+                                     userID:userId
+                                 userIdSign:userIdSign
+                                    sandbox:sandbox
+                                  sendStats:sendStatistics
+                                    resolve:resolve
+                                   rejecter:reject];
+}
+
+RCT_EXPORT_METHOD(setTags:(nonnull NSArray *)tags) {
+  [[NativeStoryManagerImpl shared] setTags:tags];
+}
+
+RCT_EXPORT_METHOD(changeSound:(BOOL)value) {
+  [[NativeStoryManagerImpl shared] changeSound:value];
+}
+
+RCT_EXPORT_METHOD(getFavoriteStories:(nonnull NSString *)feed) {
+  [[NativeStoryManagerImpl shared] getFavoriteStories:feed
+      callback:^(NSDictionary *data) {
+        [self notifyStoryListUpdate:data];
+      }
+      storyCallback:^(NSDictionary *storyData) {
+        [self notifyStoryUpdate:storyData];
+      }];
+}
+
+RCT_EXPORT_METHOD(createSubscriberList:(nonnull NSString *)feed
+                              uniqueId:(nonnull NSString *)uniqueId) {
+  [[NativeStoryManagerImpl shared] createSubscriberList:feed
+      uniqueId:uniqueId
+      callback:^(NSDictionary *data) {
+        [self notifyStoryListUpdate:data];
+      }
+      storyCallback:^(NSDictionary *storyData) {
+        [self notifyStoryUpdate:storyData];
+      }];
+}
+
+RCT_EXPORT_METHOD(getStories:(nonnull NSString *)feed
+                    uniqueId:(nonnull NSString *)uniqueId) {
+  [[NativeStoryManagerImpl shared] getStories:feed
+      uniqueId:uniqueId
+      callback:^(NSDictionary *data) {
+        [self notifyStoryListUpdate:data];
+      }
+      storyCallback:^(NSDictionary *storyData) {
+        [self notifyStoryUpdate:storyData];
+      }];
+}
+
+RCT_EXPORT_METHOD(onFavoriteCell) {
+  [[NativeStoryManagerImpl shared] onFavoriteCell];
+}
+
+RCT_EXPORT_METHOD(removeTags:(nonnull NSArray *)tags) {
+  [[NativeStoryManagerImpl shared] removeTags:tags];
+}
+
+RCT_EXPORT_METHOD(selectFavoriteStoryCellWith:(nonnull NSString *)storyID) {
+  [[NativeStoryManagerImpl shared] selectFavoriteStoryCellWith:storyID];
+}
+
+RCT_EXPORT_METHOD(selectStoryCellWith:(nonnull NSString *)storyID
+                                 feed:(nonnull NSString *)feed
+                             uniqueId:(nonnull NSString *)uniqueId) {
+  [[NativeStoryManagerImpl shared] selectStoryCellWith:storyID];
+}
+
+RCT_EXPORT_METHOD(setAppVersion:(nonnull NSString *)version build:(double)build) {
+  [[NativeStoryManagerImpl shared] setAppVersion:version appBuild:(int)build];
+}
+
+RCT_EXPORT_METHOD(setLang:(nonnull NSString *)lang) {
+  [[NativeStoryManagerImpl shared] setLang:lang];
+}
+
+RCT_EXPORT_METHOD(setPlaceholders:(nonnull NSDictionary *)placeholders) {
+  [[NativeStoryManagerImpl shared] setPlaceholders:placeholders];
+}
+
+RCT_EXPORT_METHOD(setUserID:(nonnull NSString *)userId
+                 userIdSign:(NSString *_Nullable)userIdSign) {
+  [[NativeStoryManagerImpl shared] setUserID:userId userIdSign:userIdSign];
+}
+
+RCT_EXPORT_METHOD(setVisibleWith:(nonnull NSArray *)storyIDs) {
+  [[NativeStoryManagerImpl shared] setVisibleWith:storyIDs];
+}
+
+RCT_EXPORT_METHOD(setImagesPlaceholders:(nonnull NSDictionary *)placeholders) {
+  [[NativeStoryManagerImpl shared] setImagesPlaceholders:placeholders];
+}
+
+
+
+
 // RCT_EXTERN_METHOD(getCellRatio:(RCTPromiseResolveBlock)resolve
 // rejecter:(RCTPromiseRejectBlock)reject)
 
@@ -59,107 +179,16 @@ RCT_EXPORT_MODULE()
 // RCT_EXTERN_METHOD(setLogging:(BOOL *)value)
 // RCT_EXTERN_METHOD(useDeviceID:(BOOL *)value)
 
-- (void)initWith:(nonnull NSString *)apiKey
-          userId:(nonnull NSString *)userId
-      userIdSign:(NSString *_Nullable)userIdSign
-         sandbox:(BOOL)sandbox
-  sendStatistics:(BOOL)sendStatistics
-         resolve:(RCTPromiseResolveBlock)resolve
-          reject:(RCTPromiseRejectBlock)reject {
-  [[NativeStoryManagerImpl shared] initWith:apiKey
-                                     userID:userId
-                                 userIdSign:userIdSign
-                                    sandbox:sandbox
-                                  sendStats:sendStatistics
-                                    resolve:resolve
-                                   rejecter:reject];
-}
 
-- (void)setTags:(nonnull NSArray *)tags {
-  [[NativeStoryManagerImpl shared] setTags:tags];
-}
-
-- (void)changeSound:(BOOL)value {
-  [[NativeStoryManagerImpl shared] changeSound:value];
-}
-
-- (void)getFavoriteStories:(nonnull NSString *)feed {
-  [[NativeStoryManagerImpl shared] getFavoriteStories:feed
-      callback:^(NSDictionary *data) {
-        [self emitOnStoryListUpdate:data];
-      }
-      storyCallback:^(NSDictionary *storyData) {
-        [self emitOnStoryUpdate:storyData];
-      }];
-}
-
-- (void)createSubscriberList:(nonnull NSString *)feed
-                    uniqueId:(nonnull NSString *)uniqueId {
-  [[NativeStoryManagerImpl shared] createSubscriberList:feed
-      uniqueId:uniqueId
-      callback:^(NSDictionary *data) {
-        [self emitOnStoryListUpdate:data];
-      }
-      storyCallback:^(NSDictionary *storyData) {
-        [self emitOnStoryUpdate:storyData];
-      }];
-}
-
-- (void)getStories:(nonnull NSString *)feed uniqueId:(nonnull NSString *)uniqueId {
-  [[NativeStoryManagerImpl shared] getStories:feed
-      uniqueId:uniqueId
-      callback:^(NSDictionary *data) {
-        [self emitOnStoryListUpdate:data];
-      }
-      storyCallback:^(NSDictionary *storyData) {
-        [self emitOnStoryUpdate:storyData];
-      }];
-}
-
-- (void)onFavoriteCell {
-  [[NativeStoryManagerImpl shared] onFavoriteCell];
-}
-
-- (void)removeTags:(nonnull NSArray *)tags {
-  [[NativeStoryManagerImpl shared] removeTags:tags];
-}
-
-- (void)selectFavoriteStoryCellWith:(nonnull NSString *)storyID {
-  [[NativeStoryManagerImpl shared] selectFavoriteStoryCellWith:storyID];
-}
-
-- (void)selectStoryCellWith:(nonnull NSString *)storyID feed:(nonnull NSString *)feed uniqueId:(nonnull NSString *)uniqueId {
-  [[NativeStoryManagerImpl shared] selectStoryCellWith:storyID];
-}
-
-- (void)setAppVersion:(nonnull NSString *)version build:(double)build {
-  [[NativeStoryManagerImpl shared] setAppVersion:version appBuild:(int)build];
-}
-
-- (void)setLang:(nonnull NSString *)lang {
-  [[NativeStoryManagerImpl shared] setLang:lang];
-}
-
-- (void)setPlaceholders:(nonnull NSDictionary *)placeholders {
-  [[NativeStoryManagerImpl shared] setPlaceholders:placeholders];
-}
-
-- (void)setUserID:(nonnull NSString *)userId
-       userIdSign:(NSString *_Nullable)userIdSign {
-  [[NativeStoryManagerImpl shared] setUserID:userId userIdSign:userIdSign];
-}
-
-- (void)setVisibleWith:(nonnull NSArray *)storyIDs {
-  [[NativeStoryManagerImpl shared] setVisibleWith:storyIDs];
-}
-
-- (void)setImagesPlaceholders:(nonnull NSDictionary *)placeholders {
-  [[NativeStoryManagerImpl shared] setImagesPlaceholders:placeholders];
-}
-
+#ifdef RCT_NEW_ARCH_ENABLED
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
     (const facebook::react::ObjCTurboModule::InitParams &)params {
   return std::make_shared<facebook::react::NativeStoryManagerSpecJSI>(params);
 }
+#else
+- (NSArray<NSString *> *)supportedEvents {
+  return @[ @"onStoryListUpdate", @"onStoryUpdate" ];
+}
+#endif
 
 @end

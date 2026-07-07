@@ -4,89 +4,97 @@
 @implementation NativeAppearanceManager
 RCT_EXPORT_MODULE()
 
-- (void)setCloseButtonPosition:(nonnull NSString *)value {
+RCT_EXPORT_METHOD(setCloseButtonPosition:(nonnull NSString *)value) {
   [[NativeAppearanceManagerImpl shared] setCloseButtonPosition:value];
 }
 
-- (void)setHasFavorites:(BOOL)value {
+RCT_EXPORT_METHOD(setHasFavorites:(BOOL)value) {
   [[NativeAppearanceManagerImpl shared] setHasFavorites:value];
 }
 
-- (void)setHasLike:(BOOL)value {
+RCT_EXPORT_METHOD(setHasLike:(BOOL)value) {
   [[NativeAppearanceManagerImpl shared] setHasLike:value];
 }
 
-- (void)setHasShare:(BOOL)value {
+RCT_EXPORT_METHOD(setHasShare:(BOOL)value) {
   [[NativeAppearanceManagerImpl shared] setHasShare:value];
 }
 
-- (void)setReaderCornerRadius:(double)value {
+RCT_EXPORT_METHOD(setReaderCornerRadius:(double)value) {
   [[NativeAppearanceManagerImpl shared] setReaderCornerRadius:value];
 }
 
-- (void)setScrollStyle:(nonnull NSString *)value {
+RCT_EXPORT_METHOD(setScrollStyle:(nonnull NSString *)value) {
   [[NativeAppearanceManagerImpl shared] setScrollStyle:value];
 }
 
-- (void)setCoverQuality:(nonnull NSString *)value {
+RCT_EXPORT_METHOD(setCoverQuality:(nonnull NSString *)value) {
   [[NativeAppearanceManagerImpl shared] setCoverQuality:value];
 }
 
-- (void)setReaderBackgroundColor:(nonnull NSString *)value {
+RCT_EXPORT_METHOD(setReaderBackgroundColor:(nonnull NSString *)value) {
   [[NativeAppearanceManagerImpl shared] setReaderBackgroundColor:value];
 }
 
-- (void)setOverScrollToClose:(BOOL)value {
+RCT_EXPORT_METHOD(setOverScrollToClose:(BOOL)value) {
   [[NativeAppearanceManagerImpl shared] setOverScrollToClose:value];
 }
 
-- (void)setSwipeToClose:(BOOL)value {
+RCT_EXPORT_METHOD(setSwipeToClose:(BOOL)value) {
   [[NativeAppearanceManagerImpl shared] setSwipeToClose:value];
 }
 
-- (void)setTimerGradientEnable:(BOOL)value {
+RCT_EXPORT_METHOD(setTimerGradientEnable:(BOOL)value) {
   [[NativeAppearanceManagerImpl shared] setTimerGradientEnable:value];
 }
 
-- (void)setPresentationStyle:(nonnull NSString *)value {
+RCT_EXPORT_METHOD(setPresentationStyle:(nonnull NSString *)value) {
   [[NativeAppearanceManagerImpl shared] setPresentationStyle:value];
 }
 
-- (void)setLikeImage:(NSString *)image selected:(NSString *)selectedImage {
+RCT_EXPORT_METHOD(setLikeImage:(NSString *)image selected:(NSString *)selectedImage) {
   [[NativeAppearanceManagerImpl shared] setLikeImage:image
                                             selected:selectedImage];
 }
 
-- (void)setDislikeImage:(NSString *)image selected:(NSString *)selectedImage {
+RCT_EXPORT_METHOD(setDislikeImage:(NSString *)image selected:(NSString *)selectedImage) {
   [[NativeAppearanceManagerImpl shared] setDislikeImage:image
                                                selected:selectedImage];
 }
 
-- (void)setFavoriteImage:(NSString *)image selected:(NSString *)selectedImage {
+RCT_EXPORT_METHOD(setFavoriteImage:(NSString *)image selected:(NSString *)selectedImage) {
   [[NativeAppearanceManagerImpl shared] setFavoriteImage:image
                                                 selected:selectedImage];
 }
 
-- (void)setShareImage:(NSString *)image selected:(NSString *)selectedImage {
+RCT_EXPORT_METHOD(setShareImage:(NSString *)image selected:(NSString *)selectedImage) {
   [[NativeAppearanceManagerImpl shared] setShareImage:image
                                              selected:selectedImage];
 }
-- (void)setSoundImage:(NSString *)image selected:(NSString *)selectedImage {
+
+RCT_EXPORT_METHOD(setSoundImage:(NSString *)image selected:(NSString *)selectedImage) {
   [[NativeAppearanceManagerImpl shared] setSoundImage:image
                                              selected:selectedImage];
 }
-- (void)setCloseReaderImage:(NSString *)image {
+
+RCT_EXPORT_METHOD(setCloseReaderImage:(NSString *)image) {
   [[NativeAppearanceManagerImpl shared] setCloseReaderImage:image];
 }
-- (void)setRefreshImage:(NSString *)image {
+
+RCT_EXPORT_METHOD(setRefreshImage:(NSString *)image) {
   [[NativeAppearanceManagerImpl shared] setRefreshImage:image];
 }
-- (void)setRefreshGoodsImage:(NSString *)image {
+
+RCT_EXPORT_METHOD(setRefreshGoodsImage:(NSString *)image) {
   [[NativeAppearanceManagerImpl shared] setRefreshGoodsImage:image];
 }
-- (void)setCloseGoodsImage:(NSString *)image {
+
+RCT_EXPORT_METHOD(setCloseGoodsImage:(NSString *)image) {
   [[NativeAppearanceManagerImpl shared] setRefreshGoodsImage:image];
 }
+
+
+
 
 // RCT_EXTERN_METHOD(getCellRatio:(RCTPromiseResolveBlock)resolve
 // rejecter:(RCTPromiseRejectBlock)reject)
@@ -141,10 +149,12 @@ RCT_EXPORT_MODULE()
 // RCT_EXTERN_METHOD(setAppVersion:(NSString *)appVersion appBuild:(NSInteger
 // *)appBuild)
 
+#ifdef RCT_NEW_ARCH_ENABLED
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
     (const facebook::react::ObjCTurboModule::InitParams &)params {
   return std::make_shared<facebook::react::NativeAppearanceManagerSpecJSI>(
       params);
 }
+#endif
 
 @end

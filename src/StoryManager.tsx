@@ -1,4 +1,5 @@
 import { isFunction } from './helpers/isFunction';
+import { subscribeNativeEvent } from './helpers/subscribeNativeEvent';
 import NativeStoryManager from './NativeStoryManager';
 import NativeFeedEvents from './specs/NativeFeedEvents';
 import NativeStoriesEvents from './specs/NativeStoriesEvents';
@@ -270,17 +271,27 @@ export class StoryManager {
   }
 
   onStoryReaderWillShow(listener: any) {
-    NativeFeedEvents.storyReaderWillShow((event) => {
-      console.log('Story reader will show event received: ', event);
-      listener(event);
-    });
+    subscribeNativeEvent(
+      NativeFeedEvents,
+      'NativeFeedEvents',
+      'storyReaderWillShow',
+      (event) => {
+        console.log('Story reader will show event received: ', event);
+        listener(event);
+      }
+    );
   }
 
   onShowStory(listener: any) {
-    NativeStoriesEvents.showStory((event) => {
-      console.log('Show story event received: ', event);
-      listener(event);
-    });
+    subscribeNativeEvent(
+      NativeStoriesEvents,
+      'NativeStoriesEvents',
+      'showStory',
+      (event) => {
+        console.log('Show story event received: ', event);
+        listener(event);
+      }
+    );
   }
 
   setPlaceholders(placeholders: any): void {

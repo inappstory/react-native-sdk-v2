@@ -37,7 +37,7 @@ class InappstorySdkPackage : BaseReactPackage() {
         false,  // canOverrideExistingModule
         false,  // needsEagerInit
         false,  // isCxxModule
-        true // isTurboModule
+        BuildConfig.IS_NEW_ARCHITECTURE_ENABLED // isTurboModule
       )
       moduleInfos[AppearanceManagerModule.NAME] = ReactModuleInfo(
         AppearanceManagerModule.NAME,
@@ -45,7 +45,7 @@ class InappstorySdkPackage : BaseReactPackage() {
         false,  // canOverrideExistingModule
         false,  // needsEagerInit
         false,  // isCxxModule
-        true // isTurboModule
+        BuildConfig.IS_NEW_ARCHITECTURE_ENABLED // isTurboModule
       )
       moduleInfos[StoriesEventsModule.NAME] = ReactModuleInfo(
         StoriesEventsModule.NAME,
@@ -53,7 +53,7 @@ class InappstorySdkPackage : BaseReactPackage() {
         false,  // canOverrideExistingModule
         false,  // needsEagerInit
         false,  // isCxxModule
-        true // isTurboModule
+        BuildConfig.IS_NEW_ARCHITECTURE_ENABLED // isTurboModule
       )
       moduleInfos[FeedEventsModule.NAME] = ReactModuleInfo(
         FeedEventsModule.NAME,
@@ -61,7 +61,7 @@ class InappstorySdkPackage : BaseReactPackage() {
         false,  // canOverrideExistingModule
         false,  // needsEagerInit
         false,  // isCxxModule
-        true // isTurboModule
+        BuildConfig.IS_NEW_ARCHITECTURE_ENABLED // isTurboModule
       )
       moduleInfos
     }

@@ -5,6 +5,14 @@ import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.WritableMap
 import com.facebook.react.module.annotations.ReactModule
+import com.facebook.react.modules.core.DeviceEventManagerModule
+
+private fun sendLegacyEvent(name: String, payload: WritableMap) {
+  reactApplicationContext
+    .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
+    .emit(name, payload)
+}
+
 
 import com.inappstory.sdk.InAppStoryManager
 import com.inappstory.sdk.stories.outercallbacks.common.reader.ShowStoryAction
@@ -45,7 +53,8 @@ class StoriesEventsModule(reactContext: ReactApplicationContext) :
           putString("withName", "showStory")
           putMap("body", body)
         }
-        emitShowStory(payload)
+        if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) emitShowStory(payload)
+        else sendLegacyEvent("showStory", payload)
       }
     })
   }

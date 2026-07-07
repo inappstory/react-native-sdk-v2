@@ -30,6 +30,13 @@ import android.util.Log
 import com.inappstory.reactnativesdk.AppearanceManagerImpl
 import com.inappstory.sdk.stories.api.models.ImagePlaceholderValue;
 import com.facebook.react.bridge.Promise
+import com.facebook.react.modules.core.DeviceEventManagerModule
+
+private fun sendLegacyEvent(name: String, payload: WritableMap) {
+  reactApplicationContext
+    .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
+    .emit(name, payload)
+}
 
 
 @ReactModule(name = StoryManagerModule.NAME)
@@ -703,7 +710,9 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
           ) as Map<String, Any>
         )
         Log.e(TAG, "Item = $story")
-        emitOnStoryUpdate(payload)
+        if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) emitOnStoryUpdate(payload)
+        else sendLegacyEvent("onStoryUpdate", payload)
+
         //sendEvent(getReactApplicationContext(), "storyUpdate", payload)
       }
 
@@ -759,7 +768,9 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
         payload.putString("feed", payloadFeed)
         payload.putString("list", payloadList)
         //map.putString("key1", "Value1");
-        emitOnStoryListUpdate(payload)
+        if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) emitOnStoryListUpdate(payload)
+        else sendLegacyEvent("onStoryListUpdate", payload)
+
 
         // The SDK only downloads covers for previews reported as visible. For the
         // main feed JS does this via setVisibleWith; the favorites cell never
