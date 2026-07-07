@@ -1,17 +1,29 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import * as React from 'react';
 
-import { NativeEventEmitter, NativeModules } from 'react-native';
-import { useStore } from './useStore';
-import InAppStorySDK from '@inappstory/react-native-sdk';
-import { nativeEventList } from '../nativeEventList';
+import { type EventSubscription } from 'react-native';
+import { useFeedStore } from './useStore';
+import NativeStoryManager, {
+  type StoryDTO,
+  type StoryListDTO,
+} from '../NativeStoryManager';
+import NativeFeedEvents from '../specs/NativeFeedEvents';
+
 let init = false;
+
 export const useEvents = () => {
-  const addEvent = useStore((state) => state.addEvent);
-  const addToFeed = useStore((state) => state.addToFeed);
-  const replaceInFeed = useStore((state) => state.replaceInFeed);
-  const setFavorite = useStore((state) => state.setFavorite);
-  const clearFeed = useStore((state) => state.clearFeed);
+  const storyListUpdateSubscription = React.useRef<null | EventSubscription>(
+    null
+  );
+  const storyUpdateSubscription = React.useRef<null | EventSubscription>(null);
+  const storyReaderWillShowSubscription =
+    React.useRef<null | EventSubscription>(null);
+  const showStorySubscription = React.useRef<null | EventSubscription>(null);
+
+  const addEvent = useFeedStore((state) => state.addEvent);
+  const addToFeed = useFeedStore((state) => state.addToFeed);
+  const replaceInFeed = useFeedStore((state) => state.replaceInFeed);
+  const clearFeed = useFeedStore((state) => state.clearFeed);
 
   const [readerOpen, setReaderOpen] = React.useState<any>(false);
   const imageCoverCache = React.useRef<any>({});
@@ -21,57 +33,69 @@ export const useEvents = () => {
     if (init) return;
     init = true;
 
-    const eventEmitter = new NativeEventEmitter(
-      NativeModules.RNInAppStorySDKModule
-    );
-    let eventListeners: Array<any> = [];
+    storyListUpdateSubscription.current = NativeStoryManager.onStoryListUpdate(
+      (data: StoryListDTO) => {
+        const feedName = data.feed + '_' + data.list;
+        clearFeed(feedName);
+        addToFeed(feedName, data.stories);
 
-    nativeEventList.forEach((eventName) => {
-      eventListeners.push(
-        eventEmitter.addListener(eventName, async (event) => {
-          if (eventName == 'storyReaderWillShow') {
-            setReaderOpen(true);
-          }
-          if (eventName == 'storyReaderDidClose' || eventName == 'closeStory') {
-            setReaderOpen(false);
-          }
-          if (eventName == 'favoriteCellDidSelect') {
-            //onFavoriteCell();
-          }
-          if (eventName == 'favoriteStory') {
-            setFavorite(event.storyID, event.favorite);
-            if (!event.favorite) {
-              InAppStorySDK.getFavoriteStories('default');
-            }
-          }
-          if (eventName == 'storyListUpdate') {
-            const feedName = event.feed + '_' + event.list;
-            clearFeed(feedName);
-            addToFeed(feedName, event.stories);
-          }
-          if (eventName == 'storyUpdate') {
-            const feedName = event.feed + '_' + event.list;
-            if (event.coverImagePath) {
-              imageCoverCache.current[event.storyID] = event.coverImagePath;
-            }
-            if (event.coverVideoPath) {
-              videoCoverCache.current[event.storyID] = event.coverVideoPath;
-            }
-            replaceInFeed(feedName, event);
-          }
-          addEvent({
-            event: eventName,
-            data: event,
-            time: +Date.now(),
-          });
-        })
-      );
-    });
+        addEvent({
+          event: 'storyListUpdate',
+          data: data,
+          time: +Date.now(),
+        });
+      }
+    );
+
+    storyUpdateSubscription.current = NativeStoryManager.onStoryUpdate(
+      (data: StoryDTO) => {
+        const feedName = data.feed + '_' + data.list;
+        if (data.coverImagePath) {
+          imageCoverCache.current[data.storyID] = data.coverImagePath;
+        }
+        if (data.coverVideoPath) {
+          videoCoverCache.current[data.storyID] = data.coverVideoPath;
+        }
+        replaceInFeed(feedName, data);
+        addEvent({
+          event: 'storyUpdate',
+          data: data,
+          time: +Date.now(),
+        });
+      }
+    );
+
+    storyReaderWillShowSubscription.current =
+      NativeFeedEvents.storyReaderWillShow((event) => {
+        console.log('storyReaderWillShow');
+        setReaderOpen(true);
+        addEvent({
+          event: 'storyReaderWillShow',
+          data: event,
+          time: +Date.now(),
+        });
+      });
+
+    // ponytail: bulk event-name listener wiring was parked here (commented
+    // forEach over storiesEvents/gameEvents/etc). Removed as dead; restore
+    // from git history when implementing the unified event subscription.
+
     // Removes the listener once unmounted
     return () => {
-      eventListeners.forEach((eventListener) => {
-        eventListener.remove();
-      });
+      storyListUpdateSubscription.current?.remove();
+      storyListUpdateSubscription.current = null;
+      storyUpdateSubscription.current?.remove();
+      storyUpdateSubscription.current = null;
+
+      storyReaderWillShowSubscription.current?.remove();
+      storyReaderWillShowSubscription.current = null;
+
+      showStorySubscription.current?.remove();
+      showStorySubscription.current = null;
+
+      // eventListeners.forEach((eventListener) => {
+      //   eventListener.remove();
+      // });
       init = false;
     };
   }, []);

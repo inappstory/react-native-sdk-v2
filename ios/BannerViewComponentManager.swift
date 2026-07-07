@@ -1,4 +1,5 @@
 import InAppStorySDK
+import React
 
 @objc(BannerViewManager)
 class BannerViewManager: RCTViewManager {

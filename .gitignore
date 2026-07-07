@@ -39,6 +39,8 @@ project.xcworkspace
 .settings
 local.properties
 android.iml
+.kotlin/
+android/generated/
 
 # Cocoapods
 #
@@ -81,3 +83,5 @@ example/ios/.xcode.env.local
 
 # dotenv
 /.env
+
+ios/generated/

@@ -1,124 +1,154 @@
-import React from 'react';
+import React, { forwardRef, useImperativeHandle } from 'react';
 import { StyleSheet, View } from 'react-native';
-import InAppStorySDK, {
-  type RenderCell,
-  type RenderFavoriteCell,
-} from '@inappstory/react-native-sdk';
-import { StoriesCarousel } from './StoriesCarousel';
-import { useStore } from '../hooks/useStore';
-import { useEvents } from '../hooks/useEvents';
-import { AppearanceManager, StoryManager } from '../index';
 
-export const StoriesList = ({
-  storyManager,
-  appearanceManager,
-  feed = 'default',
-  onLoadStart,
-  onLoadEnd,
-  viewModelExporter,
-  showFavorites,
-  favoritesOnly,
-  renderCell,
-  renderFavoriteCell,
-  vertical,
-}: {
+import { StoriesCarousel } from './StoriesCarousel';
+import { useFeedStore, type StoreState } from '../hooks/useStore';
+import { useEvents } from '../hooks/useEvents';
+import type { RenderCell, RenderFavoriteCell } from '../data/RenderCell';
+import NativeStoryManager from '../NativeStoryManager';
+import type { Option, StoryManager } from '../StoryManager';
+import type { AppearanceManager } from '../AppearanceManager';
+
+export type StoryCellData = {
+  storyID: number;
+  slidesCount: number;
+  statTitle: string;
+};
+
+export type ListLoadStatus = {
+  feed: string | number;
+  defaultListLength: number;
+  favoriteListLength: number;
+  success: boolean;
+  list: string;
+  error: Option<{
+    name: string;
+    networkStatus: number;
+    networkMessage: string;
+  }>;
+};
+
+export interface StoriesListRef {
+  reload: () => void;
+}
+
+interface StoriesListProps {
   storyManager: StoryManager;
   appearanceManager: AppearanceManager;
-  feed?: any;
-  onLoadStart?: any;
-  onLoadEnd?: any;
-  viewModelExporter?: any;
-  showFavorites?: any;
-  favoritesOnly?: any;
+  feed: string;
+  showFavorites?: boolean;
+  favoritesOnly?: boolean;
   renderCell?: RenderCell;
   renderFavoriteCell?: RenderFavoriteCell;
-  vertical?: any;
-}) => {
-  const updateVersion = useStore((state) => state.update);
-  const _feedEvents = useStore((state) => state[`feeds_${feed}_feed`]);
-  const feedEvents = _feedEvents || [];
-  const feedFavoriteEvents = useStore((state) => state.feeds_default_favorites);
-  const clearUpdate = useStore((state) => state.clearUpdate);
-  const addEvent = useStore((state) => state.addEvent);
+  vertical?: boolean;
+  onLoadStart: () => void;
+  onLoadEnd: (listLoadStatus: ListLoadStatus) => void;
+}
 
-  const {} = useEvents();
-  //const userID = storyManager.userId;
-  //const ref = useRef(null);
-  React.useEffect(() => {
-    updateVersion;
-  }, [updateVersion]);
-  const createSubscriberList = React.useCallback(async () => {
-    storyManager.createSubscriberList(feed);
-  }, [feed, storyManager]);
-  const fetchFeed = React.useCallback(async () => {
-    storyManager.fetchFeed(feed);
-  }, [feed, storyManager]);
-  const fetchFavoriteFeed = React.useCallback(async () => {
-    storyManager.fetchFavorites(feed);
-  }, [feed, storyManager]);
-  React.useEffect(() => {
-    // if (!favoritesOnly) {
-    if (updateVersion < 1) {
-      onLoadStart();
-    }
-    if (!feedEvents) return;
-    onLoadEnd({
-      defaultListLength: feedEvents.length || 0,
-      favoriteListLength: feedFavoriteEvents.length || 0,
-      feed,
-      list: 'feed',
-    });
-    // }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [feedEvents.length, feedFavoriteEvents.length, updateVersion]);
-  React.useEffect(() => {
-    viewModelExporter({
+export const StoriesList = forwardRef<StoriesListRef, StoriesListProps>(
+  (props, ref) => {
+    const updateVersion = useFeedStore((state) => state.update);
+    const feedFavoriteEvents = useFeedStore(
+      (state) => state.feeds_default_favorites
+    );
+    const clearUpdate = useFeedStore((state) => state.clearUpdate);
+    const addEvent = useFeedStore((state) => state.addEvent);
+
+    useEvents();
+
+    useImperativeHandle(ref, () => ({
       reload: () => {
         clearUpdate();
         fetchFeed();
       },
-      // get storiesListDimensions(): StoriesListDimensions {
-      //   return {
-      //     totalHeight: appearanceManager.storiesListOptions.layout.height,
-      //   }
-      // }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  React.useEffect(() => {
-    setTimeout(() => {
-      createSubscriberList();
-      if (favoritesOnly) {
-        fetchFavoriteFeed();
-      } else {
-        fetchFeed();
-      }
-    }, 10);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  const onPress = React.useCallback(
-    (story, index) => {
-      addEvent({
-        event: 'clickOnStory',
-        data: {
-          id: story.storyID,
-          feed,
-          index,
-          slidesCount: story.slidesCount,
-          title: story.statTitle,
-        },
-        time: +Date.now(),
-      });
+    }));
 
-      InAppStorySDK.selectStoryCellWith(String(story.storyID), feed);
-    },
-    [addEvent, feed]
-  );
-  const onFavoritePress = React.useCallback(
-    (story, index) => {
-      if (typeof story === 'string') {
-        storyManager.onFavoriteCell(feed);
-      } else {
+    const selectFeedEvents = React.useCallback(
+      (state: StoreState) => {
+        return state[`feeds_${props.feed}_feed`];
+      },
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      []
+    );
+
+    const _feedEvents = useFeedStore(selectFeedEvents);
+    const feedEvents = _feedEvents || [];
+
+    const feed = props.feed;
+    const uniqueId = React.useRef(Math.random().toString(36).slice(2)).current;
+    const storyManager = props.storyManager;
+    const appearanceManager = props.appearanceManager;
+    const showFavorites = props.showFavorites;
+    const favoritesOnly = props.favoritesOnly;
+    const renderCell = props.renderCell;
+    const renderFavoriteCell = props.renderFavoriteCell;
+    const vertical = props.vertical;
+
+    const onLoadStart = props.onLoadStart || (() => {});
+    const onLoadEnd = props.onLoadEnd;
+
+    //const userID = storyManager.userId;
+
+    React.useEffect(() => {
+      updateVersion;
+    }, [updateVersion]);
+    const createSubscriberList = React.useCallback(async () => {
+      storyManager.createSubscriberList(feed, uniqueId);
+    }, [feed, storyManager, uniqueId]);
+    const fetchFeed = React.useCallback(async () => {
+      storyManager.fetchFeed(feed, uniqueId);
+    }, [feed, storyManager, uniqueId]);
+    const fetchFavoriteFeed = React.useCallback(async () => {
+      storyManager.fetchFavorites(feed);
+    }, [feed, storyManager]);
+    React.useEffect(() => {
+      // if (!favoritesOnly) {
+      if (updateVersion < 1) {
+        onLoadStart();
+      }
+      if (!feedEvents) return;
+      onLoadEnd({
+        defaultListLength: feedEvents.length || 0,
+        favoriteListLength: feedFavoriteEvents.length || 0,
+        feed,
+        list: 'feed',
+        success: true,
+        error: null,
+      });
+      // }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [feedEvents.length, feedFavoriteEvents.length, updateVersion]);
+
+    // React.useEffect(() => {
+    // viewModelExporter({
+    //     reload: () => {
+    //       clearUpdate();
+    //       fetchFeed();
+    //     }
+    //     // get storiesListDimensions(): StoriesListDimensions {
+    //     //   return {
+    //     //     totalHeight: appearanceManager.storiesListOptions.layout.height,
+    //     //   }
+    //     // }
+    //   });
+    //   // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, []);
+    React.useEffect(() => {
+      setTimeout(() => {
+        createSubscriberList();
+        if (favoritesOnly) {
+          fetchFavoriteFeed();
+        } else {
+          fetchFeed();
+          // Carousel with a favorites cell: favorites are a separate native
+          // list and must be loaded explicitly, otherwise the cell never shows.
+          if (showFavorites) fetchFavoriteFeed();
+        }
+      }, 10);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+    const onPress = React.useCallback(
+      (story: StoryCellData, index: number) => {
         addEvent({
           event: 'clickOnStory',
           data: {
@@ -131,35 +161,62 @@ export const StoriesList = ({
           time: +Date.now(),
         });
 
-        InAppStorySDK.selectFavoriteStoryCellWith(String(story.storyID));
-      }
-    },
-    [feed, storyManager, addEvent]
-  );
+        NativeStoryManager.selectStoryCellWith(
+          String(story.storyID),
+          feed,
+          uniqueId
+        );
+      },
+      [addEvent, feed, uniqueId]
+    );
+    const onFavoritePress = React.useCallback(
+      (story: string | StoryCellData, index: number) => {
+        if (typeof story === 'string') {
+          storyManager.onFavoriteCell(feed);
+        } else {
+          addEvent({
+            event: 'clickOnStory',
+            data: {
+              id: story.storyID,
+              feed,
+              index,
+              slidesCount: story.slidesCount,
+              title: story.statTitle,
+            },
+            time: +Date.now(),
+          });
 
-  const styles = StyleSheet.create({
-    storyList: {
-      paddingTop: appearanceManager?.storiesListOptions.topPadding,
-      paddingBottom: appearanceManager?.storiesListOptions.bottomPadding,
-    },
-  });
+          NativeStoryManager.selectFavoriteStoryCellWith(String(story.storyID));
+        }
+      },
+      [feed, storyManager, addEvent]
+    );
 
-  return (
-    <View style={styles.storyList}>
-      <StoriesCarousel
-        feed={feed}
-        stories={feedEvents}
-        showFavorites={showFavorites}
-        favoriteStories={feedFavoriteEvents}
-        storyManager={storyManager}
-        appearanceManager={appearanceManager}
-        onPress={onPress}
-        onFavoritePress={onFavoritePress}
-        favoritesOnly={favoritesOnly}
-        renderCell={renderCell}
-        renderFavoriteCell={renderFavoriteCell}
-        horizontal={!vertical}
-      />
-    </View>
-  );
-};
+    const styles = StyleSheet.create({
+      storyList: {
+        paddingTop: appearanceManager?.storiesListOptions.topPadding || 16,
+        paddingBottom:
+          appearanceManager?.storiesListOptions.bottomPadding || 16,
+      },
+    });
+
+    return (
+      <View style={styles.storyList}>
+        <StoriesCarousel
+          feed={feed}
+          stories={feedEvents}
+          showFavorites={showFavorites}
+          favoriteStories={feedFavoriteEvents}
+          storyManager={storyManager}
+          appearanceManager={appearanceManager}
+          onPress={onPress}
+          onFavoritePress={onFavoritePress}
+          favoritesOnly={favoritesOnly}
+          renderCell={renderCell}
+          renderFavoriteCell={renderFavoriteCell}
+          horizontal={!vertical}
+        />
+      </View>
+    );
+  }
+);

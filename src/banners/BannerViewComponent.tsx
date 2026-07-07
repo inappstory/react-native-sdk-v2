@@ -6,7 +6,7 @@ import {
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
-import codegenNativeCommands from 'react-native/Libraries/Utilities/codegenNativeCommands';
+import { codegenNativeCommands } from 'react-native';
 
 import { cacheNativeView, getCachedNativeView } from '../GlobalsWrapper';
 

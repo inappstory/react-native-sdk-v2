@@ -1,4 +1,3 @@
-import * as React from 'react';
 import {
   Image,
   Pressable,
@@ -8,7 +7,9 @@ import {
   Platform,
 } from 'react-native';
 import Video, { MixWithOthersType, ViewType } from 'react-native-video';
-import { AppearanceManager, type RenderCell, StoryManager } from '../index';
+import type { AppearanceManager } from '../AppearanceManager';
+import type { StoryManager } from '../StoryManager';
+import type { RenderCell } from '../data/RenderCell';
 
 export const StoryComponent = ({
   story,

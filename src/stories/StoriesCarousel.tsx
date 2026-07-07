@@ -1,18 +1,13 @@
 import * as React from 'react';
 import { View, Platform } from 'react-native';
 import { StoryComponent } from './StoryComponent';
-import { Pressable } from 'react-native';
-import InAppStorySDK, {
-  type RenderCell,
-  type RenderFavoriteCell,
-} from '@inappstory/react-native-sdk';
-import { AppearanceManager, StoryManager } from '../index';
-import type {
-  ViewabilityConfig,
-  ViewabilityConfigCallbackPair,
-  ViewabilityConfigCallbackPairs,
-} from '@react-native/virtualized-lists/Lists/VirtualizedList';
-import { FlatList } from 'react-native-gesture-handler';
+import { FlatList, Pressable } from 'react-native';
+
+import type { StoryManager } from '../StoryManager';
+import type { AppearanceManager } from '../AppearanceManager';
+import type { RenderCell, RenderFavoriteCell } from '../data/RenderCell';
+import NativeStoryManager from '../NativeStoryManager';
+import type { Story } from '../data/Story';
 
 export const StoriesCarousel = ({
   feed,
@@ -44,32 +39,32 @@ export const StoriesCarousel = ({
   const visibleIds = React.useRef<any>([]);
   const flatListRef = React.useRef<any>(null);
 
-  const onViewableItemsChanged: ViewabilityConfigCallbackPair['onViewableItemsChanged'] =
-    (info) => {
-      const newIDs = info.changed
-        .filter((i) => i.isViewable)
-        .map((i) => String(i.key))
-        .filter((id) => !visibleIds.current.includes(id))
-        .filter((f) => f !== 'undefined')
-        // The favorites cell is not a story — never report it as a visible
-        // preview (native setVisibleWith does parseInt on the ids).
-        .filter((f) => f !== 'favorites_cell');
-      newIDs.map((id) => {
-        visibleIds.current.push(id);
-      });
-      if (newIDs.length > 0) {
-        InAppStorySDK.setVisibleWith(newIDs);
-      }
-    };
+  const onViewableItemsChanged = (info: {
+    changed: Array<{ isViewable: boolean; key: string }>;
+  }) => {
+    const newIDs = info.changed
+      .filter((i) => i.isViewable)
+      .map((i) => String(i.key))
+      .filter((id) => !visibleIds.current.includes(id))
+      .filter((f) => f !== 'undefined')
+      // The favorites cell is not a story — never report it as a visible
+      // preview (native setVisibleWith does parseInt on the ids).
+      .filter((f) => f !== 'favorites_cell');
+    newIDs.map((id) => {
+      visibleIds.current.push(id);
+    });
+    if (newIDs.length > 0) {
+      NativeStoryManager.setVisibleWith(newIDs);
+    }
+  };
 
-  const viewabilityConfig: ViewabilityConfig = {
+  const viewabilityConfig = {
     viewAreaCoveragePercentThreshold: 0,
   };
-  const viewabilityConfigCallbackPairs =
-    React.useRef<ViewabilityConfigCallbackPairs>([
-      { viewabilityConfig, onViewableItemsChanged },
-    ]);
-  const renderItem = ({ item, index }) => {
+  const viewabilityConfigCallbackPairs = React.useRef([
+    { viewabilityConfig, onViewableItemsChanged },
+  ]);
+  const renderItem = ({ item, index }: { item: any; index: number }) => {
     const story = item;
     if (!story.favorites) {
       return (
@@ -103,7 +98,7 @@ export const StoriesCarousel = ({
               ?.customStyles || {
               width: appearanceManager?.storiesListOptions.card.height + 30,
               height: appearanceManager?.storiesListOptions.card.height,
-              // paddingTop: appearanceManager?.storiesListOptions.topPadding,
+              paddingTop: appearanceManager?.storiesListOptions.topPadding,
               paddingRight: appearanceManager?.storiesListOptions.sidePadding,
               flexWrap: 'wrap',
               flexDirection: 'row',
@@ -114,7 +109,7 @@ export const StoriesCarousel = ({
           key="pressable_favorites"
           onPress={() => onFavoritePress(feed)}
         >
-          {story.favorites.map((story) => {
+          {story.favorites.map((story: Story) => {
             return (
               <StoryComponent
                 key={story.storyID}
@@ -182,10 +177,8 @@ export const StoriesCarousel = ({
         if (Platform.OS === 'android') flatListRef?.current?.scrollToEnd();
       }}
       style={{
-        minHeight: appearanceManager?.storiesListOptions.card.height + 7,
+        height: appearanceManager?.storiesListOptions.card.height + 7,
       }}
     />
   );
 };
-
-StoriesCarousel.whyDidYouRender = true;

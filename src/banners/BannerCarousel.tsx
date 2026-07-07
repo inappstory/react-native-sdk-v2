@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import { forwardRef } from 'react';
 import { type StyleProp, type ViewStyle } from 'react-native';
 import BannerViewComponent, { type BannerViewRef } from './BannerViewComponent';
 

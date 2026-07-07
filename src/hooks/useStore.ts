@@ -1,19 +1,21 @@
 import { create } from 'zustand';
-type StoreState = {
+
+export interface StoreState {
   events: Array<any>;
   feeds: Array<any>;
   update: number;
   clearUpdate: () => void;
   addEvent: (event: any) => void;
-  clearFeed: (feed: String) => void;
-  clearAllFeeds: () => void;
-  addToFeed: (feed: String, events: Array<any>) => void;
-  setFavorite: (storyID: String, isFavorite: Boolean) => void;
-  replaceInFeed: (feed: String, event: any) => void;
+  clearFeed: (feed: string) => void;
+  addToFeed: (feed: string, events: Array<any>) => void;
+  setFavorite: (storyID: string, isFavorite: boolean) => void;
+  replaceInFeed: (feed: string, event: any) => void;
   feeds_default_feed: Array<any>;
   feeds_default_favorites: Array<any>;
-};
-export const useStore = create<StoreState>((set) => ({
+  [feedKey: `feeds_${string}`]: Array<any>;
+}
+
+export const useFeedStore = create<StoreState>()((set) => ({
   events: [],
   feeds: [],
   feeds_default_feed: [],
@@ -26,30 +28,15 @@ export const useStore = create<StoreState>((set) => ({
       return newState;
     }, true),
   addEvent: (newEvent) =>
-    set((state) => {
-      return { events: state.events.concat([newEvent]) };
-    }),
-
-  clearAllFeeds: () =>
-    set((state) => {
-      const newState: any = { ...state };
-      state.feeds.forEach((feed) => {
-        delete newState[`feeds_${feed}`];
-      });
-      newState.feeds = [];
-      newState.feeds_default_feed = [];
-      newState.feeds_default_favorites = [];
-      newState.update = newState.update + 1;
-      return newState;
-    }, true),
+    set((state) => ({ events: state.events.concat([newEvent]) })),
   clearFeed: (feed) =>
     set((state) => {
       const newState = state;
       const feedIndex = newState.feeds.indexOf(`${feed}`);
-      const feedName = `feeds_${feed}`;
+      const feedName = `feeds_${feed}` as const;
       if (feedIndex !== -1) {
         newState.feeds.splice(feedIndex, 1);
-        delete newState[`${feedName}`];
+        delete newState[feedName];
       }
       newState.update = newState.update + 1;
       return newState;
@@ -60,16 +47,12 @@ export const useStore = create<StoreState>((set) => ({
       if (state.feeds.indexOf(feed) == -1) {
         newState.feeds.push(feed);
       }
-      const feedName = `feeds_${feed}`;
-      if (typeof newState[feedName] === 'undefined') {
-        newState[feedName] = [];
-      }
+      const feedName = `feeds_${feed}` as const;
+      const feedArr = newState[feedName] ?? (newState[feedName] = []);
       events.map((event) => {
-        const idx = newState[`${feedName}`].findIndex(
-          (f) => f.storyID == event.storyID
-        );
+        const idx = feedArr.findIndex((f) => f.storyID == event.storyID);
         if (idx === -1) {
-          newState[feedName].push(event);
+          feedArr.push(event);
         }
       });
       newState.update = newState.update + 1;
@@ -80,9 +63,10 @@ export const useStore = create<StoreState>((set) => ({
       state.feeds.map((feedName) => {
         var [feed, type] = feedName.split('_');
         if (type == 'favorites') {
-          const idx = state[`feeds_${feedName}`].findIndex(
-            (f) => f.storyID == storyID
-          );
+          const idx =
+            state[`feeds_${feedName}`]?.findIndex(
+              (f) => f.storyID == storyID
+            ) ?? -1;
           if (idx !== -1 && !isFavorite) {
             state[`feeds_${feed}_favorites`]?.splice(idx, 1);
           }
@@ -104,17 +88,13 @@ export const useStore = create<StoreState>((set) => ({
   replaceInFeed: (feed, event) =>
     set((state) => {
       const newState = { ...state };
-      const feedName = `feeds_${feed}`;
-      if (typeof newState[feedName] === 'undefined') {
-        newState[feedName] = [];
-      }
-      const eventIdx = newState[feedName].findIndex(
-        (os) => os.storyID == event.storyID
-      );
+      const feedName = `feeds_${feed}` as const;
+      const feedArr = newState[feedName] ?? (newState[feedName] = []);
+      const eventIdx = feedArr.findIndex((os) => os.storyID == event.storyID);
       if (eventIdx === -1) {
-        newState[feedName].push(event);
+        feedArr.push(event);
       } else {
-        newState[feedName][eventIdx] = event;
+        feedArr[eventIdx] = event;
         newState.update = newState.update + 1;
       }
       return newState;

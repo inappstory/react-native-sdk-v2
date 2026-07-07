@@ -1,4 +1,5 @@
 import Foundation
+import React
 @_spi(QAApp) import InAppStorySDK
 @_spi(IAS_API) import InAppStorySDK
 import UIKit
