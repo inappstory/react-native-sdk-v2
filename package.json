@@ -39,6 +39,7 @@
     "lint:fix": "eslint \"**/*.{js,ts,tsx}\" --fix",
     "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
     "prepack": "bob build",
+    "prepare": "bob build",
     "release": "release-it --only-version"
   },
   "keywords": [
