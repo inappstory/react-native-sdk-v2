@@ -18,6 +18,7 @@ export interface Spec extends TurboModule {
   readonly dislikeStory: CodegenTypes.EventEmitter<EventDTO>;
   readonly favoriteStory: CodegenTypes.EventEmitter<EventDTO>;
   readonly clickOnShareStory: CodegenTypes.EventEmitter<EventDTO>;
+  readonly clickOnButton: CodegenTypes.EventEmitter<EventDTO>;
   readonly storyWidgetEvent: CodegenTypes.EventEmitter<EventDTO>;
 }
 

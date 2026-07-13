@@ -1,8 +1,7 @@
 import * as React from 'react';
-import { View, Platform } from 'react-native';
+import { View, Platform, FlatList } from 'react-native';
 import { StoryComponent } from './StoryComponent';
 import { Pressable } from 'react-native';
-import { FlatList } from 'react-native-gesture-handler';
 
 import type { StoryManager } from '../StoryManager';
 import type { AppearanceManager } from '../AppearanceManager';
@@ -160,6 +159,7 @@ export const StoriesCarousel = ({
   return (
     <FlatList
       horizontal={horizontal}
+      removeClippedSubviews={false}
       data={datasource}
       renderItem={renderItem}
       contentContainerStyle={{

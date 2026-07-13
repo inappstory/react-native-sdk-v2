@@ -356,6 +356,78 @@ export class StoryManager {
     );
   }
 
+  onCloseStory(listener: any) {
+    subscribeNativeEvent(
+      NativeStoriesEvents,
+      'NativeStoriesEvents',
+      'closeStory',
+      listener
+    );
+  }
+
+  onShowSlide(listener: any) {
+    subscribeNativeEvent(
+      NativeStoriesEvents,
+      'NativeStoriesEvents',
+      'showSlide',
+      listener
+    );
+  }
+
+  onClickOnButton(listener: any) {
+    subscribeNativeEvent(
+      NativeStoriesEvents,
+      'NativeStoriesEvents',
+      'clickOnButton',
+      listener
+    );
+  }
+
+  onLikeStory(listener: any) {
+    subscribeNativeEvent(
+      NativeStoriesEvents,
+      'NativeStoriesEvents',
+      'likeStory',
+      listener
+    );
+  }
+
+  onDislikeStory(listener: any) {
+    subscribeNativeEvent(
+      NativeStoriesEvents,
+      'NativeStoriesEvents',
+      'dislikeStory',
+      listener
+    );
+  }
+
+  onFavoriteStory(listener: any) {
+    subscribeNativeEvent(
+      NativeStoriesEvents,
+      'NativeStoriesEvents',
+      'favoriteStory',
+      listener
+    );
+  }
+
+  onShareStory(listener: any) {
+    subscribeNativeEvent(
+      NativeStoriesEvents,
+      'NativeStoriesEvents',
+      'clickOnShareStory',
+      listener
+    );
+  }
+
+  onShareStoryWithPath(listener: any) {
+    subscribeNativeEvent(
+      NativeSystemEvents,
+      'NativeSystemEvents',
+      'customShare',
+      listener
+    );
+  }
+
   setPlaceholders(placeholders: any): void {
     this.placeholders = placeholders;
     NativeStoryManager.setPlaceholders(placeholders);

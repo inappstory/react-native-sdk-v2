@@ -12,13 +12,14 @@ public class NativeStoriesEventsImpl: NSObject {
     super.init()
   }
 
-  @objc public func setupStoryEvents(
-    onShowStory: @escaping ([String: Any]) -> Void
+  @objc(setupStoryEventsWithEmit:)
+  public func setupStoryEvents(
+    emit: @escaping ([String: Any]) -> Void
   ) {
     NSLog("setupStoryEvents")
     InAppStory.shared.storiesEvent = { storiesEvent in
       switch storiesEvent {
-      case .storiesLoaded(let feed, let stories):
+      case .storiesLoaded:
         break
       case .showStory(let storyData, let action):
         var actionString = ""
@@ -36,18 +37,15 @@ public class NativeStoriesEventsImpl: NSObject {
         @unknown default:
           actionString = "unknown"
         }
-        NSLog("showStory")
-        onShowStory([
+        emit([
           "withName": "showStory",
           "body": [
-            "id": storyData.id,
+            "id": storyData.id ?? "",
             "feed": storyData.feed,
             "action": actionString,
             "slidesCount": storyData.slidesCount,
           ],
-        ]
-        )
-        break
+        ])
       case .closeStory(let slideData, let action):
         var actionString = ""
         switch action {
@@ -62,35 +60,88 @@ public class NativeStoriesEventsImpl: NSObject {
         @unknown default:
           actionString = "unknown"
         }
-
-        break
+        emit([
+          "withName": "closeStory",
+          "body": [
+            "id": slideData.storyData?.id ?? "",
+            "feed": slideData.storyData?.feed ?? "",
+            "index": slideData.index,
+            "action": actionString,
+          ],
+        ])
       case .showSlide(let slideData):
-
-        break
+        emit([
+          "withName": "showSlide",
+          "body": [
+            "id": slideData.storyData?.id ?? "",
+            "index": slideData.index,
+          ],
+        ])
       case .likeStory(let slideData, let value):
-
-        break
+        emit([
+          "withName": "likeStory",
+          "body": [
+            "id": slideData.storyData?.id ?? "",
+            "feed": slideData.storyData?.feed ?? "",
+            "index": slideData.index,
+            "value": value,
+          ],
+        ])
       case .dislikeStory(let slideData, let value):
-
-        break
+        emit([
+          "withName": "dislikeStory",
+          "body": [
+            "id": slideData.storyData?.id ?? "",
+            "feed": slideData.storyData?.feed ?? "",
+            "index": slideData.index,
+            "value": value,
+          ],
+        ])
       case .favoriteStory(let slideData, let value):
-
-        break
+        emit([
+          "withName": "favoriteStory",
+          "body": [
+            "id": slideData.storyData?.id ?? "",
+            "feed": slideData.storyData?.feed ?? "",
+            "index": slideData.index,
+            "value": value,
+          ],
+        ])
       case .clickOnShareStory(let slideData):
-
-        break
+        emit([
+          "withName": "clickOnShareStory",
+          "body": [
+            "id": slideData.storyData?.id ?? "",
+            "feed": slideData.storyData?.feed ?? "",
+            "index": slideData.index,
+          ],
+        ])
       case .storyWidgetEvent(let slideData, let name, let data):
-
-        break
-      case .ugcStoriesLoaded(let stories):
-        break
-      case .clickOnStory(let storyData, let index):
-        break
+        emit([
+          "withName": "storyWidgetEvent",
+          "body": [
+            "id": slideData?.storyData?.id ?? "",
+            "feed": slideData?.storyData?.feed ?? "",
+            "name": name,
+            "data": data ?? [:],
+          ],
+        ])
       case .clickOnButton(let slideData, let link):
+        emit([
+          "withName": "clickOnButton",
+          "body": [
+            "id": slideData.storyData?.id ?? "",
+            "feed": slideData.storyData?.feed ?? "",
+            "index": slideData.index,
+            "url": link,
+          ],
+        ])
+      case .ugcStoriesLoaded:
+        break
+      case .clickOnStory:
         break
       @unknown default:
         NSLog("WARNING: unknown storiesEvent")
-
       }
     }
   }
