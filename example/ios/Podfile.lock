@@ -2298,7 +2298,7 @@ SPEC CHECKSUMS:
   React-microtasksnativemodule: 354ab193a7ed66e42869c8a0c2c0d844e8e22f67
   React-mutationobservernativemodule: f53ad06cbe4b44d2a33df6aa3f01ca8e9b57e83b
   react-native-safe-area-context: 0bbcdfba5c4a1b3203276f1ed9128e3239fdf199
-  react-native-sdk: fb8abfb33cf0338bbd59288729ef62c01cffbbcf
+  react-native-sdk: d83b41b2e92d09d1941abc964d2a7b0bcc055b29
   react-native-video: 950a8bb07646654716ebf0dd78acf16f95fa3b6c
   React-NativeModulesApple: a092d89b58f635ebfab88048b0eda9fb516819fd
   React-networking: ee8e1504d7c1c73a3655bf545ca1184bebae4c7f

@@ -11,9 +11,6 @@ import java.util.HashMap
 
 class InappstorySdkPackage : BaseReactPackage() {
 
-  // BannerView is a legacy SimpleViewManager (used via requireNativeComponent on
-  // both Paper and Fabric interop). Autolinking only instantiates this package,
-  // so the view manager must be registered here, not in a separate package.
   override fun createViewManagers(
     reactContext: ReactApplicationContext
   ): MutableList<ViewManager<*, *>> = mutableListOf(BannerViewComponentViewManager())
@@ -24,6 +21,9 @@ class InappstorySdkPackage : BaseReactPackage() {
       name == StoryManagerModule.NAME -> StoryManagerModule(reactContext)
       name == StoriesEventsModule.NAME -> StoriesEventsModule(reactContext)
       name == FeedEventsModule.NAME -> FeedEventsModule(reactContext)
+      name == BannerEventsModule.NAME -> BannerEventsModule(reactContext)
+      name == GoodsEventsModule.NAME -> GoodsEventsModule(reactContext)
+      name == SystemEventsModule.NAME -> SystemEventsModule(reactContext)
       else -> null
     }
   }
@@ -58,6 +58,30 @@ class InappstorySdkPackage : BaseReactPackage() {
       moduleInfos[FeedEventsModule.NAME] = ReactModuleInfo(
         FeedEventsModule.NAME,
         FeedEventsModule.NAME,
+        false,  // canOverrideExistingModule
+        false,  // needsEagerInit
+        false,  // isCxxModule
+        BuildConfig.IS_NEW_ARCHITECTURE_ENABLED // isTurboModule
+      )
+      moduleInfos[BannerEventsModule.NAME] = ReactModuleInfo(
+        BannerEventsModule.NAME,
+        BannerEventsModule.NAME,
+        false,  // canOverrideExistingModule
+        false,  // needsEagerInit
+        false,  // isCxxModule
+        BuildConfig.IS_NEW_ARCHITECTURE_ENABLED // isTurboModule
+      )
+      moduleInfos[GoodsEventsModule.NAME] = ReactModuleInfo(
+        GoodsEventsModule.NAME,
+        GoodsEventsModule.NAME,
+        false,  // canOverrideExistingModule
+        false,  // needsEagerInit
+        false,  // isCxxModule
+        BuildConfig.IS_NEW_ARCHITECTURE_ENABLED // isTurboModule
+      )
+      moduleInfos[SystemEventsModule.NAME] = ReactModuleInfo(
+        SystemEventsModule.NAME,
+        SystemEventsModule.NAME,
         false,  // canOverrideExistingModule
         false,  // needsEagerInit
         false,  // isCxxModule

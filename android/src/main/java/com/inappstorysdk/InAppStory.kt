@@ -1,12 +1,12 @@
 package com.inappstory.reactnativesdk
 
 import com.inappstory.sdk.InAppStoryManager;
-import android.content.Context;
+import android.app.Application
 
 class InAppStory {
   companion object {
-    fun initSDK(context: Context) {
-      InAppStoryManager.initSDK(context)
+    fun initSDK(application: Application) {
+      InAppStoryManager.initSDK(application, false)
     }
   }
 }

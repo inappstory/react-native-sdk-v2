@@ -68,6 +68,8 @@ public class NativeStoryManagerImpl: NSObject {
       // the parameter is responsible for animation of the reader display when you tap on a story cell
       InAppStory.shared.presentationStyle = .zoom
 
+      InAppStoryAPI.shared.plaform = ExternalPlatforms.reactNative
+
       InAppStory.shared.sandBox = sandbox
       InAppStory.shared.isStatisticDisabled = !sendStats
       InAppStory.shared.initWith(
@@ -593,6 +595,25 @@ public class NativeStoryManagerImpl: NSObject {
           "list": "feed",
         ]
       )
+    }
+  }
+
+  // tags are unused on iOS (preloadBanners has no tags parameter); kept to mirror the shared spec.
+  @objc public func preloadBannerPlace(
+    _ placeId: String,
+    tags: [String]?,
+    resolver resolve: @escaping RCTPromiseResolveBlock,
+    rejecter reject: @escaping RCTPromiseRejectBlock
+  ) {
+    DispatchQueue.main.async {
+      InAppStory.shared.preloadBanners(placeID: placeId) { result in
+        switch result {
+        case .success:
+          resolve(true)
+        case .failure:
+          resolve(false)
+        }
+      }
     }
   }
 

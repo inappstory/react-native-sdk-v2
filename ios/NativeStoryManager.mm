@@ -78,6 +78,16 @@ RCT_EXPORT_METHOD(getStories:(nonnull NSString *)feed
       }];
 }
 
+RCT_EXPORT_METHOD(preloadBannerPlace:(nonnull NSString *)placeId
+                                tags:(NSArray *_Nullable)tags
+                             resolve:(RCTPromiseResolveBlock)resolve
+                              reject:(RCTPromiseRejectBlock)reject) {
+  [[NativeStoryManagerImpl shared] preloadBannerPlace:placeId
+                                                 tags:tags
+                                             resolver:resolve
+                                             rejecter:reject];
+}
+
 RCT_EXPORT_METHOD(onFavoriteCell) {
   [[NativeStoryManagerImpl shared] onFavoriteCell];
 }

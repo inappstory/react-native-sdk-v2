@@ -1946,6 +1946,7 @@ __metadata:
     react: "npm:19.2.7"
     react-native: "npm:0.86.0"
     react-native-builder-bob: "npm:^0.43.0"
+    react-native-gesture-handler: "npm:^2.32.0"
     react-native-video: "npm:^6.19.2"
     release-it: "npm:^20.2.0"
     turbo: "npm:^2.10.0"

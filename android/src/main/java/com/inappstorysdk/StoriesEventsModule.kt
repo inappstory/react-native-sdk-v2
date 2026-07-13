@@ -7,13 +7,6 @@ import com.facebook.react.bridge.WritableMap
 import com.facebook.react.module.annotations.ReactModule
 import com.facebook.react.modules.core.DeviceEventManagerModule
 
-private fun sendLegacyEvent(name: String, payload: WritableMap) {
-  reactApplicationContext
-    .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
-    .emit(name, payload)
-}
-
-
 import com.inappstory.sdk.InAppStoryManager
 import com.inappstory.sdk.stories.outercallbacks.common.reader.ShowStoryAction
 import com.inappstory.sdk.stories.outercallbacks.common.reader.ShowStoryCallback
@@ -28,6 +21,12 @@ class StoriesEventsModule(reactContext: ReactApplicationContext) :
   }
 
   override fun getName(): String = NAME
+
+  private fun sendLegacyEvent(name: String, payload: WritableMap) {
+    reactApplicationContext
+      .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
+      .emit(name, payload)
+  }
 
   // Mirrors iOS NativeStoriesEventsImpl: wires the SDK story callback to the
   // codegen-generated emit* methods. Only showStory is wired (iOS parity);

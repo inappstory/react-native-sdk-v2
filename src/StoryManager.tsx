@@ -1,10 +1,35 @@
+import { Linking } from 'react-native';
 import { isFunction } from './helpers/isFunction';
 import { subscribeNativeEvent } from './helpers/subscribeNativeEvent';
 import NativeStoryManager from './NativeStoryManager';
+import NativeBannerEvents from './specs/NativeBannerEvents';
 import NativeFeedEvents from './specs/NativeFeedEvents';
+import NativeGoodsEvents from './specs/NativeGoodsEvents';
 import NativeStoriesEvents from './specs/NativeStoriesEvents';
+import NativeSystemEvents from './specs/NativeSystemEvents';
 
 export type Option<T> = T | null | undefined;
+
+export enum CTASource {
+  UNKNOWN = 'unknown',
+  STORY_LIST = 'storyList',
+  STORY_READER = 'storyReader',
+  GAME_READER = 'gameReader',
+}
+
+export type CTAGameReaderPayload = { url: string; gameInstanceId: string };
+export type CTAStoryReaderPayload = {
+  id: number;
+  index: number;
+  url: string;
+  elementId: string;
+};
+export type CTAStoryListPayload = {
+  id: number;
+  index: number;
+  isDeeplink: boolean;
+  url: string | undefined;
+};
 
 export type Dict<T = any> = {
   [key: string]: T | undefined;
@@ -166,30 +191,49 @@ export class StoryManager {
 
     NativeFeedEvents.setupFeedEvents();
     NativeStoriesEvents.setupStoriesEvents();
+    NativeBannerEvents.setupBannerEvents();
+    NativeGoodsEvents.setupGoodsEvents();
+    NativeSystemEvents.setupSystemEvents();
+
+    subscribeNativeEvent(
+      NativeGoodsEvents,
+      'NativeGoodsEvents',
+      'getGoodsObject',
+      (event: any) => {
+        manager.fetchGoods(event.body.skus);
+      }
+    );
+
+    subscribeNativeEvent(
+      NativeSystemEvents,
+      'NativeSystemEvents',
+      'handleCTA',
+      (event: any) => {
+        manager.handleCTA(event.body);
+      }
+    );
     return manager;
   }
 
-  // async fetchGoods(skus: string[]) {
-  //     this.getGoodsCallback(skus).then((goods) => {
-  //         goods.map((good) => {
-  //             InAppStorySDK.addProductToCache(
-  //                 good.sku,
-  //                 good.title,
-  //                 good.subtitle,
-  //                 good.imageURL,
-  //                 good.price,
-  //                 good.oldPrice
-  //             );
-  //         });
-  //     });
-  // }
-  // getGoods(callback: any) {
-  //     this.getGoodsCallback = (skus) => {
-  //         return new Promise((resolve, _reject) => {
-  //             resolve(callback(skus));
-  //         });
-  //     };
-  // }
+  async fetchGoods(skus: string[]) {
+    const goods = await this.getGoodsCallback(skus);
+    goods.forEach((good: any) => {
+      NativeGoodsEvents.addProductToCache(
+        good.sku,
+        good.title,
+        good.subtitle,
+        good.imageURL,
+        good.price,
+        good.oldPrice
+      );
+    });
+    NativeGoodsEvents.commitGoods();
+  }
+
+  getGoods(callback: (skus: string[]) => any) {
+    this.getGoodsCallback = (skus: string[]) =>
+      new Promise((resolve) => resolve(callback(skus)));
+  }
 
   setUserId(userId: string, userIdSign: string | null) {
     NativeStoryManager.setUserID(userId, userIdSign);
@@ -238,6 +282,15 @@ export class StoryManager {
     NativeStoryManager.getFavoriteStories(feed);
   }
 
+  preloadBannerPlace(placeId: string, tags?: string[]): Promise<boolean> {
+    return NativeStoryManager.preloadBannerPlace(placeId, tags ?? null).then(
+      (success) => {
+        if (!success) throw false;
+        return success;
+      }
+    );
+  }
+
   // setEventEmitter(emitter: EventEmitter) {
   //     this.emmitter = emitter;
   // }
@@ -282,6 +335,15 @@ export class StoryManager {
     );
   }
 
+  onBannerWidgetEvent(listener: any) {
+    subscribeNativeEvent(
+      NativeBannerEvents,
+      'NativeBannerEvents',
+      'bannerWidgetEvent',
+      listener
+    );
+  }
+
   onShowStory(listener: any) {
     subscribeNativeEvent(
       NativeStoriesEvents,
@@ -308,4 +370,62 @@ export class StoryManager {
       this._callbacks.storyLinkClickHandler = callback;
     }
   }
+
+  handleCTA(event: { url?: string; action?: string }) {
+    let src = CTASource.UNKNOWN;
+    let payload:
+      | CTAStoryListPayload
+      | CTAStoryReaderPayload
+      | CTAGameReaderPayload = null!;
+    switch (event.action) {
+      case 'button':
+      case 'swipe':
+        src = CTASource.STORY_READER;
+        payload = { id: 0, url: event.url!, index: 0, elementId: '' };
+        break;
+      case 'deeplink':
+        src = CTASource.STORY_LIST;
+        payload = { id: 0, index: 0, isDeeplink: true, url: event.url };
+        break;
+      case 'game':
+        src = CTASource.GAME_READER;
+        payload = { url: event.url!, gameInstanceId: '0' };
+        break;
+    }
+    if (src !== CTASource.UNKNOWN) {
+      this.clickOnButtonAction({ src, payload });
+    }
+  }
+
+  protected async defaultLinking(url?: string) {
+    if (url) {
+      try {
+        const supported = await Linking.canOpenURL(url);
+        if (supported) {
+          Linking.openURL(url);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  }
+
+  private clickOnButtonAction = ({
+    src,
+    payload,
+  }: {
+    src: CTASource;
+    payload: CTAStoryListPayload | CTAStoryReaderPayload | CTAGameReaderPayload;
+  }) => {
+    if (isFunction(this._callbacks.storyLinkClickHandler)) {
+      const cbPayload = { src, srcRef: 'default', data: payload };
+      try {
+        this._callbacks.storyLinkClickHandler(cbPayload);
+      } catch (e) {
+        console.error(e);
+      }
+    } else {
+      this.defaultLinking(payload.url);
+    }
+  };
 }

@@ -16,6 +16,13 @@ export type { StoriesListCardOptions } from './AppearanceManager';
 
 export type { StoryManagerConfig } from './StoryManager';
 
+export { CTASource } from './StoryManager';
+export type {
+  CTAGameReaderPayload,
+  CTAStoryReaderPayload,
+  CTAStoryListPayload,
+} from './StoryManager';
+
 export { StoriesList } from './stories/StoriesList';
 export type { StoriesListRef, ListLoadStatus } from './stories/StoriesList';
 

@@ -14,7 +14,7 @@ Pod::Spec.new do |s|
   s.source       = { :git => "https://github.com/inappstory/react-native-sdk-v2.git", :tag => "#{s.version}" }
 
   s.source_files = "ios/**/*.{h,m,mm,cpp,swift}"
-  s.exclude_files = "ios/generated/**"
+  s.exclude_files = "ios/generated/**/*"
   s.private_header_files = "ios/**/*.h"
   s.dependency "InAppStory", "1.27.6"
 

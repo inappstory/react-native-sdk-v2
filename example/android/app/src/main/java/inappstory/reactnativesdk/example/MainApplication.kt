@@ -34,7 +34,7 @@ class MainApplication : Application(), ReactApplication {
 
   override fun onCreate() {
     super.onCreate()
-    InAppStory.initSDK(getApplicationContext())
+    InAppStory.initSDK(this)
     loadReactNative(this)
   }
 }

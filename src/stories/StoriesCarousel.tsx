@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { View, Platform } from 'react-native';
 import { StoryComponent } from './StoryComponent';
-import { FlatList, Pressable } from 'react-native';
+import { Pressable } from 'react-native';
+import { FlatList } from 'react-native-gesture-handler';
 
 import type { StoryManager } from '../StoryManager';
 import type { AppearanceManager } from '../AppearanceManager';

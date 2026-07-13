@@ -63,6 +63,11 @@ export interface Spec extends TurboModule {
 
   selectFavoriteStoryCellWith(storyID: string): void;
 
+  preloadBannerPlace(
+    placeId: string,
+    tags: Array<string> | null
+  ): Promise<boolean>;
+
   readonly onStoryListUpdate: CodegenTypes.EventEmitter<StoryListDTO>;
   readonly onStoryUpdate: CodegenTypes.EventEmitter<StoryDTO>;
 }

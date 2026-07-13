@@ -7,13 +7,6 @@ import com.facebook.react.bridge.WritableMap
 import com.facebook.react.module.annotations.ReactModule
 import com.facebook.react.modules.core.DeviceEventManagerModule
 
-private fun sendLegacyEvent(name: String, payload: WritableMap) {
-  reactApplicationContext
-    .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
-    .emit(name, payload)
-}
-
-
 @ReactModule(name = FeedEventsModule.NAME)
 class FeedEventsModule(reactContext: ReactApplicationContext) :
   NativeFeedEventsSpec(reactContext) {
@@ -33,6 +26,12 @@ class FeedEventsModule(reactContext: ReactApplicationContext) :
   }
 
   override fun getName(): String = NAME
+
+  private fun sendLegacyEvent(name: String, payload: WritableMap) {
+    reactApplicationContext
+      .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
+      .emit(name, payload)
+  }
 
   override fun setupFeedEvents() {
     Log.d(NAME, "setupFeedEvents")

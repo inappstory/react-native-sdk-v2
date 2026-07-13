@@ -6,14 +6,18 @@ import com.facebook.react.bridge.ReadableArray
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableNativeMap;
 import com.facebook.react.module.annotations.ReactModule
-import java.lang.reflect.Field
 import java.util.Locale
 
 import com.inappstory.sdk.InAppStoryManager;
 import com.inappstory.sdk.AppearanceManager;
 
+import com.inappstory.sdk.externalapi.ExternalPlatforms
 import com.inappstory.sdk.externalapi.InAppStoryAPI;
 import com.inappstory.sdk.externalapi.StoryAPIData;
+import com.inappstory.sdk.banners.BannerPlacePreloadCallback
+import com.inappstory.sdk.banners.BannerPlaceLoadSettings
+import com.inappstory.sdk.banners.BannerData
+import com.inappstory.sdk.lrudiskcache.CacheSize
 import com.inappstory.sdk.externalapi.StoryFavoriteItemAPIData;
 import com.inappstory.sdk.externalapi.subscribers.InAppStoryAPIListSubscriber;
 import com.inappstory.sdk.externalapi.storylist.IASStoryListSessionData;
@@ -31,13 +35,7 @@ import com.inappstory.reactnativesdk.AppearanceManagerImpl
 import com.inappstory.sdk.stories.api.models.ImagePlaceholderValue;
 import com.facebook.react.bridge.Promise
 import com.facebook.react.modules.core.DeviceEventManagerModule
-
-private fun sendLegacyEvent(name: String, payload: WritableMap) {
-  reactApplicationContext
-    .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
-    .emit(name, payload)
-}
-
+import com.inappstorysdk.IASLoggerImpl
 
 @ReactModule(name = StoryManagerModule.NAME)
 class StoryManagerModule(var reactContext: ReactApplicationContext) :
@@ -49,6 +47,12 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
 
   override fun getName(): String {
     return NAME
+  }
+
+  private fun sendLegacyEvent(name: String, payload: WritableMap) {
+    reactApplicationContext
+      .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
+      .emit(name, payload)
   }
 
   var ias: InAppStoryManager? = null
@@ -146,6 +150,30 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
     )
   }
 
+  override fun preloadBannerPlace(placeId: String, tags: ReadableArray?, promise: Promise) {
+    Log.d("InappstorySdkModule", "preloadBannerPlace")
+    var settings = BannerPlaceLoadSettings().placeId(placeId)
+    if (tags != null)
+      settings = settings.tags(tags.toArrayList().toMutableList() as List<String>)
+    try {
+      this.ias?.preloadBannerPlace(settings, object : BannerPlacePreloadCallback(placeId) {
+        override fun bannerPlaceLoaded(size: Int, bannerData: List<BannerData>) {
+          promise.resolve(true)
+        }
+
+        override fun loadError() {
+          promise.resolve(false)
+        }
+
+        override fun bannerContentLoaded(bannerId: Int, isFirst: Boolean) {}
+
+        override fun bannerContentLoadError(bannerId: Int, isFirst: Boolean) {}
+      })
+    } catch (e: Throwable) {
+      promise.reject("preloadBannerPlace error", e)
+    }
+  }
+
   override fun onFavoriteCell() {
     val payload: WritableMap = Arguments.createMap()
     //sendEvent(reactContext, "favoriteCellDidSelect", payload)
@@ -194,6 +222,10 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
 
   fun setupListeners() {
     //val that:InappstorySdkModule = this;
+
+    this.ias?.setBannerWidgetCallback { bannerData, name, data ->
+      BannerEventsModule.instance?.emitBannerWidget(bannerData, name, data)
+    }
 
     // AppearanceManager.getCommonInstance().csCustomGoodsWidget(object : ICustomGoodsWidget {
     //   override fun getWidgetView(context: Context): View? {
@@ -644,6 +676,7 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
     sendStatistic: Boolean,
     inAppStoryAPI: InAppStoryAPI
   ) {
+    inAppStoryAPI.setExternalPlatform(ExternalPlatforms.REACT_NATIVE_SDK);
     this.ias = inAppStoryAPI.inAppStoryManager.create(
       apiKey,
       userID,
@@ -653,16 +686,14 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
       null,
       null,
       null,
-      null,
+      false,
       true,
-      null,
+      CacheSize.MEDIUM,
       sandbox,
     )
-    this.ias?.let {
-      val f1: Field = it.javaClass.getDeclaredField("sendStatistic")
-      f1.isAccessible = true
-      f1.set(it, sendStatistic)
-    }
+    inAppStoryAPI.settings.sendStatistic(sendStatistic)
+
+    InAppStoryManager.logger = IASLoggerImpl()
   }
 
   fun subscribeLists(inAppStoryAPI: InAppStoryAPI, feed: String, uniqueId: String = feed) {

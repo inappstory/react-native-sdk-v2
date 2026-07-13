@@ -9,6 +9,17 @@ export type EventDTO = {
 export interface Spec extends TurboModule {
   setupGoodsEvents(): void;
 
+  addProductToCache(
+    sku: string,
+    title: string,
+    subtitle: string,
+    imageURL: string,
+    price: string,
+    oldPrice: string
+  ): void;
+
+  commitGoods(): void;
+
   readonly getGoodsObject: CodegenTypes.EventEmitter<EventDTO>;
   readonly goodItemSelected: CodegenTypes.EventEmitter<EventDTO>;
 }
