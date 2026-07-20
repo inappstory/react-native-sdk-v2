@@ -48,6 +48,7 @@ export declare type StoryManagerConfig = {
     version: string;
     build: number;
   };
+  sendStatistics?: boolean;
 };
 
 // const eventEmitter = new NativeEventEmitter(
