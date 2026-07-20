@@ -36,6 +36,14 @@ import com.inappstory.sdk.stories.api.models.ImagePlaceholderValue;
 import com.facebook.react.bridge.Promise
 import com.facebook.react.modules.core.DeviceEventManagerModule
 import com.inappstorysdk.IASLoggerImpl
+import com.inappstorysdk.NativeOverlayFragment
+
+import android.content.Context
+import androidx.fragment.app.FragmentActivity
+import com.inappstory.sdk.CancellationToken
+import com.inappstory.sdk.inappmessage.InAppMessageOpenSettings
+import com.inappstory.sdk.inappmessage.InAppMessagePreloadSettings
+import com.inappstory.sdk.inappmessage.InAppMessageLoadCallback
 
 @ReactModule(name = StoryManagerModule.NAME)
 class StoryManagerModule(var reactContext: ReactApplicationContext) :
@@ -64,6 +72,8 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
   // Last favorites set seen via updateFavoriteItemData. Used to avoid reloading
   // (and looping) when the SDK re-reports the same set.
   private var lastFavoriteIds: Set<Int>? = null
+
+  private val cancellationTokenMap = mutableMapOf<String, CancellationToken?>()
 
   var stories: ArrayList<String>? = null;
   var goodsCache: ArrayList<GoodsItemData> = ArrayList<GoodsItemData>()
@@ -172,6 +182,104 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
     } catch (e: Throwable) {
       promise.reject("preloadBannerPlace error", e)
     }
+  }
+
+  override fun showGame(gameID: String, promise: Promise) {
+    Log.d(TAG, "showGame")
+    reactContext.runOnUiQueueThread {
+      try {
+        this.ias?.openGame(gameID, reactContext.currentActivity as Context)
+        promise.resolve(true)
+      } catch (e: Throwable) {
+        promise.reject("showGame error", e)
+      }
+    }
+  }
+
+  override fun showSingle(storyID: String, operationId: String, promise: Promise) {
+    Log.d(TAG, "showSingle")
+    reactContext.runOnUiQueueThread {
+      try {
+        cancellationTokenMap[operationId] =
+          this.ias?.showStory(storyID, reactContext.currentActivity, this.appearanceManager, null)
+        promise.resolve(true)
+      } catch (e: Throwable) {
+        promise.reject("showSingle error", e)
+      }
+    }
+  }
+
+  override fun showIAMById(
+    iamID: String,
+    onlyPreloaded: Boolean,
+    operationId: String,
+    promise: Promise
+  ) {
+    Log.d(TAG, "showIAMById")
+    reactContext.runOnUiQueueThread {
+      try {
+        val settings =
+          InAppMessageOpenSettings().id(iamID.toInt()).showOnlyIfLoaded(onlyPreloaded)
+
+        val fragment = NativeOverlayFragment(
+          ias = this.ias,
+          settings = settings,
+          onReaderIsClosed = { cancellationTokenMap.remove(operationId) },
+          onReaderIsOpen = { cancellationToken ->
+            cancellationTokenMap[operationId] = cancellationToken
+            promise.resolve(true)
+          },
+        )
+
+        (reactContext.currentActivity as FragmentActivity).supportFragmentManager
+          .beginTransaction()
+          .add(android.R.id.content, fragment, "overlay_fragment")
+          .addToBackStack("overlay_fragment")
+          .commit()
+      } catch (e: Throwable) {
+        promise.reject("showIAMById error", e)
+      }
+    }
+  }
+
+  override fun preloadIAM(ids: ReadableArray?, tags: ReadableArray?, promise: Promise) {
+    Log.d(TAG, "preloadIAM")
+    var settings = InAppMessagePreloadSettings()
+    if (ids != null)
+      settings = settings.inAppMessageIds(ids.toArrayList().toMutableList() as List<String>)
+    if (tags != null)
+      settings = settings.tags(tags.toArrayList().toMutableList() as List<String>)
+    try {
+      this.ias?.preloadInAppMessages(settings, object : InAppMessageLoadCallback {
+        override fun loaded(id: Int) {}
+
+        override fun allLoaded() {
+          promise.resolve(true)
+        }
+
+        override fun loadError(id: Int) {}
+
+        override fun loadError() {
+          promise.resolve(false)
+        }
+
+        override fun isEmpty() {
+          promise.resolve(true)
+        }
+      })
+    } catch (e: Throwable) {
+      promise.reject("preloadIAM error", e)
+    }
+  }
+
+  override fun cancelOperation(operationId: String) {
+    Log.d(TAG, "cancelOperation")
+    cancellationTokenMap.remove(operationId)?.cancel()
+  }
+
+  override fun clearCache() {
+    Log.d(TAG, "clearCache")
+    this.ias?.clearCache()
   }
 
   override fun onFavoriteCell() {

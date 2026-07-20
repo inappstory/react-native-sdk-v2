@@ -140,13 +140,20 @@ export const StoriesList = forwardRef<StoriesListRef, StoriesListProps>(
           fetchFavoriteFeed();
         } else {
           fetchFeed();
-          // Carousel with a favorites cell: favorites are a separate native
-          // list and must be loaded explicitly, otherwise the cell never shows.
-          if (showFavorites) fetchFavoriteFeed();
         }
       }, 10);
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    React.useEffect(() => {
+      // Carousel with a favorites cell: favorites are a separate native list
+      // and must be loaded explicitly, otherwise the cell never shows. Keyed on
+      // showFavorites rather than mount — apps flip the flag asynchronously
+      // (remote config, feature flag), and then the mount-time load is missed.
+      if (!showFavorites || favoritesOnly) return;
+      const timer = setTimeout(fetchFavoriteFeed, 10);
+      return () => clearTimeout(timer);
+    }, [showFavorites, favoritesOnly, fetchFavoriteFeed]);
     const onPress = React.useCallback(
       (story: StoryCellData, index: number) => {
         addEvent({

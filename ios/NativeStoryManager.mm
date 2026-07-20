@@ -131,6 +131,54 @@ RCT_EXPORT_METHOD(setImagesPlaceholders:(nonnull NSDictionary *)placeholders) {
   [[NativeStoryManagerImpl shared] setImagesPlaceholders:placeholders];
 }
 
+RCT_EXPORT_METHOD(showSingle:(nonnull NSString *)storyID
+                 operationId:(nonnull NSString *)operationId
+                     resolve:(RCTPromiseResolveBlock)resolve
+                      reject:(RCTPromiseRejectBlock)reject) {
+  [[NativeStoryManagerImpl shared] showSingle:storyID
+                                  operationId:operationId
+                                      resolve:resolve
+                                     rejecter:reject];
+}
+
+RCT_EXPORT_METHOD(showGame:(nonnull NSString *)gameID
+                   resolve:(RCTPromiseResolveBlock)resolve
+                    reject:(RCTPromiseRejectBlock)reject) {
+  [[NativeStoryManagerImpl shared] showGame:gameID
+                                    resolve:resolve
+                                   rejecter:reject];
+}
+
+RCT_EXPORT_METHOD(showIAMById:(nonnull NSString *)iamID
+                onlyPreloaded:(BOOL)onlyPreloaded
+                  operationId:(nonnull NSString *)operationId
+                      resolve:(RCTPromiseResolveBlock)resolve
+                       reject:(RCTPromiseRejectBlock)reject) {
+  [[NativeStoryManagerImpl shared] showIAMById:iamID
+                                 onlyPreloaded:onlyPreloaded
+                                   operationId:operationId
+                                       resolve:resolve
+                                      rejecter:reject];
+}
+
+RCT_EXPORT_METHOD(preloadIAM:(NSArray *_Nullable)ids
+                        tags:(NSArray *_Nullable)tags
+                     resolve:(RCTPromiseResolveBlock)resolve
+                      reject:(RCTPromiseRejectBlock)reject) {
+  [[NativeStoryManagerImpl shared] preloadIAM:ids
+                                         tags:tags
+                                      resolve:resolve
+                                     rejecter:reject];
+}
+
+RCT_EXPORT_METHOD(cancelOperation:(nonnull NSString *)operationId) {
+  [[NativeStoryManagerImpl shared] cancelOperation:operationId];
+}
+
+RCT_EXPORT_METHOD(clearCache) {
+  [[NativeStoryManagerImpl shared] clearCache];
+}
+
 
 
 

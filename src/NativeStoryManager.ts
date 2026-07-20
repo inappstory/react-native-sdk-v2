@@ -68,6 +68,25 @@ export interface Spec extends TurboModule {
     tags: Array<string> | null
   ): Promise<boolean>;
 
+  showSingle(storyID: string, operationId: string): Promise<boolean>;
+
+  showGame(gameID: string): Promise<boolean>;
+
+  showIAMById(
+    iamID: string,
+    onlyPreloaded: boolean,
+    operationId: string
+  ): Promise<boolean>;
+
+  preloadIAM(
+    ids: Array<string> | null,
+    tags: Array<string> | null
+  ): Promise<boolean>;
+
+  cancelOperation(operationId: string): void;
+
+  clearCache(): void;
+
   readonly onStoryListUpdate: CodegenTypes.EventEmitter<StoryListDTO>;
   readonly onStoryUpdate: CodegenTypes.EventEmitter<StoryDTO>;
 }

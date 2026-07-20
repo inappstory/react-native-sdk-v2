@@ -35,6 +35,7 @@ public class NativeStoryManagerImpl: NSObject {
 
   var storiesAPI = StoryListAPI()
   var favoriteStoriesAPI = StoryListAPI(isFavorite: true)
+  var cancellationTokenMap: [String: CancellationToken] = [:]
 
   @objc public static let shared = NativeStoryManagerImpl()
 
@@ -911,12 +912,75 @@ public class NativeStoryManagerImpl: NSObject {
     // NativeStoryManager.emitter.sendEvent(withName: "favoriteCellDidSelect", body: [])
   }
 
-  // @objc
-  // func clearCache() {
-  //       DispatchQueue.main.async {
-  //         InAppStory.shared.clearCache()
-  //       }
-  // }
+  @objc public func clearCache() {
+    DispatchQueue.main.async {
+      InAppStory.shared.clearCache()
+    }
+  }
+
+  @objc public func cancelOperation(_ operationId: String) {
+    cancellationTokenMap[operationId]?.cancel()
+    cancellationTokenMap.removeValue(forKey: operationId)
+  }
+
+  @objc public func showSingle(
+    _ storyID: String,
+    operationId: String,
+    resolve: @escaping RCTPromiseResolveBlock,
+    rejecter reject: @escaping RCTPromiseRejectBlock
+  ) {
+    DispatchQueue.main.async { [self] in
+      guard let vc = UIApplication.shared.firstKeyWindow?.rootViewController
+      else {
+        resolve(false)
+        return
+      }
+      cancellationTokenMap[operationId] = InAppStory.shared.showStory(
+        with: storyID,
+        from: vc
+      ) { opened in
+        resolve(opened)
+        self.cancellationTokenMap.removeValue(forKey: operationId)
+      }
+    }
+  }
+
+  @objc public func showIAMById(
+    _ iamID: String,
+    onlyPreloaded: Bool,
+    operationId: String,
+    resolve: @escaping RCTPromiseResolveBlock,
+    rejecter reject: @escaping RCTPromiseRejectBlock
+  ) {
+    DispatchQueue.main.async { [self] in
+      cancellationTokenMap[operationId] = InAppStory.shared
+        .showInAppMessageWith(
+          id: iamID,
+          onlyPreloaded: onlyPreloaded
+        ) { show in
+          resolve(show)
+          self.cancellationTokenMap.removeValue(forKey: operationId)
+        }
+    }
+  }
+
+  @objc public func preloadIAM(
+    _ ids: [String]?,
+    tags: [String]?,
+    resolve: @escaping RCTPromiseResolveBlock,
+    rejecter reject: @escaping RCTPromiseRejectBlock
+  ) {
+    DispatchQueue.main.async {
+      InAppStory.shared.preloadInAppMessages(ids: ids, tags: tags) { result in
+        switch result {
+        case .success:
+          resolve(true)
+        case .failure:
+          resolve(false)
+        }
+      }
+    }
+  }
 
   // @objc
   // func getFavoritesCount(_ storyID: String, resolve:@escaping RCTPromiseResolveBlock, rejecter reject:@escaping RCTPromiseRejectBlock) {
@@ -939,19 +1003,18 @@ public class NativeStoryManagerImpl: NSObject {
   //       }
   // }
 
-  // @objc
-  // func showGame(_ gameID: String, resolver resolve:@escaping RCTPromiseResolveBlock, rejecter reject:@escaping RCTPromiseRejectBlock) {
-  //       DispatchQueue.main.async {
-  //         let vc = UIApplication.shared.firstKeyWindow?.rootViewController
-  //         InAppStory.shared.openGame(with: Game(id: gameID), from: vc) { opened in
-  //           if (opened) {
-  //             resolve(true)
-  //           } else {
-  //             resolve(false)
-  //           }
-  //         }
-  //       }
-  // }
+  @objc public func showGame(
+    _ gameID: String,
+    resolve: @escaping RCTPromiseResolveBlock,
+    rejecter reject: @escaping RCTPromiseRejectBlock
+  ) {
+    DispatchQueue.main.async {
+      let vc = UIApplication.shared.firstKeyWindow?.rootViewController
+      InAppStory.shared.openGame(with: Game(id: gameID), from: vc) { opened in
+        resolve(opened)
+      }
+    }
+  }
 
   // @objc
   // func showOnboardings(_ feed: String, limit: Int, tags: [String]?, resolver resolve:@escaping RCTPromiseResolveBlock, rejecter reject:@escaping RCTPromiseRejectBlock) {

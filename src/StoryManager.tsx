@@ -1,5 +1,8 @@
 import { Linking } from 'react-native';
+import type { AppearanceManager } from './AppearanceManager';
+import { generateId } from './helpers/idGenerator';
 import { isFunction } from './helpers/isFunction';
+import NativeAppearanceManager from './NativeAppearanceManager';
 import { subscribeNativeEvent } from './helpers/subscribeNativeEvent';
 import NativeStoryManager from './NativeStoryManager';
 import NativeBannerEvents from './specs/NativeBannerEvents';
@@ -290,6 +293,79 @@ export class StoryManager {
         return success;
       }
     );
+  }
+
+  /**
+   * Runs a native operation that can be aborted while it is loading:
+   * the operationId lets native cancel the pending open.
+   */
+  private runCancelable<T>(
+    signal: Option<AbortSignal>,
+    rejectValue: T,
+    run: (operationId: string) => Promise<boolean>
+  ): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      if (signal?.aborted) {
+        return reject(rejectValue);
+      }
+      const operationId = generateId();
+      const onAbort = () => {
+        NativeStoryManager.cancelOperation(operationId);
+        reject(rejectValue);
+      };
+      signal?.addEventListener('abort', onAbort);
+      run(operationId).then((success) => {
+        signal?.removeEventListener('abort', onAbort);
+        if (success) {
+          resolve(success);
+        } else {
+          reject(rejectValue);
+        }
+      });
+    });
+  }
+
+  showStory(
+    storyId: string | number,
+    signal?: Option<AbortSignal>,
+    appearanceManager?: AppearanceManager
+  ): Promise<{ loaded: boolean }> {
+    const commonOptions = appearanceManager?.commonOptions;
+    if (commonOptions?.hasLike) {
+      NativeAppearanceManager.setHasLike(commonOptions.hasLikeButton);
+      NativeAppearanceManager.setHasFavorites(commonOptions.hasFavorite);
+      NativeAppearanceManager.setHasShare(commonOptions.hasShare);
+    }
+    return this.runCancelable(signal, { loaded: false }, (operationId) =>
+      NativeStoryManager.showSingle(String(storyId), operationId)
+    ).then(() => ({ loaded: true }));
+  }
+
+  showGame(id: string): Promise<boolean> {
+    return NativeStoryManager.showGame(id);
+  }
+
+  showIAMById(
+    id: string,
+    onlyPreloaded: boolean,
+    signal?: Option<AbortSignal>
+  ): Promise<boolean> {
+    return this.runCancelable(signal, false, (operationId) =>
+      NativeStoryManager.showIAMById(id, onlyPreloaded, operationId)
+    );
+  }
+
+  preloadIAM(ids?: string[], tags?: string[]): Promise<boolean> {
+    return NativeStoryManager.preloadIAM(ids ?? null, tags ?? null).then(
+      (success) => {
+        if (!success) throw false;
+        return success;
+      }
+    );
+  }
+
+  clearCache(): void {
+    NativeStoryManager.clearCache();
   }
 
   // setEventEmitter(emitter: EventEmitter) {
