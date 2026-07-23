@@ -242,6 +242,39 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
     }
   }
 
+  override fun showIAMByEvent(
+    event: String,
+    onlyPreloaded: Boolean,
+    operationId: String,
+    promise: Promise
+  ) {
+    Log.d(TAG, "showIAMByEvent")
+    reactContext.runOnUiQueueThread {
+      try {
+        val settings =
+          InAppMessageOpenSettings().event(event).showOnlyIfLoaded(onlyPreloaded)
+
+        val fragment = NativeOverlayFragment(
+          ias = this.ias,
+          settings = settings,
+          onReaderIsClosed = { cancellationTokenMap.remove(operationId) },
+          onReaderIsOpen = { cancellationToken ->
+            cancellationTokenMap[operationId] = cancellationToken
+            promise.resolve(true)
+          },
+        )
+
+        (reactContext.currentActivity as FragmentActivity).supportFragmentManager
+          .beginTransaction()
+          .add(android.R.id.content, fragment, "overlay_fragment")
+          .addToBackStack("overlay_fragment")
+          .commit()
+      } catch (e: Throwable) {
+        promise.reject("showIAMByEvent error", e)
+      }
+    }
+  }
+
   override fun preloadIAM(ids: ReadableArray?, tags: ReadableArray?, promise: Promise) {
     Log.d(TAG, "preloadIAM")
     var settings = InAppMessagePreloadSettings()

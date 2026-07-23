@@ -78,6 +78,12 @@ export interface Spec extends TurboModule {
     operationId: string
   ): Promise<boolean>;
 
+  showIAMByEvent(
+    event: string,
+    onlyPreloaded: boolean,
+    operationId: string
+  ): Promise<boolean>;
+
   preloadIAM(
     ids: Array<string> | null,
     tags: Array<string> | null

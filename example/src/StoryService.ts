@@ -16,6 +16,7 @@ let storyManagerConfig: StoryManagerConfig = {
   },
   lang: 'en-US',
   defaultMuted: true,
+  sendStatistics: true,
 };
 
 //configure StoryManager

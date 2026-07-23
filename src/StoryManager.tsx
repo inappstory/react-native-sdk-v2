@@ -355,6 +355,16 @@ export class StoryManager {
     );
   }
 
+  showIAMByEvent(
+    event: string,
+    onlyPreloaded: boolean,
+    signal?: Option<AbortSignal>
+  ): Promise<boolean> {
+    return this.runCancelable(signal, false, (operationId) =>
+      NativeStoryManager.showIAMByEvent(event, onlyPreloaded, operationId)
+    );
+  }
+
   preloadIAM(ids?: string[], tags?: string[]): Promise<boolean> {
     return NativeStoryManager.preloadIAM(ids ?? null, tags ?? null).then(
       (success) => {

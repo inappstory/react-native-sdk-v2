@@ -36,6 +36,7 @@ public class NativeStoryManagerImpl: NSObject {
   var storiesAPI = StoryListAPI()
   var favoriteStoriesAPI = StoryListAPI(isFavorite: true)
   var cancellationTokenMap: [String: CancellationToken] = [:]
+  private var iamContainerView: IAMContainerView?
 
   @objc public static let shared = NativeStoryManagerImpl()
 
@@ -952,16 +953,67 @@ public class NativeStoryManagerImpl: NSObject {
     resolve: @escaping RCTPromiseResolveBlock,
     rejecter reject: @escaping RCTPromiseRejectBlock
   ) {
-    DispatchQueue.main.async { [self] in
-      cancellationTokenMap[operationId] = InAppStory.shared
-        .showInAppMessageWith(
-          id: iamID,
-          onlyPreloaded: onlyPreloaded
-        ) { show in
-          resolve(show)
-          self.cancellationTokenMap.removeValue(forKey: operationId)
-        }
+    showIAM(operationId: operationId, resolve: resolve) { container, completion in
+      InAppStory.shared.showInAppMessageWith(
+        id: iamID,
+        targetView: container,
+        onlyPreloaded: onlyPreloaded,
+        completion: completion
+      )
     }
+  }
+
+  @objc public func showIAMByEvent(
+    _ event: String,
+    onlyPreloaded: Bool,
+    operationId: String,
+    resolve: @escaping RCTPromiseResolveBlock,
+    rejecter reject: @escaping RCTPromiseRejectBlock
+  ) {
+    showIAM(operationId: operationId, resolve: resolve) { container, completion in
+      InAppStory.shared.showInAppMessageWith(
+        event: event,
+        targetView: container,
+        onlyPreloaded: onlyPreloaded,
+        completion: completion
+      )
+    }
+  }
+
+  private func showIAM(
+    operationId: String,
+    resolve: @escaping RCTPromiseResolveBlock,
+    present: @escaping (_ container: IAMContainerView, _ completion: @escaping (Bool) -> Void)
+      -> CancellationToken?
+  ) {
+    DispatchQueue.main.async { [self] in
+      guard let host = UIApplication.shared.firstKeyWindow?.rootViewController?.view
+      else {
+        resolve(false)
+        return
+      }
+      InAppStory.shared.inAppMessageDidClose = { [weak self] in
+        self?.removeIAMContainer()
+      }
+      let container = iamContainerView ?? makeIAMContainer(host: host)
+      cancellationTokenMap[operationId] = present(container) { [weak self] show in
+        resolve(show)
+        if !show { self?.removeIAMContainer() }
+        self?.cancellationTokenMap.removeValue(forKey: operationId)
+      }
+    }
+  }
+
+  private func makeIAMContainer(host: UIView) -> IAMContainerView {
+    let container = IAMContainerView()
+    container.attach(to: host)
+    iamContainerView = container
+    return container
+  }
+
+  private func removeIAMContainer() {
+    iamContainerView?.removeFromSuperview()
+    iamContainerView = nil
   }
 
   @objc public func preloadIAM(
@@ -1181,4 +1233,22 @@ public class NativeStoryManagerImpl: NSObject {
   // override static func requiresMainQueueSetup() -> Bool {
   //   return true
   // }
+}
+
+final class IAMContainerView: UIView {
+  func attach(to host: UIView) {
+    translatesAutoresizingMaskIntoConstraints = false
+    host.addSubview(self)
+    NSLayoutConstraint.activate([
+      topAnchor.constraint(equalTo: host.topAnchor),
+      leadingAnchor.constraint(equalTo: host.leadingAnchor),
+      trailingAnchor.constraint(equalTo: host.trailingAnchor),
+      bottomAnchor.constraint(equalTo: host.bottomAnchor),
+    ])
+  }
+
+  override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+    let hit = super.hitTest(point, with: event)
+    return hit == self ? nil : hit
+  }
 }

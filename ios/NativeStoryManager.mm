@@ -161,6 +161,18 @@ RCT_EXPORT_METHOD(showIAMById:(nonnull NSString *)iamID
                                       rejecter:reject];
 }
 
+RCT_EXPORT_METHOD(showIAMByEvent:(nonnull NSString *)event
+                   onlyPreloaded:(BOOL)onlyPreloaded
+                     operationId:(nonnull NSString *)operationId
+                         resolve:(RCTPromiseResolveBlock)resolve
+                          reject:(RCTPromiseRejectBlock)reject) {
+  [[NativeStoryManagerImpl shared] showIAMByEvent:event
+                                    onlyPreloaded:onlyPreloaded
+                                      operationId:operationId
+                                          resolve:resolve
+                                         rejecter:reject];
+}
+
 RCT_EXPORT_METHOD(preloadIAM:(NSArray *_Nullable)ids
                         tags:(NSArray *_Nullable)tags
                      resolve:(RCTPromiseResolveBlock)resolve

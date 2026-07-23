@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   s.source_files = "ios/**/*.{h,m,mm,cpp,swift}"
   s.exclude_files = "ios/generated/**/*"
   s.private_header_files = "ios/**/*.h"
-  s.dependency "InAppStory", "1.27.6"
+  s.dependency "InAppStory", "1.29.3"
 
   if respond_to?(:install_modules_dependencies, true)
     install_modules_dependencies(s)
