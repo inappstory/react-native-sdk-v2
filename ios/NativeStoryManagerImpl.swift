@@ -50,7 +50,9 @@ public class NativeStoryManagerImpl: NSObject {
     userIdSign: String?,
     sandbox: Bool,
     sendStats: Bool,
-    resolve: @escaping RCTPromiseResolveBlock, 
+    cacheSize: String?,
+    anonymous: Bool,
+    resolve: @escaping RCTPromiseResolveBlock,
     rejecter reject: @escaping RCTPromiseRejectBlock
   ) {
     DispatchQueue.main.async {
@@ -74,9 +76,15 @@ public class NativeStoryManagerImpl: NSObject {
 
       InAppStory.shared.sandBox = sandbox
       InAppStory.shared.isStatisticDisabled = !sendStats
+      self._userID = userID
+      self._userIdSign = userIdSign
       InAppStory.shared.initWith(
         serviceKey: apiKey,
-        settings: Settings(userID: userID, sign: userIdSign)
+        settings: Settings(
+          userID: userID,
+          sign: userIdSign,
+          anonymous: anonymous
+        )
       )
 
       // InAppStory.shared.storyReaderWillShow = {showed in
@@ -780,7 +788,13 @@ public class NativeStoryManagerImpl: NSObject {
     DispatchQueue.main.async {
       NSLog("setLang")
       self._lang = lang
-      InAppStory.shared.settings = Settings(userID:self._userID, tags: self._tags, lang: lang)
+      let current = InAppStory.shared.settings
+      InAppStory.shared.settings = Settings(
+        userID: current?.userID ?? self._userID,
+        sign: current?.sign,
+        tags: current?.tags ?? [],
+        lang: lang
+      )
     }
   }
 
@@ -919,6 +933,54 @@ public class NativeStoryManagerImpl: NSObject {
     }
   }
 
+  @objc public func removeFromFavorite(_ storyID: String) {
+    DispatchQueue.main.async {
+      InAppStory.shared.removeFromFavorite(with: storyID)
+    }
+  }
+
+  @objc public func removeAllFavorites() {
+    DispatchQueue.main.async {
+      InAppStory.shared.removeAllFavorites()
+    }
+  }
+
+  @objc public func favoritesCount(
+    _ resolve: @escaping RCTPromiseResolveBlock,
+    rejecter reject: @escaping RCTPromiseRejectBlock
+  ) {
+    DispatchQueue.main.async {
+      resolve(InAppStory.shared.favoritesCount)
+    }
+  }
+
+  @objc public func logout() {
+    DispatchQueue.main.async {
+      InAppStory.shared.logOut {}
+    }
+  }
+
+  @objc public func setOptions(_ options: [String: String]) {
+    DispatchQueue.main.async {
+      InAppStory.shared.options = options
+    }
+  }
+
+  @objc public func showStoryOnce(
+    _ storyID: String,
+    operationId: String,
+    resolve: @escaping RCTPromiseResolveBlock,
+    rejecter reject: @escaping RCTPromiseRejectBlock
+  ) {
+    DispatchQueue.main.async { [self] in
+      cancellationTokenMap[operationId] = InAppStoryAPI.shared.singleStoryAPI
+        .showStoryOnce(with: storyID) { shown in
+          resolve(shown)
+          self.cancellationTokenMap.removeValue(forKey: operationId)
+        }
+    }
+  }
+
   @objc public func cancelOperation(_ operationId: String) {
     cancellationTokenMap[operationId]?.cancel()
     cancellationTokenMap.removeValue(forKey: operationId)
@@ -943,6 +1005,34 @@ public class NativeStoryManagerImpl: NSObject {
         resolve(opened)
         self.cancellationTokenMap.removeValue(forKey: operationId)
       }
+    }
+  }
+
+  @objc public func showOnboardings(
+    _ feed: String,
+    limit: Int,
+    tags: [String]?,
+    operationId: String,
+    resolve: @escaping RCTPromiseResolveBlock,
+    rejecter reject: @escaping RCTPromiseRejectBlock
+  ) {
+    DispatchQueue.main.async { [self] in
+      guard let vc = UIApplication.shared.firstKeyWindow?.rootViewController
+      else {
+        resolve(false)
+        return
+      }
+      cancellationTokenMap[operationId] = InAppStory.shared.showOnboardings(
+        feed: feed,
+        limit: limit,
+        from: vc,
+        with: tags,
+        with: InAppStory.shared.panelSettings,
+        complete: { show in
+          resolve(show)
+          self.cancellationTokenMap.removeValue(forKey: operationId)
+        }
+      )
     }
   }
 

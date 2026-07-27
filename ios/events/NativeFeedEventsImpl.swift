@@ -13,9 +13,46 @@ public class NativeFeedEventsImpl: NSObject {
   }
 
   @objc public func setupFeedEvents(
-    storyReaderWillShow: @escaping ([String: Any]) -> Void
+    storyReaderWillShow: @escaping ([String: Any]) -> Void,
+    storyReaderDidClose: @escaping ([String: Any]) -> Void
   ) {
     NSLog("setupFeedEvents")
+    InAppStory.shared.storyReaderDidClose = { showed in
+      switch showed {
+      case .list(let feed):
+        storyReaderDidClose([
+          "withName": "storyReaderDidClose",
+          "body": [
+            "feed": feed,
+            "type": "list",
+          ],
+        ])
+      case .ugcList:
+        storyReaderDidClose([
+          "withName": "storyReaderDidClose",
+          "body": [
+            "type": "ugcList"
+          ],
+        ])
+      case .single:
+        storyReaderDidClose([
+          "withName": "storyReaderDidClose",
+          "body": [
+            "type": "single"
+          ],
+        ])
+      case .onboarding(let feed):
+        storyReaderDidClose([
+          "withName": "storyReaderDidClose",
+          "body": [
+            "feed": feed,
+            "type": "onboarding",
+          ],
+        ])
+      @unknown default:
+        NSLog("WARNING: unknown storyReaderDidClose")
+      }
+    }
     InAppStory.shared.storyReaderWillShow = { showed in
       switch showed {
       case .list(let feed):

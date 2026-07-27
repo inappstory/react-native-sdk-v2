@@ -24,6 +24,8 @@ class InappstorySdkPackage : BaseReactPackage() {
       name == BannerEventsModule.NAME -> BannerEventsModule(reactContext)
       name == GoodsEventsModule.NAME -> GoodsEventsModule(reactContext)
       name == SystemEventsModule.NAME -> SystemEventsModule(reactContext)
+      name == GameEventsModule.NAME -> GameEventsModule(reactContext)
+      name == IamEventsModule.NAME -> IamEventsModule(reactContext)
       else -> null
     }
   }
@@ -82,6 +84,22 @@ class InappstorySdkPackage : BaseReactPackage() {
       moduleInfos[SystemEventsModule.NAME] = ReactModuleInfo(
         SystemEventsModule.NAME,
         SystemEventsModule.NAME,
+        false,  // canOverrideExistingModule
+        false,  // needsEagerInit
+        false,  // isCxxModule
+        BuildConfig.IS_NEW_ARCHITECTURE_ENABLED // isTurboModule
+      )
+      moduleInfos[GameEventsModule.NAME] = ReactModuleInfo(
+        GameEventsModule.NAME,
+        GameEventsModule.NAME,
+        false,  // canOverrideExistingModule
+        false,  // needsEagerInit
+        false,  // isCxxModule
+        BuildConfig.IS_NEW_ARCHITECTURE_ENABLED // isTurboModule
+      )
+      moduleInfos[IamEventsModule.NAME] = ReactModuleInfo(
+        IamEventsModule.NAME,
+        IamEventsModule.NAME,
         false,  // canOverrideExistingModule
         false,  // needsEagerInit
         false,  // isCxxModule

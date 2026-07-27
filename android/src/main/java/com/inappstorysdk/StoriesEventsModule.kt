@@ -11,6 +11,7 @@ import com.inappstory.sdk.InAppStoryManager
 import com.inappstory.sdk.stories.outercallbacks.common.reader.ClickOnShareStoryCallback
 import com.inappstory.sdk.stories.outercallbacks.common.reader.CloseReader
 import com.inappstory.sdk.stories.outercallbacks.common.reader.CloseStoryCallback
+import com.inappstory.sdk.stories.outercallbacks.common.reader.ContentData
 import com.inappstory.sdk.stories.outercallbacks.common.reader.FavoriteStoryCallback
 import com.inappstory.sdk.stories.outercallbacks.common.reader.LikeDislikeStoryCallback
 import com.inappstory.sdk.stories.outercallbacks.common.reader.ShowSlideCallback
@@ -18,6 +19,7 @@ import com.inappstory.sdk.stories.outercallbacks.common.reader.ShowStoryAction
 import com.inappstory.sdk.stories.outercallbacks.common.reader.ShowStoryCallback
 import com.inappstory.sdk.stories.outercallbacks.common.reader.SlideData
 import com.inappstory.sdk.stories.outercallbacks.common.reader.StoryData
+import com.inappstory.sdk.stories.outercallbacks.common.reader.StoryWidgetCallback
 
 @ReactModule(name = StoriesEventsModule.NAME)
 class StoriesEventsModule(reactContext: ReactApplicationContext) :
@@ -25,9 +27,21 @@ class StoriesEventsModule(reactContext: ReactApplicationContext) :
 
   companion object {
     const val NAME = "NativeStoriesEvents"
+
+    @Volatile
+    var instance: StoriesEventsModule? = null
+  }
+
+  init {
+    instance = this
   }
 
   override fun getName(): String = NAME
+
+  override fun invalidate() {
+    if (instance === this) instance = null
+    super.invalidate()
+  }
 
   private fun sendLegacyEvent(name: String, payload: WritableMap) {
     reactApplicationContext
@@ -48,8 +62,25 @@ class StoriesEventsModule(reactContext: ReactApplicationContext) :
       "dislikeStory" -> if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) emitDislikeStory(payload) else sendLegacyEvent(name, payload)
       "favoriteStory" -> if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) emitFavoriteStory(payload) else sendLegacyEvent(name, payload)
       "clickOnShareStory" -> if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) emitClickOnShareStory(payload) else sendLegacyEvent(name, payload)
+      "clickOnButton" -> if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) emitClickOnButton(payload) else sendLegacyEvent(name, payload)
+      "storyWidgetEvent" -> if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) emitStoryWidgetEvent(payload) else sendLegacyEvent(name, payload)
       else -> sendLegacyEvent(name, payload)
     }
+  }
+
+  // Called from SystemEventsModule's CallToActionCallback for BUTTON clicks
+  // (Android SDK has a single CTA callback slot, registered there).
+  // Body mirrors iOS NativeStoriesEventsImpl clickOnButton.
+  fun emitButtonClick(data: ContentData?, url: String?) {
+    val slide = data as? SlideData
+    emit("clickOnButton", Arguments.createMap().apply {
+      slide?.let {
+        putInt("id", it.story().id())
+        putString("feed", it.story().feed())
+        putInt("index", it.index())
+      }
+      putString("url", url)
+    })
   }
 
   private fun storyBody(slide: SlideData): WritableMap = Arguments.createMap().apply {
@@ -122,6 +153,22 @@ class StoriesEventsModule(reactContext: ReactApplicationContext) :
     manager.setClickOnShareStoryCallback(object : ClickOnShareStoryCallback {
       override fun shareClick(slideData: SlideData) {
         emit("clickOnShareStory", storyBody(slideData))
+      }
+    })
+
+    manager.setStoryWidgetCallback(object : StoryWidgetCallback {
+      override fun widgetEvent(
+        slideData: SlideData,
+        widgetEventName: String,
+        widgetData: Map<String, String>
+      ) {
+        // Body mirrors iOS NativeStoriesEventsImpl storyWidgetEvent.
+        emit("storyWidgetEvent", Arguments.createMap().apply {
+          putInt("id", slideData.story().id())
+          putString("feed", slideData.story().feed())
+          putString("name", widgetEventName)
+          putMap("data", Arguments.makeNativeMap(widgetData as Map<String, Any>))
+        })
       }
     })
   }

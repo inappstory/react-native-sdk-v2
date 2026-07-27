@@ -18,6 +18,7 @@ import com.inappstory.sdk.banners.BannerPlacePreloadCallback
 import com.inappstory.sdk.banners.BannerPlaceLoadSettings
 import com.inappstory.sdk.banners.BannerData
 import com.inappstory.sdk.lrudiskcache.CacheSize
+import com.inappstory.sdk.stories.callbacks.IShowStoryOnceCallback
 import com.inappstory.sdk.externalapi.StoryFavoriteItemAPIData;
 import com.inappstory.sdk.externalapi.subscribers.InAppStoryAPIListSubscriber;
 import com.inappstory.sdk.externalapi.storylist.IASStoryListSessionData;
@@ -80,18 +81,26 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
   private var listenerCount = 0
 
   override fun initWith(
-    apiKey: String, userID: String, userIdSign: String?, sandbox: Boolean, sendStatistics: Boolean, promise: Promise
+    apiKey: String, userID: String, userIdSign: String?, sandbox: Boolean, sendStatistics: Boolean,
+    cacheSize: String?, anonymous: Boolean, promise: Promise
   ) {
     Log.d("InappstorySdkModule", "initWith")
     //this.ias = this.createInAppStoryManager(apiKey, userID)
     this.appearanceManager = AppearanceManagerImpl.getAppearanceManager()
     this.api = InAppStoryAPI()
     this.favoritesApi = InAppStoryAPI()
+    val cacheSizeNative = when (cacheSize) {
+      "small" -> CacheSize.SMALL
+      "large" -> CacheSize.LARGE
+      else -> CacheSize.MEDIUM
+    }
     this.createManager(
-      apiKey, userID, userIdSign, sandbox, sendStatistics, this.favoritesApi as InAppStoryAPI
+      apiKey, userID, userIdSign, sandbox, sendStatistics, cacheSizeNative, anonymous,
+      this.favoritesApi as InAppStoryAPI
     )
     this.createManager(
-      apiKey, userID, userIdSign, sandbox, sendStatistics, this.api as InAppStoryAPI
+      apiKey, userID, userIdSign, sandbox, sendStatistics, cacheSizeNative, anonymous,
+      this.api as InAppStoryAPI
     )
     // Main feed is subscribed per carousel via createSubscriberList(feed, uniqueId);
     // here only favorites is subscribed once (mirrors the old-arch module).
@@ -130,8 +139,8 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
   }
 
   override fun setLang(lang: String) {
-    Log.d("InappstorySdkModule", "setLang")
-    this.ias?.setLang(Locale.forLanguageTag("en-US"))
+    Log.d("InappstorySdkModule", "setLang: $lang")
+    this.ias?.setLang(Locale.forLanguageTag(lang))
   }
 
   override fun setAppVersion(version: String, build: Double) {
@@ -205,6 +214,31 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
         promise.resolve(true)
       } catch (e: Throwable) {
         promise.reject("showSingle error", e)
+      }
+    }
+  }
+
+  override fun showOnboardings(
+    feed: String,
+    limit: Double,
+    tags: ReadableArray?,
+    operationId: String,
+    promise: Promise
+  ) {
+    Log.d(TAG, "showOnboardings")
+    reactContext.runOnUiQueueThread {
+      try {
+        val tagsList = tags?.toArrayList()?.map { it.toString() }
+        cancellationTokenMap[operationId] = this.ias?.showOnboardingStories(
+          limit.toInt(),
+          feed,
+          tagsList,
+          reactContext.currentActivity as Context,
+          this.appearanceManager
+        )
+        promise.resolve(true)
+      } catch (e: Throwable) {
+        promise.reject("showOnboardings error", e)
       }
     }
   }
@@ -313,6 +347,63 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
   override fun clearCache() {
     Log.d(TAG, "clearCache")
     this.ias?.clearCache()
+  }
+
+  override fun removeFromFavorite(storyID: String) {
+    Log.d(TAG, "removeFromFavorite: $storyID")
+    this.ias?.removeFromFavorite(storyID.toInt())
+  }
+
+  override fun removeAllFavorites() {
+    Log.d(TAG, "removeAllFavorites")
+    this.ias?.removeAllFavorites()
+  }
+
+  override fun favoritesCount(promise: Promise) {
+    promise.resolve(lastFavoriteIds?.size ?: 0)
+  }
+
+  override fun logout() {
+    Log.d(TAG, "logout")
+    this.ias?.userLogout()
+  }
+
+  override fun setOptions(options: ReadableMap) {
+    Log.d(TAG, "setOptions")
+    val nativeMap: ReadableNativeMap = options as ReadableNativeMap
+    @Suppress("UNCHECKED_CAST")
+    this.ias?.setOptions(nativeMap.toHashMap() as Map<String, String>)
+  }
+
+  override fun showStoryOnce(storyID: String, operationId: String, promise: Promise) {
+    Log.d(TAG, "showStoryOnce")
+    reactContext.runOnUiQueueThread {
+      try {
+        cancellationTokenMap[operationId] = this.ias?.showStoryOnce(
+          storyID,
+          reactContext.currentActivity as Context,
+          this.appearanceManager,
+          object : IShowStoryOnceCallback {
+            override fun onShow() {
+              cancellationTokenMap.remove(operationId)
+              promise.resolve(true)
+            }
+
+            override fun onError() {
+              cancellationTokenMap.remove(operationId)
+              promise.resolve(false)
+            }
+
+            override fun alreadyShown() {
+              cancellationTokenMap.remove(operationId)
+              promise.resolve(false)
+            }
+          }
+        )
+      } catch (e: Throwable) {
+        promise.reject("showStoryOnce error", e)
+      }
+    }
   }
 
   override fun onFavoriteCell() {
@@ -815,23 +906,36 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
     userIdSign: String?,
     sandbox: Boolean,
     sendStatistic: Boolean,
+    cacheSize: Int,
+    anonymous: Boolean,
     inAppStoryAPI: InAppStoryAPI
   ) {
     inAppStoryAPI.setExternalPlatform(ExternalPlatforms.REACT_NATIVE_SDK);
-    this.ias = inAppStoryAPI.inAppStoryManager.create(
-      apiKey,
-      userID,
-      userIdSign,
-      null,
-      null,
-      null,
-      null,
-      null,
-      false,
-      true,
-      CacheSize.MEDIUM,
-      sandbox,
-    )
+    this.ias = if (anonymous) {
+      InAppStoryManager.Builder()
+        .lang(Locale.getDefault())
+        .sandbox(sandbox)
+        .cacheSize(cacheSize)
+        .gameDemoMode(false)
+        .apiKey(apiKey)
+        .anonymous(true)
+        .create()
+    } else {
+      inAppStoryAPI.inAppStoryManager.create(
+        apiKey,
+        userID,
+        userIdSign,
+        null,
+        null,
+        null,
+        null,
+        null,
+        false,
+        true,
+        cacheSize,
+        sandbox,
+      )
+    }
     inAppStoryAPI.settings.sendStatistic(sendStatistic)
 
     InAppStoryManager.logger = IASLoggerImpl()

@@ -12,10 +12,21 @@ RCT_EXPORT_MODULE()
 #endif
 }
 
+- (void)notifyStoryReaderDidClose:(NSDictionary *)data {
+#ifdef RCT_NEW_ARCH_ENABLED
+  [self emitStoryReaderDidClose:data];
+#else
+  [self sendEventWithName:@"storyReaderDidClose" body:data];
+#endif
+}
+
 RCT_EXPORT_METHOD(setupFeedEvents) {
   [[NativeFeedEventsImpl shared]
       setupFeedEventsWithStoryReaderWillShow:^(NSDictionary *data) {
         [self notifyStoryReaderWillShow:data];
+      }
+      storyReaderDidClose:^(NSDictionary *data) {
+        [self notifyStoryReaderDidClose:data];
       }];
 }
 

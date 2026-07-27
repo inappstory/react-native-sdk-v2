@@ -25,6 +25,8 @@ RCT_EXPORT_METHOD(initWith:(nonnull NSString *)apiKey
                 userIdSign:(NSString *_Nullable)userIdSign
                    sandbox:(BOOL)sandbox
             sendStatistics:(BOOL)sendStatistics
+                 cacheSize:(NSString *_Nullable)cacheSize
+                 anonymous:(BOOL)anonymous
                    resolve:(RCTPromiseResolveBlock)resolve
                     reject:(RCTPromiseRejectBlock)reject) {
   [[NativeStoryManagerImpl shared] initWith:apiKey
@@ -32,8 +34,24 @@ RCT_EXPORT_METHOD(initWith:(nonnull NSString *)apiKey
                                  userIdSign:userIdSign
                                     sandbox:sandbox
                                   sendStats:sendStatistics
+                                  cacheSize:cacheSize
+                                  anonymous:anonymous
                                     resolve:resolve
                                    rejecter:reject];
+}
+
+RCT_EXPORT_METHOD(setOptions:(nonnull NSDictionary *)options) {
+  [[NativeStoryManagerImpl shared] setOptions:options];
+}
+
+RCT_EXPORT_METHOD(showStoryOnce:(nonnull NSString *)storyID
+                    operationId:(nonnull NSString *)operationId
+                        resolve:(RCTPromiseResolveBlock)resolve
+                         reject:(RCTPromiseRejectBlock)reject) {
+  [[NativeStoryManagerImpl shared] showStoryOnce:storyID
+                                     operationId:operationId
+                                         resolve:resolve
+                                        rejecter:reject];
 }
 
 RCT_EXPORT_METHOD(setTags:(nonnull NSArray *)tags) {
@@ -149,6 +167,20 @@ RCT_EXPORT_METHOD(showGame:(nonnull NSString *)gameID
                                    rejecter:reject];
 }
 
+RCT_EXPORT_METHOD(showOnboardings:(nonnull NSString *)feed
+                            limit:(double)limit
+                             tags:(nullable NSArray *)tags
+                      operationId:(nonnull NSString *)operationId
+                          resolve:(RCTPromiseResolveBlock)resolve
+                           reject:(RCTPromiseRejectBlock)reject) {
+  [[NativeStoryManagerImpl shared] showOnboardings:feed
+                                             limit:(NSInteger)limit
+                                              tags:tags
+                                       operationId:operationId
+                                           resolve:resolve
+                                          rejecter:reject];
+}
+
 RCT_EXPORT_METHOD(showIAMById:(nonnull NSString *)iamID
                 onlyPreloaded:(BOOL)onlyPreloaded
                   operationId:(nonnull NSString *)operationId
@@ -189,6 +221,23 @@ RCT_EXPORT_METHOD(cancelOperation:(nonnull NSString *)operationId) {
 
 RCT_EXPORT_METHOD(clearCache) {
   [[NativeStoryManagerImpl shared] clearCache];
+}
+
+RCT_EXPORT_METHOD(removeFromFavorite:(nonnull NSString *)storyID) {
+  [[NativeStoryManagerImpl shared] removeFromFavorite:storyID];
+}
+
+RCT_EXPORT_METHOD(removeAllFavorites) {
+  [[NativeStoryManagerImpl shared] removeAllFavorites];
+}
+
+RCT_EXPORT_METHOD(favoritesCount:(RCTPromiseResolveBlock)resolve
+                          reject:(RCTPromiseRejectBlock)reject) {
+  [[NativeStoryManagerImpl shared] favoritesCount:resolve rejecter:reject];
+}
+
+RCT_EXPORT_METHOD(logout) {
+  [[NativeStoryManagerImpl shared] logout];
 }
 
 

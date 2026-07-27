@@ -7,7 +7,9 @@ import { subscribeNativeEvent } from './helpers/subscribeNativeEvent';
 import NativeStoryManager from './NativeStoryManager';
 import NativeBannerEvents from './specs/NativeBannerEvents';
 import NativeFeedEvents from './specs/NativeFeedEvents';
+import NativeGameEvents from './specs/NativeGameEvents';
 import NativeGoodsEvents from './specs/NativeGoodsEvents';
+import NativeIamEvents from './specs/NativeIamEvents';
 import NativeStoriesEvents from './specs/NativeStoriesEvents';
 import NativeSystemEvents from './specs/NativeSystemEvents';
 
@@ -52,6 +54,10 @@ export declare type StoryManagerConfig = {
     build: number;
   };
   sendStatistics?: boolean;
+  /** Native story cache size. Android-only (iOS SDK manages its cache itself). */
+  cacheSize?: 'small' | 'medium' | 'large';
+  /** Anonymous mode: no userId is sent to the backend. */
+  anonymous?: boolean;
 };
 
 // const eventEmitter = new NativeEventEmitter(
@@ -79,6 +85,8 @@ export class StoryManager {
   getGoodsCallback: Function = () => {};
   sandbox: boolean = false;
   sendStatistics: boolean = true;
+  cacheSize: string | null = null;
+  anonymous: boolean = false;
   listeners: any = [];
 
   protected _callbacks: Dict<any> = {};
@@ -108,6 +116,18 @@ export class StoryManager {
       this.soundEnabled = false;
     } else {
       this.soundEnabled = true;
+    }
+
+    if (config.sendStatistics != null) {
+      this.sendStatistics = config.sendStatistics;
+    }
+
+    if (config.cacheSize) {
+      this.cacheSize = config.cacheSize;
+    }
+
+    if (config.anonymous) {
+      this.anonymous = true;
     }
 
     // eventEmitter.addListener('getGoodsObject', (event) => {
@@ -159,45 +179,43 @@ export class StoryManager {
   ): Promise<StoryManager> {
     const manager = new StoryManager(config);
 
-    console.warn('Initializing StoryManager with config');
-
     await NativeStoryManager.initWith(
       manager.apiKey,
       manager.userId,
       manager.userIdSign,
       manager.sandbox,
-      manager.sendStatistics
+      manager.sendStatistics,
+      manager.cacheSize,
+      manager.anonymous
     );
 
-    // if (manager.tags) {
-    //     NativeStoryManager.setTags(manager.tags);
-    // }
+    if (manager.tags.length) {
+      NativeStoryManager.setTags(manager.tags);
+    }
 
-    // if (manager.placeholders) {
-    //     NativeStoryManager.setPlaceholders(manager.placeholders);
-    // }
+    if (manager.placeholders) {
+      NativeStoryManager.setPlaceholders(manager.placeholders);
+    }
 
-    // if (manager.lang) {
-    //     NativeStoryManager.setLang(manager.lang);
-    // }
-    // NativeStoryManager.changeSound(manager.soundEnabled);
+    if (manager.lang) {
+      NativeStoryManager.setLang(manager.lang);
+    }
+    NativeStoryManager.changeSound(manager.soundEnabled);
 
-    // if (
-    //     config.appVersion != null &&
-    //     config.appVersion.version != null &&
-    //     config.appVersion.build != null
-    // ) {
-    //     NativeStoryManager.setAppVersion(
-    //         config.appVersion.version,
-    //         config.appVersion.build
-    //     );
-    // }
+    if (config.appVersion != null) {
+      NativeStoryManager.setAppVersion(
+        config.appVersion.version,
+        config.appVersion.build
+      );
+    }
 
     NativeFeedEvents.setupFeedEvents();
     NativeStoriesEvents.setupStoriesEvents();
     NativeBannerEvents.setupBannerEvents();
     NativeGoodsEvents.setupGoodsEvents();
     NativeSystemEvents.setupSystemEvents();
+    NativeGameEvents.setupGameEvents();
+    NativeIamEvents.setupIamEvents();
 
     subscribeNativeEvent(
       NativeGoodsEvents,
@@ -251,26 +269,45 @@ export class StoryManager {
     NativeStoryManager.removeTags(tags);
   }
 
-  setApiKey(apiKey: string) {
-    this.apiKey = apiKey;
+  setLang(lang: string) {
+    this.lang = lang;
+    NativeStoryManager.setLang(lang);
+  }
+
+  /** Runtime sound toggle: true = sound on. */
+  changeSound(soundOn: boolean) {
+    this.soundEnabled = soundOn;
+    NativeStoryManager.changeSound(soundOn);
+  }
+
+  setAppVersion(version: string, build: number) {
+    NativeStoryManager.setAppVersion(version, build);
+  }
+
+  private reinit() {
     NativeStoryManager.initWith(
       this.apiKey,
       this.userId,
       this.userIdSign,
       this.sandbox,
-      this.sendStatistics
+      this.sendStatistics,
+      this.cacheSize,
+      this.anonymous
     );
+  }
+
+  setApiKey(apiKey: string) {
+    this.apiKey = apiKey;
+    this.reinit();
   }
 
   setSendStatistics(sendStatistics: boolean): void {
     this.sendStatistics = sendStatistics;
-    NativeStoryManager.initWith(
-      this.apiKey,
-      this.userId,
-      this.userIdSign,
-      this.sandbox,
-      this.sendStatistics
-    );
+    this.reinit();
+  }
+
+  setOptions(options: Record<string, string>): void {
+    NativeStoryManager.setOptions(options);
   }
 
   async createSubscriberList(feed: string, uniqueId?: string) {
@@ -341,8 +378,28 @@ export class StoryManager {
     ).then(() => ({ loaded: true }));
   }
 
+  showStoryOnce(
+    storyId: string | number,
+    signal?: Option<AbortSignal>
+  ): Promise<boolean> {
+    return this.runCancelable(signal, false, (operationId) =>
+      NativeStoryManager.showStoryOnce(String(storyId), operationId)
+    );
+  }
+
   showGame(id: string): Promise<boolean> {
     return NativeStoryManager.showGame(id);
+  }
+
+  showOnboardings(
+    feed: string = 'onboarding',
+    limit: number = 1000,
+    tags?: string[],
+    signal?: Option<AbortSignal>
+  ): Promise<boolean> {
+    return this.runCancelable(signal, false, (operationId) =>
+      NativeStoryManager.showOnboardings(feed, limit, tags ?? null, operationId)
+    );
   }
 
   showIAMById(
@@ -376,6 +433,23 @@ export class StoryManager {
 
   clearCache(): void {
     NativeStoryManager.clearCache();
+  }
+
+  removeFromFavorite(storyId: string | number): void {
+    NativeStoryManager.removeFromFavorite(String(storyId));
+  }
+
+  removeAllFavorites(): void {
+    NativeStoryManager.removeAllFavorites();
+  }
+
+  favoritesCount(): Promise<number> {
+    return NativeStoryManager.favoritesCount();
+  }
+
+  /** Log out the current user (clears user session on the native SDK). */
+  logout(): void {
+    NativeStoryManager.logout();
   }
 
   // setEventEmitter(emitter: EventEmitter) {
@@ -415,10 +489,25 @@ export class StoryManager {
       NativeFeedEvents,
       'NativeFeedEvents',
       'storyReaderWillShow',
-      (event) => {
-        console.log('Story reader will show event received: ', event);
-        listener(event);
-      }
+      listener
+    );
+  }
+
+  onStoryReaderDidClose(listener: any) {
+    subscribeNativeEvent(
+      NativeFeedEvents,
+      'NativeFeedEvents',
+      'storyReaderDidClose',
+      listener
+    );
+  }
+
+  onStoryWidgetEvent(listener: any) {
+    subscribeNativeEvent(
+      NativeStoriesEvents,
+      'NativeStoriesEvents',
+      'storyWidgetEvent',
+      listener
     );
   }
 
@@ -436,10 +525,7 @@ export class StoryManager {
       NativeStoriesEvents,
       'NativeStoriesEvents',
       'showStory',
-      (event) => {
-        console.log('Show story event received: ', event);
-        listener(event);
-      }
+      listener
     );
   }
 
@@ -504,6 +590,52 @@ export class StoryManager {
       'clickOnShareStory',
       listener
     );
+  }
+
+  onGameEvent(listener: any) {
+    for (const name of [
+      'startGame',
+      'closeGame',
+      'eventGame',
+      'gameFailure',
+      'gameReaderWillShow',
+      'gameReaderDidClose',
+      'gameComplete',
+    ] as const) {
+      subscribeNativeEvent(
+        NativeGameEvents,
+        'NativeGameEvents',
+        name,
+        listener
+      );
+    }
+  }
+
+  onIamEvent(listener: any) {
+    for (const name of [
+      'showInAppMessage',
+      'closeInAppMessage',
+      'inAppMessageWidgetEvent',
+    ] as const) {
+      subscribeNativeEvent(NativeIamEvents, 'NativeIamEvents', name, listener);
+    }
+  }
+
+  onFailure(listener: any) {
+    for (const name of [
+      'sessionFailure',
+      'storyFailure',
+      'currentStoryFailure',
+      'networkFailure',
+      'requestFailure',
+    ] as const) {
+      subscribeNativeEvent(
+        NativeSystemEvents,
+        'NativeSystemEvents',
+        name,
+        listener
+      );
+    }
   }
 
   onShareStoryWithPath(listener: any) {

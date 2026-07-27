@@ -7,6 +7,7 @@ import com.facebook.react.bridge.WritableMap
 import com.facebook.react.module.annotations.ReactModule
 import com.facebook.react.modules.core.DeviceEventManagerModule
 import com.inappstory.sdk.InAppStoryManager
+import com.inappstory.sdk.stories.outercallbacks.common.errors.ErrorCallback
 import com.inappstory.sdk.stories.outercallbacks.common.reader.CallToActionCallback
 import com.inappstory.sdk.stories.outercallbacks.common.reader.ClickAction
 import com.inappstory.sdk.stories.outercallbacks.common.reader.ContentData
@@ -53,7 +54,40 @@ class SystemEventsModule(reactContext: ReactApplicationContext) :
         }
         if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) emitHandleCTA(payload)
         else sendLegacyEvent("handleCTA", payload)
+
+        if (action == ClickAction.BUTTON) {
+          StoriesEventsModule.instance?.emitButtonClick(slideData, link)
+        }
       }
     })
+
+    InAppStoryManager.getInstance()?.setErrorCallback(object : ErrorCallback {
+      override fun sessionError() = emitFailure("sessionFailure", "sessionError")
+      override fun noConnection() = emitFailure("networkFailure", "noConnection")
+      override fun loadListError(feed: String?) =
+        emitFailure("storyFailure", "loadListError", feed)
+      override fun cacheError() = emitFailure("requestFailure", "cacheError")
+      override fun emptyLinkError() = emitFailure("requestFailure", "emptyLinkError")
+    })
+  }
+
+  private fun emitFailure(name: String, message: String, feed: String? = null) {
+    val payload: WritableMap = Arguments.createMap().apply {
+      putString("withName", name)
+      putMap("body", Arguments.createMap().apply {
+        putString("message", message)
+        feed?.let { putString("feed", it) }
+      })
+    }
+    if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
+      when (name) {
+        "sessionFailure" -> emitSessionFailure(payload)
+        "networkFailure" -> emitNetworkFailure(payload)
+        "storyFailure" -> emitStoryFailure(payload)
+        "requestFailure" -> emitRequestFailure(payload)
+      }
+    } else {
+      sendLegacyEvent(name, payload)
+    }
   }
 }

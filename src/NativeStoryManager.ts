@@ -30,8 +30,14 @@ export interface Spec extends TurboModule {
     userId: string,
     userIdSign: string | null,
     sandbox: boolean,
-    sendStatistics: boolean
+    sendStatistics: boolean,
+    cacheSize: string | null,
+    anonymous: boolean
   ): Promise<void>;
+
+  setOptions(options: Object): void;
+
+  showStoryOnce(storyID: string, operationId: string): Promise<boolean>;
 
   setUserID(userId: string, userIdSign: string | null): void;
 
@@ -70,6 +76,13 @@ export interface Spec extends TurboModule {
 
   showSingle(storyID: string, operationId: string): Promise<boolean>;
 
+  showOnboardings(
+    feed: string,
+    limit: number,
+    tags: Array<string> | null,
+    operationId: string
+  ): Promise<boolean>;
+
   showGame(gameID: string): Promise<boolean>;
 
   showIAMById(
@@ -92,6 +105,14 @@ export interface Spec extends TurboModule {
   cancelOperation(operationId: string): void;
 
   clearCache(): void;
+
+  removeFromFavorite(storyID: string): void;
+
+  removeAllFavorites(): void;
+
+  favoritesCount(): Promise<number>;
+
+  logout(): void;
 
   readonly onStoryListUpdate: CodegenTypes.EventEmitter<StoryListDTO>;
   readonly onStoryUpdate: CodegenTypes.EventEmitter<StoryDTO>;

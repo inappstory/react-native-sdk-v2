@@ -15,7 +15,8 @@ public class NativeSystemEventsImpl: NSObject {
   }
 
   @objc public func setupSystemEvents(
-    handleCTA: @escaping ([String: Any]) -> Void
+    handleCTA: @escaping ([String: Any]) -> Void,
+    failure: @escaping ([String: Any]) -> Void
   ) {
     NSLog("setupSystemEvents")
     self.handleCTACallback = handleCTA
@@ -29,6 +30,26 @@ public class NativeSystemEventsImpl: NSObject {
       @unknown default: typeString = "unknown"
       }
       self?.emitCTA(url: target, action: typeString)
+    }
+
+    InAppStory.shared.failureEvent = { failureEvent in
+      switch failureEvent {
+      case .sessionFailure(let message):
+        failure(["withName": "sessionFailure", "body": ["message": message]])
+      case .storyFailure(let message):
+        failure(["withName": "storyFailure", "body": ["message": message]])
+      case .currentStoryFailure(let message):
+        failure(["withName": "currentStoryFailure", "body": ["message": message]])
+      case .networkFailure(let message):
+        failure(["withName": "networkFailure", "body": ["message": message]])
+      case .requestFailure(let message, let statusCode):
+        failure([
+          "withName": "requestFailure",
+          "body": ["message": message, "statusCode": statusCode],
+        ])
+      @unknown default:
+        NSLog("WARNING: unknown failureEvent")
+      }
     }
   }
 
