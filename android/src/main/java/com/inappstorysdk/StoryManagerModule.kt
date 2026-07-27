@@ -161,7 +161,6 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
     //this.api.getStories()
   }
 
-
   override fun getFavoriteStories(feed: String) {
     Log.d("InappstorySdkModule", "getFavoriteStories");
     this.favoritesApi?.storyList?.load(
@@ -459,12 +458,6 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
       BannerEventsModule.instance?.emitBannerWidget(bannerData, name, data)
     }
 
-    // AppearanceManager.getCommonInstance().csCustomGoodsWidget(object : ICustomGoodsWidget {
-    //   override fun getWidgetView(context: Context): View? {
-    //     print("csCustomGoodsWidget getWidgetView");
-    //     return null;
-    //   }
-
     //   override fun getItem(): ICustomGoodsItem? {
     //     print("csCustomGoodsWidget getItem");
     //     return null;
@@ -480,416 +473,14 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
     //     return null;
     //   }
 
-    //   public override fun getSkus(
-    //     widgetView: View, skus: ArrayList<String>, callback: GetGoodsDataCallback
-    //   ) {
-    //     print("csCustomGoodsWidget getSkus = $skus")
-    //     var payload = Arguments.makeNativeMap(
-    //       mutableMapOf(
-    //         "skus" to skus,
-    //       ) as Map<String, Any>
-    //     )
-    //     sendEvent(getReactApplicationContext(), "getGoodsObject", payload)
-    //     val handler = Handler()
-    //     val runnableCode: Runnable = Runnable {
-    //       // if (that.goodsCache.size > 0) {
-    //       //     callback.onSuccess(that.goodsCache)
-    //       //     that.goodsCache.clear();
-    //       // } else {
-    //       //     handler.postDelayed(this as Runnable, 250)
-    //       // }
-    //     }
-    //     handler.post(runnableCode)
-
-
     //   }
-
-    //   override fun onItemClick(
-    //     widgetView: View,
-    //     goodsItemView: View,
-    //     goodsItemData: GoodsItemData,
-    //     callback: GetGoodsDataCallback
-    //   ) {
-    //     var payload = Arguments.makeNativeMap(
-    //       mutableMapOf(
-    //         "sku" to goodsItemData.sku,
-    //       ) as Map<String, Any>
-    //     )
-    //     sendEvent(getReactApplicationContext(), "goodItemSelected", payload)
-    //     callback.onClose()
-    //     InAppStoryManager.closeStoryReader()
-    //     return;
-    //   }
-    // });
-
-    // this.ias?.setShowStoryCallback(object : ShowStoryCallback {
-    //   override fun showStory(
-    //     story: StoryData?, showStoryAction: ShowStoryAction?
-    //   ) {
-    //     var payload = Arguments.makeNativeMap(
-    //       mutableMapOf(
-    //         "action" to when (showStoryAction) {
-    //           ShowStoryAction.OPEN -> "open"
-    //           ShowStoryAction.TAP -> "tap"
-    //           ShowStoryAction.SWIPE -> "swipe"
-    //           ShowStoryAction.AUTO -> "auto"
-    //           ShowStoryAction.CUSTOM -> "custom"
-    //           null -> "unknown"
-    //         }, "feed" to story?.feed, "id" to story?.id, "slidesCount" to story?.slidesCount
-
-    //       ) as Map<String, Any>
-    //     )
-    //     sendEvent(getReactApplicationContext(), "showStory", payload)
-    //   }
-    // })
-    // this.ias?.setShowSlideCallback(object : ShowSlideCallback {
-    //   override fun showSlide(
-    //     slide: SlideData?
-    //   ) {
-    //     var payload = Arguments.makeNativeMap(
-    //       mutableMapOf(
-    //         "id" to slide?.story?.id,
-    //         "index" to slide?.index,
-    //         "slidesCount" to slide?.story?.slidesCount
-
-    //       ) as Map<String, Any>
-    //     )
-    //     sendEvent(getReactApplicationContext(), "showSlide", payload)
-    //   }
-    // })
-    // this.ias?.setCloseStoryCallback(object : CloseStoryCallback {
-    //   override fun closeStory(
-    //     slide: SlideData?, action: CloseReader?
-    //   ) {
-    //     var payload = Arguments.makeNativeMap(
-    //       mutableMapOf(
-    //         "action" to when (action) {
-    //           CloseReader.AUTO -> "auto"
-    //           CloseReader.CLICK -> "click"
-    //           CloseReader.SWIPE -> "swipe"
-    //           CloseReader.CUSTOM -> "custom"
-    //           null -> "unknown"
-    //         }, "feed" to slide?.story?.feed, "id" to slide?.story?.id
-
-    //       ) as Map<String, Any>
-    //     )
-    //     sendEvent(getReactApplicationContext(), "closeStory", payload)
-    //   }
-    // })
-
-    // this.ias?.setCallToActionCallback(object : CallToActionCallback {
-    //   override fun callToAction(
-    //     context: Context?, //Here context of story reader or context of storiesList if it calls from it's deeplinks
-    //     content: ContentData?, url: String?, action: ClickAction
-    //   ) {
-
-    //     if (content is SlideData) {
-    //       var payload = Arguments.makeNativeMap(
-    //         mutableMapOf(
-    //           "action" to when (action) {
-    //             ClickAction.BUTTON -> "button"
-    //             ClickAction.SWIPE -> "swipe"
-    //             ClickAction.GAME -> "game"
-    //             ClickAction.DEEPLINK -> "deeplink"
-    //           },
-    //           "feed" to content?.story?.feed,
-    //           "index" to content?.index,
-    //           "id" to content?.story?.id,
-    //           "url" to url
 
     //         ) as Map<String, Any>
     //       )
-
-    //       Log.d(
-    //         "InappstorySdkModule", "callToAction slide = $content url = $url action= $action"
-    //       );
-    //       // currently not work two sendEvent simultaneously
-    //       //if (action == ClickAction.BUTTON) {
-    //       // just event
-    //       //sendEvent(reactContext, "clickOnButton", payload)
-    //       //}
-    //       // CTA(link) handler
-    //       sendEvent(getReactApplicationContext(), "handleCTA", payload)
-    //     } else if (content is InAppMessageData) {
-    //       //val inAppMessageId: Int = content.id
-    //       //val title: String? = content.title
-    //       //val event: String? = content.event
-    //     }
-    //   }
-    // })
-    // this.ias?.setFavoriteStoryCallback(object : FavoriteStoryCallback {
-    //   override fun favoriteStory(
-    //     slide: SlideData?, value: Boolean
-    //   ) {
-    //     var payload = Arguments.makeNativeMap(
-    //       mutableMapOf(
-    //         "feed" to slide?.story?.feed,
-    //         "index" to slide?.index,
-    //         "storyID" to slide?.story?.id,
-    //         "favorite" to value
-
-    //       ) as Map<String, Any>
-    //     )
-    //     sendEvent(getReactApplicationContext(), "favoriteStory", payload)
-    //   }
-    // })
-    // this.ias?.setLikeDislikeStoryCallback(object : LikeDislikeStoryCallback {
-    //   override fun likeStory(
-    //     slide: SlideData?, value: Boolean
-    //   ) {
-    //     var payload = Arguments.makeNativeMap(
-    //       mutableMapOf(
-    //         "feed" to slide?.story?.feed,
-    //         "index" to slide?.index,
-    //         "id" to slide?.story?.id,
-    //         "value" to value
 
     //       ) as Map<String, Any>
     //     )
     //     sendEvent(getReactApplicationContext(), "likeStory", payload)
-    //   }
-
-    //   override fun dislikeStory(
-    //     slide: SlideData?, value: Boolean
-    //   ) {
-    //     var payload = Arguments.makeNativeMap(
-    //       mutableMapOf(
-    //         "feed" to slide?.story?.feed,
-    //         "index" to slide?.index,
-    //         "id" to slide?.story?.id,
-    //         "value" to value
-
-    //       ) as Map<String, Any>
-    //     )
-    //     sendEvent(getReactApplicationContext(), "dislikeStory", payload)
-    //   }
-    // })
-    // this.ias?.setClickOnShareStoryCallback(object : ClickOnShareStoryCallback {
-    //   override fun shareClick(
-    //     slide: SlideData?
-    //   ) {
-    //     var payload = Arguments.makeNativeMap(
-    //       mutableMapOf(
-    //         "feed" to slide?.story?.feed, "index" to slide?.index, "id" to slide?.story?.id
-
-    //       ) as Map<String, Any>
-    //     )
-    //     sendEvent(getReactApplicationContext(), "clickOnShareStory", payload)
-    //     Log.d("InappstorySdkModule", "clickOnShareStory slide = $slide");
-    //   }
-    // })
-    // this.ias?.setOnboardingLoadCallback(object : OnboardingLoadCallback {
-    //   override fun onboardingLoadSuccess(count: Int, feed: String?) {
-    //     var payload = Arguments.makeNativeMap(
-    //       mutableMapOf(
-    //         "count" to count,
-    //         "feed" to feed,
-
-    //         ) as Map<String, Any>
-    //     )
-    //     sendEvent(getReactApplicationContext(), "onboardingLoad", payload)
-    //     Log.d("InappstorySdkModule", "onboardingLoadSuccess count = $count, feed = $feed");
-    //   }
-
-    //   override fun onboardingLoadError(feed: String?, reason: String?) {
-    //     var payload = Arguments.makeNativeMap(
-    //       mutableMapOf(
-    //         "feed" to feed,
-    //         "reason" to reason,
-    //       ) as Map<String, Any>
-    //     )
-    //     sendEvent(getReactApplicationContext(), "loadOnboardingError", payload)
-    //     Log.d("InappstorySdkModule", "loadOnboardingError reason = $reason, feed = $feed");
-    //   }
-
-    // })
-    // this.ias?.setSingleLoadCallback(object : SingleLoadCallback {
-    //   override fun singleLoadSuccess(story: StoryData?) {
-    //     var payload = Arguments.makeNativeMap(
-    //       mutableMapOf(
-    //         "id" to story?.id,
-    //         "feed" to story?.feed,
-
-    //         ) as Map<String, Any>
-    //     )
-    //     sendEvent(getReactApplicationContext(), "singleLoad", payload)
-    //     Log.d("InappstorySdkModule", "singleLoadSuccess story = $story");
-    //   }
-
-    //   override fun singleLoadError(storyId: String?, reason: String?) {
-    //     //val payload:WritableMap = Arguments.createMap()
-    //     var payload = Arguments.makeNativeMap(
-    //       mutableMapOf(
-    //         "id" to storyId,
-    //         "reason" to reason,
-
-    //         ) as Map<String, Any>
-    //     )
-    //     sendEvent(getReactApplicationContext(), "loadSingleError", payload)
-    //     Log.d("InappstorySdkModule", "loadSingleError storyId = $storyId, reason = $reason");
-    //   }
-    // })
-    // this.ias?.setStoryWidgetCallback(object : StoryWidgetCallback {
-    //   override fun widgetEvent(
-    //     slideData: SlideData?,
-    //     widgetEventName: String?,
-    //     widgetData: Map<String, String?>?,
-    //     //feed: String?
-    //   ) {
-    //     var payload = Arguments.makeNativeMap(
-    //       mutableMapOf(
-    //         "feed" to slideData?.story?.feed,
-    //         "id" to slideData?.story?.id,
-    //         "name" to widgetEventName,
-    //         "data" to widgetData
-    //       ) as Map<String, Any>
-    //     )
-    //     sendEvent(getReactApplicationContext(), "storyWidgetEvent", payload)
-    //     Log.d(
-    //       "InappstorySdkModule",
-    //       "storyWidget story = $slideData, widgetEventName = $widgetEventName, widgetData = $widgetData"
-    //     );
-    //   }
-    // })
-    // this.ias?.setGameReaderCallback(object : GameReaderCallback {
-    //   override fun startGame(
-    //     content: ContentData?, id: String?
-    //   ) {
-    //     if (content is GameStoryData) {
-    //       var payload = Arguments.makeNativeMap(
-    //         mutableMapOf(
-    //           "storyID" to content?.slideData?.story?.id,
-    //           "index" to content?.slideData?.index,
-    //           "id" to id
-    //         ) as Map<String, Any>
-    //       )
-    //       sendEvent(getReactApplicationContext(), "startGame", payload)
-    //     }
-    //   }
-
-    //   override fun finishGame(
-    //     content: ContentData?, result: String?, id: String?
-    //   ) {
-    //     if (content is GameStoryData) {
-    //       var payload = Arguments.makeNativeMap(
-    //         mutableMapOf(
-    //           "storyID" to content?.slideData?.story?.id,
-    //           "index" to content?.slideData?.index,
-    //           "result" to result,
-    //           "id" to id
-    //         ) as Map<String, Any>
-    //       )
-    //       sendEvent(getReactApplicationContext(), "finishGame", payload)
-    //     }
-    //   }
-
-    //   override fun closeGame(
-    //     content: ContentData?, id: String?
-    //   ) {
-    //     if (content is GameStoryData) {
-    //       var payload = Arguments.makeNativeMap(
-    //         mutableMapOf(
-    //           "storyID" to content?.slideData?.story?.id,
-    //           "index" to content?.slideData?.index,
-    //           "id" to id
-    //         ) as Map<String, Any>
-    //       )
-    //       sendEvent(getReactApplicationContext(), "closeGame", payload)
-    //     }
-    //   }
-
-    //   override fun gameLoadError(
-    //     content: ContentData?, id: String?
-    //   ) {
-    //     if (content is GameStoryData) {
-    //       var payload = Arguments.makeNativeMap(
-    //         mutableMapOf(
-    //           "storyID" to content?.slideData?.story?.id,
-    //           "index" to content?.slideData?.index,
-    //           "id" to id
-    //         ) as Map<String, Any>
-    //       )
-    //       sendEvent(getReactApplicationContext(), "gameFailure", payload)
-    //       Log.d("InappstorySdkModule", "gameLoadError gameStoryData = $content, id = $id");
-    //     }
-    //   }
-
-    //   override fun gameOpenError(
-    //     content: ContentData?, id: String?
-    //   ) {
-    //     if (content is GameStoryData) {
-    //       var payload = Arguments.makeNativeMap(
-    //         mutableMapOf(
-    //           "storyID" to content?.slideData?.story?.id,
-    //           "index" to content?.slideData?.index,
-    //           "id" to id
-    //         ) as Map<String, Any>
-    //       )
-    //       sendEvent(getReactApplicationContext(), "gameFailure", payload)
-    //       Log.d("InappstorySdkModule", "gameOpenError gameStoryData = $content, id = $id");
-    //     }
-    //   }
-
-    //   override fun eventGame(
-    //     content: ContentData?, id: String?, id2: String?, id3: String?
-    //   ) {
-    //     if (content is GameStoryData) {
-    //       var payload = Arguments.makeNativeMap(
-    //         mutableMapOf(
-    //           "storyID" to content?.slideData?.story?.id,
-    //           "index" to content?.slideData?.index,
-    //           "id" to id,
-    //           "id2" to id2,
-    //           "id3" to id3
-    //         ) as Map<String, Any>
-    //       )
-    //       sendEvent(getReactApplicationContext(), "eventGame", payload)
-    //       Log.d(
-    //         "InappstorySdkModule",
-    //         "eventGame gameStoryData = $content, id = $id , id2 = $id2 , id3 = $id3"
-    //       );
-    //     }
-    //   }
-    // })
-    // this.ias?.setErrorCallback(object : ErrorCallback {
-    //   override fun loadListError(feed: String?) {
-    //     var payload = Arguments.makeNativeMap(
-    //       mutableMapOf(
-    //         "feed" to feed
-    //       ) as Map<String, Any>
-    //     )
-    //     sendEvent(getReactApplicationContext(), "loadListError", payload)
-    //     Log.d("InappstorySdkModule", "loadListError feed = $feed");
-    //   }
-
-    //   override fun cacheError() {
-    //     val payload: WritableMap = Arguments.createMap()
-    //     sendEvent(getReactApplicationContext(), "cacheError", payload)
-    //     Log.d("InappstorySdkModule", "cacheError");
-    //   }
-
-    //   //override fun readerError() {
-    //   //    val payload:WritableMap = Arguments.createMap()
-    //   //    sendEvent(reactContext,"readerError", payload)
-    //   //    Log.d("InappstorySdkModule","readerError");
-    //   //}
-
-    //   override fun emptyLinkError() {
-    //     val payload: WritableMap = Arguments.createMap()
-    //     sendEvent(getReactApplicationContext(), "emptyLinkError", payload)
-    //     Log.d("InappstorySdkModule", "emptyLinkError");
-    //   }
-
-    //   override fun sessionError() {
-    //     val payload: WritableMap = Arguments.createMap()
-    //     sendEvent(getReactApplicationContext(), "sessionError", payload)
-    //     Log.d("InappstorySdkModule", "sessionError");
-    //   }
-
-    //   override fun noConnection() {
-    //     val payload: WritableMap = Arguments.createMap()
-    //     sendEvent(getReactApplicationContext(), "noConnection", payload)
-    //     Log.d("InappstorySdkModule", "noConnection");
     //   }
 
     // })
@@ -945,12 +536,6 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
     inAppStoryAPI.addSubscriber(object : InAppStoryAPIListSubscriber(uniqueId) {
       override fun updateFavoriteItemData(favorites: List<StoryFavoriteItemAPIData>) {
         Log.e(TAG, "$feed updateFavoriteItemData: $favorites")
-        // Push model: the SDK fires this whenever the favorites set changes
-        // (e.g. toggled in the reader). The snapshot only carries ids
-        // (imageFilePath is null), so use it as a trigger and reload the
-        // favorites list, which repopulates the cell with real covers via the
-        // favorites subscriber's updateStoriesData/updateStoryData. Guard on the
-        // id set so the reload's own callbacks can't loop.
         val ids = favorites.map { it.id }.toSet()
         if (ids == lastFavoriteIds) return
         lastFavoriteIds = ids
@@ -1028,17 +613,6 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
           storiesList.add(storyData)
         }
 
-        /* val action =
-
-         val actionArray = Arguments.makeNativeArray(listOf(action))
-
-         val arguments = Arguments.createMap().apply {
-             putString("path", "general/authentication")
-             putArray("actions",actionArray)
-         }
-         val array = Array(stories.size) { index ->
-             stories[index]
-         }*/
         val payload: WritableMap = Arguments.createMap()
         payload.putArray("stories", Arguments.makeNativeArray(storiesList));
         payload.putString("feed", payloadFeed)
@@ -1047,7 +621,6 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
         if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) emitOnStoryListUpdate(payload)
         else sendLegacyEvent("onStoryListUpdate", payload)
 
-
         // The SDK only downloads covers for previews reported as visible. For the
         // main feed JS does this via setVisibleWith; the favorites cell never
         // reports visibility, so mark the loaded favorites visible here to make
@@ -1055,13 +628,6 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
         if (feed == "favorites") {
           inAppStoryAPI.storyList.updateVisiblePreviews(stories.map { it.id }, "favorites")
         }
-        //sendEvent(getReactApplicationContext(), "storyListUpdate", payload)
-        //stories.clear()
-        //stories.addAll(stories)
-        /*Handler(Looper.getMainLooper()).post {
-            inAppStoryAPI.storyList.updateVisiblePreviews(ids, uniqueId1)
-            inAppStoryAPI.storyList.showFavoriteItem(uniqueId1)
-        }*/
       }
 
       override fun storyIsOpened(storyId: Int) {

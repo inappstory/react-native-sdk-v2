@@ -20,6 +20,21 @@ RCT_EXPORT_MODULE()
 #endif
 }
 
+- (void)notifyCartEvent:(NSDictionary *)data {
+  NSString *name = data[@"withName"];
+#ifdef RCT_NEW_ARCH_ENABLED
+  if ([name isEqualToString:@"productCartUpdate"]) {
+    [self emitProductCartUpdate:data];
+  } else if ([name isEqualToString:@"productCartClicked"]) {
+    [self emitProductCartClicked:data];
+  } else if ([name isEqualToString:@"productCartGetState"]) {
+    [self emitProductCartGetState:data];
+  }
+#else
+  [self sendEventWithName:name body:data];
+#endif
+}
+
 RCT_EXPORT_METHOD(setupGoodsEvents) {
   [[NativeGoodsEventsImpl shared]
       setupGoodsEventsWithGetGoodsObject:^(NSDictionary *data) {
@@ -27,7 +42,15 @@ RCT_EXPORT_METHOD(setupGoodsEvents) {
       }
       goodItemSelected:^(NSDictionary *data) {
         [self notifyGoodItemSelected:data];
+      }
+      cartEvent:^(NSDictionary *data) {
+        [self notifyCartEvent:data];
       }];
+}
+
+RCT_EXPORT_METHOD(resolveProductCart:(nonnull NSString *)requestId
+                                cart:(nullable NSDictionary *)cart) {
+  [[NativeGoodsEventsImpl shared] resolveProductCart:requestId cart:cart];
 }
 
 RCT_EXPORT_METHOD(addProductToCache:(nonnull NSString *)sku
@@ -55,7 +78,10 @@ RCT_EXPORT_METHOD(commitGoods) {
 }
 #else
 - (NSArray<NSString *> *)supportedEvents {
-  return @[ @"getGoodsObject", @"goodItemSelected" ];
+  return @[
+    @"getGoodsObject", @"goodItemSelected", @"productCartUpdate",
+    @"productCartClicked", @"productCartGetState"
+  ];
 }
 #endif
 

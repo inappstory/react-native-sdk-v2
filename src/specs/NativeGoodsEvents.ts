@@ -20,8 +20,17 @@ export interface Spec extends TurboModule {
 
   commitGoods(): void;
 
+  /**
+   * Answer a pending productCartUpdate/productCartGetState request.
+   * cart=null reports an error to the native SDK.
+   */
+  resolveProductCart(requestId: string, cart: Object | null): void;
+
   readonly getGoodsObject: CodegenTypes.EventEmitter<EventDTO>;
   readonly goodItemSelected: CodegenTypes.EventEmitter<EventDTO>;
+  readonly productCartUpdate: CodegenTypes.EventEmitter<EventDTO>;
+  readonly productCartClicked: CodegenTypes.EventEmitter<EventDTO>;
+  readonly productCartGetState: CodegenTypes.EventEmitter<EventDTO>;
 }
 
 export default TurboModuleRegistry.getEnforcing<Spec>('NativeGoodsEvents');

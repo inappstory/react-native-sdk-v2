@@ -41,6 +41,38 @@ export type Dict<T = any> = {
   [key: number]: T | undefined;
 };
 
+export type ProductCartOffer = {
+  offerId: string;
+  groupId?: string;
+  name?: string;
+  description?: string;
+  url?: string;
+  coverUrl?: string;
+  imageUrls?: string[];
+  currency?: string;
+  price?: string;
+  oldPrice?: string;
+  adult?: boolean;
+  availability?: number;
+  size?: string;
+  color?: string;
+  quantity?: number;
+};
+
+export type ProductCart = {
+  offers: ProductCartOffer[];
+  price?: string;
+  oldPrice?: string;
+  priceCurrency?: string;
+};
+
+export type ProductCartHandlers = {
+  onUpdate: (
+    offer: ProductCartOffer
+  ) => ProductCart | null | Promise<ProductCart | null>;
+  getState: () => ProductCart | null | Promise<ProductCart | null>;
+};
+
 export declare type StoryManagerConfig = {
   apiKey: string;
   userId?: Option<string | number>;
@@ -83,6 +115,7 @@ export class StoryManager {
   lang: string = '';
   soundEnabled: boolean = true;
   getGoodsCallback: Function = () => {};
+  productCartHandlers: ProductCartHandlers | null = null;
   sandbox: boolean = false;
   sendStatistics: boolean = true;
   cacheSize: string | null = null;
@@ -234,7 +267,55 @@ export class StoryManager {
         manager.handleCTA(event.body);
       }
     );
+
+    const answerCart = async (
+      requestId: string,
+      run: (handlers: ProductCartHandlers) => Promise<ProductCart | null>
+    ) => {
+      let cart: ProductCart | null = null;
+      try {
+        if (manager.productCartHandlers) {
+          cart = await run(manager.productCartHandlers);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+      NativeGoodsEvents.resolveProductCart(requestId, cart);
+    };
+    subscribeNativeEvent(
+      NativeGoodsEvents,
+      'NativeGoodsEvents',
+      'productCartUpdate',
+      (event: any) => {
+        answerCart(event.body.requestId, (handlers) =>
+          Promise.resolve(handlers.onUpdate(event.body.offer))
+        );
+      }
+    );
+    subscribeNativeEvent(
+      NativeGoodsEvents,
+      'NativeGoodsEvents',
+      'productCartGetState',
+      (event: any) => {
+        answerCart(event.body.requestId, (handlers) =>
+          Promise.resolve(handlers.getState())
+        );
+      }
+    );
     return manager;
+  }
+
+  setProductCartHandlers(handlers: ProductCartHandlers) {
+    this.productCartHandlers = handlers;
+  }
+
+  onProductCartClicked(listener: any) {
+    subscribeNativeEvent(
+      NativeGoodsEvents,
+      'NativeGoodsEvents',
+      'productCartClicked',
+      listener
+    );
   }
 
   async fetchGoods(skus: string[]) {

@@ -97,8 +97,12 @@ jest.mock('../specs/NativeGoodsEvents', () => ({
     setupGoodsEvents: jest.fn(),
     getGoodsObject: jest.fn(() => ({ remove: jest.fn() })),
     goodItemSelected: jest.fn(() => ({ remove: jest.fn() })),
+    productCartUpdate: jest.fn(() => ({ remove: jest.fn() })),
+    productCartClicked: jest.fn(() => ({ remove: jest.fn() })),
+    productCartGetState: jest.fn(() => ({ remove: jest.fn() })),
     addProductToCache: jest.fn(),
     commitGoods: jest.fn(),
+    resolveProductCart: jest.fn(),
   },
 }));
 
@@ -417,6 +421,83 @@ describe('CTA handling', () => {
       .calls[0]![0];
     nativeHandler({ body: { url: 'https://x', action: 'button' } });
     expect(handler).toHaveBeenCalled();
+  });
+});
+
+describe('product cart (checkout)', () => {
+  const cart = { offers: [{ offerId: 'o1', quantity: 2 }], price: '10' };
+
+  const fireCartEvent = (eventName: string, body: any) => {
+    const handler = ((NativeGoodsEvents as any)[eventName] as jest.Mock).mock
+      .calls[0]![0];
+    handler({ body });
+  };
+
+  it('answers productCartUpdate via handlers.onUpdate', async () => {
+    const manager = await StoryManager.create({ apiKey: 'k', userId: 'u' });
+    const onUpdate = jest.fn().mockResolvedValue(cart);
+    manager.setProductCartHandlers({ onUpdate, getState: () => null });
+    fireCartEvent('productCartUpdate', {
+      requestId: 'cart_1',
+      offer: { offerId: 'o1' },
+    });
+    await flush();
+    expect(onUpdate).toHaveBeenCalledWith({ offerId: 'o1' });
+    expect(NativeGoodsEvents.resolveProductCart).toHaveBeenCalledWith(
+      'cart_1',
+      cart
+    );
+  });
+
+  it('answers productCartGetState via handlers.getState', async () => {
+    const manager = await StoryManager.create({ apiKey: 'k', userId: 'u' });
+    manager.setProductCartHandlers({
+      onUpdate: () => null,
+      getState: () => cart,
+    });
+    fireCartEvent('productCartGetState', { requestId: 'cart_2' });
+    await flush();
+    expect(NativeGoodsEvents.resolveProductCart).toHaveBeenCalledWith(
+      'cart_2',
+      cart
+    );
+  });
+
+  it('resolves null when no handlers are set (native gets an error)', async () => {
+    await StoryManager.create({ apiKey: 'k', userId: 'u' });
+    fireCartEvent('productCartGetState', { requestId: 'cart_3' });
+    await flush();
+    expect(NativeGoodsEvents.resolveProductCart).toHaveBeenCalledWith(
+      'cart_3',
+      null
+    );
+  });
+
+  it('resolves null when a handler throws', async () => {
+    const manager = await StoryManager.create({ apiKey: 'k', userId: 'u' });
+    manager.setProductCartHandlers({
+      onUpdate: () => {
+        throw new Error('boom');
+      },
+      getState: () => null,
+    });
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+    fireCartEvent('productCartUpdate', {
+      requestId: 'cart_4',
+      offer: { offerId: 'o1' },
+    });
+    await flush();
+    expect(NativeGoodsEvents.resolveProductCart).toHaveBeenCalledWith(
+      'cart_4',
+      null
+    );
+  });
+
+  it('onProductCartClicked subscribes', async () => {
+    const manager = await StoryManager.create({ apiKey: 'k', userId: 'u' });
+    const listener = jest.fn();
+    manager.onProductCartClicked(listener);
+    expect(NativeGoodsEvents.productCartClicked).toHaveBeenCalledWith(listener);
   });
 });
 

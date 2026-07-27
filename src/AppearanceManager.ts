@@ -14,6 +14,7 @@ export enum StoryReaderSwipeStyle {
   FLAT = 'flat',
   COVER = 'cover',
   CUBE = 'cube',
+  DEPTH = 'depth',
 }
 
 export declare enum StoriesListSliderAlign {
