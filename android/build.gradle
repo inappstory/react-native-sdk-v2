@@ -77,7 +77,6 @@ repositories {
 }
 
 def kotlin_version = getExtOrDefault("kotlinVersion")
-def ugc_version = "bcd5bb710c16dd84441a0dbd95f7d9bfa590f80a"
 dependencies {
   // For < 0.71, this will be from the local maven repo
   // For > 0.71, this will be replaced by `com.facebook.react:react-android:$version` by react gradle plugin
@@ -86,5 +85,5 @@ dependencies {
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
   implementation 'androidx.recyclerview:recyclerview:1.2.1'
   implementation 'androidx.webkit:webkit:1.4.0'
-  implementation 'com.github.inappstory:android-sdk:1.25.1'
+  implementation 'com.github.inappstory:android-sdk:1.25.3'
 }
