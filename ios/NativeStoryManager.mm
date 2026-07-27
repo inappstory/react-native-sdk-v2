@@ -58,6 +58,10 @@ RCT_EXPORT_METHOD(setTags:(nonnull NSArray *)tags) {
   [[NativeStoryManagerImpl shared] setTags:tags];
 }
 
+RCT_EXPORT_METHOD(addTags:(nonnull NSArray *)tags) {
+  [[NativeStoryManagerImpl shared] addTags:tags];
+}
+
 RCT_EXPORT_METHOD(changeSound:(BOOL)value) {
   [[NativeStoryManagerImpl shared] changeSound:value];
 }

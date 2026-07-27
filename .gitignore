@@ -85,3 +85,8 @@ example/ios/.xcode.env.local
 /.env
 
 ios/generated/
+
+# AI agent vendor folders (generated from .agents/ by .agents/setup)
+.claude/
+.codex/
+.cursor/

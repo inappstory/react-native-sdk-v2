@@ -346,6 +346,11 @@ export class StoryManager {
     NativeStoryManager.setTags(tags);
   }
 
+  addTags(tags: string[]) {
+    this.tags = [...new Set([...this.tags, ...tags])];
+    NativeStoryManager.addTags(tags);
+  }
+
   removeTags(tags: string[]) {
     NativeStoryManager.removeTags(tags);
   }

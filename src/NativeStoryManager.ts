@@ -43,6 +43,8 @@ export interface Spec extends TurboModule {
 
   setTags(tags: Array<string>): void;
 
+  addTags(tags: Array<string>): void;
+
   removeTags(tags: Array<string>): void;
 
   setPlaceholders(placeholders: Object): void;

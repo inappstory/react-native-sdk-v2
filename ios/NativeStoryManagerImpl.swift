@@ -353,6 +353,17 @@ public class NativeStoryManagerImpl: NSObject {
     }
   }
 
+  @objc public func addTags(_ tags: [String]) {
+    DispatchQueue.main.async {
+      NSLog("addTags")
+      let current = InAppStory.shared.settings?.tags ?? []
+      let merged = current + tags.filter { !current.contains($0) }
+      self._tags = merged
+      InAppStory.shared.settings?.tags = merged
+      InAppStory.shared.setTags(merged)
+    }
+  }
+
   @objc public func removeTags(_ tags: [String]) {
     DispatchQueue.main.async {
       //InAppStory.shared.settings = Settings(userID:self._userID,tags: ["tag3"], lang: self._lang)

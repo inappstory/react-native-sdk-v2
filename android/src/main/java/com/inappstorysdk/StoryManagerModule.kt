@@ -121,6 +121,12 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
     this.ias?.setTags(list)
   }
 
+  override fun addTags(tags: ReadableArray) {
+    Log.d("InappstorySdkModule", "addTags")
+    val list: ArrayList<String> = tags.toArrayList() as ArrayList<String>
+    this.ias?.addTags(list)
+  }
+
   override fun removeTags(tags: ReadableArray) {
     Log.d("InappstorySdkModule", "removeTags")
     val list: ArrayList<String> = tags.toArrayList() as ArrayList<String>

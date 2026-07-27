@@ -16,6 +16,7 @@ jest.mock('../NativeStoryManager', () => ({
     initWith: jest.fn().mockResolvedValue(undefined),
     setUserID: jest.fn(),
     setTags: jest.fn(),
+    addTags: jest.fn(),
     removeTags: jest.fn(),
     setPlaceholders: jest.fn(),
     setImagesPlaceholders: jest.fn(),
@@ -308,6 +309,17 @@ describe('runtime setters', () => {
   it('setOptions passes the options map to native', () => {
     manager.setOptions({ pos: '1' });
     expect(native.setOptions).toHaveBeenCalledWith({ pos: '1' });
+  });
+
+  it('addTags calls native and merges local tags without duplicates', async () => {
+    const m = await StoryManager.create({
+      apiKey: 'k',
+      userId: 'u',
+      tags: ['a'],
+    });
+    m.addTags(['a', 'b']);
+    expect(native.addTags).toHaveBeenCalledWith(['a', 'b']);
+    expect(m.tags).toEqual(['a', 'b']);
   });
 
   it('removeFromFavorite stringifies numeric ids', () => {

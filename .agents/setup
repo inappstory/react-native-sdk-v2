@@ -1,0 +1,18 @@
+#!/bin/sh
+# Mirrors .agents/<vendor>/ into the vendor's own config folder (.claude, .codex, .cursor).
+# Shared .agents/skills/ is copied into every vendor that has a folder here.
+set -e
+cd "$(dirname "$0")/.."
+
+for vendor in claude codex cursor; do
+  [ -d ".agents/$vendor" ] || continue
+  mkdir -p ".$vendor"
+  cp -R ".agents/$vendor/." ".$vendor/"
+  if [ -d .agents/skills ]; then
+    mkdir -p ".$vendor/skills"
+    cp -R .agents/skills/. ".$vendor/skills/"
+  fi
+done
+
+# ponytail: copy-over, never delete — .claude also holds untracked settings.local.json.
+# Add pruning of stale mirrored files only if renames in .agents actually start biting.
