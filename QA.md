@@ -18,6 +18,13 @@ A build fails on its own when a gate is missed — the thresholds live in
 [package.json](package.json) (`jest.coverageThreshold`) and
 [stryker.config.json](stryker.config.json) (`thresholds`), not in a wiki page.
 
+> **Where these actually run.** [ci.yml](.github/workflows/ci.yml) triggers on
+> pushes and PRs to the `ci` branch only, so a PR into `main` runs no gate — run
+> them locally before asking for review. The backstop is the manually started
+> Release workflow ([release.yml](.github/workflows/release.yml)): it runs lint,
+> typecheck and the unit tests with coverage before release-it, so a broken gate
+> blocks the publish. Mutation testing is in neither path — run it by hand.
+
 ### Scope of the automated gates
 
 Measured: `src/core/**`, `src/utils/**`, the feed store and its native event
@@ -53,7 +60,7 @@ the reason `break` sits at 88 rather than 100):
 - Module-name string literals passed to `subscribeNativeEvent` — the name only
   reaches `NativeEventEmitter` on the old architecture; with TurboModules the
   method call path wins. The fallback itself is tested in
-  [helpers.test.ts](src/__tests__/helpers.test.ts).
+  [utils.test.ts](src/__tests__/utils.test.ts).
 - Class field initializers (`apiKey = ''`, `soundEnabled = true`, …) that the
   constructor overwrites on every path.
 - zustand's `replace` flag on the reducers that only add keys — they return a
@@ -69,8 +76,8 @@ If a *new* mutant survives, treat it as a missing assertion, not as noise.
 3. New behaviour comes with a test that fails without the change.
 4. A bug fix comes with a test that reproduces the bug first.
 5. Public API changed → [README.md](README.md) updated in the same PR.
-6. Native side changed → both platforms rebuilt (below) and the parity notes in
-   [PARITY_IOS_VS_ANDROID.md](PARITY_IOS_VS_ANDROID.md) updated.
+6. Native side changed → both platforms rebuilt and smoke-tested (below). Landing
+   one platform only is a parity bug — say so explicitly in the PR description.
 
 ## Manual QA — native and UI
 
