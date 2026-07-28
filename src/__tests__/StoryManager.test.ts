@@ -1,8 +1,8 @@
 /// <reference types="jest" />
 import { Linking } from 'react-native';
-import { StoryManager, CTASource } from '../StoryManager';
-import NativeStoryManager from '../NativeStoryManager';
-import NativeAppearanceManager from '../NativeAppearanceManager';
+import { StoryManager, CTASource } from '../core/StoryManager';
+import NativeStoryManager from '../specs/NativeStoryManager';
+import NativeAppearanceManager from '../specs/NativeAppearanceManager';
 import NativeFeedEvents from '../specs/NativeFeedEvents';
 import NativeStoriesEvents from '../specs/NativeStoriesEvents';
 import NativeBannerEvents from '../specs/NativeBannerEvents';
@@ -11,7 +11,7 @@ import NativeSystemEvents from '../specs/NativeSystemEvents';
 import NativeGameEvents from '../specs/NativeGameEvents';
 import NativeIamEvents from '../specs/NativeIamEvents';
 
-jest.mock('../NativeStoryManager', () => ({
+jest.mock('../specs/NativeStoryManager', () => ({
   __esModule: true,
   default: {
     initWith: jest.fn().mockResolvedValue(undefined),
@@ -50,7 +50,7 @@ jest.mock('../NativeStoryManager', () => ({
   },
 }));
 
-jest.mock('../NativeAppearanceManager', () => ({
+jest.mock('../specs/NativeAppearanceManager', () => ({
   __esModule: true,
   default: {
     setHasLike: jest.fn(),

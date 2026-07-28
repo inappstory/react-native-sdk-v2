@@ -1,8 +1,9 @@
 /// <reference types="jest" />
 import { NativeEventEmitter, NativeModules } from 'react-native';
-import { generateId } from '../helpers/idGenerator';
-import { isFunction } from '../helpers/isFunction';
-import { subscribeNativeEvent } from '../helpers/subscribeNativeEvent';
+import { applyPlaceholders } from '../utils/applyPlaceholders';
+import { generateId } from '../utils/generateId';
+import { isFunction } from '../utils/isFunction';
+import { subscribeNativeEvent } from '../utils/subscribeNativeEvent';
 
 describe('generateId', () => {
   it('returns a non-empty base36 string', () => {
@@ -28,6 +29,31 @@ describe('isFunction', () => {
   ])('%p -> %p', (value, expected) => {
     expect(isFunction(value)).toBe(expected);
   });
+});
+
+describe('applyPlaceholders', () => {
+  it('substitutes a placeholder by its %key% form', () => {
+    expect(applyPlaceholders('Hi %name%', { name: 'Ann' })).toBe('Hi Ann');
+  });
+
+  it('substitutes every occurrence, not just the first', () => {
+    expect(applyPlaceholders('%a% and %a%', { a: 'x' })).toBe('x and x');
+  });
+
+  it('substitutes several placeholders in one title', () => {
+    expect(applyPlaceholders('%a%-%b%', { a: '1', b: '2' })).toBe('1-2');
+  });
+
+  it('leaves unknown placeholders alone', () => {
+    expect(applyPlaceholders('%a% %b%', { a: '1' })).toBe('1 %b%');
+  });
+
+  it.each([[null], [undefined], [{}]])(
+    'returns the text unchanged for %p',
+    (placeholders) => {
+      expect(applyPlaceholders('%a%', placeholders as any)).toBe('%a%');
+    }
+  );
 });
 
 describe('subscribeNativeEvent', () => {

@@ -1,5 +1,5 @@
 /// <reference types="jest" />
-import { useFeedStore } from '../hooks/useStore';
+import { useFeedStore } from '../hooks/useFeedStore';
 
 const story = (storyID: number, extra: object = {}) => ({
   storyID,
@@ -35,7 +35,7 @@ beforeEach(() => {
 describe('initial state', () => {
   it('starts with empty feeds', () => {
     jest.isolateModules(() => {
-      const store = require('../hooks/useStore').useFeedStore;
+      const store = require('../hooks/useFeedStore').useFeedStore;
       expect(store.getState().feeds).toEqual([]);
       expect(store.getState().events).toEqual([]);
       expect(store.getState().feeds_default_feed).toEqual([]);

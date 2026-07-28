@@ -43,11 +43,7 @@ public class NativeStoryManagerImpl: NSObject {
       InAppStory.shared.cellBorderColor = UIColor.blue
       // the parameter is responsible for displaying the bottom panel in the story card (likes, favorites and share)
       // additionally should be configured in the console
-      InAppStory.shared.panelSettings = PanelSettings(
-        like: self._hasLike,
-        favorites: self._hasFavorites,
-        share: self._hasShare
-      )
+      InAppStory.shared.panelSettings = NativeAppearanceManagerImpl.shared.panelSettings
       // the parameter is responsible for animation of the reader display when you tap on a story cell
       InAppStory.shared.presentationStyle = .zoom
 

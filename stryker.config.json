@@ -20,18 +20,22 @@
     "reports",
     "**/*.md"
   ],
-  "reporters": ["html", "clear-text", "progress"],
-  "_comment": "Same scope as jest collectCoverageFrom: native specs and UI components are covered by the manual QA checklist in QA.md, not by unit tests.",
+  "reporters": [
+    "html",
+    "clear-text",
+    "progress"
+  ],
+  "_comment": "Same scope as jest collectCoverageFrom: native specs, UI components and the two renderer-bound hooks are covered by the manual QA checklist in QA.md, not by unit tests. cardGeometry is pure math and is opted back in.",
   "mutate": [
     "src/**/*.{ts,tsx}",
     "!src/__tests__/**",
     "!src/specs/**",
-    "!src/data/**",
-    "!src/Native*.ts",
+    "!src/types/**",
     "!src/index.ts",
-    "!src/GlobalsWrapper.ts",
-    "!src/stories/**",
-    "!src/banners/**"
+    "!src/components/**",
+    "!src/hooks/useFeedLoader.ts",
+    "!src/hooks/useEventCallback.ts",
+    "src/components/StoriesList/cardGeometry.ts"
   ],
   "_thresholds_comment": "The surviving mutants are equivalent under unit tests: legacy NativeEventEmitter module-name strings (the new arch never reaches that branch), class field initializers the constructor always overwrites, and zustand's replace flag. Raise `break` if that changes.",
   "thresholds": {

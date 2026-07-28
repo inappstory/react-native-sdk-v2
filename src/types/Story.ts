@@ -1,10 +1,12 @@
 export type Story = {
   storyID: number;
-  opened: boolean;
-  aspectRatio: number;
+  title: string;
+  titleColor: string;
   backgroundColor: string;
   coverVideoPath?: string;
   coverImagePath?: string;
-  title: string;
-  titleColor: string;
+  opened: boolean;
+  aspectRatio: number;
+  slidesCount: number;
+  statTitle: string;
 };

@@ -1,21 +1,15 @@
 import * as React from 'react';
 
-import { useFeedStore } from './useStore';
+import { useFeedStore } from './useFeedStore';
 import NativeStoryManager, {
   type StoryDTO,
   type StoryListDTO,
-} from '../NativeStoryManager';
+} from '../specs/NativeStoryManager';
 import NativeFeedEvents from '../specs/NativeFeedEvents';
-import { subscribeNativeEvent } from '../helpers/subscribeNativeEvent';
+import { subscribeNativeEvent } from '../utils/subscribeNativeEvent';
 
 let subscribed = false;
 
-/**
- * Subscribes the feed store to native list events. Runs once per app: the
- * native modules are singletons and the store is global, so the subscription
- * must not be tied to the lifetime of any single StoriesList — unsubscribing
- * on unmount used to leave the remaining lists without updates.
- */
 const subscribeFeedStore = () => {
   if (subscribed) return;
   subscribed = true;
@@ -60,6 +54,6 @@ const subscribeFeedStore = () => {
   );
 };
 
-export const useEvents = () => {
+export const useNativeFeedEvents = () => {
   React.useEffect(subscribeFeedStore, []);
 };

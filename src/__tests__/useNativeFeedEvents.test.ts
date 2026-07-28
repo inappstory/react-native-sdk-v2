@@ -3,7 +3,7 @@
 // eagerly keeps this a unit test with no renderer involved.
 jest.mock('react', () => ({ useEffect: (effect: () => void) => effect() }));
 
-jest.mock('../NativeStoryManager', () => ({
+jest.mock('../specs/NativeStoryManager', () => ({
   __esModule: true,
   default: {
     onStoryListUpdate: jest.fn(() => ({ remove: jest.fn() })),
@@ -20,29 +20,31 @@ jest.mock('../specs/NativeFeedEvents', () => ({
 // fresh module registry to exercise the first-subscription path.
 const load = () => {
   let api!: {
-    useEvents: () => void;
-    store: typeof import('../hooks/useStore').useFeedStore;
+    useNativeFeedEvents: () => void;
+    store: typeof import('../hooks/useFeedStore').useFeedStore;
     native: any;
     feedEvents: any;
   };
   jest.isolateModules(() => {
     api = {
-      useEvents: require('../hooks/useEvents').useEvents,
-      store: require('../hooks/useStore').useFeedStore,
-      native: require('../NativeStoryManager').default,
+      useNativeFeedEvents: require('../hooks/useNativeFeedEvents')
+        .useNativeFeedEvents,
+      store: require('../hooks/useFeedStore').useFeedStore,
+      native: require('../specs/NativeStoryManager').default,
       feedEvents: require('../specs/NativeFeedEvents').default,
     };
   });
   return api;
 };
 
-const runEffect = (api: { useEvents: () => void }) => api.useEvents();
+const runEffect = (api: { useNativeFeedEvents: () => void }) =>
+  api.useNativeFeedEvents();
 
 const handlerOf = (mock: jest.Mock) => mock.mock.calls[0]![0];
 
 beforeEach(() => jest.clearAllMocks());
 
-describe('useEvents', () => {
+describe('useNativeFeedEvents', () => {
   it('subscribes to the three native feed events', () => {
     const api = load();
     const { native, feedEvents } = api;

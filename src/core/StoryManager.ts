@@ -1,17 +1,17 @@
 import { Linking } from 'react-native';
 import type { AppearanceManager } from './AppearanceManager';
-import { generateId } from './helpers/idGenerator';
-import { isFunction } from './helpers/isFunction';
-import NativeAppearanceManager from './NativeAppearanceManager';
-import { subscribeNativeEvent } from './helpers/subscribeNativeEvent';
-import NativeStoryManager from './NativeStoryManager';
-import NativeBannerEvents from './specs/NativeBannerEvents';
-import NativeFeedEvents from './specs/NativeFeedEvents';
-import NativeGameEvents from './specs/NativeGameEvents';
-import NativeGoodsEvents from './specs/NativeGoodsEvents';
-import NativeIamEvents from './specs/NativeIamEvents';
-import NativeStoriesEvents from './specs/NativeStoriesEvents';
-import NativeSystemEvents from './specs/NativeSystemEvents';
+import { generateId } from '../utils/generateId';
+import { isFunction } from '../utils/isFunction';
+import NativeAppearanceManager from '../specs/NativeAppearanceManager';
+import { subscribeNativeEvent } from '../utils/subscribeNativeEvent';
+import NativeStoryManager from '../specs/NativeStoryManager';
+import NativeBannerEvents from '../specs/NativeBannerEvents';
+import NativeFeedEvents from '../specs/NativeFeedEvents';
+import NativeGameEvents from '../specs/NativeGameEvents';
+import NativeGoodsEvents from '../specs/NativeGoodsEvents';
+import NativeIamEvents from '../specs/NativeIamEvents';
+import NativeStoriesEvents from '../specs/NativeStoriesEvents';
+import NativeSystemEvents from '../specs/NativeSystemEvents';
 
 export type Option<T> = T | null | undefined;
 

@@ -1,30 +1,33 @@
-import { AppearanceManager } from './AppearanceManager';
-import { StoryManager } from './StoryManager';
+import { AppearanceManager } from './core/AppearanceManager';
+import { StoryManager } from './core/StoryManager';
 
 export { StoryManager, AppearanceManager };
 
-export type { StoriesListCardOptions } from './AppearanceManager';
+export type { StoriesListCardOptions } from './core/AppearanceManager';
 
 export type {
   StoryManagerConfig,
   ProductCartOffer,
   ProductCart,
   ProductCartHandlers,
-} from './StoryManager';
+} from './core/StoryManager';
 
-export { CTASource } from './StoryManager';
+export { CTASource } from './core/StoryManager';
 export type {
   CTAGameReaderPayload,
   CTAStoryReaderPayload,
   CTAStoryListPayload,
-} from './StoryManager';
+} from './core/StoryManager';
 
-export { StoriesList } from './stories/StoriesList';
-export type { StoriesListRef, ListLoadStatus } from './stories/StoriesList';
+export { StoriesList } from './components/StoriesList/StoriesList';
+export type {
+  StoriesListRef,
+  ListLoadStatus,
+} from './components/StoriesList/StoriesList';
 
-export { BannerCarousel } from './banners/BannerCarousel';
-export type { BannerCarouselProps } from './banners/BannerCarousel';
-export type { BannerViewRef } from './banners/BannerViewComponent';
+export { BannerCarousel } from './components/BannerCarousel/BannerCarousel';
+export type { BannerCarouselProps } from './components/BannerCarousel/BannerCarousel';
+export type { BannerViewRef } from './components/BannerCarousel/BannerNativeView';
 
 export {
   StoryReaderSwipeStyle,
@@ -33,6 +36,6 @@ export {
   StoriesListCardViewVariant,
   StoryReaderCloseButtonPosition,
   StoriesListCardTitleTextAlign,
-} from './AppearanceManager';
+} from './core/AppearanceManager';
 
-export { CoverQuality } from './data/Enum';
+export { CoverQuality } from './types/CoverQuality';

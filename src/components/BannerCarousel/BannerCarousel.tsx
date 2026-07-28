@@ -1,6 +1,7 @@
-import { forwardRef } from 'react';
+import { forwardRef, useCallback, useMemo } from 'react';
 import { type StyleProp, type ViewStyle } from 'react-native';
-import BannerViewComponent, { type BannerViewRef } from './BannerViewComponent';
+
+import BannerNativeView, { type BannerViewRef } from './BannerNativeView';
 
 export type BannerCarouselProps = {
   placeId?: string;
@@ -33,22 +34,39 @@ export const BannerCarousel = forwardRef<BannerViewRef, BannerCarouselProps>(
     },
     ref
   ) => {
+    const viewStyle = useMemo(
+      () => [{ height, width: '100%' as const }, style],
+      [height, style]
+    );
+
+    const handleScroll = useCallback(
+      (e: { nativeEvent: { index: number } }) =>
+        onScroll?.(e.nativeEvent.index),
+      [onScroll]
+    );
+
+    const handlePlaceLoaded = useCallback(
+      (e: { nativeEvent: { size: number; widgetHeight: number } }) =>
+        onPlaceLoaded?.(e.nativeEvent.size, e.nativeEvent.widgetHeight),
+      [onPlaceLoaded]
+    );
+
     return (
-      <BannerViewComponent
-        placeId={placeId}
+      <BannerNativeView
         ref={ref}
+        placeId={placeId}
         shouldLoop={shouldLoop}
         sideInset={sideInset}
         leadingInset={leadingInset}
         trailingInset={trailingInset}
         interItemSpacing={interItemSpacing}
         cornerRadius={cornerRadius}
-        style={[{ height: height, width: '100%' }, style]}
-        onScroll={(e) => onScroll?.(e.nativeEvent.index)}
-        onPlaceLoaded={(e) => {
-          onPlaceLoaded?.(e.nativeEvent.size, e.nativeEvent.widgetHeight);
-        }}
+        style={viewStyle}
+        onScroll={handleScroll}
+        onPlaceLoaded={handlePlaceLoaded}
       />
     );
   }
 );
+
+BannerCarousel.displayName = 'BannerCarousel';

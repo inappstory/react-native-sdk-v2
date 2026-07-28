@@ -43,7 +43,7 @@ export const useFeedStore = create<StoreState>()((set) => ({
       const feedName = `feeds_${feed}` as const;
       const feedArr = state[feedName] ?? [];
       const added = events.filter(
-        (event) => !feedArr.some((f) => f.storyID == event.storyID)
+        (event) => !feedArr.some((f) => f.storyID === event.storyID)
       );
       return {
         ...state,
@@ -58,7 +58,7 @@ export const useFeedStore = create<StoreState>()((set) => ({
     set((state) => {
       const feedName = `feeds_${feed}` as const;
       const feedArr = state[feedName] ?? [];
-      const eventIdx = feedArr.findIndex((os) => os.storyID == event.storyID);
+      const eventIdx = feedArr.findIndex((os) => os.storyID === event.storyID);
       return {
         ...state,
         [feedName]:

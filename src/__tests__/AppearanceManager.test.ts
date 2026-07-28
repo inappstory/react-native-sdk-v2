@@ -1,9 +1,9 @@
 /// <reference types="jest" />
-import { AppearanceManager } from '../AppearanceManager';
-import NativeAppearanceManager from '../NativeAppearanceManager';
-import { CoverQuality } from '../data/Enum';
+import { AppearanceManager } from '../core/AppearanceManager';
+import NativeAppearanceManager from '../specs/NativeAppearanceManager';
+import { CoverQuality } from '../types/CoverQuality';
 
-jest.mock('../NativeAppearanceManager', () => ({
+jest.mock('../specs/NativeAppearanceManager', () => ({
   __esModule: true,
   default: new Proxy(
     {},
@@ -210,6 +210,18 @@ describe('setStoriesListOptions — card title padding', () => {
     });
     expect(error).toHaveBeenCalled();
     error.mockRestore();
+  });
+
+  it('keeps parsed padding across successive merges', () => {
+    const manager = new AppearanceManager();
+    manager.setStoriesListOptions({ card: { title: { padding: '4px 8px' } } });
+    manager.setStoriesListOptions({ topPadding: 7 });
+    expect(manager.storiesListOptions.card?.title?.padding).toEqual({
+      paddingTop: 4,
+      paddingRight: 8,
+      paddingBottom: 4,
+      paddingLeft: 8,
+    });
   });
 
   it('keeps other list options across successive merges', () => {

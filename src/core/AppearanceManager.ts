@@ -1,8 +1,8 @@
-import NativeAppearanceManager from './NativeAppearanceManager';
+import NativeAppearanceManager from '../specs/NativeAppearanceManager';
 import type { Option } from './StoryManager';
 import type { StyleProp, ViewStyle } from 'react-native';
 import parseSides from 'parse-css-sides';
-import type { CoverQuality } from './data/Enum';
+import type { CoverQuality } from '../types/CoverQuality';
 import { deepmerge } from 'deepmerge-ts';
 
 export enum StoryReaderCloseButtonPosition {
@@ -304,7 +304,12 @@ export class AppearanceManager {
       paddingLeft: 0,
     };
     try {
-      if (typeof cardTitlePadding === 'number') {
+      if (cardTitlePadding && typeof cardTitlePadding === 'object') {
+        cardTitlePaddingParsed = {
+          ...cardTitlePaddingParsed,
+          ...(cardTitlePadding as unknown as typeof cardTitlePaddingParsed),
+        };
+      } else if (typeof cardTitlePadding === 'number') {
         cardTitlePaddingParsed.paddingTop = cardTitlePadding;
         cardTitlePaddingParsed.paddingRight = cardTitlePadding;
         cardTitlePaddingParsed.paddingBottom = cardTitlePadding;

@@ -20,15 +20,19 @@ A build fails on its own when a gate is missed — the thresholds live in
 
 ### Scope of the automated gates
 
-Measured: `AppearanceManager`, `StoryManager`, `hooks/`, `helpers/`.
+Measured: `src/core/**`, `src/utils/**`, the feed store and its native event
+bridge, plus `src/components/StoriesList/cardGeometry.ts` — pure card layout
+math, opted back in explicitly.
 
 Not measured, on purpose:
 
-- `src/specs/**`, `src/Native*.ts` — TurboModule declarations, no logic to test.
-- `src/data/**`, `src/index.ts`, `src/GlobalsWrapper.ts` — types and re-exports.
-- `src/stories/**`, `src/banners/**` — components that render native views; a
-  renderer test would assert on mocks, not on behaviour. They are covered by the
-  manual checklist below.
+- `src/specs/**` — TurboModule declarations, no logic to test.
+- `src/types/**`, `src/index.ts` — types and re-exports.
+- `src/components/**` — components that render native views; a renderer test
+  would assert on mocks, not on behaviour. Covered by the manual checklist below.
+- `src/hooks/useFeedLoader.ts`, `src/hooks/useEventCallback.ts` — hooks bound to
+  the React lifecycle. The repo has no renderer in devDependencies, so these are
+  covered by the manual checklist too.
 
 Keep the two scope lists (`jest.collectCoverageFrom` and `stryker.mutate`) in
 sync when a file moves.
