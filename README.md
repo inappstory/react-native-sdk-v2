@@ -110,11 +110,8 @@ const createStoryManager = () => {
   storyManager.on('favoriteStory', (payload: any) =>
     console.log('favoriteStory', { payload })
   );
-  storyManager.on('shareStory', (payload: any) =>
-    console.log('shareStory', { payload })
-  );
-  storyManager.on('shareStoryWithPath', (payload: any) =>
-    console.log('shareStoryWithPath', { payload })
+  storyManager.onShareStory((event: any) =>
+    console.log('clickOnShareStory', event.body)
   );
 
   // btn handler
@@ -401,7 +398,7 @@ storyManager.on(eventName, (payload) => {
 | likeStory         | {id: Number, feed: String, index: Number, value: Boolean} |     |     |
 | dislikeStory      | {id: Number, feed: String, index: Number, value: Boolean} |     |     |
 | favoriteStory     | {id: Number, feed: String, index: Number, value: Boolean} |     |     |
-| clickOnShareStory | {id: Number, feed: String, index: Number}                 |     |     |
+| clickOnShareStory | {id: Number, feed: String, index: Number, payload: String} |     |     |
 | storyWidgetEvent  | {id: Number, feed: String, name: String, data: Object}    |     |     |
 
 ## Feed Events

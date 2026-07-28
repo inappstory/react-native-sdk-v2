@@ -114,6 +114,7 @@ public class NativeStoriesEventsImpl: NSObject {
             "id": storyIDForJS(slideData.storyData?.id),
             "feed": slideData.storyData?.feed ?? "",
             "index": slideData.index,
+            "payload": slideData.payload ?? "",
           ],
         ])
       case .storyWidgetEvent(let slideData, let name, let data):

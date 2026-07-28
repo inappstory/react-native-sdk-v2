@@ -150,7 +150,9 @@ class StoriesEventsModule(reactContext: ReactApplicationContext) :
 
     manager.setClickOnShareStoryCallback(object : ClickOnShareStoryCallback {
       override fun shareClick(slideData: SlideData) {
-        emit("clickOnShareStory", storyBody(slideData))
+        emit("clickOnShareStory", storyBody(slideData).apply {
+          putString("payload", slideData.payload())
+        })
       }
     })
 
