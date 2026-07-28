@@ -35,6 +35,10 @@ jobs:
       - name: Run unit tests
         run: yarn test --maxWorkers=2 --coverage
 
+      # Fails below the score in stryker.config.json — see QA.md.
+      - name: Run mutation tests
+        run: yarn test:mutation
+
   build-library:
     runs-on: ubuntu-latest
     steps:

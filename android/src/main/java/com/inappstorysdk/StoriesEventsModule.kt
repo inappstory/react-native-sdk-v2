@@ -74,11 +74,9 @@ class StoriesEventsModule(reactContext: ReactApplicationContext) :
   fun emitButtonClick(data: ContentData?, url: String?) {
     val slide = data as? SlideData
     emit("clickOnButton", Arguments.createMap().apply {
-      slide?.let {
-        putInt("id", it.story().id())
-        putString("feed", it.story().feed())
-        putInt("index", it.index())
-      }
+      putInt("id", slide?.story()?.id() ?: -1)
+      putString("feed", slide?.story()?.feed() ?: "")
+      putInt("index", slide?.index() ?: -1)
       putString("url", url)
     })
   }

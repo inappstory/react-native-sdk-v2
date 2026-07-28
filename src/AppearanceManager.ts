@@ -10,6 +10,12 @@ export enum StoryReaderCloseButtonPosition {
   RIGHT = 'right',
 }
 
+export enum StoryReaderPresentationStyle {
+  ZOOM = 'zoom',
+  MODAL = 'modal',
+  FADE = 'fade',
+}
+
 export enum StoryReaderSwipeStyle {
   FLAT = 'flat',
   COVER = 'cover',
@@ -245,7 +251,7 @@ export class AppearanceManager {
     NativeAppearanceManager.setTimerGradientEnable(value);
   }
 
-  setPresentationStyle(value: string): void {
+  setPresentationStyle(value: StoryReaderPresentationStyle): void {
     NativeAppearanceManager.setPresentationStyle(value);
   }
 

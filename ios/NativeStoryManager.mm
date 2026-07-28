@@ -125,7 +125,8 @@ RCT_EXPORT_METHOD(selectFavoriteStoryCellWith:(nonnull NSString *)storyID) {
 RCT_EXPORT_METHOD(selectStoryCellWith:(nonnull NSString *)storyID
                                  feed:(nonnull NSString *)feed
                              uniqueId:(nonnull NSString *)uniqueId) {
-  [[NativeStoryManagerImpl shared] selectStoryCellWith:storyID];
+  [[NativeStoryManagerImpl shared] selectStoryCellWith:storyID
+                                              uniqueId:uniqueId];
 }
 
 RCT_EXPORT_METHOD(setAppVersion:(nonnull NSString *)version build:(double)build) {
@@ -145,8 +146,9 @@ RCT_EXPORT_METHOD(setUserID:(nonnull NSString *)userId
   [[NativeStoryManagerImpl shared] setUserID:userId userIdSign:userIdSign];
 }
 
-RCT_EXPORT_METHOD(setVisibleWith:(nonnull NSArray *)storyIDs) {
-  [[NativeStoryManagerImpl shared] setVisibleWith:storyIDs];
+RCT_EXPORT_METHOD(setVisibleWith:(nonnull NSArray *)storyIDs
+                        uniqueId:(nonnull NSString *)uniqueId) {
+  [[NativeStoryManagerImpl shared] setVisibleWith:storyIDs uniqueId:uniqueId];
 }
 
 RCT_EXPORT_METHOD(setImagesPlaceholders:(nonnull NSDictionary *)placeholders) {
@@ -225,6 +227,10 @@ RCT_EXPORT_METHOD(cancelOperation:(nonnull NSString *)operationId) {
 
 RCT_EXPORT_METHOD(clearCache) {
   [[NativeStoryManagerImpl shared] clearCache];
+}
+
+RCT_EXPORT_METHOD(preloadGames) {
+  [[NativeStoryManagerImpl shared] preloadGames];
 }
 
 RCT_EXPORT_METHOD(removeFromFavorite:(nonnull NSString *)storyID) {

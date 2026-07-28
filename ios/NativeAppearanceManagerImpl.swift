@@ -17,31 +17,27 @@ public class NativeAppearanceManagerImpl: NSObject {
     super.init()
   }
 
-  @objc public func setHasLike(_ value: Bool) {
-    _hasLike = value
-    InAppStory.shared.panelSettings = PanelSettings(
+  public var panelSettings: PanelSettings {
+    PanelSettings(
       like: self._hasLike,
       favorites: self._hasFavorites,
       share: self._hasShare
     )
+  }
+
+  @objc public func setHasLike(_ value: Bool) {
+    _hasLike = value
+    InAppStory.shared.panelSettings = panelSettings
   }
 
   @objc public func setHasFavorites(_ value: Bool) {
     _hasFavorites = value
-    InAppStory.shared.panelSettings = PanelSettings(
-      like: self._hasLike,
-      favorites: self._hasFavorites,
-      share: self._hasShare
-    )
+    InAppStory.shared.panelSettings = panelSettings
   }
 
   @objc public func setHasShare(_ value: Bool) {
     _hasShare = value
-    InAppStory.shared.panelSettings = PanelSettings(
-      like: self._hasLike,
-      favorites: self._hasFavorites,
-      share: self._hasShare
-    )
+    InAppStory.shared.panelSettings = panelSettings
   }
 
   @objc public func setTimerGradientEnable(_ value: Bool) {
@@ -172,14 +168,14 @@ public class NativeAppearanceManagerImpl: NSObject {
   @objc public func setPresentationStyle(_ value: String) {
     DispatchQueue.main.async {
       switch value {
-      case "crossDissolve":
-        InAppStory.shared.presentationStyle = .crossDissolve
-      case "modal":
-        InAppStory.shared.presentationStyle = .modal
       case "zoom":
         InAppStory.shared.presentationStyle = .zoom
-      default:
+      case "modal":
+        InAppStory.shared.presentationStyle = .modal
+      case "fade":
         InAppStory.shared.presentationStyle = .crossDissolve
+      default:
+        NSLog("WARNING: unknown presentationStyle \(value)")
       }
     }
   }

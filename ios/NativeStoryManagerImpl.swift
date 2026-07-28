@@ -5,36 +5,15 @@ import React
 
 @objc(NativeStoryManagerImpl)
 public class NativeStoryManagerImpl: NSObject {
-  open func supportedEvents() -> [String] {
-    [
-      "storiesLoaded", "ugcStoriesLoaded", "showStory", "closeStory",
-      "showSlide", "likeStory", "dislikeStory", "favoriteStory",
-      "clickOnShareStory", "storyWidgetEvent",
-      "startGame", "finishGame", "closeGame", "eventGame", "gameFailure",
-      "gameReaderWillShow", "gameReaderDidClose", "gameComplete",
-      "getGoodsObject",
-      "storyListUpdate", "storyUpdate",
-      "favoritesUpdate", "scrollUpdate",
-      "storyReaderWillShow", "storyReaderDidClose", "sessionFailure",
-      "storyFailure", "currentStoryFailure", "networkFailure", "requestFailure",
-      "favoriteCellDidSelect", "editorCellDidSelect",
-      "customShare", "onActionWith", "storiesDidUpdated", "goodItemSelected",
-      "openStoryReader", "openStoryFavoriteReader", "clickOnFavoriteCell",
-      "shareStoryWithPath", "handleCTA",
-    ]  // etc.
-  }
-
-  @objc private var _hasLike: Bool = true
-  @objc private var _hasFavorites: Bool = true
-  @objc private var _hasShare: Bool = true
   @objc private var _userID: String = ""
   @objc private var _userIdSign: String? = nil
   @objc private var _lang: String = ""
   @objc private var _tags: [String] = [""]
   @objc private var goodsCache: [GoodObject] = []
 
-  var storiesAPI = StoryListAPI()
+  var storiesAPIs: [String: StoryListAPI] = [:]
   var favoriteStoriesAPI = StoryListAPI(isFavorite: true)
+  private var lastFavoriteIDs: Set<String>?
   var cancellationTokenMap: [String: CancellationToken] = [:]
   private var iamContainerView: IAMContainerView?
 
@@ -87,45 +66,25 @@ public class NativeStoryManagerImpl: NSObject {
         )
       )
 
-      /*InAppStory.shared.customShare = { share, fn in
-       NativeStoryManager.emitter.sendEvent(withName: "customShare", body: [])
-       NSLog("TODO: customShare closure");
-       }*/
-
-      /*InAppStory.shared.onActionWith = { target, type, storyType in
-       NativeStoryManager.emitter.sendEvent(withName: "onActionWith", body: [])
-       NSLog("TODO: onActionWith closure");
-       }*/
-
-      //     }
-      // }
-
-      InAppStory.shared.stackFeedUpdate = { newFeed in
-        NSLog("TODO: stackFeedUpdate closure")
-      }
-
-      //         @unknown default:
-      //              NSLog("WARNING: unknown storiesEvent")
-
-      //      }
-      // }
-
       resolve(nil)
     }
   }
 
-  // ponytail: iOS has a single storiesAPI, so uniqueId isn't used for routing
-  // (kept to mirror the JS/Android API). Subscribe = wire callbacks, no load.
-  @objc public func createSubscriberList(
-    _ feed: String,
-    uniqueId: String,
+  private func listAPI(feed: String, uniqueId: String) -> StoryListAPI {
+    if let api = storiesAPIs[uniqueId] { return api }
+    let api = StoryListAPI(feed: feed)
+    storiesAPIs[uniqueId] = api
+    return api
+  }
+
+  private func attachHandlers(
+    to api: StoryListAPI,
     callback: @escaping ([String: Any]) -> Void,
     storyCallback: @escaping ([String: Any]) -> Void
   ) {
-    self.storiesAPI.storyUpdate = { storyData in
+    api.storyUpdate = { [weak api] storyData in
       storyCallback([
-        "storyID": storyData.storyID,
-        "storyData": storyData.storyData,
+        "storyID": storyIDForJS(storyData.storyID),
         "title": storyData.title,
         "coverImagePath": storyData.coverImagePath,
         "coverVideoPath": storyData.coverVideoPath,
@@ -135,18 +94,17 @@ public class NativeStoryManagerImpl: NSObject {
         "hasAudio": storyData.hasAudio,
         "list": "feed",
         "feed": storyData.storyData.feed,
-        "aspectRatio": self.storiesAPI.cellRatio,
+        "aspectRatio": api?.cellRatio ?? 0,
         "slidesCount": storyData.storyData.slidesCount,
         "statTitle": storyData.storyData.title,
       ])
     }
-    self.storiesAPI.storyListUpdate = { storiesList, isFavorite, feed in
+    api.storyListUpdate = { [weak api] storiesList, isFavorite, feed in
       callback(
         [
           "stories": storiesList.map {
             [
-              "storyID": $0.storyID,
-              "storyData": $0.storyData,
+              "storyID": storyIDForJS($0.storyID),
               "title": $0.title,
               "coverImagePath": $0.coverImagePath,
               "coverVideoPath": $0.coverVideoPath,
@@ -156,7 +114,7 @@ public class NativeStoryManagerImpl: NSObject {
               "hasAudio": $0.hasAudio,
               "list": "feed",
               "feed": feed,
-              "aspectRatio": self.storiesAPI.cellRatio,
+              "aspectRatio": api?.cellRatio ?? 0,
               "slidesCount": $0.storyData.slidesCount,
               "statTitle": $0.storyData.title,
             ]
@@ -166,6 +124,19 @@ public class NativeStoryManagerImpl: NSObject {
         ]
       )
     }
+  }
+
+  @objc public func createSubscriberList(
+    _ feed: String,
+    uniqueId: String,
+    callback: @escaping ([String: Any]) -> Void,
+    storyCallback: @escaping ([String: Any]) -> Void
+  ) {
+    attachHandlers(
+      to: listAPI(feed: feed, uniqueId: uniqueId),
+      callback: callback,
+      storyCallback: storyCallback
+    )
   }
 
   // tags are unused on iOS (preloadBanners has no tags parameter); kept to mirror the shared spec.
@@ -187,59 +158,21 @@ public class NativeStoryManagerImpl: NSObject {
     }
   }
 
-  // uniqueId is unused on iOS (single storiesAPI); kept to mirror the shared spec.
   @objc public func getStories(
     _ feed: String,
     uniqueId: String,
     callback: @escaping ([String: Any]) -> Void,
     storyCallback: @escaping ([String: Any]) -> Void
   ) {
-    self.storiesAPI.storyUpdate = { storyData in
-      storyCallback([
-        "storyID": storyData.storyID,
-        "storyData": storyData.storyData,
-        "title": storyData.title,
-        "coverImagePath": storyData.coverImagePath,
-        "coverVideoPath": storyData.coverVideoPath,
-        "backgroundColor": storyData.backgroundColor,
-        "titleColor": storyData.titleColor,
-        "opened": storyData.opened,
-        "hasAudio": storyData.hasAudio,
-        "list": "feed",
-        "feed": storyData.storyData.feed,
-        "aspectRatio": self.storiesAPI.cellRatio,
-        "slidesCount": storyData.storyData.slidesCount,
-        "statTitle": storyData.storyData.title,
-      ])
-    }
-    self.storiesAPI.storyListUpdate = { storiesList, isFavorite, feed in
-      callback(
-        [
-          "stories": storiesList.map {
-            [
-              "storyID": $0.storyID,
-              "storyData": $0.storyData,
-              "title": $0.title,
-              "coverImagePath": $0.coverImagePath,
-              "coverVideoPath": $0.coverVideoPath,
-              "backgroundColor": $0.backgroundColor,
-              "titleColor": $0.titleColor,
-              "opened": $0.opened,
-              "hasAudio": $0.hasAudio,
-              "list": "feed",
-              "feed": feed,
-              "aspectRatio": self.storiesAPI.cellRatio,
-              "slidesCount": $0.storyData.slidesCount,
-              "statTitle": $0.storyData.title,
-            ]
-          },
-          "feed": feed,
-          "list": "feed",
-        ]
-      )
-    }
+    let isNew = storiesAPIs[uniqueId] == nil
+    let api = listAPI(feed: feed, uniqueId: uniqueId)
+    attachHandlers(to: api, callback: callback, storyCallback: storyCallback)
     DispatchQueue.main.async {
-      self.storiesAPI.setNewFeed(feed)
+      if isNew {
+        api.getStoriesList()
+      } else {
+        api.setNewFeed(feed)
+      }
     }
   }
 
@@ -250,8 +183,7 @@ public class NativeStoryManagerImpl: NSObject {
   ) {
     self.favoriteStoriesAPI.storyUpdate = { storyData in
       storyCallback([
-        "storyID": storyData.storyID,
-        "storyData": storyData.storyData,
+        "storyID": storyIDForJS(storyData.storyID),
         "title": storyData.title,
         "coverImagePath": storyData.coverImagePath,
         "coverVideoPath": storyData.coverVideoPath,
@@ -263,7 +195,7 @@ public class NativeStoryManagerImpl: NSObject {
         // feed/list so they land in feeds_default_favorites, not the main feed.
         "list": "favorites",
         "feed": "default",
-        "aspectRatio": self.storiesAPI.cellRatio,
+        "aspectRatio": self.favoriteStoriesAPI.cellRatio,
         "slidesCount": storyData.storyData.slidesCount,
         "statTitle": storyData.storyData.title,
       ])
@@ -272,8 +204,7 @@ public class NativeStoryManagerImpl: NSObject {
       callback([
         "stories": storiesList.map {
           [
-            "storyID": $0.storyID,
-            "storyData": $0.storyData,
+            "storyID": storyIDForJS($0.storyID),
             "title": $0.title,
             "coverImagePath": $0.coverImagePath,
             "coverVideoPath": $0.coverVideoPath,
@@ -283,7 +214,7 @@ public class NativeStoryManagerImpl: NSObject {
             "hasAudio": $0.hasAudio,
             "list": "favorites",
             "feed": "default",
-            "aspectRatio": self.storiesAPI.cellRatio,
+            "aspectRatio": self.favoriteStoriesAPI.cellRatio,
             "slidesCount": $0.storyData.slidesCount,
             "statTitle": $0.storyData.title,
           ]
@@ -293,14 +224,24 @@ public class NativeStoryManagerImpl: NSObject {
       ])
     }
 
+    self.favoriteStoriesAPI.favoritesUpdate = { [weak self] favorites in
+      guard let self else { return }
+      let ids = Set((favorites ?? []).map { $0.serverID })
+      guard ids != self.lastFavoriteIDs else { return }
+      self.lastFavoriteIDs = ids
+      DispatchQueue.main.async {
+        self.favoriteStoriesAPI.getStoriesList()
+      }
+    }
+
     DispatchQueue.main.async {
       self.favoriteStoriesAPI.getStoriesList()
     }
   }
 
-  @objc public func selectStoryCellWith(_ storyID: String) {
+  @objc public func selectStoryCellWith(_ storyID: String, uniqueId: String) {
     DispatchQueue.main.async {
-      self.storiesAPI.selectStoryCellWith(id: storyID)
+      self.storiesAPIs[uniqueId]?.selectStoryCellWith(id: storyID)
     }
   }
 
@@ -310,9 +251,9 @@ public class NativeStoryManagerImpl: NSObject {
     }
   }
 
-  @objc public func setVisibleWith(_ storyIDs: [String]) {
+  @objc public func setVisibleWith(_ storyIDs: [String], uniqueId: String) {
     DispatchQueue.main.async {
-      self.storiesAPI.setVisibleWith(storyIDs: storyIDs)
+      self.storiesAPIs[uniqueId]?.setVisibleWith(storyIDs: storyIDs)
     }
   }
 
@@ -422,6 +363,12 @@ public class NativeStoryManagerImpl: NSObject {
   @objc public func clearCache() {
     DispatchQueue.main.async {
       InAppStory.shared.clearCache()
+    }
+  }
+
+  @objc public func preloadGames() {
+    DispatchQueue.main.async {
+      InAppStory.shared.preloadGames()
     }
   }
 

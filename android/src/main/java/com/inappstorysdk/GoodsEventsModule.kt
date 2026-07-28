@@ -1,10 +1,12 @@
 package com.inappstory.reactnativesdk
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.View
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.ReactApplicationContext
@@ -20,6 +22,7 @@ import com.inappstory.sdk.goods.outercallbacks.ProductCartOffer
 import com.inappstory.sdk.goods.outercallbacks.ProductCartUpdatedProcessCallback
 import com.inappstory.sdk.stories.ui.views.goodswidget.GetGoodsDataCallback
 import com.inappstory.sdk.stories.ui.views.goodswidget.GoodsItemData
+import com.inappstory.sdk.stories.ui.views.goodswidget.GoodsWidgetAppearanceAdapter
 import com.inappstory.sdk.stories.ui.views.goodswidget.ICustomGoodsItem
 import com.inappstory.sdk.stories.ui.views.goodswidget.ICustomGoodsWidget
 import com.inappstory.sdk.stories.ui.views.goodswidget.IGoodsWidgetAppearance
@@ -50,11 +53,23 @@ class GoodsEventsModule(reactContext: ReactApplicationContext) :
 
   override fun setupGoodsEvents() {
     Log.d(NAME, "setupGoodsEvents")
-    AppearanceManager.getCommonInstance().csCustomGoodsWidget(object : ICustomGoodsWidget {
+    AppearanceManagerImpl.getAppearanceManager().csCustomGoodsWidget(object : ICustomGoodsWidget {
       override fun getWidgetView(context: Context): View? = null
       override fun getItem(): ICustomGoodsItem? = null
-      override fun getWidgetAppearance(): IGoodsWidgetAppearance? = null
       override fun getDecoration(): RecyclerView.ItemDecoration? = null
+
+      override fun getWidgetAppearance(): IGoodsWidgetAppearance? {
+        val resId = AppearanceManagerImpl.goodsCloseIconResId
+        if (resId == 0) return null
+        return object : GoodsWidgetAppearanceAdapter() {
+          init {
+            context = reactApplicationContext
+          }
+
+          override fun getCloseButtonImage(): Drawable? =
+            ContextCompat.getDrawable(reactApplicationContext, resId)
+        }
+      }
 
       override fun getSkus(
         widgetView: View,

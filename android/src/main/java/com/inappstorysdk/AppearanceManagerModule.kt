@@ -42,12 +42,12 @@ class AppearanceManagerModule(private val reactContext: ReactApplicationContext)
   }
 
   override fun setPresentationStyle(value: String) {
-    Log.d("AppearanceManagerModule", "setPresentationStyle")
+    Log.d("AppearanceManagerModule", "setPresentationStyle: $value")
     when (value) {
-      "zoom" -> this.appearanceManager?.csStoryReaderPresentationStyle(0)
-      "fade" -> this.appearanceManager?.csStoryReaderPresentationStyle(1)
-      "popup" -> this.appearanceManager?.csStoryReaderPresentationStyle(2)
-      "disable" -> this.appearanceManager?.csStoryReaderPresentationStyle(-1)
+      "zoom" -> this.appearanceManager?.csStoryReaderPresentationStyle(AppearanceManager.ZOOM)
+      "modal" -> this.appearanceManager?.csStoryReaderPresentationStyle(AppearanceManager.POPUP)
+      "fade" -> this.appearanceManager?.csStoryReaderPresentationStyle(AppearanceManager.FADE)
+      else -> Log.w("AppearanceManagerModule", "unknown presentationStyle $value")
     }
   }
 
@@ -100,9 +100,14 @@ class AppearanceManagerModule(private val reactContext: ReactApplicationContext)
     }
   }
 
-  // ponytail: no Android SDK setter for reader background color; iOS-only. No-op for spec parity.
   override fun setReaderBackgroundColor(value: String) {
-    Log.d("AppearanceManagerModule", "setReaderBackgroundColor (no-op on Android)")
+    Log.d("AppearanceManagerModule", "setReaderBackgroundColor: $value")
+    try {
+      val colorInt = android.graphics.Color.parseColor(value)
+      appearanceManager?.csReaderBackgroundColor(colorInt)
+    } catch (e: Throwable) {
+      Log.e("AppearanceManagerModule", "Error parsing reader background color: $value", e)
+    }
   }
 
   override fun setLikeImage(image: String, selected: String) {
@@ -139,7 +144,7 @@ class AppearanceManagerModule(private val reactContext: ReactApplicationContext)
   }
 
   override fun setCloseGoodsImage(image: String) {
-    this.appearanceManager?.csCloseIcon(getImageID(image));
+    AppearanceManagerImpl.goodsCloseIconResId = getImageID(image)
   }
 
   private fun getImageID(imgName: String): Int {

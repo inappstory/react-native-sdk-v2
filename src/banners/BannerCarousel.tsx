@@ -25,7 +25,7 @@ export const BannerCarousel = forwardRef<BannerViewRef, BannerCarouselProps>(
       leadingInset = 16,
       trailingInset = 16,
       interItemSpacing = 8,
-      cornerRadius = 24,
+      cornerRadius = 16,
       height = 150,
       style,
       onScroll,

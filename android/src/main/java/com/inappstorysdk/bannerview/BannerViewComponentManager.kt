@@ -65,7 +65,8 @@ class BannerViewComponentViewManager : SimpleViewManager<BannerViewComponent>() 
             "resume" to 2,
             "showNext" to 3,
             "showPrevious" to 4,
-            "showBannerWith" to 5
+            "showBannerWith" to 5,
+            "refresh" to 6
         )
     }
 
@@ -76,6 +77,7 @@ class BannerViewComponentViewManager : SimpleViewManager<BannerViewComponent>() 
             3 -> view.showNext()
             4 -> view.showPrevious()
             5 -> args?.let { view.showBannerWith(it.getInt(0)) }
+            6 -> view.refresh()
         }
     }
 
@@ -86,6 +88,7 @@ class BannerViewComponentViewManager : SimpleViewManager<BannerViewComponent>() 
             "showNext" -> view.showNext()
             "showPrevious" -> view.showPrevious()
             "showBannerWith" -> args?.let { view.showBannerWith(it.getInt(0)) }
+            "refresh" -> view.refresh()
         }
     }
 

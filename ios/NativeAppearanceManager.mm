@@ -90,7 +90,7 @@ RCT_EXPORT_METHOD(setRefreshGoodsImage:(NSString *)image) {
 }
 
 RCT_EXPORT_METHOD(setCloseGoodsImage:(NSString *)image) {
-  [[NativeAppearanceManagerImpl shared] setRefreshGoodsImage:image];
+  [[NativeAppearanceManagerImpl shared] setCloseGoodsImage:image];
 }
 
 

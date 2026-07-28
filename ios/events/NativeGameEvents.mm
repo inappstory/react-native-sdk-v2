@@ -15,12 +15,6 @@ RCT_EXPORT_MODULE()
     [self emitEventGame:data];
   } else if ([name isEqualToString:@"gameFailure"]) {
     [self emitGameFailure:data];
-  } else if ([name isEqualToString:@"gameReaderWillShow"]) {
-    [self emitGameReaderWillShow:data];
-  } else if ([name isEqualToString:@"gameReaderDidClose"]) {
-    [self emitGameReaderDidClose:data];
-  } else if ([name isEqualToString:@"gameComplete"]) {
-    [self emitGameComplete:data];
   }
 #else
   [self sendEventWithName:name body:data];
@@ -40,10 +34,7 @@ RCT_EXPORT_METHOD(setupGameEvents) {
 }
 #else
 - (NSArray<NSString *> *)supportedEvents {
-  return @[
-    @"startGame", @"closeGame", @"eventGame", @"gameFailure",
-    @"gameReaderWillShow", @"gameReaderDidClose", @"gameComplete"
-  ];
+  return @[ @"startGame", @"closeGame", @"eventGame", @"gameFailure" ];
 }
 #endif
 

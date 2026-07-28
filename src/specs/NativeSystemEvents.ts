@@ -14,8 +14,6 @@ export interface Spec extends TurboModule {
   readonly currentStoryFailure: CodegenTypes.EventEmitter<EventDTO>;
   readonly networkFailure: CodegenTypes.EventEmitter<EventDTO>;
   readonly requestFailure: CodegenTypes.EventEmitter<EventDTO>;
-  readonly customShare: CodegenTypes.EventEmitter<EventDTO>;
-  readonly onActionWith: CodegenTypes.EventEmitter<EventDTO>;
   readonly handleCTA: CodegenTypes.EventEmitter<EventDTO>;
 }
 

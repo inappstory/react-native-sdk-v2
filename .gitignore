@@ -90,3 +90,8 @@ ios/generated/
 .claude/
 .codex/
 .cursor/
+
+# test artifacts
+coverage/
+reports/
+.stryker-tmp/

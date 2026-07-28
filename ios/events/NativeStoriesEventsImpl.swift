@@ -40,7 +40,7 @@ public class NativeStoriesEventsImpl: NSObject {
         emit([
           "withName": "showStory",
           "body": [
-            "id": storyData.id ?? "",
+            "id": storyIDForJS(storyData.id),
             "feed": storyData.feed,
             "action": actionString,
             "slidesCount": storyData.slidesCount,
@@ -63,7 +63,7 @@ public class NativeStoriesEventsImpl: NSObject {
         emit([
           "withName": "closeStory",
           "body": [
-            "id": slideData.storyData?.id ?? "",
+            "id": storyIDForJS(slideData.storyData?.id),
             "feed": slideData.storyData?.feed ?? "",
             "index": slideData.index,
             "action": actionString,
@@ -73,7 +73,7 @@ public class NativeStoriesEventsImpl: NSObject {
         emit([
           "withName": "showSlide",
           "body": [
-            "id": slideData.storyData?.id ?? "",
+            "id": storyIDForJS(slideData.storyData?.id),
             "index": slideData.index,
           ],
         ])
@@ -81,7 +81,7 @@ public class NativeStoriesEventsImpl: NSObject {
         emit([
           "withName": "likeStory",
           "body": [
-            "id": slideData.storyData?.id ?? "",
+            "id": storyIDForJS(slideData.storyData?.id),
             "feed": slideData.storyData?.feed ?? "",
             "index": slideData.index,
             "value": value,
@@ -91,7 +91,7 @@ public class NativeStoriesEventsImpl: NSObject {
         emit([
           "withName": "dislikeStory",
           "body": [
-            "id": slideData.storyData?.id ?? "",
+            "id": storyIDForJS(slideData.storyData?.id),
             "feed": slideData.storyData?.feed ?? "",
             "index": slideData.index,
             "value": value,
@@ -101,7 +101,7 @@ public class NativeStoriesEventsImpl: NSObject {
         emit([
           "withName": "favoriteStory",
           "body": [
-            "id": slideData.storyData?.id ?? "",
+            "id": storyIDForJS(slideData.storyData?.id),
             "feed": slideData.storyData?.feed ?? "",
             "index": slideData.index,
             "value": value,
@@ -111,7 +111,7 @@ public class NativeStoriesEventsImpl: NSObject {
         emit([
           "withName": "clickOnShareStory",
           "body": [
-            "id": slideData.storyData?.id ?? "",
+            "id": storyIDForJS(slideData.storyData?.id),
             "feed": slideData.storyData?.feed ?? "",
             "index": slideData.index,
           ],
@@ -120,7 +120,7 @@ public class NativeStoriesEventsImpl: NSObject {
         emit([
           "withName": "storyWidgetEvent",
           "body": [
-            "id": slideData?.storyData?.id ?? "",
+            "id": storyIDForJS(slideData?.storyData?.id),
             "feed": slideData?.storyData?.feed ?? "",
             "name": name,
             "data": data ?? [:],
@@ -130,7 +130,7 @@ public class NativeStoriesEventsImpl: NSObject {
         emit([
           "withName": "clickOnButton",
           "body": [
-            "id": slideData.storyData?.id ?? "",
+            "id": storyIDForJS(slideData.storyData?.id),
             "feed": slideData.storyData?.feed ?? "",
             "index": slideData.index,
             "url": link,

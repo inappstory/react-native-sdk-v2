@@ -211,6 +211,7 @@ export const StoriesList = forwardRef<StoriesListRef, StoriesListProps>(
       <View style={styles.storyList}>
         <StoriesCarousel
           feed={feed}
+          uniqueId={uniqueId}
           stories={feedEvents}
           showFavorites={showFavorites}
           favoriteStories={feedFavoriteEvents}

@@ -9,8 +9,6 @@ export type EventDTO = {
 export interface Spec extends TurboModule {
   setupStoriesEvents(): void;
 
-  readonly storiesLoaded: CodegenTypes.EventEmitter<EventDTO>;
-  readonly ugcStoriesLoaded: CodegenTypes.EventEmitter<EventDTO>;
   readonly showStory: CodegenTypes.EventEmitter<EventDTO>;
   readonly closeStory: CodegenTypes.EventEmitter<EventDTO>;
   readonly showSlide: CodegenTypes.EventEmitter<EventDTO>;

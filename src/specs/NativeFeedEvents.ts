@@ -9,13 +9,10 @@ export type EventDTO = {
 export interface Spec extends TurboModule {
   setupFeedEvents(): void;
 
-  readonly favoritesUpdate: CodegenTypes.EventEmitter<EventDTO>;
-  readonly favoriteCellDidSelect: CodegenTypes.EventEmitter<EventDTO>;
-  readonly editorCellDidSelect: CodegenTypes.EventEmitter<EventDTO>;
+  // Favorites changes reach JS through onStoryListUpdate with list="favorites",
+  // so there is no separate favourites event here.
   readonly storyReaderWillShow: CodegenTypes.EventEmitter<EventDTO>;
   readonly storyReaderDidClose: CodegenTypes.EventEmitter<EventDTO>;
-  readonly storiesDidUpdated: CodegenTypes.EventEmitter<EventDTO>;
-  readonly scrollUpdate: CodegenTypes.EventEmitter<EventDTO>;
 }
 
 export default TurboModuleRegistry.getEnforcing<Spec>('NativeFeedEvents');

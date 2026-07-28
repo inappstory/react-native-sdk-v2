@@ -1,5 +1,10 @@
 import UIKit
 
+func storyIDForJS(_ id: String?) -> Int {
+  guard let id, let value = Int(id) else { return -1 }
+  return value
+}
+
 extension UIApplication {
   var firstKeyWindow: UIWindow? {
     if #available(iOS 15.0, *) {

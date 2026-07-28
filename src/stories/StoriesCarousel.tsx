@@ -11,6 +11,7 @@ import type { Story } from '../data/Story';
 
 export const StoriesCarousel = ({
   feed,
+  uniqueId,
   stories,
   storyManager,
   appearanceManager,
@@ -24,6 +25,7 @@ export const StoriesCarousel = ({
   horizontal,
 }: {
   feed: any;
+  uniqueId: string;
   stories: any;
   storyManager: StoryManager;
   appearanceManager: AppearanceManager;
@@ -54,7 +56,7 @@ export const StoriesCarousel = ({
       visibleIds.current.push(id);
     });
     if (newIDs.length > 0) {
-      NativeStoryManager.setVisibleWith(newIDs);
+      NativeStoryManager.setVisibleWith(newIDs, uniqueId);
     }
   };
 

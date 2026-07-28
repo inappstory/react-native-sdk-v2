@@ -13,9 +13,6 @@ export interface Spec extends TurboModule {
   readonly closeGame: CodegenTypes.EventEmitter<EventDTO>;
   readonly eventGame: CodegenTypes.EventEmitter<EventDTO>;
   readonly gameFailure: CodegenTypes.EventEmitter<EventDTO>;
-  readonly gameReaderWillShow: CodegenTypes.EventEmitter<EventDTO>;
-  readonly gameReaderDidClose: CodegenTypes.EventEmitter<EventDTO>;
-  readonly gameComplete: CodegenTypes.EventEmitter<EventDTO>;
 }
 
 export default TurboModuleRegistry.getEnforcing<Spec>('NativeGameEvents');

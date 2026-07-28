@@ -2,6 +2,7 @@
 import { Linking } from 'react-native';
 import { StoryManager, CTASource } from '../StoryManager';
 import NativeStoryManager from '../NativeStoryManager';
+import NativeAppearanceManager from '../NativeAppearanceManager';
 import NativeFeedEvents from '../specs/NativeFeedEvents';
 import NativeStoriesEvents from '../specs/NativeStoriesEvents';
 import NativeBannerEvents from '../specs/NativeBannerEvents';
@@ -41,6 +42,7 @@ jest.mock('../NativeStoryManager', () => ({
     preloadIAM: jest.fn().mockResolvedValue(true),
     cancelOperation: jest.fn(),
     clearCache: jest.fn(),
+    preloadGames: jest.fn(),
     removeFromFavorite: jest.fn(),
     removeAllFavorites: jest.fn(),
     favoritesCount: jest.fn().mockResolvedValue(2),
@@ -116,7 +118,6 @@ jest.mock('../specs/NativeSystemEvents', () => ({
     currentStoryFailure: jest.fn(() => ({ remove: jest.fn() })),
     networkFailure: jest.fn(() => ({ remove: jest.fn() })),
     requestFailure: jest.fn(() => ({ remove: jest.fn() })),
-    customShare: jest.fn(() => ({ remove: jest.fn() })),
     handleCTA: jest.fn(() => ({ remove: jest.fn() })),
   },
 }));
@@ -129,9 +130,6 @@ jest.mock('../specs/NativeGameEvents', () => ({
     closeGame: jest.fn(() => ({ remove: jest.fn() })),
     eventGame: jest.fn(() => ({ remove: jest.fn() })),
     gameFailure: jest.fn(() => ({ remove: jest.fn() })),
-    gameReaderWillShow: jest.fn(() => ({ remove: jest.fn() })),
-    gameReaderDidClose: jest.fn(() => ({ remove: jest.fn() })),
-    gameComplete: jest.fn(() => ({ remove: jest.fn() })),
   },
 }));
 
@@ -209,9 +207,31 @@ describe('StoryManager.create', () => {
     await StoryManager.create({ apiKey: 'key', userId: 'u' });
     expect(native.setTags).not.toHaveBeenCalled();
     expect(native.setPlaceholders).not.toHaveBeenCalled();
+    expect(native.setImagesPlaceholders).not.toHaveBeenCalled();
     expect(native.setLang).not.toHaveBeenCalled();
     expect(native.setAppVersion).not.toHaveBeenCalled();
     expect(native.changeSound).toHaveBeenCalledWith(true);
+  });
+
+  it('sends an empty userId when the config has none', async () => {
+    await StoryManager.create({ apiKey: 'key' });
+    expect(native.initWith).toHaveBeenCalledWith(
+      'key',
+      '',
+      null,
+      false,
+      true,
+      null,
+      false
+    );
+  });
+
+  it('starts with empty tags and sound on', async () => {
+    const manager = await StoryManager.create({ apiKey: 'key' });
+    expect(manager.tags).toEqual([]);
+    expect(manager.soundEnabled).toBe(true);
+    expect(manager.userIdSign).toBeNull();
+    expect(manager.appVersion).toBeNull();
   });
 
   it('maps defaultMuted to changeSound(false)', async () => {
@@ -263,6 +283,14 @@ describe('cancelable operations', () => {
     expect(native.showIAMById).not.toHaveBeenCalled();
   });
 
+  it('stops listening to the signal once the operation finished', async () => {
+    const manager = await StoryManager.create({ apiKey: 'k', userId: 'u' });
+    const controller = new AbortController();
+    await manager.showStory(1, controller.signal);
+    controller.abort();
+    expect(native.cancelOperation).not.toHaveBeenCalled();
+  });
+
   it('showStoryOnce resolves native result and stringifies id', async () => {
     const manager = await StoryManager.create({ apiKey: 'k', userId: 'u' });
     await expect(manager.showStoryOnce(9)).resolves.toBe(true);
@@ -301,6 +329,7 @@ describe('runtime setters', () => {
     ['removeAllFavorites', []],
     ['logout', []],
     ['clearCache', []],
+    ['preloadGames', []],
   ] as const)('%s calls through to native', (method, args) => {
     (manager as any)[method](...args);
     expect((native as any)[method]).toHaveBeenCalledWith(...args);
@@ -359,9 +388,6 @@ describe('event subscriptions fan-out', () => {
       'closeGame',
       'eventGame',
       'gameFailure',
-      'gameReaderWillShow',
-      'gameReaderDidClose',
-      'gameComplete',
     ] as const) {
       expect((NativeGameEvents as any)[name]).toHaveBeenCalledWith(listener);
     }
@@ -393,21 +419,31 @@ describe('CTA handling', () => {
   });
 
   it.each([
-    ['button', CTASource.STORY_READER],
-    ['swipe', CTASource.STORY_READER],
-    ['deeplink', CTASource.STORY_LIST],
-    ['game', CTASource.GAME_READER],
-  ] as const)('routes %s action to handler with src=%s', (action, src) => {
-    const handler = jest.fn();
-    manager.storyLinkClickHandler = handler;
-    manager.handleCTA({ url: 'https://x', action });
-    expect(handler).toHaveBeenCalledWith(
-      expect.objectContaining({
-        src,
-        data: expect.objectContaining({ url: 'https://x' }),
-      })
-    );
-  });
+    [
+      'button',
+      CTASource.STORY_READER,
+      { id: 0, url: 'https://x', index: 0, elementId: '' },
+    ],
+    [
+      'swipe',
+      CTASource.STORY_READER,
+      { id: 0, url: 'https://x', index: 0, elementId: '' },
+    ],
+    [
+      'deeplink',
+      CTASource.STORY_LIST,
+      { id: 0, index: 0, isDeeplink: true, url: 'https://x' },
+    ],
+    ['game', CTASource.GAME_READER, { url: 'https://x', gameInstanceId: '0' }],
+  ] as const)(
+    'routes %s action to handler with src=%s',
+    (action, src, data) => {
+      const handler = jest.fn();
+      manager.storyLinkClickHandler = handler;
+      manager.handleCTA({ url: 'https://x', action });
+      expect(handler).toHaveBeenCalledWith({ src, srcRef: 'default', data });
+    }
+  );
 
   it('ignores unknown actions', () => {
     const handler = jest.fn();
@@ -485,7 +521,7 @@ describe('product cart (checkout)', () => {
     );
   });
 
-  it('resolves null when a handler throws', async () => {
+  it('resolves null and logs when a handler throws', async () => {
     const manager = await StoryManager.create({ apiKey: 'k', userId: 'u' });
     manager.setProductCartHandlers({
       onUpdate: () => {
@@ -493,7 +529,7 @@ describe('product cart (checkout)', () => {
       },
       getState: () => null,
     });
-    jest.spyOn(console, 'error').mockImplementation(() => {});
+    const error = jest.spyOn(console, 'error').mockImplementation(() => {});
     fireCartEvent('productCartUpdate', {
       requestId: 'cart_4',
       offer: { offerId: 'o1' },
@@ -503,6 +539,8 @@ describe('product cart (checkout)', () => {
       'cart_4',
       null
     );
+    expect(error).toHaveBeenCalled();
+    error.mockRestore();
   });
 
   it('onProductCartClicked subscribes', async () => {
@@ -510,6 +548,383 @@ describe('product cart (checkout)', () => {
     const listener = jest.fn();
     manager.onProductCartClicked(listener);
     expect(NativeGoodsEvents.productCartClicked).toHaveBeenCalledWith(listener);
+  });
+
+  it('onGoodItemSelected subscribes', async () => {
+    const manager = await StoryManager.create({ apiKey: 'k', userId: 'u' });
+    const listener = jest.fn();
+    manager.onGoodItemSelected(listener);
+    expect(NativeGoodsEvents.goodItemSelected).toHaveBeenCalledWith(listener);
+  });
+});
+
+describe('promise rejection paths', () => {
+  let manager: StoryManager;
+  beforeEach(async () => {
+    manager = await StoryManager.create({ apiKey: 'k', userId: 'u' });
+  });
+
+  it('showStory rejects with loaded=false when native reports failure', async () => {
+    native.showSingle.mockResolvedValueOnce(false);
+    await expect(manager.showStory(1)).rejects.toEqual({ loaded: false });
+  });
+
+  it('showStoryOnce rejects with false when native reports failure', async () => {
+    native.showStoryOnce.mockResolvedValueOnce(false);
+    await expect(manager.showStoryOnce(1)).rejects.toBe(false);
+  });
+
+  it('preloadBannerPlace throws false when native returns false', async () => {
+    native.preloadBannerPlace.mockResolvedValueOnce(false);
+    await expect(manager.preloadBannerPlace('place')).rejects.toBe(false);
+  });
+
+  it('preloadBannerPlace passes null tags by default', async () => {
+    await expect(manager.preloadBannerPlace('place')).resolves.toBe(true);
+    expect(native.preloadBannerPlace).toHaveBeenCalledWith('place', null);
+    await manager.preloadBannerPlace('place', ['vip']);
+    expect(native.preloadBannerPlace).toHaveBeenLastCalledWith('place', [
+      'vip',
+    ]);
+  });
+
+  it('preloadIAM throws false when native returns false', async () => {
+    native.preloadIAM.mockResolvedValueOnce(false);
+    await expect(manager.preloadIAM()).rejects.toBe(false);
+  });
+
+  it('preloadIAM normalizes missing ids and tags to null', async () => {
+    await expect(manager.preloadIAM()).resolves.toBe(true);
+    expect(native.preloadIAM).toHaveBeenCalledWith(null, null);
+  });
+
+  it('showIAMByEvent forwards event, onlyPreloaded and an operationId', async () => {
+    await expect(manager.showIAMByEvent('promo', true)).resolves.toBe(true);
+    expect(native.showIAMByEvent).toHaveBeenCalledWith(
+      'promo',
+      true,
+      expect.any(String)
+    );
+  });
+
+  it.each([
+    ['showOnboardings', () => manager.showOnboardings(), 'showOnboardings'],
+    ['showIAMById', () => manager.showIAMById('1', false), 'showIAMById'],
+    [
+      'showIAMByEvent',
+      () => manager.showIAMByEvent('e', false),
+      'showIAMByEvent',
+    ],
+  ] as const)(
+    '%s rejects with false on native failure',
+    async (_n, call, nativeName) => {
+      (native as any)[nativeName].mockResolvedValueOnce(false);
+      await expect(call()).rejects.toBe(false);
+    }
+  );
+
+  it('showIAMById forwards id, onlyPreloaded and an operationId', async () => {
+    await expect(manager.showIAMById('5', true)).resolves.toBe(true);
+    expect(native.showIAMById).toHaveBeenCalledWith(
+      '5',
+      true,
+      expect.any(String)
+    );
+  });
+
+  it('showGame delegates straight to native without an operationId', async () => {
+    await expect(manager.showGame('g1')).resolves.toBe(true);
+    expect(native.showGame).toHaveBeenCalledWith('g1');
+  });
+
+  it('gives every cancelable operation its own id', async () => {
+    await manager.showStory(1);
+    await manager.showStory(2);
+    const [first, second] = native.showSingle.mock.calls.map((c) => c[1]);
+    expect(first).not.toBe(second);
+  });
+});
+
+describe('reinit', () => {
+  it('setApiKey replays the whole config onto native', async () => {
+    const manager = await StoryManager.create({
+      apiKey: 'old',
+      userId: 'u',
+      tags: ['a'],
+      lang: 'ru',
+    });
+    native.initWith.mockClear();
+    manager.setApiKey('new');
+    await flush();
+    expect(native.initWith).toHaveBeenCalledWith(
+      'new',
+      'u',
+      null,
+      false,
+      true,
+      null,
+      false
+    );
+    // tags and lang must survive the native state reset
+    expect(native.setTags).toHaveBeenLastCalledWith(['a']);
+    expect(native.setLang).toHaveBeenLastCalledWith('ru');
+  });
+
+  it('setSendStatistics reinits with the new flag', async () => {
+    const manager = await StoryManager.create({ apiKey: 'k', userId: 'u' });
+    manager.setSendStatistics(false);
+    await flush();
+    expect(native.initWith).toHaveBeenLastCalledWith(
+      'k',
+      'u',
+      null,
+      false,
+      false,
+      null,
+      false
+    );
+  });
+
+  it('logs instead of throwing when reinit fails', async () => {
+    const manager = await StoryManager.create({ apiKey: 'k', userId: 'u' });
+    const error = jest.spyOn(console, 'error').mockImplementation(() => {});
+    native.initWith.mockRejectedValueOnce(new Error('native down'));
+    expect(() => manager.setApiKey('new')).not.toThrow();
+    await flush();
+    expect(error).toHaveBeenCalledWith(
+      'InAppStory: reinit failed',
+      expect.any(Error)
+    );
+    error.mockRestore();
+  });
+
+  it('replays image placeholders set at runtime', async () => {
+    const manager = await StoryManager.create({ apiKey: 'k', userId: 'u' });
+    manager.setImagePlaceholders({ img: 'url' });
+    native.setImagesPlaceholders.mockClear();
+    manager.setApiKey('new');
+    await flush();
+    expect(native.setImagesPlaceholders).toHaveBeenCalledWith({ img: 'url' });
+  });
+
+  it('replays runtime setter values, not the original config', async () => {
+    const manager = await StoryManager.create({
+      apiKey: 'k',
+      userId: 'u',
+      lang: 'ru',
+    });
+    manager.setLang('en');
+    manager.changeSound(false);
+    manager.setApiKey('new');
+    await flush();
+    expect(native.setLang).toHaveBeenLastCalledWith('en');
+    expect(native.changeSound).toHaveBeenLastCalledWith(false);
+  });
+});
+
+describe('local state kept in sync for reinit', () => {
+  let manager: StoryManager;
+  beforeEach(async () => {
+    manager = await StoryManager.create({
+      apiKey: 'k',
+      userId: 'u',
+      tags: ['a', 'b'],
+    });
+  });
+
+  it('setTags replaces the local list', () => {
+    manager.setTags(['x']);
+    expect(manager.tags).toEqual(['x']);
+    expect(native.setTags).toHaveBeenLastCalledWith(['x']);
+  });
+
+  it('removeTags drops only the listed tags', () => {
+    manager.removeTags(['a', 'missing']);
+    expect(manager.tags).toEqual(['b']);
+    expect(native.removeTags).toHaveBeenCalledWith(['a', 'missing']);
+  });
+
+  it('setLang / changeSound / setAppVersion update local fields', () => {
+    manager.setLang('en');
+    manager.changeSound(false);
+    manager.setAppVersion('3.0', 7);
+    expect(manager.lang).toBe('en');
+    expect(manager.soundEnabled).toBe(false);
+    expect(manager.appVersion).toEqual({ version: '3.0', build: 7 });
+  });
+
+  it('setPlaceholders and setImagePlaceholders push and store', () => {
+    manager.setPlaceholders({ a: '1' });
+    manager.setImagePlaceholders({ b: '2' });
+    expect(native.setPlaceholders).toHaveBeenCalledWith({ a: '1' });
+    expect(native.setImagesPlaceholders).toHaveBeenCalledWith({ b: '2' });
+    expect(manager.placeholders).toEqual({ a: '1' });
+    expect(manager.imagePlaceholders).toEqual({ b: '2' });
+  });
+
+  it('setUserId delegates without touching the stored id', () => {
+    manager.setUserId('u2', 'sign');
+    expect(native.setUserID).toHaveBeenCalledWith('u2', 'sign');
+  });
+});
+
+describe('feeds', () => {
+  let manager: StoryManager;
+  beforeEach(async () => {
+    manager = await StoryManager.create({ apiKey: 'k', userId: 'u' });
+  });
+
+  it('createSubscriberList falls back to the feed name as uniqueId', async () => {
+    await manager.createSubscriberList('main');
+    expect(native.createSubscriberList).toHaveBeenCalledWith('main', 'main');
+    await manager.createSubscriberList('main', 'list1');
+    expect(native.createSubscriberList).toHaveBeenLastCalledWith(
+      'main',
+      'list1'
+    );
+  });
+
+  it('fetchFeed and fetchFavorites delegate to native', async () => {
+    await manager.fetchFeed('main', 'list1');
+    await manager.fetchFavorites('main');
+    expect(native.getStories).toHaveBeenCalledWith('main', 'list1');
+    expect(native.getFavoriteStories).toHaveBeenCalledWith('main');
+  });
+
+  it('onFavoriteCell also refetches the favorites feed', () => {
+    manager.onFavoriteCell('main');
+    expect(native.onFavoriteCell).toHaveBeenCalled();
+    expect(native.getFavoriteStories).toHaveBeenCalledWith('main');
+  });
+});
+
+describe('story reader appearance overrides', () => {
+  it('pushes button visibility to native when hasLike is on', async () => {
+    const manager = await StoryManager.create({ apiKey: 'k', userId: 'u' });
+    const appearance: any = {
+      commonOptions: {
+        hasLike: true,
+        hasLikeButton: true,
+        hasFavorite: true,
+        hasShare: false,
+      },
+    };
+    await manager.showStory(1, null, appearance);
+    expect(NativeAppearanceManager.setHasLike).toHaveBeenCalledWith(true);
+    expect(NativeAppearanceManager.setHasFavorites).toHaveBeenCalledWith(true);
+    expect(NativeAppearanceManager.setHasShare).toHaveBeenCalledWith(false);
+  });
+
+  it('leaves native appearance alone when hasLike is off', async () => {
+    const manager = await StoryManager.create({ apiKey: 'k', userId: 'u' });
+    await manager.showStory(1, null, {
+      commonOptions: { hasLike: false },
+    } as any);
+    expect(NativeAppearanceManager.setHasLike).not.toHaveBeenCalled();
+  });
+
+  it('leaves native appearance alone when no manager is passed', async () => {
+    const manager = await StoryManager.create({ apiKey: 'k', userId: 'u' });
+    await manager.showStory(1);
+    expect(NativeAppearanceManager.setHasLike).not.toHaveBeenCalled();
+  });
+});
+
+describe('storyLinkClickHandler', () => {
+  let manager: StoryManager;
+  beforeEach(async () => {
+    manager = await StoryManager.create({ apiKey: 'k', userId: 'u' });
+  });
+
+  it('keeps the previous handler when a non-function is assigned', () => {
+    const handler = jest.fn();
+    manager.storyLinkClickHandler = handler;
+    manager.storyLinkClickHandler = null as any;
+    manager.handleCTA({ url: 'https://x', action: 'button' });
+    expect(handler).toHaveBeenCalled();
+  });
+
+  it('ignores a non-function handler and keeps the Linking fallback', async () => {
+    const open = jest.spyOn(Linking, 'openURL').mockResolvedValue(undefined);
+    jest.spyOn(Linking, 'canOpenURL').mockResolvedValue(true);
+    manager.storyLinkClickHandler = 'not a function' as any;
+    manager.handleCTA({ url: 'https://x', action: 'button' });
+    await flush();
+    expect(open).toHaveBeenCalledWith('https://x');
+  });
+
+  it('does not open an unsupported url', async () => {
+    jest.spyOn(Linking, 'canOpenURL').mockResolvedValue(false);
+    const open = jest.spyOn(Linking, 'openURL').mockResolvedValue(undefined);
+    manager.handleCTA({ url: 'https://x', action: 'button' });
+    await flush();
+    expect(open).not.toHaveBeenCalled();
+  });
+
+  it('swallows a failing Linking check', async () => {
+    const error = jest.spyOn(console, 'error').mockImplementation(() => {});
+    jest.spyOn(Linking, 'canOpenURL').mockRejectedValue(new Error('no'));
+    manager.handleCTA({ url: 'https://x', action: 'button' });
+    await flush();
+    expect(error).toHaveBeenCalled();
+    error.mockRestore();
+  });
+
+  it('does nothing when the CTA carries no url', async () => {
+    const canOpen = jest.spyOn(Linking, 'canOpenURL').mockResolvedValue(true);
+    manager.handleCTA({ action: 'deeplink' });
+    await flush();
+    expect(canOpen).not.toHaveBeenCalled();
+  });
+
+  it('swallows a throwing handler', async () => {
+    const error = jest.spyOn(console, 'error').mockImplementation(() => {});
+    manager.storyLinkClickHandler = () => {
+      throw new Error('boom');
+    };
+    expect(() =>
+      manager.handleCTA({ url: 'https://x', action: 'button' })
+    ).not.toThrow();
+    expect(error).toHaveBeenCalled();
+    error.mockRestore();
+  });
+
+  it('passes url and srcRef in the callback payload', () => {
+    const handler = jest.fn();
+    manager.storyLinkClickHandler = handler;
+    manager.handleCTA({ url: 'https://x', action: 'game' });
+    expect(handler).toHaveBeenCalledWith({
+      src: CTASource.GAME_READER,
+      srcRef: 'default',
+      data: { url: 'https://x', gameInstanceId: '0' },
+    });
+  });
+});
+
+describe('remaining event subscriptions', () => {
+  it.each([
+    ['onShowStory', 'showStory'],
+    ['onCloseStory', 'closeStory'],
+    ['onShowSlide', 'showSlide'],
+    ['onClickOnButton', 'clickOnButton'],
+    ['onLikeStory', 'likeStory'],
+    ['onDislikeStory', 'dislikeStory'],
+    ['onFavoriteStory', 'favoriteStory'],
+    ['onShareStory', 'clickOnShareStory'],
+  ] as const)('%s subscribes to %s', async (method, event) => {
+    const manager = await StoryManager.create({ apiKey: 'k', userId: 'u' });
+    const listener = jest.fn();
+    (manager as any)[method](listener);
+    expect((NativeStoriesEvents as any)[event]).toHaveBeenCalledWith(listener);
+  });
+
+  it('onStoryReaderWillShow and onBannerWidgetEvent subscribe', async () => {
+    const manager = await StoryManager.create({ apiKey: 'k', userId: 'u' });
+    const listener = jest.fn();
+    manager.onStoryReaderWillShow(listener);
+    manager.onBannerWidgetEvent(listener);
+    expect(NativeFeedEvents.storyReaderWillShow).toHaveBeenCalledWith(listener);
+    expect(NativeBannerEvents.bannerWidgetEvent).toHaveBeenCalledWith(listener);
   });
 });
 
@@ -540,6 +955,26 @@ describe('goods flow', () => {
       '1',
       '2'
     );
+    expect(NativeGoodsEvents.commitGoods).toHaveBeenCalled();
+  });
+
+  it('commits an empty list when the app never registered a goods callback', async () => {
+    await StoryManager.create({ apiKey: 'k', userId: 'u' });
+    const nativeHandler = (NativeGoodsEvents.getGoodsObject as jest.Mock).mock
+      .calls[0]![0];
+    expect(() => nativeHandler({ body: { skus: ['sku1'] } })).not.toThrow();
+    await flush();
+    expect(NativeGoodsEvents.addProductToCache).not.toHaveBeenCalled();
+    expect(NativeGoodsEvents.commitGoods).toHaveBeenCalled();
+  });
+
+  it('commits an empty list when the callback returns nothing', async () => {
+    const manager = await StoryManager.create({ apiKey: 'k', userId: 'u' });
+    manager.getGoods(() => undefined as any);
+    const nativeHandler = (NativeGoodsEvents.getGoodsObject as jest.Mock).mock
+      .calls[0]![0];
+    nativeHandler({ body: { skus: ['sku1'] } });
+    await flush();
     expect(NativeGoodsEvents.commitGoods).toHaveBeenCalled();
   });
 });

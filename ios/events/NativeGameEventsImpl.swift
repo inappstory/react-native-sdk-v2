@@ -24,7 +24,7 @@ public class NativeGameEventsImpl: NSObject {
           "withName": "startGame",
           "body": [
             "gameID": gameData.gameID,
-            "id": gameData.slideData?.storyData?.id ?? "",
+            "id": storyIDForJS(gameData.slideData?.storyData?.id),
             "feed": gameData.slideData?.storyData?.feed ?? "",
           ],
         ])
@@ -33,7 +33,7 @@ public class NativeGameEventsImpl: NSObject {
           "withName": "closeGame",
           "body": [
             "gameID": gameData.gameID,
-            "id": gameData.slideData?.storyData?.id ?? "",
+            "id": storyIDForJS(gameData.slideData?.storyData?.id),
             "feed": gameData.slideData?.storyData?.feed ?? "",
           ],
         ])
@@ -42,7 +42,7 @@ public class NativeGameEventsImpl: NSObject {
           "withName": "eventGame",
           "body": [
             "gameID": gameData.gameID,
-            "id": gameData.slideData?.storyData?.id ?? "",
+            "id": storyIDForJS(gameData.slideData?.storyData?.id),
             "feed": gameData.slideData?.storyData?.feed ?? "",
             "name": name,
             "payload": payload,
@@ -53,30 +53,14 @@ public class NativeGameEventsImpl: NSObject {
           "withName": "gameFailure",
           "body": [
             "gameID": gameData.gameID,
-            "id": gameData.slideData?.storyData?.id ?? "",
+            "id": storyIDForJS(gameData.slideData?.storyData?.id),
+            "feed": gameData.slideData?.storyData?.feed ?? "",
             "message": message,
           ],
         ])
       @unknown default:
         NSLog("WARNING: unknown gameEvent")
       }
-    }
-
-    InAppStory.shared.gameReaderWillShow = {
-      emit(["withName": "gameReaderWillShow", "body": [:]])
-    }
-    InAppStory.shared.gameReaderDidClose = {
-      emit(["withName": "gameReaderDidClose", "body": [:]])
-    }
-    InAppStory.shared.gameComplete = { data, result, url in
-      emit([
-        "withName": "gameComplete",
-        "body": [
-          "data": data,
-          "result": result ?? [:],
-          "url": url ?? "",
-        ],
-      ])
     }
   }
 }

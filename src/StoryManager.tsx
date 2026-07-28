@@ -92,19 +92,6 @@ export declare type StoryManagerConfig = {
   anonymous?: boolean;
 };
 
-// const eventEmitter = new NativeEventEmitter(
-//     NativeModules.RNInAppStorySDKModule
-// );
-
-// const EVENTS_MAP = {
-//     shareStory: 'clickOnShareStory',
-//     clickOnFavoriteCell: 'favoriteCellDidSelect',
-//     onFavoriteCell: 'favoriteCellDidSelect',
-// };
-// const getEventName = (eventName: string) => {
-//     return EVENTS_MAP[eventName] || eventName;
-// };
-
 export class StoryManager {
   apiKey: string = '';
   userId: string = '';
@@ -120,6 +107,7 @@ export class StoryManager {
   sendStatistics: boolean = true;
   cacheSize: string | null = null;
   anonymous: boolean = false;
+  appVersion: { version: string; build: number } | null = null;
   listeners: any = [];
 
   protected _callbacks: Dict<any> = {};
@@ -161,6 +149,10 @@ export class StoryManager {
 
     if (config.anonymous) {
       this.anonymous = true;
+    }
+
+    if (config.appVersion != null) {
+      this.appVersion = config.appVersion;
     }
 
     // eventEmitter.addListener('getGoodsObject', (event) => {
@@ -207,38 +199,38 @@ export class StoryManager {
     // });
   }
 
-  public static async create(
-    config: StoryManagerConfig
-  ): Promise<StoryManager> {
-    const manager = new StoryManager(config);
-
+  private async applyNativeConfig(): Promise<void> {
     await NativeStoryManager.initWith(
-      manager.apiKey,
-      manager.userId,
-      manager.userIdSign,
-      manager.sandbox,
-      manager.sendStatistics,
-      manager.cacheSize,
-      manager.anonymous
+      this.apiKey,
+      this.userId,
+      this.userIdSign,
+      this.sandbox,
+      this.sendStatistics,
+      this.cacheSize,
+      this.anonymous
     );
 
-    if (manager.tags.length) {
-      NativeStoryManager.setTags(manager.tags);
+    if (this.tags.length) {
+      NativeStoryManager.setTags(this.tags);
     }
 
-    if (manager.placeholders) {
-      NativeStoryManager.setPlaceholders(manager.placeholders);
+    if (this.placeholders) {
+      NativeStoryManager.setPlaceholders(this.placeholders);
     }
 
-    if (manager.lang) {
-      NativeStoryManager.setLang(manager.lang);
+    if (this.imagePlaceholders) {
+      NativeStoryManager.setImagesPlaceholders(this.imagePlaceholders);
     }
-    NativeStoryManager.changeSound(manager.soundEnabled);
 
-    if (config.appVersion != null) {
+    if (this.lang) {
+      NativeStoryManager.setLang(this.lang);
+    }
+    NativeStoryManager.changeSound(this.soundEnabled);
+
+    if (this.appVersion != null) {
       NativeStoryManager.setAppVersion(
-        config.appVersion.version,
-        config.appVersion.build
+        this.appVersion.version,
+        this.appVersion.build
       );
     }
 
@@ -249,6 +241,14 @@ export class StoryManager {
     NativeSystemEvents.setupSystemEvents();
     NativeGameEvents.setupGameEvents();
     NativeIamEvents.setupIamEvents();
+  }
+
+  public static async create(
+    config: StoryManagerConfig
+  ): Promise<StoryManager> {
+    const manager = new StoryManager(config);
+
+    await manager.applyNativeConfig();
 
     subscribeNativeEvent(
       NativeGoodsEvents,
@@ -318,8 +318,17 @@ export class StoryManager {
     );
   }
 
+  onGoodItemSelected(listener: any) {
+    subscribeNativeEvent(
+      NativeGoodsEvents,
+      'NativeGoodsEvents',
+      'goodItemSelected',
+      listener
+    );
+  }
+
   async fetchGoods(skus: string[]) {
-    const goods = await this.getGoodsCallback(skus);
+    const goods = (await this.getGoodsCallback(skus)) ?? [];
     goods.forEach((good: any) => {
       NativeGoodsEvents.addProductToCache(
         good.sku,
@@ -343,6 +352,7 @@ export class StoryManager {
   }
 
   setTags(tags: string[]) {
+    this.tags = tags;
     NativeStoryManager.setTags(tags);
   }
 
@@ -352,6 +362,7 @@ export class StoryManager {
   }
 
   removeTags(tags: string[]) {
+    this.tags = this.tags.filter((tag) => !tags.includes(tag));
     NativeStoryManager.removeTags(tags);
   }
 
@@ -367,18 +378,13 @@ export class StoryManager {
   }
 
   setAppVersion(version: string, build: number) {
+    this.appVersion = { version, build };
     NativeStoryManager.setAppVersion(version, build);
   }
 
   private reinit() {
-    NativeStoryManager.initWith(
-      this.apiKey,
-      this.userId,
-      this.userIdSign,
-      this.sandbox,
-      this.sendStatistics,
-      this.cacheSize,
-      this.anonymous
+    this.applyNativeConfig().catch((e) =>
+      console.error('InAppStory: reinit failed', e)
     );
   }
 
@@ -519,6 +525,10 @@ export class StoryManager {
 
   clearCache(): void {
     NativeStoryManager.clearCache();
+  }
+
+  preloadGames(): void {
+    NativeStoryManager.preloadGames();
   }
 
   removeFromFavorite(storyId: string | number): void {
@@ -684,9 +694,6 @@ export class StoryManager {
       'closeGame',
       'eventGame',
       'gameFailure',
-      'gameReaderWillShow',
-      'gameReaderDidClose',
-      'gameComplete',
     ] as const) {
       subscribeNativeEvent(
         NativeGameEvents,
@@ -722,15 +729,6 @@ export class StoryManager {
         listener
       );
     }
-  }
-
-  onShareStoryWithPath(listener: any) {
-    subscribeNativeEvent(
-      NativeSystemEvents,
-      'NativeSystemEvents',
-      'customShare',
-      listener
-    );
   }
 
   setPlaceholders(placeholders: any): void {

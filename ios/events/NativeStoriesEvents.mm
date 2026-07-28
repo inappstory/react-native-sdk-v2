@@ -45,9 +45,9 @@ RCT_EXPORT_METHOD(setupStoriesEvents) {
 }
 #else
 - (NSArray<NSString *> *)supportedEvents {
-  return @[ @"storiesLoaded", @"ugcStoriesLoaded", @"showStory", @"closeStory",
-            @"showSlide", @"likeStory", @"dislikeStory", @"favoriteStory",
-            @"clickOnShareStory", @"clickOnButton", @"storyWidgetEvent" ];
+  return @[ @"showStory", @"closeStory", @"showSlide", @"likeStory",
+            @"dislikeStory", @"favoriteStory", @"clickOnShareStory",
+            @"clickOnButton", @"storyWidgetEvent" ];
 }
 #endif
 @end

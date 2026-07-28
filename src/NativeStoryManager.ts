@@ -3,13 +3,12 @@ import { TurboModuleRegistry } from 'react-native';
 
 export type StoryDTO = {
   storyID: number;
-  storyData: string;
   title: string;
   coverImagePath: string;
   coverVideoPath: string;
   backgroundColor: string;
   titleColor: string;
-  opened: string;
+  opened: boolean;
   hasAudio: boolean;
   list: string;
   feed: string;
@@ -65,7 +64,7 @@ export interface Spec extends TurboModule {
 
   onFavoriteCell(): void;
 
-  setVisibleWith(storyIDs: Array<string>): void;
+  setVisibleWith(storyIDs: Array<string>, uniqueId: string): void;
 
   selectStoryCellWith(storyID: string, feed: string, uniqueId: string): void;
 
@@ -107,6 +106,8 @@ export interface Spec extends TurboModule {
   cancelOperation(operationId: string): void;
 
   clearCache(): void;
+
+  preloadGames(): void;
 
   removeFromFavorite(storyID: string): void;
 

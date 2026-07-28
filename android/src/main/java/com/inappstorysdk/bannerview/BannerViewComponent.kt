@@ -1,7 +1,7 @@
 package com.inappstorysdk.bannerview
 
 
-import com.inappstory.sdk.AppearanceManager
+import com.inappstory.reactnativesdk.AppearanceManagerImpl
 import com.inappstory.sdk.banners.BannerCarouselNavigationCallback
 import com.inappstory.sdk.banners.BannerData
 import com.inappstory.sdk.banners.BannerPlaceLoadCallback
@@ -14,6 +14,7 @@ import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.WritableMap
 import com.facebook.react.uimanager.ThemedReactContext
 import com.facebook.react.uimanager.events.RCTEventEmitter
+import kotlin.math.roundToInt
 
 @SuppressLint("ViewConstructor")
 class BannerViewComponent(context: ThemedReactContext) : LinearLayout(context) {
@@ -114,29 +115,25 @@ class BannerViewComponent(context: ThemedReactContext) : LinearLayout(context) {
         ) / resources.displayMetrics.density
     }
 
-    private fun dpToPx(dp: Float?): Int? {
-        if (dp == null) return null
-        return (dp * resources.displayMetrics.density).toInt()
-    }
-
     // Called once from the view manager's onAfterUpdateTransaction, after the
     // whole batch of props has been written. The appearance is immutable, so we
     // rebuild it from scratch and (re)load the banners.
     fun applyAppearanceAndLoad() {
         // sideInset applies to both sides; leading/trailing override per side.
-        val prevOffset = dpToPx(leadingInset ?: sideInset)
-        val nextOffset = dpToPx(trailingInset ?: sideInset)
+        val prevOffset = (leadingInset ?: sideInset)?.roundToInt()
+        val nextOffset = (trailingInset ?: sideInset)?.roundToInt()
 
         val appearance = CustomBannerViewAppearance(
             prevBannerOffset = prevOffset,
             nextBannerOffset = nextOffset,
-            bannersGap = dpToPx(interItemSpacing),
-            cornerRadius = dpToPx(cornerRadius),
+            bannersGap = interItemSpacing?.roundToInt(),
+            cornerRadius = cornerRadius?.roundToInt(),
             loop = shouldLoop
         )
 
-        // Appearance must be applied before loading the banners.
-        AppearanceManager().csBannerCarouselInterface(appearance)
+        val appearanceManager = AppearanceManagerImpl.getAppearanceManager()
+        appearanceManager.csBannerCarouselInterface(appearance)
+        bannerCarousel.setAppearanceManager(appearanceManager)
 
         placeId?.let {
             bannerCarousel.setPlaceId(it)

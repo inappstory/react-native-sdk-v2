@@ -45,10 +45,9 @@ class GameEventsModule(reactContext: ReactApplicationContext) :
   private fun gameBody(data: ContentData?, gameId: String?): WritableMap =
     Arguments.createMap().apply {
       putString("gameID", gameId)
-      (data as? SlideData)?.let {
-        putInt("id", it.story().id())
-        putString("feed", it.story().feed())
-      }
+      val slide = data as? SlideData
+      putInt("id", slide?.story()?.id() ?: -1)
+      putString("feed", slide?.story()?.feed() ?: "")
     }
 
   override fun setupGameEvents() {

@@ -314,9 +314,9 @@ InAppStorySDK.setImagesPlaceholders({
 InAppStorySDK.setOverScrollToClose(value);
 InAppStorySDK.setSwipeToClose(value);
 InAppStorySDK.setTimerGradientEnable(value);
-InAppStorySDK.setCloseButtonPosition(value);
-InAppStorySDK.setScrollStyle(value);
-InAppStorySDK.setPresentationStyle(value);
+InAppStorySDK.setCloseButtonPosition(value); // 'left' | 'right' | 'bottomLeft' | 'bottomRight'
+InAppStorySDK.setScrollStyle(value); // 'cover' | 'flat' | 'cube' | 'depth'
+InAppStorySDK.setPresentationStyle(value); // 'zoom' | 'modal' | 'fade'
 InAppStorySDK.setReaderBackgroundColor(value);
 InAppStorySDK.setReaderCornerRadius(value);
 ```
@@ -394,18 +394,15 @@ storyManager.on(eventName, (payload) => {
 
 | Event Name        |                                                           |     |     |
 |-------------------|-----------------------------------------------------------|-----|-----|
-| storiesLoaded     |                                                           |     |     |
-| ugcStoriesLoaded  |                                                           |     |     |
-| clickOnStory      | {id: String, feed: String, index: Number}                 |     |     |
-| showStory         | {id: String, feed: String, action: String}                |     |     |
-| closeStory        | {id: String, feed: String, index: Number, action: String} |     |     |
-| clickOnButton     |                                                           |     |     |
-| showSlide         | {id: String, index: Number}                               |     |     |
-| likeStory         | {id: String, feed: String, value: Boolean}                |     |     |
-| dislikeStory      | {id: String, feed: String, value: Boolean}                |     |     |
-| favoriteStory     | {id: String, feed: String, value: Boolean}                |     |     |
-| clickOnShareStory |                                                           |     |     |
-| storyWidgetEvent  | {id: String, feed: String, name: String, data: String }   |     |     |
+| showStory         | {id: Number, feed: String, action: String, slidesCount: Number} |     |     |
+| closeStory        | {id: Number, feed: String, index: Number, action: String} |     |     |
+| clickOnButton     | {id: Number, feed: String, index: Number, url: String}    |     |     |
+| showSlide         | {id: Number, index: Number}                               |     |     |
+| likeStory         | {id: Number, feed: String, index: Number, value: Boolean} |     |     |
+| dislikeStory      | {id: Number, feed: String, index: Number, value: Boolean} |     |     |
+| favoriteStory     | {id: Number, feed: String, index: Number, value: Boolean} |     |     |
+| clickOnShareStory | {id: Number, feed: String, index: Number}                 |     |     |
+| storyWidgetEvent  | {id: Number, feed: String, name: String, data: Object}    |     |     |
 
 ## Feed Events
 
@@ -413,19 +410,13 @@ storyManager.on(eventName, (payload) => {
 |-----------------------|------------------------|-----|-----|
 | storyListUpdate       | {stories: [StoryData]} |     |     |
 | storyUpdate           | StoryData              |     |     |
-| favoritesUpdate       | {}                     |     |     |
-| favoriteCellDidSelect | {}                     |     |     |
-| editorCellDidSelect   | {}                     |     |     |
-| favoritesUpdate       | {}                     |     |     |
 
 ## Reader events
 
 | Event               |                                        |     |     |
 |---------------------|----------------------------------------|-----|-----|
-| storyReaderWillShow | {type: String}                         |     |     |
-| storyReaderDidClose | {type: String}                         |     |     |
-| storiesDidUpdated   | {isContent: String, storyType: String} |     |     |
-| scrollUpdate        | {index: String}                        |     |     |
+| storyReaderWillShow | {feed: String, type: String}           |     |     |
+| storyReaderDidClose | {feed: String, type: String}           |     |     |
 
 ## Failure events
 
@@ -441,14 +432,10 @@ storyManager.on(eventName, (payload) => {
 
 | Event              | Payload                                                     |     |     |
 |--------------------|-------------------------------------------------------------|-----|-----|
-| startGame          | {id: String, gameID: String}                                |
-| finishGame         | {id: String, gameID: String, result: String}                |     |     |
-| closeGame          | {id: String, gameID: String}                                |     |     |
-| eventGame          | {id: String, gameID: String, name: String, payload: Object} |     |     |
-| gameFailure        | {id: String, gameID: String, message: String}               |     |     |
-| gameReaderWillShow | {}                                                          |     |     |
-| gameReaderDidClose | {}                                                          |     |     |
-| gameComplete       | {data: Object, result: String, url: String}                 |     |     |
+| startGame          | {id: Number, gameID: String, feed: String}                  | game reader opened |     |
+| closeGame          | {id: Number, gameID: String, feed: String}                  | game reader closed, including when the game finished |     |
+| eventGame          | {id: Number, gameID: String, feed: String, name: String, payload: String} |     |     |
+| gameFailure        | {id: Number, gameID: String, feed: String, message: String} |     |     |
 
 ## Goods events
 

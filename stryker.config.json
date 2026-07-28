@@ -1,0 +1,42 @@
+{
+  "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "packageManager": "yarn",
+  "testRunner": "jest",
+  "jest": {
+    "projectType": "custom",
+    "configFile": "package.json",
+    "enableFindRelatedTests": true
+  },
+  "coverageAnalysis": "perTest",
+  "ignorePatterns": [
+    "example",
+    "android",
+    "ios",
+    "cpp",
+    "lib",
+    ".yarn",
+    ".git",
+    "coverage",
+    "reports",
+    "**/*.md"
+  ],
+  "reporters": ["html", "clear-text", "progress"],
+  "_comment": "Same scope as jest collectCoverageFrom: native specs and UI components are covered by the manual QA checklist in QA.md, not by unit tests.",
+  "mutate": [
+    "src/**/*.{ts,tsx}",
+    "!src/__tests__/**",
+    "!src/specs/**",
+    "!src/data/**",
+    "!src/Native*.ts",
+    "!src/index.ts",
+    "!src/GlobalsWrapper.ts",
+    "!src/stories/**",
+    "!src/banners/**"
+  ],
+  "_thresholds_comment": "The surviving mutants are equivalent under unit tests: legacy NativeEventEmitter module-name strings (the new arch never reaches that branch), class field initializers the constructor always overwrites, and zustand's replace flag. Raise `break` if that changes.",
+  "thresholds": {
+    "high": 95,
+    "low": 85,
+    "break": 88
+  }
+}

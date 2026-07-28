@@ -18,12 +18,12 @@ import com.inappstory.sdk.banners.BannerPlacePreloadCallback
 import com.inappstory.sdk.banners.BannerPlaceLoadSettings
 import com.inappstory.sdk.banners.BannerData
 import com.inappstory.sdk.lrudiskcache.CacheSize
+import com.inappstory.sdk.stories.callbacks.IShowStoryCallback
 import com.inappstory.sdk.stories.callbacks.IShowStoryOnceCallback
 import com.inappstory.sdk.externalapi.StoryFavoriteItemAPIData;
 import com.inappstory.sdk.externalapi.subscribers.InAppStoryAPIListSubscriber;
 import com.inappstory.sdk.externalapi.storylist.IASStoryListSessionData;
 
-import com.inappstory.sdk.stories.ui.views.goodswidget.GoodsItemData;
 
 import com.facebook.react.bridge.WritableMap;
 
@@ -40,6 +40,8 @@ import com.inappstorysdk.IASLoggerImpl
 import com.inappstorysdk.NativeOverlayFragment
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import androidx.fragment.app.FragmentActivity
 import com.inappstory.sdk.CancellationToken
 import com.inappstory.sdk.inappmessage.InAppMessageOpenSettings
@@ -52,6 +54,7 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
 
   companion object {
     const val NAME = "NativeStoryManager"
+    private const val FAVORITES_COUNT_TIMEOUT_MS = 10_000L
   }
 
   override fun getName(): String {
@@ -74,38 +77,37 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
   // (and looping) when the SDK re-reports the same set.
   private var lastFavoriteIds: Set<Int>? = null
 
-  private val cancellationTokenMap = mutableMapOf<String, CancellationToken?>()
+  private val pendingFavoritesCount = mutableListOf<Promise>()
 
-  var stories: ArrayList<String>? = null;
-  var goodsCache: ArrayList<GoodsItemData> = ArrayList<GoodsItemData>()
-  private var listenerCount = 0
+  private val cancellationTokenMap = mutableMapOf<String, CancellationToken?>()
 
   override fun initWith(
     apiKey: String, userID: String, userIdSign: String?, sandbox: Boolean, sendStatistics: Boolean,
     cacheSize: String?, anonymous: Boolean, promise: Promise
   ) {
     Log.d("InappstorySdkModule", "initWith")
-    //this.ias = this.createInAppStoryManager(apiKey, userID)
     this.appearanceManager = AppearanceManagerImpl.getAppearanceManager()
-    this.api = InAppStoryAPI()
-    this.favoritesApi = InAppStoryAPI()
+    val isFirstInit = this.api == null
+    if (isFirstInit) {
+      this.api = InAppStoryAPI()
+      this.favoritesApi = InAppStoryAPI()
+    }
     val cacheSizeNative = when (cacheSize) {
       "small" -> CacheSize.SMALL
       "large" -> CacheSize.LARGE
       else -> CacheSize.MEDIUM
     }
+    val apis = listOf(this.api as InAppStoryAPI, this.favoritesApi as InAppStoryAPI)
+    apis.forEach { it.setExternalPlatform(ExternalPlatforms.REACT_NATIVE_SDK) }
     this.createManager(
-      apiKey, userID, userIdSign, sandbox, sendStatistics, cacheSizeNative, anonymous,
-      this.favoritesApi as InAppStoryAPI
-    )
-    this.createManager(
-      apiKey, userID, userIdSign, sandbox, sendStatistics, cacheSizeNative, anonymous,
+      apiKey, userID, userIdSign, sandbox, cacheSizeNative, anonymous,
       this.api as InAppStoryAPI
     )
+    apis.forEach { it.settings.sendStatistic(sendStatistics) }
     // Main feed is subscribed per carousel via createSubscriberList(feed, uniqueId);
-    // here only favorites is subscribed once (mirrors the old-arch module).
-    //this.subscribeLists(this.api as InAppStoryAPI, "feed")
-    this.subscribeLists(this.favoritesApi as InAppStoryAPI, "favorites")
+    if (isFirstInit) {
+      this.subscribeLists(this.favoritesApi as InAppStoryAPI, "favorites")
+    }
     setupListeners()
     promise.resolve(null)
   }
@@ -214,9 +216,22 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
     Log.d(TAG, "showSingle")
     reactContext.runOnUiQueueThread {
       try {
-        cancellationTokenMap[operationId] =
-          this.ias?.showStory(storyID, reactContext.currentActivity, this.appearanceManager, null)
-        promise.resolve(true)
+        cancellationTokenMap[operationId] = this.ias?.showStory(
+          storyID,
+          reactContext.currentActivity,
+          this.appearanceManager,
+          object : IShowStoryCallback {
+            override fun onShow() {
+              cancellationTokenMap.remove(operationId)
+              promise.resolve(true)
+            }
+
+            override fun onError() {
+              cancellationTokenMap.remove(operationId)
+              promise.resolve(false)
+            }
+          }
+        )
       } catch (e: Throwable) {
         promise.reject("showSingle error", e)
       }
@@ -354,18 +369,42 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
     this.ias?.clearCache()
   }
 
+  override fun preloadGames() {
+    Log.d(TAG, "preloadGames")
+    this.ias?.preloadGames()
+  }
+
   override fun removeFromFavorite(storyID: String) {
     Log.d(TAG, "removeFromFavorite: $storyID")
     this.ias?.removeFromFavorite(storyID.toInt())
+    storyID.toIntOrNull()?.let { id ->
+      lastFavoriteIds = lastFavoriteIds?.minus(id)
+    }
   }
 
   override fun removeAllFavorites() {
     Log.d(TAG, "removeAllFavorites")
     this.ias?.removeAllFavorites()
+    lastFavoriteIds = emptySet()
   }
 
   override fun favoritesCount(promise: Promise) {
+    if (lastFavoriteIds == null && favoritesApi != null) {
+      pendingFavoritesCount.add(promise)
+      getFavoriteStories("default")
+      Handler(Looper.getMainLooper()).postDelayed({
+        resolvePendingFavoritesCount(lastFavoriteIds?.size ?: 0)
+      }, FAVORITES_COUNT_TIMEOUT_MS)
+      return
+    }
     promise.resolve(lastFavoriteIds?.size ?: 0)
+  }
+
+  private fun resolvePendingFavoritesCount(count: Int) {
+    if (pendingFavoritesCount.isEmpty()) return
+    val pending = pendingFavoritesCount.toList()
+    pendingFavoritesCount.clear()
+    pending.forEach { it.resolve(count) }
   }
 
   override fun logout() {
@@ -423,12 +462,13 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
       this.ias?.setImagePlaceholders(imageMap)
   }
 
-  override fun setVisibleWith(storyIDs: ReadableArray) {
-        Log.d("InappstorySdkModule", "setVisibleWith")
+  override fun setVisibleWith(storyIDs: ReadableArray, uniqueId: String) {
+        Log.d("InappstorySdkModule", "setVisibleWith uniqueId: $uniqueId")
         val stringIds: ArrayList<String> = storyIDs.toArrayList() as ArrayList<String>
         var ids: List<Int> = stringIds.map{it.toInt()}
         Log.d("InappstorySdkModule", "ids: $ids")
         this.api?.storyList?.updateVisiblePreviews(ids, "feed")
+        this.api?.storyList?.updateVisiblePreviews(ids, uniqueId)
     }
 
    override fun selectStoryCellWith(storyID: String, feed: String, uniqueId: String) {
@@ -458,56 +498,20 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
     }
 
   fun setupListeners() {
-    //val that:InappstorySdkModule = this;
-
     this.ias?.setBannerWidgetCallback { bannerData, name, data ->
       BannerEventsModule.instance?.emitBannerWidget(bannerData, name, data)
     }
-
-    //   override fun getItem(): ICustomGoodsItem? {
-    //     print("csCustomGoodsWidget getItem");
-    //     return null;
-    //   }
-
-    //   override fun getWidgetAppearance(): IGoodsWidgetAppearance? {
-    //     print("csCustomGoodsWidget getWidgetAppearance");
-    //     return null;
-    //   }
-
-    //   override fun getDecoration(): RecyclerView.ItemDecoration? {
-    //     print("csCustomGoodsWidget getDecoration");
-    //     return null;
-    //   }
-
-    //   }
-
-    //         ) as Map<String, Any>
-    //       )
-
-    //       ) as Map<String, Any>
-    //     )
-    //     sendEvent(getReactApplicationContext(), "likeStory", payload)
-    //   }
-
-    // })
   }
-
-//  fun sendEvent(reactContext: ReactContext, eventName: String, params: WritableMap?) {
-//    reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
-//      .emit(eventName, params)
-//  }
 
   private fun createManager(
     apiKey: String,
     userID: String,
     userIdSign: String?,
     sandbox: Boolean,
-    sendStatistic: Boolean,
     cacheSize: Int,
     anonymous: Boolean,
     inAppStoryAPI: InAppStoryAPI
   ) {
-    inAppStoryAPI.setExternalPlatform(ExternalPlatforms.REACT_NATIVE_SDK);
     this.ias = if (anonymous) {
       InAppStoryManager.Builder()
         .lang(Locale.getDefault())
@@ -533,7 +537,6 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
         sandbox,
       )
     }
-    inAppStoryAPI.settings.sendStatistic(sendStatistic)
 
     InAppStoryManager.logger = IASLoggerImpl()
   }
@@ -543,6 +546,7 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
       override fun updateFavoriteItemData(favorites: List<StoryFavoriteItemAPIData>) {
         Log.e(TAG, "$feed updateFavoriteItemData: $favorites")
         val ids = favorites.map { it.id }.toSet()
+        resolvePendingFavoritesCount(ids.size)
         if (ids == lastFavoriteIds) return
         lastFavoriteIds = ids
         getFavoriteStories("default")
@@ -561,7 +565,6 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
         var payload = Arguments.makeNativeMap(
           mutableMapOf(
             "storyID" to story.id,
-            //"storyData" to item.storyData,
             "title" to story.title,
             "coverImagePath" to story.imageFilePath,
             "coverVideoPath" to story.videoFilePath,
@@ -599,7 +602,6 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
           var storyData = Arguments.makeNativeMap(
             mutableMapOf(
               "storyID" to item.id,
-              //"storyData" to item.storyData,
               "title" to item.title,
               "coverImagePath" to item.imageFilePath,
               "coverVideoPath" to item.videoFilePath,

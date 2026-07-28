@@ -30,45 +30,42 @@ export const useFeedStore = create<StoreState>()((set) => ({
     set((state) => ({ events: state.events.concat([newEvent]) })),
   clearFeed: (feed) =>
     set((state) => {
-      const newState = state;
-      const feedIndex = newState.feeds.indexOf(`${feed}`);
-      const feedName = `feeds_${feed}` as const;
-      if (feedIndex !== -1) {
-        newState.feeds.splice(feedIndex, 1);
-        delete newState[feedName];
-      }
-      newState.update = newState.update + 1;
+      const newState = {
+        ...state,
+        feeds: state.feeds.filter((f) => f !== `${feed}`),
+        update: state.update + 1,
+      };
+      delete (newState as Record<string, unknown>)[`feeds_${feed}`];
       return newState;
     }, true),
   addToFeed: (feed, events) =>
     set((state) => {
-      const newState = { ...state };
-      if (state.feeds.indexOf(feed) == -1) {
-        newState.feeds.push(feed);
-      }
       const feedName = `feeds_${feed}` as const;
-      const feedArr = newState[feedName] ?? (newState[feedName] = []);
-      events.map((event) => {
-        const idx = feedArr.findIndex((f) => f.storyID == event.storyID);
-        if (idx === -1) {
-          feedArr.push(event);
-        }
-      });
-      newState.update = newState.update + 1;
-      return newState;
+      const feedArr = state[feedName] ?? [];
+      const added = events.filter(
+        (event) => !feedArr.some((f) => f.storyID == event.storyID)
+      );
+      return {
+        ...state,
+        feeds: state.feeds.includes(feed)
+          ? state.feeds
+          : [...state.feeds, feed],
+        [feedName]: [...feedArr, ...added],
+        update: state.update + 1,
+      };
     }, true),
   replaceInFeed: (feed, event) =>
     set((state) => {
-      const newState = { ...state };
       const feedName = `feeds_${feed}` as const;
-      const feedArr = newState[feedName] ?? (newState[feedName] = []);
+      const feedArr = state[feedName] ?? [];
       const eventIdx = feedArr.findIndex((os) => os.storyID == event.storyID);
-      if (eventIdx === -1) {
-        feedArr.push(event);
-      } else {
-        feedArr[eventIdx] = event;
-        newState.update = newState.update + 1;
-      }
-      return newState;
+      return {
+        ...state,
+        [feedName]:
+          eventIdx === -1
+            ? [...feedArr, event]
+            : feedArr.map((story, i) => (i === eventIdx ? event : story)),
+        update: state.update + 1,
+      };
     }, true),
 }));

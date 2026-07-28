@@ -37,11 +37,7 @@ RCT_EXPORT_METHOD(setupFeedEvents) {
 }
 #else
 - (NSArray<NSString *> *)supportedEvents {
-  return @[
-    @"favoritesUpdate", @"favoriteCellDidSelect", @"editorCellDidSelect",
-    @"storyReaderWillShow", @"storyReaderDidClose", @"storiesDidUpdated",
-    @"scrollUpdate"
-  ];
+  return @[ @"storyReaderWillShow", @"storyReaderDidClose" ];
 }
 #endif
 

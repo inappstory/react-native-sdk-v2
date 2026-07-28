@@ -1,8 +1,6 @@
 package com.inappstorysdk.bannerview
 
 import com.inappstory.sdk.banners.ui.carousel.DefaultBannerCarouselAppearance
-import android.content.Context
-import android.view.View
 
 class CustomBannerViewAppearance(
     private val prevBannerOffset: Int?,
@@ -29,9 +27,5 @@ class CustomBannerViewAppearance(
 
     override fun loop(): Boolean {
         return loop ?: super.loop()
-    }
-
-    override fun loadingPlaceholder(context: Context?): View {
-        return super.loadingPlaceholder(context)
     }
 }

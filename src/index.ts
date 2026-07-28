@@ -1,20 +1,16 @@
-//import ReactNativeSdk from './NativeReactNativeSdk';
 import { AppearanceManager } from './AppearanceManager';
 import { StoryManager } from './StoryManager';
-
-// export function multiply(a: number, b: number): number {
-//   return ReactNativeSdk.multiply(a, b);
-// }
-
-// export function plus(a: number, b: number): number {
-//   return ReactNativeSdk.plus(a, b);
-// }
 
 export { StoryManager, AppearanceManager };
 
 export type { StoriesListCardOptions } from './AppearanceManager';
 
-export type { StoryManagerConfig } from './StoryManager';
+export type {
+  StoryManagerConfig,
+  ProductCartOffer,
+  ProductCart,
+  ProductCartHandlers,
+} from './StoryManager';
 
 export { CTASource } from './StoryManager';
 export type {
@@ -32,6 +28,7 @@ export type { BannerViewRef } from './banners/BannerViewComponent';
 
 export {
   StoryReaderSwipeStyle,
+  StoryReaderPresentationStyle,
   StoriesListCardTitlePosition,
   StoriesListCardViewVariant,
   StoryReaderCloseButtonPosition,
@@ -39,19 +36,3 @@ export {
 } from './AppearanceManager';
 
 export { CoverQuality } from './data/Enum';
-
-// export function initWith(
-//   apiKey: string,
-//   userId: string,
-//   userIdSign: string,
-//   sandbox: boolean,
-//   sendStatistics: boolean
-// ): void {
-//   NativeStoryManager.initWith(
-//     apiKey,
-//     userId,
-//     userIdSign,
-//     sandbox,
-//     sendStatistics
-//   );
-//}
