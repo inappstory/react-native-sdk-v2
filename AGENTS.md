@@ -11,6 +11,19 @@ implemented in JS: the package is a bridge, so a change is rarely "JS only".
 
 `.claude/`, `.codex/`, `.cursor/` are compiled from [.agents/](.agents/) by [.agents/setup](.agents/setup) and are gitignored. Don't edit them directly — edit the matching subfolder under `.agents/` and run `.agents/setup` (this also runs automatically on session start).
 
+## Skills
+
+Task-scoped instructions live in `.agents/skills/<name>/SKILL.md` and are mirrored into every
+vendor folder by the same setup script. They are vendor-agnostic markdown — read the relevant
+one before starting that kind of work, whether or not your tooling loads it for you.
+
+- [`design-first`](.agents/skills/design-first/SKILL.md) — a new native method or event, a change
+  to `src/index.ts`, anything crossing the bridge. Run it *before* writing the code.
+- [`test-guidelines`](.agents/skills/test-guidelines/SKILL.md) — writing or changing tests,
+  coverage, the mutation gate.
+- [`diagnosing-bugs`](.agents/skills/diagnosing-bugs/SKILL.md) — a bug that resists, a flaky test,
+  a regression.
+
 ## Repository layout
 
 - `src/` — the JS side of the library, the only published source of truth.
