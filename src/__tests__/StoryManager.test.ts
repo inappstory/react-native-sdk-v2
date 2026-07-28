@@ -791,10 +791,13 @@ describe('feeds', () => {
     expect(native.getFavoriteStories).toHaveBeenCalledWith('main');
   });
 
-  it('onFavoriteCell also refetches the favorites feed', () => {
-    manager.onFavoriteCell('main');
+  it('favoriteCellPressed refetches favorites and notifies the listener', () => {
+    const listener = jest.fn();
+    manager.onFavoriteCell(listener);
+    manager.favoriteCellPressed('main');
     expect(native.onFavoriteCell).toHaveBeenCalled();
     expect(native.getFavoriteStories).toHaveBeenCalledWith('main');
+    expect(listener).toHaveBeenCalled();
   });
 });
 

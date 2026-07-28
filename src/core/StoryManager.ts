@@ -575,9 +575,16 @@ export class StoryManager {
   //     return this;
   // }
 
-  onFavoriteCell(feed: string) {
+  private favoriteCellListener?: (...args: any[]) => void;
+
+  onFavoriteCell(listener: any) {
+    this.favoriteCellListener = listener;
+  }
+
+  favoriteCellPressed(feed: string) {
     NativeStoryManager.onFavoriteCell();
     this.fetchFavorites(feed);
+    if (isFunction(this.favoriteCellListener)) this.favoriteCellListener?.();
   }
 
   onStoryReaderWillShow(listener: any) {

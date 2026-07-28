@@ -247,7 +247,7 @@ const viewModelExporter = React.useCallback(
 If you use favorites, use **onFavoriteCell** event that fires when user clicks on favorites cell
 
 ```ts
-storyManager.on('onFavoriteCell', () => {
+storyManager.onFavoriteCell(() => {
   //Navigate to favorites screen
 });
 ```

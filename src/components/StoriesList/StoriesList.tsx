@@ -148,7 +148,7 @@ export const StoriesList = forwardRef<StoriesListRef, StoriesListProps>(
     const onFavoritePress = useCallback(
       (story: Story | string, index?: number) => {
         if (typeof story === 'string') {
-          storyManager.onFavoriteCell(feed);
+          storyManager.favoriteCellPressed(feed);
           return;
         }
         trackClick(story, index);
