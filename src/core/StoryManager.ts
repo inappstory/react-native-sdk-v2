@@ -135,8 +135,6 @@ export class StoryManager {
 
     if (config.defaultMuted) {
       this.soundEnabled = false;
-    } else {
-      this.soundEnabled = true;
     }
 
     if (config.sendStatistics != null) {
@@ -584,7 +582,7 @@ export class StoryManager {
   favoriteCellPressed(feed: string) {
     NativeStoryManager.onFavoriteCell();
     this.fetchFavorites(feed);
-    if (isFunction(this.favoriteCellListener)) this.favoriteCellListener?.();
+    if (isFunction(this.favoriteCellListener)) this.favoriteCellListener();
   }
 
   onStoryReaderWillShow(listener: any) {

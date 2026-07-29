@@ -55,17 +55,24 @@ Run `yarn test:mutation` and open `reports/mutation/mutation.html` for the
 annotated source.
 
 **Known equivalent survivors** (they cannot be killed by a unit test, and are
-the reason `break` sits at 88 rather than 100):
+the reason `break` sits at 92 rather than 100):
 
 - Module-name string literals passed to `subscribeNativeEvent` — the name only
   reaches `NativeEventEmitter` on the old architecture; with TurboModules the
   method call path wins. The fallback itself is tested in
   [utils.test.ts](src/__tests__/utils.test.ts).
-- Class field initializers (`apiKey = ''`, `soundEnabled = true`, …) that the
-  constructor overwrites on every path.
+- Class field initializers (`apiKey = ''`, `tags = []`, …) that the constructor
+  overwrites on every path.
 - zustand's `replace` flag on the reducers that only add keys — they return a
   complete state object, so merge and replace produce the same result. (On
   `clearFeed`, which deletes a key, the flag does matter and the mutant dies.)
+- The `[]` dependency list of `useNativeFeedEvents` — the module-level
+  `subscribed` guard already makes a re-run a no-op, so a mutated dependency
+  array changes nothing observable.
+
+Stryker also reports one `RuntimeError` on the `useFeedStore` factory arrow: the
+mutant replaces the whole store initializer with `undefined` and zustand throws
+at import time. It is not a survivor and does not count against the score.
 
 If a *new* mutant survives, treat it as a missing assertion, not as noise.
 

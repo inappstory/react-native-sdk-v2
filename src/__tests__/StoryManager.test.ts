@@ -213,6 +213,12 @@ describe('StoryManager.create', () => {
     expect(native.changeSound).toHaveBeenCalledWith(true);
   });
 
+  it('keeps the empty defaults when the config omits placeholders and lang', async () => {
+    const manager = await StoryManager.create({ apiKey: 'key', userId: 'u' });
+    expect(manager.placeholders).toBe('');
+    expect(manager.lang).toBe('');
+  });
+
   it('sends an empty userId when the config has none', async () => {
     await StoryManager.create({ apiKey: 'key' });
     expect(native.initWith).toHaveBeenCalledWith(
@@ -511,7 +517,8 @@ describe('product cart (checkout)', () => {
     );
   });
 
-  it('resolves null when no handlers are set (native gets an error)', async () => {
+  it('resolves null without reaching a handler when none are set', async () => {
+    const error = jest.spyOn(console, 'error').mockImplementation(() => {});
     await StoryManager.create({ apiKey: 'k', userId: 'u' });
     fireCartEvent('productCartGetState', { requestId: 'cart_3' });
     await flush();
@@ -519,6 +526,8 @@ describe('product cart (checkout)', () => {
       'cart_3',
       null
     );
+    expect(error).not.toHaveBeenCalled();
+    error.mockRestore();
   });
 
   it('resolves null and logs when a handler throws', async () => {
@@ -798,6 +807,11 @@ describe('feeds', () => {
     expect(native.onFavoriteCell).toHaveBeenCalled();
     expect(native.getFavoriteStories).toHaveBeenCalledWith('main');
     expect(listener).toHaveBeenCalled();
+  });
+
+  it('favoriteCellPressed does not throw when no listener is registered', () => {
+    expect(() => manager.favoriteCellPressed('main')).not.toThrow();
+    expect(native.getFavoriteStories).toHaveBeenCalledWith('main');
   });
 });
 

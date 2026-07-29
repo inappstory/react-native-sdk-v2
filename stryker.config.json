@@ -37,10 +37,10 @@
     "!src/hooks/useEventCallback.ts",
     "src/components/StoriesList/cardGeometry.ts"
   ],
-  "_thresholds_comment": "The surviving mutants are equivalent under unit tests: legacy NativeEventEmitter module-name strings (the new arch never reaches that branch), class field initializers the constructor always overwrites, and zustand's replace flag. Raise `break` if that changes.",
+  "_thresholds_comment": "The surviving mutants are equivalent under unit tests: legacy NativeEventEmitter module-name strings (the new arch never reaches that branch), class field initializers the constructor always overwrites, zustand's replace flag, and the dependency array of useNativeFeedEvents. Raise `break` if that changes.",
   "thresholds": {
     "high": 95,
     "low": 85,
-    "break": 88
+    "break": 92
   }
 }
