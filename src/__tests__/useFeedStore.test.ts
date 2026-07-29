@@ -178,6 +178,21 @@ describe('immutability', () => {
     state().addToFeed('main', [story(2)]);
     expect(state().feeds).toBe(feeds);
   });
+
+  it('creates a new array reference even when adding an empty story list', () => {
+    state().addToFeed('main', [story(1)]);
+    const first = feed('main');
+    state().addToFeed('main', []);
+    expect(feed('main')).not.toBe(first);
+    expect(feed('main')).toEqual([{ storyID: 1, opened: false }]);
+  });
+
+  it('replaces state entirely so deleted keys do not persist after clearFeed', () => {
+    state().addToFeed('temp', [story(1)]);
+    expect((state() as any).feeds_temp).toBeDefined();
+    state().clearFeed('temp');
+    expect((state() as any).feeds_temp).toBeUndefined();
+  });
 });
 
 describe('events log', () => {

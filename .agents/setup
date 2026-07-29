@@ -14,5 +14,18 @@ for vendor in claude codex cursor; do
   fi
 done
 
+# Vendor-agnostic guard: warn about a skill dropped straight into a vendor folder
+# (e.g. a plugin installer writing to .claude/skills) instead of the shared source.
+# The mirror above only copies .agents/skills/*, so anything extra was added the wrong way.
+for vendor in claude codex cursor; do
+  [ -d ".$vendor/skills" ] || continue
+  for dir in ".$vendor/skills"/*/; do
+    [ -d "$dir" ] || continue
+    name=$(basename "$dir")
+    [ -d ".agents/skills/$name" ] && continue
+    echo "warning: .$vendor/skills/$name is not in .agents/skills/ — move it there so every vendor gets it (vendor-agnostic rule)." >&2
+  done
+done
+
 # ponytail: copy-over, never delete — .claude also holds untracked settings.local.json.
 # Add pruning of stale mirrored files only if renames in .agents actually start biting.

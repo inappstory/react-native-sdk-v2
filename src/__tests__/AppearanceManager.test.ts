@@ -231,6 +231,18 @@ describe('setStoriesListOptions — card title padding', () => {
     expect(manager.storiesListOptions.sidePadding).toBe(5);
     expect(manager.storiesListOptions.topPadding).toBe(7);
   });
+
+  it('handles zero card dimensions without throwing', () => {
+    const manager = new AppearanceManager();
+    expect(() =>
+      manager.setStoriesListOptions({
+        card: { height: 0, gap: 0, aspectRatio: 0 },
+      })
+    ).not.toThrow();
+    expect(manager.storiesListOptions.card?.height).toBe(0);
+    expect(manager.storiesListOptions.card?.gap).toBe(0);
+    expect(manager.storiesListOptions.card?.aspectRatio).toBe(0);
+  });
 });
 
 describe('native delegating setters', () => {
@@ -255,5 +267,13 @@ describe('native delegating setters', () => {
   ] as const)('%s forwards to native unchanged', (method, args) => {
     (new AppearanceManager() as any)[method](...args);
     expect((native as any)[method]).toHaveBeenCalledWith(...args);
+  });
+
+  it('forwards empty icon paths to native unchanged', () => {
+    const manager = new AppearanceManager();
+    manager.setLikeImage('', '');
+    expect(native.setLikeImage).toHaveBeenCalledWith('', '');
+    manager.setCloseReaderImage('');
+    expect(native.setCloseReaderImage).toHaveBeenCalledWith('');
   });
 });

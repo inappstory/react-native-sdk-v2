@@ -95,3 +95,6 @@ ios/generated/
 coverage/
 reports/
 .stryker-tmp/
+
+# graphify knowledge graph output
+graphify-out/

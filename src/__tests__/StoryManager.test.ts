@@ -365,6 +365,40 @@ describe('runtime setters', () => {
   it('favoritesCount resolves native value', async () => {
     await expect(manager.favoritesCount()).resolves.toBe(2);
   });
+
+  it('favoritesCount returns 0 when native resolves 0', async () => {
+    native.favoritesCount.mockResolvedValueOnce(0);
+    await expect(manager.favoritesCount()).resolves.toBe(0);
+  });
+
+  it('setTags replaces local tags and calls native', async () => {
+    const m = await StoryManager.create({
+      apiKey: 'k',
+      userId: 'u',
+      tags: ['a'],
+    });
+    m.setTags(['sport', 'news']);
+    expect(native.setTags).toHaveBeenCalledWith(['sport', 'news']);
+    expect(m.tags).toEqual(['sport', 'news']);
+  });
+
+  it('removeTags removes specified tags from local state and calls native', async () => {
+    const m = await StoryManager.create({
+      apiKey: 'k',
+      userId: 'u',
+      tags: ['a', 'b', 'c'],
+    });
+    m.removeTags(['b']);
+    expect(native.removeTags).toHaveBeenCalledWith(['b']);
+    expect(m.tags).toEqual(['a', 'c']);
+  });
+
+  it('setPlaceholders and setImagePlaceholders pass empty objects to native', () => {
+    manager.setPlaceholders({});
+    manager.setImagePlaceholders({});
+    expect(native.setPlaceholders).toHaveBeenCalledWith({});
+    expect(native.setImagesPlaceholders).toHaveBeenCalledWith({});
+  });
 });
 
 describe('event subscriptions fan-out', () => {
@@ -415,6 +449,16 @@ describe('event subscriptions fan-out', () => {
     manager.onStoryWidgetEvent(listener);
     expect(NativeFeedEvents.storyReaderDidClose).toHaveBeenCalledWith(listener);
     expect(NativeStoriesEvents.storyWidgetEvent).toHaveBeenCalledWith(listener);
+  });
+
+  it('forwards each listener on the same event to native', () => {
+    const l1 = jest.fn();
+    const l2 = jest.fn();
+    manager.onStoryReaderWillShow(l1);
+    manager.onStoryReaderWillShow(l2);
+    expect(NativeFeedEvents.storyReaderWillShow).toHaveBeenCalledTimes(2);
+    expect(NativeFeedEvents.storyReaderWillShow).toHaveBeenNthCalledWith(1, l1);
+    expect(NativeFeedEvents.storyReaderWillShow).toHaveBeenNthCalledWith(2, l2);
   });
 });
 
@@ -646,6 +690,11 @@ describe('promise rejection paths', () => {
     expect(native.showGame).toHaveBeenCalledWith('g1');
   });
 
+  it('showGame resolves false when native reports failure', async () => {
+    native.showGame.mockResolvedValueOnce(false);
+    await expect(manager.showGame('g1')).resolves.toBe(false);
+  });
+
   it('gives every cancelable operation its own id', async () => {
     await manager.showStory(1);
     await manager.showStory(2);
@@ -728,6 +777,23 @@ describe('reinit', () => {
     await flush();
     expect(native.setLang).toHaveBeenLastCalledWith('en');
     expect(native.changeSound).toHaveBeenLastCalledWith(false);
+  });
+
+  it('reinit after logout resets internal state and calls initWith cleanly', async () => {
+    const manager = await StoryManager.create({ apiKey: 'k', userId: 'u' });
+    manager.logout();
+    native.initWith.mockClear();
+    manager.setApiKey('new');
+    await flush();
+    expect(native.initWith).toHaveBeenCalledWith(
+      'new',
+      'u',
+      null,
+      false,
+      true,
+      null,
+      false
+    );
   });
 });
 

@@ -76,6 +76,26 @@ describe('getCardGeometry', () => {
 
     expect(geometry.borderRadius).toBe(geometry.coverRadius + border.gap);
   });
+
+  it('derives width from size * aspectRatio for extreme ratios', () => {
+    const wide = getCardGeometry({
+      size: 100,
+      aspectRatio: 2.5,
+      isCircle: false,
+      border,
+    });
+    expect(wide.width).toBe(250);
+    expect(wide.height).toBe(100);
+
+    const tall = getCardGeometry({
+      size: 100,
+      aspectRatio: 0.4,
+      isCircle: false,
+      border,
+    });
+    expect(tall.width).toBe(40);
+    expect(tall.height).toBe(100);
+  });
 });
 
 describe('getCardSidePadding', () => {
