@@ -1,5 +1,9 @@
 #import "NativeAppearanceManager.h"
-#import "react_native_sdk/react_native_sdk-Swift.h"
+#if __has_include("react_native_sdk-Swift.h")
+#import "react_native_sdk-Swift.h"
+#else
+#import <react_native_sdk/react_native_sdk-Swift.h>
+#endif
 
 @implementation NativeAppearanceManager
 RCT_EXPORT_MODULE()

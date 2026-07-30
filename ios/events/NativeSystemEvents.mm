@@ -1,5 +1,9 @@
 #import "NativeSystemEvents.h"
-#import "react_native_sdk/react_native_sdk-Swift.h"
+#if __has_include("react_native_sdk-Swift.h")
+#import "react_native_sdk-Swift.h"
+#else
+#import <react_native_sdk/react_native_sdk-Swift.h>
+#endif
 
 @implementation NativeSystemEvents
 RCT_EXPORT_MODULE()
