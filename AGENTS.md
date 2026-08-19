@@ -44,9 +44,18 @@ one before starting that kind of work, whether or not your tooling loads it for 
     `NativeEventEmitter` fallback), `validation` (userId/tags limits), placeholders,
     id generation.
   - `src/__tests__/` — all Jest tests live here, not next to the sources.
-- `android/src/main/java/com/inappstorysdk/` — Kotlin modules implementing the specs.
-- `ios/` — Objective-C++ `.mm` bridges + Swift `*Impl` implementations; `ios/events/`
-  mirrors `src/specs/Native*Events`, `ios/views/bannerview/` is the banner view.
+- `android/src/main/java/com/inappstory/reactnativesdk/` — Kotlin, one package per
+  concern: `modules/` (StoryManager, Appearance TurboModules), `events/` (the
+  `*EventsModule` emitters), `appearance/` (`AppearanceManagerImpl`), `view/` (banner
+  view), `activity/` (`InAppStoryActivity`, overlay fragment, back-press). `InappstorySdkPackage`,
+  `InAppStory` and `IASLoggerImpl` sit at the package root. Directory path matches the
+  declared package — the module namespace is `com.inappstory.reactnativesdk`.
+- `ios/` — Objective-C++ `.mm` bridges + Swift `*Impl` implementations; `ios/modules/`
+  holds the StoryManager/AppearanceManager pairs (each `.mm`/`.h`/`*Impl.swift`, the big
+  Impl split into `NativeStoryManagerImpl+*.swift` extensions), `ios/events/` mirrors
+  `src/specs/Native*Events`, `ios/views/bannerview/` is the banner view, `ios/support/`
+  holds shared `Extensions.swift`. The podspec globs `ios/**` recursively, so files can
+  move between these folders without editing it.
 - `android/generated/`, `ios/generated/` — **codegen output, never edit by hand.**
   Regenerated from `src/specs/` on build (`codegenConfig` in `package.json`).
 - `example/` — the example app (a yarn workspace). The only way to test the bridge;

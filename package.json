@@ -125,6 +125,9 @@
   "packageManager": "yarn@4.17.1",
   "jest": {
     "preset": "@react-native/jest-preset",
+    "testMatch": [
+      "<rootDir>/src/**/*.test.{ts,tsx}"
+    ],
     "modulePathIgnorePatterns": [
       "<rootDir>/example/node_modules",
       "<rootDir>/lib/",
@@ -133,6 +136,7 @@
     "collectCoverageFrom": [
       "src/**/*.{ts,tsx}",
       "!src/**/*.d.ts",
+      "!src/__tests__/**",
       "!src/specs/**",
       "!src/types/**",
       "!src/index.ts",

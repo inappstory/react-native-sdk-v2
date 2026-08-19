@@ -35,7 +35,7 @@ targetSdkVersion = 34
 Import InAppStory SDK in MainApplication
 
 ```java
-import com.inappstorysdk.InAppStory;
+import com.inappstory.reactnativesdk.InAppStory;
 ```
 
 Add following code to onCreate() function
@@ -291,9 +291,11 @@ InAppStorySDK.showGame(gameID);
 InAppStorySDK.setTags(['tag1']);
 ```
 
-Каждый тег может содержать только буквы (любой алфавит), цифры, `_` и `-`, а
-суммарный размер списка тегов не должен превышать 4096 байт в UTF-8 (тег +
-разделитель; кириллический символ — 2 байта). Нарушение правила бросает ошибку.
+A tag may contain only letters (any alphabet), digits, `_` and `-`, and the total
+list size must not exceed 4096 bytes in UTF-8 (tag + separator; a Cyrillic
+character counts as 2 bytes). If a rule is violated, the error is written to
+`console.error` and the call never reaches the native SDK — the tags are not
+applied, but the app does not crash.
 
 ## Placeholders
 
