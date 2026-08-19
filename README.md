@@ -291,6 +291,10 @@ InAppStorySDK.showGame(gameID);
 InAppStorySDK.setTags(['tag1']);
 ```
 
+Каждый тег может содержать только буквы (любой алфавит), цифры, `_` и `-`, а
+суммарный размер списка тегов не должен превышать 4096 байт в UTF-8 (тег +
+разделитель; кириллический символ — 2 байта). Нарушение правила бросает ошибку.
+
 ## Placeholders
 
 ```ts
@@ -424,6 +428,24 @@ storyManager.on(eventName, (payload) => {
 | currentStoryFailure | {message: String}                     |     |     |
 | networkFailure      | {message: String}                     |     |     |
 | requestFailure      | {message: String, statusCode: String} |     |     |
+
+## Logger
+
+Forward the native SDK's internal logs (requests/responses, errors, technical
+messages) to JS. Disabled by default — enable it, then subscribe:
+
+```ts
+storyManager.setLoggingEnabled(true);
+storyManager.onLog((entry) => {
+  console.log(`[${entry.level}] ${entry.message ?? ''}`);
+});
+```
+
+`LogEntry` is `{ level: 'debug' | 'error'; message?: string }`.
+`setLoggingEnabled(false)` stops the stream. The payload is identical on both
+platforms — `level` is the severity (iOS derives it from the log's error field,
+Android from `showELog`/`showDLog`). iOS log categories (`network`, `reader`,
+`cache`, …) are not surfaced, as Android has no equivalent.
 
 ## Game Events
 

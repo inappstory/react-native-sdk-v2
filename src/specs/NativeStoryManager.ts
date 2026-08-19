@@ -31,7 +31,8 @@ export interface Spec extends TurboModule {
     sandbox: boolean,
     sendStatistics: boolean,
     cacheSize: string | null,
-    anonymous: boolean
+    anonymous: boolean,
+    tags: Array<string>
   ): Promise<void>;
 
   setOptions(options: Object): void;

@@ -29,15 +29,20 @@ one before starting that kind of work, whether or not your tooling loads it for 
 - `src/` — the JS side of the library, the only published source of truth.
   - `src/index.ts` — the public API surface. If an export changes here, it's a
     breaking-change candidate and README must be updated in the same PR.
-  - `src/core/` — `StoryManager` (config, sessions, events, goods, games, IAM) and
-    `AppearanceManager` (options serialized down to native).
+  - `src/core/` — the classes: `StoryManager` (config, sessions, goods, games, IAM),
+    `StoryEvents` (its `on*` base class, one method per native event stream),
+    `CTAHandler` (link routing) and `AppearanceManager` (options serialized down to
+    native).
   - `src/specs/` — codegen TurboModule specs (`NativeStoryManager`,
     `NativeAppearanceManager`, `Native*Events`). Declarations only, no logic.
   - `src/components/` — `StoriesList` (JS-rendered cards) and `BannerCarousel`
     (native view). `cardGeometry.ts` is pure layout math and is unit-tested.
   - `src/hooks/` — feed store (`zustand`) and the native-event subscriptions.
+  - `src/types/` — shared type declarations only, one concept per file. No logic
+    (excluded from coverage and mutation).
   - `src/utils/` — `subscribeNativeEvent` (TurboModule call with a legacy
-    `NativeEventEmitter` fallback), placeholders, id generation.
+    `NativeEventEmitter` fallback), `validation` (userId/tags limits), placeholders,
+    id generation.
   - `src/__tests__/` — all Jest tests live here, not next to the sources.
 - `android/src/main/java/com/inappstorysdk/` — Kotlin modules implementing the specs.
 - `ios/` — Objective-C++ `.mm` bridges + Swift `*Impl` implementations; `ios/events/`

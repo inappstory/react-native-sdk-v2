@@ -8,7 +8,6 @@ public class NativeStoryManagerImpl: NSObject {
   @objc private var _userID: String = ""
   @objc private var _userIdSign: String? = nil
   @objc private var _lang: String = ""
-  @objc private var _tags: [String] = [""]
   @objc private var goodsCache: [GoodObject] = []
 
   var storiesAPIs: [String: StoryListAPI] = [:]
@@ -31,12 +30,14 @@ public class NativeStoryManagerImpl: NSObject {
     sendStats: Bool,
     cacheSize: String?,
     anonymous: Bool,
+    tags: [String],
     resolve: @escaping RCTPromiseResolveBlock,
     rejecter reject: @escaping RCTPromiseRejectBlock
   ) {
     DispatchQueue.main.async {
-      // the parameter is responsible for logging to the XCode console
-      InAppStory.shared.isLoggingEnabled = false
+      // Logging state is owned by NativeStoryManager.setLoggingEnabled (off by
+      // default); re-apply it here so this init doesn't reset the flag.
+      NativeSystemEventsImpl.shared.applyLogging()
       // the parameter is responsible for displaying the shading under cell headers
       InAppStory.shared.cellGradientEnabled = true
       // the parameter is responsible for the color of the cell gradient of the unread story.
@@ -58,7 +59,8 @@ public class NativeStoryManagerImpl: NSObject {
         settings: Settings(
           userID: userID,
           sign: userIdSign,
-          anonymous: anonymous
+          anonymous: anonymous,
+          tags: tags
         )
       )
 
@@ -280,30 +282,23 @@ public class NativeStoryManagerImpl: NSObject {
     }
   }
 
+  // Tags go through the SettingsAPI methods only: `InAppStory.shared.settings` is a
+  // computed property over a struct, so `settings?.tags = ...` desugars into a full
+  // settings reassignment (session setter) instead of a point update.
   @objc public func setTags(_ tags: [String]) {
     DispatchQueue.main.async {
-      NSLog("setTags")
-      self._tags = tags
-      //InAppStory.shared.settings = Settings(userID:self._userID,tags: self._tags, lang: self._lang)
-      InAppStory.shared.settings?.tags = tags
       InAppStory.shared.setTags(tags)
     }
   }
 
   @objc public func addTags(_ tags: [String]) {
     DispatchQueue.main.async {
-      NSLog("addTags")
-      let current = InAppStory.shared.settings?.tags ?? []
-      let merged = current + tags.filter { !current.contains($0) }
-      self._tags = merged
-      InAppStory.shared.settings?.tags = merged
-      InAppStory.shared.setTags(merged)
+      InAppStory.shared.addTags(tags)
     }
   }
 
   @objc public func removeTags(_ tags: [String]) {
     DispatchQueue.main.async {
-      //InAppStory.shared.settings = Settings(userID:self._userID,tags: ["tag3"], lang: self._lang)
       InAppStory.shared.removeTags(tags)
     }
   }

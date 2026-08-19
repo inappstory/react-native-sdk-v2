@@ -5,19 +5,19 @@ export { StoryManager, AppearanceManager };
 
 export type { StoriesListCardOptions } from './core/AppearanceManager';
 
+export type { StoryManagerConfig, LogEntry } from './types/StoryManager';
 export type {
-  StoryManagerConfig,
   ProductCartOffer,
   ProductCart,
   ProductCartHandlers,
-} from './core/StoryManager';
+} from './types/ProductCart';
 
-export { CTASource } from './core/StoryManager';
+export { CTASource } from './types/CTA';
 export type {
   CTAGameReaderPayload,
   CTAStoryReaderPayload,
   CTAStoryListPayload,
-} from './core/StoryManager';
+} from './types/CTA';
 
 export { StoriesList } from './components/StoriesList/StoriesList';
 export type {

@@ -118,6 +118,9 @@ yarn example ios      # and: yarn example android
       handlers answer, and the reader shows the returned items.
 - [ ] CTA: a story button with a deeplink reaches `storyLinkClickHandler`;
       without a handler the OS opens the URL.
+- [ ] Logger: `setLoggingEnabled(true)` + `onLog(console.log)` then open a feed →
+      `{level, message}` entries reach JS; `setLoggingEnabled(false)` stops the
+      stream. Check both iOS and Android emit the same shape.
 
 ### Lifecycle and state (the regressions that hurt)
 

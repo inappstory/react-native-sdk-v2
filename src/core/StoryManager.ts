@@ -1,4 +1,3 @@
-import { Linking } from 'react-native';
 import type { AppearanceManager } from './AppearanceManager';
 import { generateId } from '../utils/generateId';
 import { isFunction } from '../utils/isFunction';
@@ -12,87 +11,14 @@ import NativeGoodsEvents from '../specs/NativeGoodsEvents';
 import NativeIamEvents from '../specs/NativeIamEvents';
 import NativeStoriesEvents from '../specs/NativeStoriesEvents';
 import NativeSystemEvents from '../specs/NativeSystemEvents';
+import { CTAHandler } from './CTAHandler';
+import { StoryEvents } from './StoryEvents';
+import { assertUserIdLength, tagsAreValid } from '../utils/validation';
+import type { Option } from '../types/common';
+import type { ProductCart, ProductCartHandlers } from '../types/ProductCart';
+import type { StoryManagerConfig } from '../types/StoryManager';
 
-export type Option<T> = T | null | undefined;
-
-export enum CTASource {
-  UNKNOWN = 'unknown',
-  STORY_LIST = 'storyList',
-  STORY_READER = 'storyReader',
-  GAME_READER = 'gameReader',
-}
-
-export type CTAGameReaderPayload = { url: string; gameInstanceId: string };
-export type CTAStoryReaderPayload = {
-  id: number;
-  index: number;
-  url: string;
-  elementId: string;
-};
-export type CTAStoryListPayload = {
-  id: number;
-  index: number;
-  isDeeplink: boolean;
-  url: string | undefined;
-};
-
-export type Dict<T = any> = {
-  [key: string]: T | undefined;
-  [key: number]: T | undefined;
-};
-
-export type ProductCartOffer = {
-  offerId: string;
-  groupId?: string;
-  name?: string;
-  description?: string;
-  url?: string;
-  coverUrl?: string;
-  imageUrls?: string[];
-  currency?: string;
-  price?: string;
-  oldPrice?: string;
-  adult?: boolean;
-  availability?: number;
-  size?: string;
-  color?: string;
-  quantity?: number;
-};
-
-export type ProductCart = {
-  offers: ProductCartOffer[];
-  price?: string;
-  oldPrice?: string;
-  priceCurrency?: string;
-};
-
-export type ProductCartHandlers = {
-  onUpdate: (
-    offer: ProductCartOffer
-  ) => ProductCart | null | Promise<ProductCart | null>;
-  getState: () => ProductCart | null | Promise<ProductCart | null>;
-};
-
-export declare type StoryManagerConfig = {
-  apiKey: string;
-  userId?: Option<string | number>;
-  userIdSign?: Option<string>;
-  tags?: Option<Array<string>>;
-  placeholders?: Option<Dict<string>>;
-  lang?: string;
-  defaultMuted?: boolean;
-  appVersion?: {
-    version: string;
-    build: number;
-  };
-  sendStatistics?: boolean;
-  /** Native story cache size. Android-only (iOS SDK manages its cache itself). */
-  cacheSize?: 'small' | 'medium' | 'large';
-  /** Anonymous mode: no userId is sent to the backend. */
-  anonymous?: boolean;
-};
-
-export class StoryManager {
+export class StoryManager extends StoryEvents {
   apiKey: string = '';
   userId: string = '';
   userIdSign: string | null = null;
@@ -110,10 +36,13 @@ export class StoryManager {
   appVersion: { version: string; build: number } | null = null;
   listeners: any = [];
 
-  protected _callbacks: Dict<any> = {};
+  protected readonly cta = new CTAHandler();
 
   constructor(config: StoryManagerConfig) {
-    const userId = config.userId != null ? String(config.userId) : '';
+    super();
+    const userId = assertUserIdLength(
+      config.userId != null ? String(config.userId) : ''
+    );
     const userIdSign =
       config.userIdSign != null ? String(config.userIdSign) : null;
 
@@ -121,7 +50,7 @@ export class StoryManager {
     this.userId = userId;
     this.userIdSign = userIdSign;
 
-    if (config.tags) {
+    if (config.tags && tagsAreValid(config.tags)) {
       this.tags = config.tags;
     }
 
@@ -152,52 +81,12 @@ export class StoryManager {
     if (config.appVersion != null) {
       this.appVersion = config.appVersion;
     }
-
-    // eventEmitter.addListener('getGoodsObject', (event) => {
-    //     this.fetchGoods(event.skus);
-    // });
-
-    // eventEmitter.addListener('handleCTA', (event) => {
-    //     let src = CTASource.UNKNOWN;
-    //     let payload:
-    //         | CTAStoryListPayload
-    //         | CTAStoryReaderPayload
-    //         | CTAGameReaderPayload = null!;
-    //     switch (event.action) {
-    //         case 'button':
-    //         case 'swipe':
-    //             src = CTASource.STORY_READER;
-    //             payload = {
-    //                 id: 0,
-    //                 url: event.url,
-    //                 index: 0,
-    //                 elementId: '',
-    //             };
-    //             break;
-    //         case 'deeplink':
-    //             src = CTASource.STORY_LIST;
-    //             payload = {
-    //                 id: 0,
-    //                 index: 0,
-    //                 isDeeplink: true,
-    //                 url: event.url,
-    //             };
-    //             break;
-    //         case 'game':
-    //             src = CTASource.GAME_READER;
-    //             payload = {
-    //                 url: event.url,
-    //                 gameInstanceId: '0',
-    //             };
-    //             break;
-    //     }
-    //     if (src !== CTASource.UNKNOWN) {
-    //         this.clickOnButtonAction({ src, payload });
-    //     }
-    // });
   }
 
   private async applyNativeConfig(): Promise<void> {
+    if (!tagsAreValid(this.tags)) {
+      this.tags = [];
+    }
     await NativeStoryManager.initWith(
       this.apiKey,
       this.userId,
@@ -205,12 +94,9 @@ export class StoryManager {
       this.sandbox,
       this.sendStatistics,
       this.cacheSize,
-      this.anonymous
+      this.anonymous,
+      this.tags
     );
-
-    if (this.tags.length) {
-      NativeStoryManager.setTags(this.tags);
-    }
 
     if (this.placeholders) {
       NativeStoryManager.setPlaceholders(this.placeholders);
@@ -307,24 +193,6 @@ export class StoryManager {
     this.productCartHandlers = handlers;
   }
 
-  onProductCartClicked(listener: any) {
-    subscribeNativeEvent(
-      NativeGoodsEvents,
-      'NativeGoodsEvents',
-      'productCartClicked',
-      listener
-    );
-  }
-
-  onGoodItemSelected(listener: any) {
-    subscribeNativeEvent(
-      NativeGoodsEvents,
-      'NativeGoodsEvents',
-      'goodItemSelected',
-      listener
-    );
-  }
-
   async fetchGoods(skus: string[]) {
     const goods = (await this.getGoodsCallback(skus)) ?? [];
     goods.forEach((good: any) => {
@@ -346,16 +214,20 @@ export class StoryManager {
   }
 
   setUserId(userId: string, userIdSign: string | null) {
+    assertUserIdLength(userId);
     NativeStoryManager.setUserID(userId, userIdSign);
   }
 
   setTags(tags: string[]) {
+    if (!tagsAreValid(tags)) return;
     this.tags = tags;
     NativeStoryManager.setTags(tags);
   }
 
   addTags(tags: string[]) {
-    this.tags = [...new Set([...this.tags, ...tags])];
+    const merged = [...new Set([...this.tags, ...tags])];
+    if (!tagsAreValid(merged)) return;
+    this.tags = merged;
     NativeStoryManager.addTags(tags);
   }
 
@@ -405,15 +277,13 @@ export class StoryManager {
   }
   async fetchFeed(feed: string, uniqueId: string) {
     NativeStoryManager.getStories(feed, uniqueId);
-    //if (include_favorites) {
-    //NativeStoryManager.getFavoriteStories(feed);
-    //}
   }
   async fetchFavorites(feed: string) {
     NativeStoryManager.getFavoriteStories(feed);
   }
 
   preloadBannerPlace(placeId: string, tags?: string[]): Promise<boolean> {
+    if (tags && !tagsAreValid(tags)) return Promise.reject(false);
     return NativeStoryManager.preloadBannerPlace(placeId, tags ?? null).then(
       (success) => {
         if (!success) throw false;
@@ -487,6 +357,7 @@ export class StoryManager {
     tags?: string[],
     signal?: Option<AbortSignal>
   ): Promise<boolean> {
+    if (tags && !tagsAreValid(tags)) return Promise.reject(false);
     return this.runCancelable(signal, false, (operationId) =>
       NativeStoryManager.showOnboardings(feed, limit, tags ?? null, operationId)
     );
@@ -513,6 +384,7 @@ export class StoryManager {
   }
 
   preloadIAM(ids?: string[], tags?: string[]): Promise<boolean> {
+    if (tags && !tagsAreValid(tags)) return Promise.reject(false);
     return NativeStoryManager.preloadIAM(ids ?? null, tags ?? null).then(
       (success) => {
         if (!success) throw false;
@@ -546,33 +418,6 @@ export class StoryManager {
     NativeStoryManager.logout();
   }
 
-  // setEventEmitter(emitter: EventEmitter) {
-  //     this.emmitter = emitter;
-  // }
-
-  // on(eventName: string | symbol, listener: any) {
-  //     this.emmitter.addListener(eventName as string, async (event) => {
-  //         listener(event);
-  //     });
-  //     // super.on(eventName, listener);
-  //     return this;
-  // }
-
-  // on(eventName: string | symbol, listener: any) {
-  //     //super.on(eventName, listener);
-  //     // eventEmitter.addListener(getEventName(eventName), async (event) => {
-  //     //     listener(event);
-  //     // });
-  //     return this;
-  // }
-  // once(eventName: string | symbol, listener: any) {
-  //     //super.on(eventName, listener);
-  //     // eventEmitter.addListener(getEventName(eventName), async (event) => {
-  //     //     listener(event);
-  //     // });
-  //     return this;
-  // }
-
   private favoriteCellListener?: (...args: any[]) => void;
 
   onFavoriteCell(listener: any) {
@@ -585,227 +430,21 @@ export class StoryManager {
     if (isFunction(this.favoriteCellListener)) this.favoriteCellListener();
   }
 
-  onStoryReaderWillShow(listener: any) {
-    subscribeNativeEvent(
-      NativeFeedEvents,
-      'NativeFeedEvents',
-      'storyReaderWillShow',
-      listener
-    );
-  }
-
-  onStoryReaderDidClose(listener: any) {
-    subscribeNativeEvent(
-      NativeFeedEvents,
-      'NativeFeedEvents',
-      'storyReaderDidClose',
-      listener
-    );
-  }
-
-  onStoryWidgetEvent(listener: any) {
-    subscribeNativeEvent(
-      NativeStoriesEvents,
-      'NativeStoriesEvents',
-      'storyWidgetEvent',
-      listener
-    );
-  }
-
-  onBannerWidgetEvent(listener: any) {
-    subscribeNativeEvent(
-      NativeBannerEvents,
-      'NativeBannerEvents',
-      'bannerWidgetEvent',
-      listener
-    );
-  }
-
-  onShowStory(listener: any) {
-    subscribeNativeEvent(
-      NativeStoriesEvents,
-      'NativeStoriesEvents',
-      'showStory',
-      listener
-    );
-  }
-
-  onCloseStory(listener: any) {
-    subscribeNativeEvent(
-      NativeStoriesEvents,
-      'NativeStoriesEvents',
-      'closeStory',
-      listener
-    );
-  }
-
-  onShowSlide(listener: any) {
-    subscribeNativeEvent(
-      NativeStoriesEvents,
-      'NativeStoriesEvents',
-      'showSlide',
-      listener
-    );
-  }
-
-  onClickOnButton(listener: any) {
-    subscribeNativeEvent(
-      NativeStoriesEvents,
-      'NativeStoriesEvents',
-      'clickOnButton',
-      listener
-    );
-  }
-
-  onLikeStory(listener: any) {
-    subscribeNativeEvent(
-      NativeStoriesEvents,
-      'NativeStoriesEvents',
-      'likeStory',
-      listener
-    );
-  }
-
-  onDislikeStory(listener: any) {
-    subscribeNativeEvent(
-      NativeStoriesEvents,
-      'NativeStoriesEvents',
-      'dislikeStory',
-      listener
-    );
-  }
-
-  onFavoriteStory(listener: any) {
-    subscribeNativeEvent(
-      NativeStoriesEvents,
-      'NativeStoriesEvents',
-      'favoriteStory',
-      listener
-    );
-  }
-
-  onShareStory(listener: any) {
-    subscribeNativeEvent(
-      NativeStoriesEvents,
-      'NativeStoriesEvents',
-      'clickOnShareStory',
-      listener
-    );
-  }
-
-  onGameEvent(listener: any) {
-    for (const name of [
-      'startGame',
-      'closeGame',
-      'eventGame',
-      'gameFailure',
-    ] as const) {
-      subscribeNativeEvent(
-        NativeGameEvents,
-        'NativeGameEvents',
-        name,
-        listener
-      );
-    }
-  }
-
-  onIamEvent(listener: any) {
-    for (const name of [
-      'showInAppMessage',
-      'closeInAppMessage',
-      'inAppMessageWidgetEvent',
-    ] as const) {
-      subscribeNativeEvent(NativeIamEvents, 'NativeIamEvents', name, listener);
-    }
-  }
-
-  onFailure(listener: any) {
-    for (const name of [
-      'sessionFailure',
-      'storyFailure',
-      'currentStoryFailure',
-      'networkFailure',
-      'requestFailure',
-    ] as const) {
-      subscribeNativeEvent(
-        NativeSystemEvents,
-        'NativeSystemEvents',
-        name,
-        listener
-      );
-    }
-  }
-
   setPlaceholders(placeholders: any): void {
     this.placeholders = placeholders;
     NativeStoryManager.setPlaceholders(placeholders);
   }
+
   setImagePlaceholders(placeholders: any): void {
     this.imagePlaceholders = placeholders;
     NativeStoryManager.setImagesPlaceholders(placeholders);
   }
 
   public set storyLinkClickHandler(callback: Function) {
-    if (isFunction(callback)) {
-      this._callbacks.storyLinkClickHandler = callback;
-    }
+    this.cta.clickHandler = callback;
   }
 
   handleCTA(event: { url?: string; action?: string }) {
-    let src = CTASource.UNKNOWN;
-    let payload:
-      | CTAStoryListPayload
-      | CTAStoryReaderPayload
-      | CTAGameReaderPayload = null!;
-    switch (event.action) {
-      case 'button':
-      case 'swipe':
-        src = CTASource.STORY_READER;
-        payload = { id: 0, url: event.url!, index: 0, elementId: '' };
-        break;
-      case 'deeplink':
-        src = CTASource.STORY_LIST;
-        payload = { id: 0, index: 0, isDeeplink: true, url: event.url };
-        break;
-      case 'game':
-        src = CTASource.GAME_READER;
-        payload = { url: event.url!, gameInstanceId: '0' };
-        break;
-    }
-    if (src !== CTASource.UNKNOWN) {
-      this.clickOnButtonAction({ src, payload });
-    }
+    this.cta.handle(event);
   }
-
-  protected async defaultLinking(url?: string) {
-    if (url) {
-      try {
-        const supported = await Linking.canOpenURL(url);
-        if (supported) {
-          Linking.openURL(url);
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    }
-  }
-
-  private clickOnButtonAction = ({
-    src,
-    payload,
-  }: {
-    src: CTASource;
-    payload: CTAStoryListPayload | CTAStoryReaderPayload | CTAGameReaderPayload;
-  }) => {
-    if (isFunction(this._callbacks.storyLinkClickHandler)) {
-      const cbPayload = { src, srcRef: 'default', data: payload };
-      try {
-        this._callbacks.storyLinkClickHandler(cbPayload);
-      } catch (e) {
-        console.error(e);
-      }
-    } else {
-      this.defaultLinking(payload.url);
-    }
-  };
 }

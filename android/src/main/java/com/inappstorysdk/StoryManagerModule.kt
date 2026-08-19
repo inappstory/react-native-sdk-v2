@@ -36,7 +36,6 @@ import com.inappstory.reactnativesdk.AppearanceManagerImpl
 import com.inappstory.sdk.stories.api.models.ImagePlaceholderValue;
 import com.facebook.react.bridge.Promise
 import com.facebook.react.modules.core.DeviceEventManagerModule
-import com.inappstorysdk.IASLoggerImpl
 import com.inappstorysdk.NativeOverlayFragment
 
 import android.content.Context
@@ -83,7 +82,7 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
 
   override fun initWith(
     apiKey: String, userID: String, userIdSign: String?, sandbox: Boolean, sendStatistics: Boolean,
-    cacheSize: String?, anonymous: Boolean, promise: Promise
+    cacheSize: String?, anonymous: Boolean, tags: ReadableArray, promise: Promise
   ) {
     Log.d("InappstorySdkModule", "initWith")
     this.appearanceManager = AppearanceManagerImpl.getAppearanceManager()
@@ -101,6 +100,7 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
     apis.forEach { it.setExternalPlatform(ExternalPlatforms.REACT_NATIVE_SDK) }
     this.createManager(
       apiKey, userID, userIdSign, sandbox, cacheSizeNative, anonymous,
+      ArrayList(tags.toArrayList().map { it.toString() }),
       this.api as InAppStoryAPI
     )
     apis.forEach { it.settings.sendStatistic(sendStatistics) }
@@ -510,6 +510,7 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
     sandbox: Boolean,
     cacheSize: Int,
     anonymous: Boolean,
+    tags: ArrayList<String>,
     inAppStoryAPI: InAppStoryAPI
   ) {
     this.ias = if (anonymous) {
@@ -519,6 +520,7 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
         .cacheSize(cacheSize)
         .gameDemoMode(false)
         .apiKey(apiKey)
+        .tags(tags)
         .anonymous(true)
         .create()
     } else {
@@ -527,7 +529,7 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
         userID,
         userIdSign,
         null,
-        null,
+        tags,
         null,
         null,
         null,
@@ -537,8 +539,6 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
         sandbox,
       )
     }
-
-    InAppStoryManager.logger = IASLoggerImpl()
   }
 
   fun subscribeLists(inAppStoryAPI: InAppStoryAPI, feed: String, uniqueId: String = feed) {

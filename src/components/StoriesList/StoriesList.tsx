@@ -8,7 +8,8 @@ import {
 import { View } from 'react-native';
 
 import type { AppearanceManager } from '../../core/AppearanceManager';
-import type { Option, StoryManager } from '../../core/StoryManager';
+import type { StoryManager } from '../../core/StoryManager';
+import type { Option } from '../../types/common';
 import { useEventCallback } from '../../hooks/useEventCallback';
 import { useFeedLoader } from '../../hooks/useFeedLoader';
 import { useFeedStore } from '../../hooks/useFeedStore';

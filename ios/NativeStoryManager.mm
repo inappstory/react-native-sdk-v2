@@ -31,6 +31,7 @@ RCT_EXPORT_METHOD(initWith:(nonnull NSString *)apiKey
             sendStatistics:(BOOL)sendStatistics
                  cacheSize:(NSString *_Nullable)cacheSize
                  anonymous:(BOOL)anonymous
+                      tags:(nonnull NSArray *)tags
                    resolve:(RCTPromiseResolveBlock)resolve
                     reject:(RCTPromiseRejectBlock)reject) {
   [[NativeStoryManagerImpl shared] initWith:apiKey
@@ -40,6 +41,7 @@ RCT_EXPORT_METHOD(initWith:(nonnull NSString *)apiKey
                                   sendStats:sendStatistics
                                   cacheSize:cacheSize
                                   anonymous:anonymous
+                                       tags:tags
                                     resolve:resolve
                                    rejecter:reject];
 }

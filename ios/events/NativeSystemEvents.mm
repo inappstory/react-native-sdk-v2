@@ -8,6 +8,14 @@
 @implementation NativeSystemEvents
 RCT_EXPORT_MODULE()
 
+- (void)notifyOnLog:(NSDictionary *)data {
+#ifdef RCT_NEW_ARCH_ENABLED
+  [self emitOnLog:data];
+#else
+  [self sendEventWithName:@"onLog" body:data];
+#endif
+}
+
 - (void)notifyHandleCTA:(NSDictionary *)data {
 #ifdef RCT_NEW_ARCH_ENABLED
   [self emitHandleCTA:data];
@@ -35,6 +43,13 @@ RCT_EXPORT_MODULE()
 #endif
 }
 
+RCT_EXPORT_METHOD(setLoggingEnabled:(BOOL)enabled) {
+  [[NativeSystemEventsImpl shared] setLoggingEnabled:enabled
+                                               onLog:^(NSDictionary *data) {
+                                                 [self notifyOnLog:data];
+                                               }];
+}
+
 RCT_EXPORT_METHOD(setupSystemEvents) {
   [[NativeSystemEventsImpl shared]
       setupSystemEventsWithHandleCTA:^(NSDictionary *data) {
@@ -53,8 +68,8 @@ RCT_EXPORT_METHOD(setupSystemEvents) {
 #else
 - (NSArray<NSString *> *)supportedEvents {
   return @[
-    @"handleCTA", @"sessionFailure", @"storyFailure", @"currentStoryFailure",
-    @"networkFailure", @"requestFailure"
+    @"onLog", @"handleCTA", @"sessionFailure", @"storyFailure",
+    @"currentStoryFailure", @"networkFailure", @"requestFailure"
   ];
 }
 #endif

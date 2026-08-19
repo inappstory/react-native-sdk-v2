@@ -9,6 +9,9 @@ export type EventDTO = {
 export interface Spec extends TurboModule {
   setupSystemEvents(): void;
 
+  setLoggingEnabled(enabled: boolean): void;
+
+  readonly onLog: CodegenTypes.EventEmitter<EventDTO>;
   readonly sessionFailure: CodegenTypes.EventEmitter<EventDTO>;
   readonly storyFailure: CodegenTypes.EventEmitter<EventDTO>;
   readonly currentStoryFailure: CodegenTypes.EventEmitter<EventDTO>;

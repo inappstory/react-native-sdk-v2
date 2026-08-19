@@ -5,12 +5,14 @@ import {
   StoriesListCardViewVariant,
   StoryManager,
   type StoryManagerConfig,
+  type LogEntry,
 } from '@inappstory/react-native-sdk';
+import { TEST_TAGS } from './TestTags';
 
 let storyManagerConfig: StoryManagerConfig = {
   apiKey: 'test-key',
   userId: '',
-  tags: [],
+  tags: TEST_TAGS,
   placeholders: {
     username: 'Guest',
   },
@@ -22,49 +24,17 @@ let storyManagerConfig: StoryManagerConfig = {
 //configure StoryManager
 export const createStoryManager = () => {
   const storyManager = new StoryManager(storyManagerConfig);
-  // storyManager.getGoodsCallback((skus: string[]) => {
-  //     //TODO: Fetch goods information
-  //     return skus.map((sku) => ({
-  //         sku: sku, //item sku
-  //         title: 'title of ' + sku, //item title for cell
-  //         subtitle: 'subtitle of ' + sku, //item subtitle for cell
-  //         imageURL: 'URL', //image url for cell
-  //         price: Number(Math.random() * 1000).toFixed(2), //price value for cell
-  //         oldPrice: Number(Math.random() * 1000).toFixed(2),
-  //     }));
-  // });
 
-  //subscribe to events
-  // storyManager.on('clickOnStory', (payload: any) =>
-  //     console.log('clickOnStory', { payload })
-  // );
-  // storyManager.on('showStory', (payload: any) =>
-  //     console.log('showStory', { payload })
-  // );
-  // storyManager.on('closeStory', (payload: any) =>
-  //     console.log('closeStory', { payload })
-  // );
-  // storyManager.on('showSlide', (payload: any) =>
-  //     console.log('showSlide', { payload })
-  // );
-  // // storyManager.on('clickOnButton', (payload: any) =>
-  // //     console.log('clickOnButton', { payload })
-  // // );
-  // storyManager.on('likeStory', (payload: any) =>
-  //     console.log('likeStory', { payload })
-  // );
-  // storyManager.on('dislikeStory', (payload: any) =>
-  //     console.log('dislikeStory', { payload })
-  // );
-  // storyManager.on('favoriteStory', (payload: any) =>
-  //     console.log('favoriteStory', { payload })
-  // );
-  // storyManager.on('shareStory', (payload: any) =>
-  //     console.log('shareStory', { payload })
-  // );
-  // storyManager.on('shareStoryWithPath', (payload: any) =>
-  //     console.log('shareStoryWithPath', { payload })
-  // );
+  // forward native SDK logs to the JS console
+  storyManager.setLoggingEnabled(true);
+  storyManager.onLog((entry: LogEntry) => {
+    console.log(`[IAS ${entry.level}] ${entry.message ?? ''}`);
+  });
+
+  // failure events: session/story/network/request errors
+  storyManager.onFailure((event: { withName: string; body: any }) => {
+    console.warn(`[IAS failure] ${event.withName}`, event.body);
+  });
 
   // btn handler
   // storyManager.storyLinkClickHandler = (payload: any) => {

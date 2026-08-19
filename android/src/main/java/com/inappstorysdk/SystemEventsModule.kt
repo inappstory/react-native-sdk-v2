@@ -7,6 +7,7 @@ import com.facebook.react.bridge.WritableMap
 import com.facebook.react.module.annotations.ReactModule
 import com.facebook.react.modules.core.DeviceEventManagerModule
 import com.inappstory.sdk.InAppStoryManager
+import com.inappstorysdk.IASLoggerImpl
 import com.inappstory.sdk.stories.outercallbacks.common.errors.ErrorCallback
 import com.inappstory.sdk.stories.outercallbacks.common.reader.CallToActionCallback
 import com.inappstory.sdk.stories.outercallbacks.common.reader.ClickAction
@@ -69,6 +70,28 @@ class SystemEventsModule(reactContext: ReactApplicationContext) :
       override fun cacheError() = emitFailure("requestFailure", "cacheError")
       override fun emptyLinkError() = emitFailure("requestFailure", "emptyLinkError")
     })
+  }
+
+  override fun setLoggingEnabled(enabled: Boolean) {
+    Log.d(NAME, "setLoggingEnabled: $enabled")
+    InAppStoryManager.logger = if (enabled) {
+      IASLoggerImpl { level, message -> dispatchOnLog(level, message) }
+    } else {
+      null
+    }
+  }
+
+  private fun dispatchOnLog(level: String, message: String?) {
+    val body: WritableMap = Arguments.createMap().apply {
+      putString("level", level)
+      putString("message", message)
+    }
+    val payload: WritableMap = Arguments.createMap().apply {
+      putString("withName", "onLog")
+      putMap("body", body)
+    }
+    if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) emitOnLog(payload)
+    else sendLegacyEvent("onLog", payload)
   }
 
   private fun emitFailure(name: String, message: String, feed: String? = null) {

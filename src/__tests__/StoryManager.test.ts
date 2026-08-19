@@ -1,6 +1,7 @@
 /// <reference types="jest" />
 import { Linking } from 'react-native';
-import { StoryManager, CTASource } from '../core/StoryManager';
+import { StoryManager } from '../core/StoryManager';
+import { CTASource } from '../types/CTA';
 import NativeStoryManager from '../specs/NativeStoryManager';
 import NativeAppearanceManager from '../specs/NativeAppearanceManager';
 import NativeFeedEvents from '../specs/NativeFeedEvents';
@@ -113,6 +114,8 @@ jest.mock('../specs/NativeSystemEvents', () => ({
   __esModule: true,
   default: {
     setupSystemEvents: jest.fn(),
+    setLoggingEnabled: jest.fn(),
+    onLog: jest.fn(() => ({ remove: jest.fn() })),
     sessionFailure: jest.fn(() => ({ remove: jest.fn() })),
     storyFailure: jest.fn(() => ({ remove: jest.fn() })),
     currentStoryFailure: jest.fn(() => ({ remove: jest.fn() })),
@@ -166,8 +169,22 @@ describe('StoryManager.create', () => {
       false,
       false,
       null,
-      false
+      false,
+      []
     );
+  });
+
+  it('rejects a userId longer than 255 bytes, counting UTF-8 bytes', async () => {
+    // 128 two-byte chars = 256 bytes, still 128 JS characters
+    await expect(
+      StoryManager.create({ apiKey: 'key', userId: '\u00e9'.repeat(128) })
+    ).rejects.toThrow('userId must be at most 255 bytes, got 256');
+    expect(native.initWith).not.toHaveBeenCalled();
+  });
+
+  it('accepts a userId of exactly 255 bytes', async () => {
+    await StoryManager.create({ apiKey: 'key', userId: 'a'.repeat(255) });
+    expect(native.initWith).toHaveBeenCalled();
   });
 
   it('passes cacheSize and anonymous to native init', async () => {
@@ -184,7 +201,8 @@ describe('StoryManager.create', () => {
       false,
       true,
       'large',
-      true
+      true,
+      []
     );
   });
 
@@ -197,7 +215,17 @@ describe('StoryManager.create', () => {
       lang: 'ru-RU',
       appVersion: { version: '1.2.3', build: 45 },
     });
-    expect(native.setTags).toHaveBeenCalledWith(['a', 'b']);
+    expect(native.initWith).toHaveBeenCalledWith(
+      'key',
+      'u',
+      null,
+      false,
+      true,
+      null,
+      false,
+      ['a', 'b']
+    );
+    expect(native.setTags).not.toHaveBeenCalled();
     expect(native.setPlaceholders).toHaveBeenCalledWith({ name: 'Alex' });
     expect(native.setLang).toHaveBeenCalledWith('ru-RU');
     expect(native.setAppVersion).toHaveBeenCalledWith('1.2.3', 45);
@@ -228,7 +256,8 @@ describe('StoryManager.create', () => {
       false,
       true,
       null,
-      false
+      false,
+      []
     );
   });
 
@@ -459,6 +488,33 @@ describe('event subscriptions fan-out', () => {
     expect(NativeFeedEvents.storyReaderWillShow).toHaveBeenCalledTimes(2);
     expect(NativeFeedEvents.storyReaderWillShow).toHaveBeenNthCalledWith(1, l1);
     expect(NativeFeedEvents.storyReaderWillShow).toHaveBeenNthCalledWith(2, l2);
+  });
+});
+
+describe('logger', () => {
+  let manager: StoryManager;
+  beforeEach(async () => {
+    manager = await StoryManager.create({ apiKey: 'k', userId: 'u' });
+  });
+
+  it('setLoggingEnabled passes the flag straight to native', () => {
+    manager.setLoggingEnabled(true);
+    expect(NativeSystemEvents.setLoggingEnabled).toHaveBeenCalledWith(true);
+    manager.setLoggingEnabled(false);
+    expect(NativeSystemEvents.setLoggingEnabled).toHaveBeenLastCalledWith(
+      false
+    );
+  });
+
+  it('onLog subscribes and hands the listener the unwrapped body', () => {
+    const listener = jest.fn();
+    manager.onLog(listener);
+    expect(NativeSystemEvents.onLog).toHaveBeenCalled();
+    const nativeHandler = (NativeSystemEvents.onLog as jest.Mock).mock
+      .calls[0]![0];
+    const entry = { level: 'error', message: 'boom' };
+    nativeHandler({ body: entry });
+    expect(listener).toHaveBeenCalledWith(entry);
   });
 });
 
@@ -721,10 +777,10 @@ describe('reinit', () => {
       false,
       true,
       null,
-      false
+      false,
+      ['a']
     );
     // tags and lang must survive the native state reset
-    expect(native.setTags).toHaveBeenLastCalledWith(['a']);
     expect(native.setLang).toHaveBeenLastCalledWith('ru');
   });
 
@@ -739,7 +795,8 @@ describe('reinit', () => {
       false,
       false,
       null,
-      false
+      false,
+      []
     );
   });
 
@@ -792,7 +849,8 @@ describe('reinit', () => {
       false,
       true,
       null,
-      false
+      false,
+      []
     );
   });
 });
@@ -840,6 +898,114 @@ describe('local state kept in sync for reinit', () => {
   it('setUserId delegates without touching the stored id', () => {
     manager.setUserId('u2', 'sign');
     expect(native.setUserID).toHaveBeenCalledWith('u2', 'sign');
+  });
+
+  it('initWith drops tags assigned directly on the instance when invalid', async () => {
+    const error = jest.spyOn(console, 'error').mockImplementation(() => {});
+    manager.tags = ['ok', 'bad tag'];
+    native.initWith.mockClear();
+    manager.setApiKey('k2');
+    await Promise.resolve();
+    expect(native.initWith).toHaveBeenCalledWith(
+      'k2',
+      expect.anything(),
+      null,
+      false,
+      true,
+      null,
+      false,
+      []
+    );
+    expect(error).toHaveBeenCalledWith(
+      'InAppStory: tag "bad tag" is invalid, only letters, digits, underscores and dashes are allowed'
+    );
+    error.mockRestore();
+  });
+
+  it('setTags reports a tag with characters outside letters, digits, _ and - and skips native', () => {
+    const error = jest.spyOn(console, 'error').mockImplementation(() => {});
+    manager.setTags(['ok']);
+    native.setTags.mockClear();
+    manager.setTags(['ok', 'bad tag']);
+    expect(native.setTags).not.toHaveBeenCalled();
+    expect(manager.tags).toEqual(['ok']);
+    expect(error).toHaveBeenCalledWith(
+      'InAppStory: tag "bad tag" is invalid, only letters, digits, underscores and dashes are allowed'
+    );
+    error.mockRestore();
+  });
+
+  it('setTags accepts letters from non-latin scripts', () => {
+    const error = jest.spyOn(console, 'error').mockImplementation(() => {});
+    manager.setTags(['спорт', '新闻', 'tag_1-2']);
+    expect(native.setTags).toHaveBeenCalledWith(['спорт', '新闻', 'tag_1-2']);
+    expect(error).not.toHaveBeenCalled();
+    error.mockRestore();
+  });
+
+  it('setTags rejects an emoji tag', () => {
+    const error = jest.spyOn(console, 'error').mockImplementation(() => {});
+    manager.setTags(['🔥']);
+    expect(native.setTags).not.toHaveBeenCalled();
+    expect(error).toHaveBeenCalledWith(
+      'InAppStory: tag "🔥" is invalid, only letters, digits, underscores and dashes are allowed'
+    );
+    error.mockRestore();
+  });
+
+  it('setTags reports tags larger than 4096 bytes in total and skips native', () => {
+    const error = jest.spyOn(console, 'error').mockImplementation(() => {});
+    manager.setTags(['a'.repeat(4096)]);
+    expect(native.setTags).not.toHaveBeenCalled();
+    expect(error).toHaveBeenCalledWith(
+      'InAppStory: tags must be at most 4096 bytes in total, got 4097'
+    );
+    error.mockRestore();
+  });
+
+  it('setTags accepts exactly 4096 bytes in total', () => {
+    const error = jest.spyOn(console, 'error').mockImplementation(() => {});
+    manager.setTags(['a'.repeat(4095)]);
+    expect(native.setTags).toHaveBeenCalledWith(['a'.repeat(4095)]);
+    expect(error).not.toHaveBeenCalled();
+    error.mockRestore();
+  });
+
+  it('setTags counts cyrillic tags as 2 UTF-8 bytes per character', () => {
+    const error = jest.spyOn(console, 'error').mockImplementation(() => {});
+    // 'я' x 2048 = 4096 bytes, plus the separator that overflows the budget.
+    manager.setTags(['я'.repeat(2048)]);
+    expect(native.setTags).not.toHaveBeenCalled();
+    expect(error).toHaveBeenCalledWith(
+      'InAppStory: tags must be at most 4096 bytes in total, got 4097'
+    );
+    error.mockRestore();
+  });
+
+  it('addTags keeps the local tags when the merged list exceeds the limit', () => {
+    const error = jest.spyOn(console, 'error').mockImplementation(() => {});
+    manager.setTags(['a'.repeat(4000)]);
+    manager.addTags(['b'.repeat(96)]);
+    expect(native.addTags).not.toHaveBeenCalled();
+    expect(manager.tags).toEqual(['a'.repeat(4000)]);
+    expect(error).toHaveBeenCalledWith(
+      'InAppStory: tags must be at most 4096 bytes in total, got 4098'
+    );
+    error.mockRestore();
+  });
+
+  it('preloadIAM rejects invalid tags without calling native', async () => {
+    const error = jest.spyOn(console, 'error').mockImplementation(() => {});
+    await expect(manager.preloadIAM(['id'], ['bad tag'])).rejects.toBe(false);
+    expect(native.preloadIAM).not.toHaveBeenCalled();
+    error.mockRestore();
+  });
+
+  it('setUserId rejects an id longer than 255 bytes', () => {
+    expect(() => manager.setUserId('a'.repeat(256), null)).toThrow(
+      'userId must be at most 255 bytes, got 256'
+    );
+    expect(native.setUserID).not.toHaveBeenCalled();
   });
 });
 

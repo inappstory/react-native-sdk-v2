@@ -10,6 +10,11 @@ public class NativeSystemEventsImpl: NSObject {
 
   private var handleCTACallback: (([String: Any]) -> Void)?
 
+  // Logging is off by default and owned by the toggle below, so
+  // `initWith` re-applies this state instead of forcing it off.
+  private var loggingEnabled = false
+  private var onLogCallback: (([String: Any]) -> Void)?
+
   override init() {
     super.init()
   }
@@ -53,12 +58,55 @@ public class NativeSystemEventsImpl: NSObject {
     }
   }
 
+  @objc public func setLoggingEnabled(
+    _ enabled: Bool,
+    onLog: @escaping ([String: Any]) -> Void
+  ) {
+    self.loggingEnabled = enabled
+    self.onLogCallback = enabled ? onLog : nil
+    DispatchQueue.main.async { self.applyLogging() }
+  }
+
+  /// Pushes the current logging state onto the shared SDK instance. Called from
+  /// the toggle and from `initWith`, so an SDK (re)init never resets the flag.
+  /// Must run on the main queue. `logger` is non-optional, so disabling is done
+  /// via `isLoggingEnabled` alone.
+  @objc public func applyLogging() {
+    InAppStory.shared.isLoggingEnabled = loggingEnabled
+    if loggingEnabled, let onLog = onLogCallback {
+      InAppStory.shared.logger = IASReactNativeLogger(onLog: onLog)
+    }
+  }
+
   @objc public func emitCTA(url: String, action: String) {
     self.handleCTACallback?([
       "withName": "handleCTA",
       "body": [
         "url": url,
         "action": action,
+      ],
+    ])
+  }
+}
+
+/// Forwards native SDK logs to JS as `onLog` events. `error` present → level
+/// "error", otherwise "debug" (Android only distinguishes these two).
+private final class IASReactNativeLogger: IASLoggerProtocol {
+  var level: [IASLogLevel] = [.all]
+
+  private let onLog: ([String: Any]) -> Void
+
+  init(onLog: @escaping ([String: Any]) -> Void) {
+    self.onLog = onLog
+  }
+
+  func log(object: IASLogObject) {
+    let message = object.message ?? object.warning ?? object.error ?? object.cURL
+    onLog([
+      "withName": "onLog",
+      "body": [
+        "level": object.error != nil ? "error" : "debug",
+        "message": message as Any,
       ],
     ])
   }

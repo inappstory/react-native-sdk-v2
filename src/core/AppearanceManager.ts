@@ -1,5 +1,5 @@
 import NativeAppearanceManager from '../specs/NativeAppearanceManager';
-import type { Option } from './StoryManager';
+import type { Option } from '../types/common';
 import type { StyleProp, ViewStyle } from 'react-native';
 import parseSides from 'parse-css-sides';
 import type { CoverQuality } from '../types/CoverQuality';
