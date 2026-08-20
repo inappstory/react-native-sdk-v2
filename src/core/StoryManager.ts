@@ -2,7 +2,6 @@ import type { AppearanceManager } from './AppearanceManager';
 import { generateId } from '../utils/generateId';
 import { isFunction } from '../utils/isFunction';
 import NativeAppearanceManager from '../specs/NativeAppearanceManager';
-import { subscribeNativeEvent } from '../utils/subscribeNativeEvent';
 import NativeStoryManager from '../specs/NativeStoryManager';
 import NativeBannerEvents from '../specs/NativeBannerEvents';
 import NativeFeedEvents from '../specs/NativeFeedEvents';
@@ -27,7 +26,7 @@ export class StoryManager extends StoryEvents {
   imagePlaceholders: any = '';
   lang: string = '';
   soundEnabled: boolean = true;
-  getGoodsCallback: Function = () => {};
+  private goodsCallback: Function = () => {};
   productCartHandlers: ProductCartHandlers | null = null;
   sandbox: boolean = false;
   sendStatistics: boolean = true;
@@ -37,6 +36,9 @@ export class StoryManager extends StoryEvents {
   listeners: any = [];
 
   protected readonly cta = new CTAHandler();
+
+  /** Resolves once the native SDK has been initialised with the current config. */
+  private nativeReady: Promise<void>;
 
   constructor(config: StoryManagerConfig) {
     super();
@@ -81,6 +83,71 @@ export class StoryManager extends StoryEvents {
     if (config.appVersion != null) {
       this.appVersion = config.appVersion;
     }
+
+    this.setupJsEventBridge();
+    this.nativeReady = this.reinit();
+  }
+
+  /**
+   * Native -> JS bridges that are not `on*` listeners the app registers, but
+   * plumbing the manager always needs: CTA routing, goods and the product
+   * cart. Lives in the constructor so it is wired on every construction path,
+   * not only `create()` — `new StoryManager()` plus `setApiKey()` initialises
+   * native just as well and used to leave these unsubscribed.
+   */
+  private setupJsEventBridge(): void {
+    this.subscribe(
+      NativeGoodsEvents,
+      'NativeGoodsEvents',
+      'getGoodsObject',
+      (event: any) => {
+        this.fetchGoods(event.body.skus);
+      }
+    );
+
+    this.subscribe(
+      NativeSystemEvents,
+      'NativeSystemEvents',
+      'handleCTA',
+      (event: any) => {
+        this.handleCTA(event.body);
+      }
+    );
+
+    const answerCart = async (
+      requestId: string,
+      run: (handlers: ProductCartHandlers) => Promise<ProductCart | null>
+    ) => {
+      let cart: ProductCart | null = null;
+      try {
+        if (this.productCartHandlers) {
+          cart = await run(this.productCartHandlers);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+      NativeGoodsEvents.resolveProductCart(requestId, cart);
+    };
+    this.subscribe(
+      NativeGoodsEvents,
+      'NativeGoodsEvents',
+      'productCartUpdate',
+      (event: any) => {
+        answerCart(event.body.requestId, (handlers) =>
+          Promise.resolve(handlers.onUpdate(event.body.offer))
+        );
+      }
+    );
+    this.subscribe(
+      NativeGoodsEvents,
+      'NativeGoodsEvents',
+      'productCartGetState',
+      (event: any) => {
+        answerCart(event.body.requestId, (handlers) =>
+          Promise.resolve(handlers.getState())
+        );
+      }
+    );
   }
 
   private async applyNativeConfig(): Promise<void> {
@@ -127,65 +194,15 @@ export class StoryManager extends StoryEvents {
     NativeIamEvents.setupIamEvents();
   }
 
+  /**
+   * The recommended entry point: same as `new StoryManager(config)`, but waits
+   * for the native SDK to finish initialising and rejects if it fails.
+   */
   public static async create(
     config: StoryManagerConfig
   ): Promise<StoryManager> {
     const manager = new StoryManager(config);
-
-    await manager.applyNativeConfig();
-
-    subscribeNativeEvent(
-      NativeGoodsEvents,
-      'NativeGoodsEvents',
-      'getGoodsObject',
-      (event: any) => {
-        manager.fetchGoods(event.body.skus);
-      }
-    );
-
-    subscribeNativeEvent(
-      NativeSystemEvents,
-      'NativeSystemEvents',
-      'handleCTA',
-      (event: any) => {
-        manager.handleCTA(event.body);
-      }
-    );
-
-    const answerCart = async (
-      requestId: string,
-      run: (handlers: ProductCartHandlers) => Promise<ProductCart | null>
-    ) => {
-      let cart: ProductCart | null = null;
-      try {
-        if (manager.productCartHandlers) {
-          cart = await run(manager.productCartHandlers);
-        }
-      } catch (e) {
-        console.error(e);
-      }
-      NativeGoodsEvents.resolveProductCart(requestId, cart);
-    };
-    subscribeNativeEvent(
-      NativeGoodsEvents,
-      'NativeGoodsEvents',
-      'productCartUpdate',
-      (event: any) => {
-        answerCart(event.body.requestId, (handlers) =>
-          Promise.resolve(handlers.onUpdate(event.body.offer))
-        );
-      }
-    );
-    subscribeNativeEvent(
-      NativeGoodsEvents,
-      'NativeGoodsEvents',
-      'productCartGetState',
-      (event: any) => {
-        answerCart(event.body.requestId, (handlers) =>
-          Promise.resolve(handlers.getState())
-        );
-      }
-    );
+    await manager.nativeReady;
     return manager;
   }
 
@@ -194,7 +211,7 @@ export class StoryManager extends StoryEvents {
   }
 
   async fetchGoods(skus: string[]) {
-    const goods = (await this.getGoodsCallback(skus)) ?? [];
+    const goods = (await this.goodsCallback(skus)) ?? [];
     goods.forEach((good: any) => {
       NativeGoodsEvents.addProductToCache(
         good.sku,
@@ -209,7 +226,7 @@ export class StoryManager extends StoryEvents {
   }
 
   getGoods(callback: (skus: string[]) => any) {
-    this.getGoodsCallback = (skus: string[]) =>
+    this.goodsCallback = (skus: string[]) =>
       new Promise((resolve) => resolve(callback(skus)));
   }
 
@@ -252,10 +269,17 @@ export class StoryManager extends StoryEvents {
     NativeStoryManager.setAppVersion(version, build);
   }
 
-  private reinit() {
-    this.applyNativeConfig().catch((e) =>
+  /**
+   * (Re)apply the current config to the native SDK. Returns the pending init
+   * so `create()` can await it; the rejection is also logged here, because the
+   * constructor and the `set*` setters start it without anyone awaiting.
+   */
+  private reinit(): Promise<void> {
+    this.nativeReady = this.applyNativeConfig();
+    this.nativeReady.catch((e) =>
       console.error('InAppStory: reinit failed', e)
     );
+    return this.nativeReady;
   }
 
   setApiKey(apiKey: string) {

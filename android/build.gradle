@@ -85,5 +85,5 @@ dependencies {
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
   implementation 'androidx.recyclerview:recyclerview:1.2.1'
   implementation 'androidx.webkit:webkit:1.4.0'
-  implementation 'com.github.inappstory:android-sdk:1.25.3'
+  implementation 'com.github.inappstory:android-sdk:1.25.4'
 }

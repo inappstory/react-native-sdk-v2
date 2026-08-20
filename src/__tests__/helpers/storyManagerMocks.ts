@@ -5,6 +5,31 @@
 // importing this file before it touches StoryManager.
 import NativeStoryManager from '../../specs/NativeStoryManager';
 
+// A native event mock that behaves like the real bridge: handlers stay
+// registered until their subscription is removed, so a test can emit one event
+// and see how many live listeners actually got it.
+const mockRegistry: Record<string, Array<(e: any) => void>> = {};
+const mockEvent = (moduleName: string, event: string) =>
+  jest.fn((handler: (e: any) => void) => {
+    const key = `${moduleName}.${event}`;
+    (mockRegistry[key] ??= []).push(handler);
+    return {
+      remove: jest.fn(() => {
+        mockRegistry[key] = mockRegistry[key]!.filter((h) => h !== handler);
+      }),
+    };
+  });
+
+/** Fire a native event at every listener still subscribed to it. */
+export const emitNative = (moduleName: string, event: string, body: any) => {
+  const handlers = mockRegistry[`${moduleName}.${event}`] ?? [];
+  [...handlers].forEach((handler) => handler({ body }));
+};
+
+/** How many live listeners a native event currently has. */
+export const listenerCount = (moduleName: string, event: string) =>
+  (mockRegistry[`${moduleName}.${event}`] ?? []).length;
+
 jest.mock('../../specs/NativeStoryManager', () => ({
   __esModule: true,
   default: {
@@ -59,8 +84,8 @@ jest.mock('../../specs/NativeFeedEvents', () => ({
   __esModule: true,
   default: {
     setupFeedEvents: jest.fn(),
-    storyReaderWillShow: jest.fn(() => ({ remove: jest.fn() })),
-    storyReaderDidClose: jest.fn(() => ({ remove: jest.fn() })),
+    storyReaderWillShow: mockEvent('NativeFeedEvents', 'storyReaderWillShow'),
+    storyReaderDidClose: mockEvent('NativeFeedEvents', 'storyReaderDidClose'),
   },
 }));
 
@@ -68,15 +93,15 @@ jest.mock('../../specs/NativeStoriesEvents', () => ({
   __esModule: true,
   default: {
     setupStoriesEvents: jest.fn(),
-    showStory: jest.fn(() => ({ remove: jest.fn() })),
-    closeStory: jest.fn(() => ({ remove: jest.fn() })),
-    showSlide: jest.fn(() => ({ remove: jest.fn() })),
-    likeStory: jest.fn(() => ({ remove: jest.fn() })),
-    dislikeStory: jest.fn(() => ({ remove: jest.fn() })),
-    favoriteStory: jest.fn(() => ({ remove: jest.fn() })),
-    clickOnShareStory: jest.fn(() => ({ remove: jest.fn() })),
-    clickOnButton: jest.fn(() => ({ remove: jest.fn() })),
-    storyWidgetEvent: jest.fn(() => ({ remove: jest.fn() })),
+    showStory: mockEvent('NativeStoriesEvents', 'showStory'),
+    closeStory: mockEvent('NativeStoriesEvents', 'closeStory'),
+    showSlide: mockEvent('NativeStoriesEvents', 'showSlide'),
+    likeStory: mockEvent('NativeStoriesEvents', 'likeStory'),
+    dislikeStory: mockEvent('NativeStoriesEvents', 'dislikeStory'),
+    favoriteStory: mockEvent('NativeStoriesEvents', 'favoriteStory'),
+    clickOnShareStory: mockEvent('NativeStoriesEvents', 'clickOnShareStory'),
+    clickOnButton: mockEvent('NativeStoriesEvents', 'clickOnButton'),
+    storyWidgetEvent: mockEvent('NativeStoriesEvents', 'storyWidgetEvent'),
   },
 }));
 
@@ -84,7 +109,7 @@ jest.mock('../../specs/NativeBannerEvents', () => ({
   __esModule: true,
   default: {
     setupBannerEvents: jest.fn(),
-    bannerWidgetEvent: jest.fn(() => ({ remove: jest.fn() })),
+    bannerWidgetEvent: mockEvent('NativeBannerEvents', 'bannerWidgetEvent'),
   },
 }));
 
@@ -92,11 +117,11 @@ jest.mock('../../specs/NativeGoodsEvents', () => ({
   __esModule: true,
   default: {
     setupGoodsEvents: jest.fn(),
-    getGoodsObject: jest.fn(() => ({ remove: jest.fn() })),
-    goodItemSelected: jest.fn(() => ({ remove: jest.fn() })),
-    productCartUpdate: jest.fn(() => ({ remove: jest.fn() })),
-    productCartClicked: jest.fn(() => ({ remove: jest.fn() })),
-    productCartGetState: jest.fn(() => ({ remove: jest.fn() })),
+    getGoodsObject: mockEvent('NativeGoodsEvents', 'getGoodsObject'),
+    goodItemSelected: mockEvent('NativeGoodsEvents', 'goodItemSelected'),
+    productCartUpdate: mockEvent('NativeGoodsEvents', 'productCartUpdate'),
+    productCartClicked: mockEvent('NativeGoodsEvents', 'productCartClicked'),
+    productCartGetState: mockEvent('NativeGoodsEvents', 'productCartGetState'),
     addProductToCache: jest.fn(),
     commitGoods: jest.fn(),
     resolveProductCart: jest.fn(),
@@ -108,13 +133,13 @@ jest.mock('../../specs/NativeSystemEvents', () => ({
   default: {
     setupSystemEvents: jest.fn(),
     setLoggingEnabled: jest.fn(),
-    onLog: jest.fn(() => ({ remove: jest.fn() })),
-    sessionFailure: jest.fn(() => ({ remove: jest.fn() })),
-    storyFailure: jest.fn(() => ({ remove: jest.fn() })),
-    currentStoryFailure: jest.fn(() => ({ remove: jest.fn() })),
-    networkFailure: jest.fn(() => ({ remove: jest.fn() })),
-    requestFailure: jest.fn(() => ({ remove: jest.fn() })),
-    handleCTA: jest.fn(() => ({ remove: jest.fn() })),
+    onLog: mockEvent('NativeSystemEvents', 'onLog'),
+    sessionFailure: mockEvent('NativeSystemEvents', 'sessionFailure'),
+    storyFailure: mockEvent('NativeSystemEvents', 'storyFailure'),
+    currentStoryFailure: mockEvent('NativeSystemEvents', 'currentStoryFailure'),
+    networkFailure: mockEvent('NativeSystemEvents', 'networkFailure'),
+    requestFailure: mockEvent('NativeSystemEvents', 'requestFailure'),
+    handleCTA: mockEvent('NativeSystemEvents', 'handleCTA'),
   },
 }));
 
@@ -122,10 +147,10 @@ jest.mock('../../specs/NativeGameEvents', () => ({
   __esModule: true,
   default: {
     setupGameEvents: jest.fn(),
-    startGame: jest.fn(() => ({ remove: jest.fn() })),
-    closeGame: jest.fn(() => ({ remove: jest.fn() })),
-    eventGame: jest.fn(() => ({ remove: jest.fn() })),
-    gameFailure: jest.fn(() => ({ remove: jest.fn() })),
+    startGame: mockEvent('NativeGameEvents', 'startGame'),
+    closeGame: mockEvent('NativeGameEvents', 'closeGame'),
+    eventGame: mockEvent('NativeGameEvents', 'eventGame'),
+    gameFailure: mockEvent('NativeGameEvents', 'gameFailure'),
   },
 }));
 
@@ -133,9 +158,12 @@ jest.mock('../../specs/NativeIamEvents', () => ({
   __esModule: true,
   default: {
     setupIamEvents: jest.fn(),
-    showInAppMessage: jest.fn(() => ({ remove: jest.fn() })),
-    closeInAppMessage: jest.fn(() => ({ remove: jest.fn() })),
-    inAppMessageWidgetEvent: jest.fn(() => ({ remove: jest.fn() })),
+    showInAppMessage: mockEvent('NativeIamEvents', 'showInAppMessage'),
+    closeInAppMessage: mockEvent('NativeIamEvents', 'closeInAppMessage'),
+    inAppMessageWidgetEvent: mockEvent(
+      'NativeIamEvents',
+      'inAppMessageWidgetEvent'
+    ),
   },
 }));
 
@@ -148,4 +176,5 @@ export const flush = () =>
 
 beforeEach(() => {
   jest.clearAllMocks();
+  Object.keys(mockRegistry).forEach((key) => delete mockRegistry[key]);
 });

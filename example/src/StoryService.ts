@@ -7,10 +7,11 @@ import {
   type StoryManagerConfig,
   type LogEntry,
 } from '@inappstory/react-native-sdk';
+import { Linking } from 'react-native';
 import { TEST_TAGS } from './TestTags';
 
 let storyManagerConfig: StoryManagerConfig = {
-  apiKey: 'test-key',
+  apiKey: '',
   userId: '',
   tags: TEST_TAGS,
   placeholders: {
@@ -37,12 +38,12 @@ export const createStoryManager = () => {
   });
 
   // btn handler
-  // storyManager.storyLinkClickHandler = (payload: any) => {
-  //     console.log({ payload });
-  //     if (payload.data.url != null) {
-  //         Linking.openURL(payload.data.url);
-  //     }
-  // };
+  storyManager.storyLinkClickHandler = (payload: any) => {
+    console.log({ payload });
+    if (payload.data.url != null) {
+      Linking.openURL(payload.data.url);
+    }
+  };
 
   return storyManager;
 };
