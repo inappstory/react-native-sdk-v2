@@ -39,6 +39,8 @@ project.xcworkspace
 .settings
 local.properties
 android.iml
+.kotlin/
+android/generated/
 
 # Cocoapods
 #
@@ -81,3 +83,18 @@ example/ios/.xcode.env.local
 
 # dotenv
 /.env
+
+ios/generated/
+
+# AI agent vendor folders (generated from .agents/ by .agents/setup)
+.claude/
+.codex/
+.cursor/
+
+# test artifacts
+coverage/
+reports/
+.stryker-tmp/
+
+# graphify knowledge graph output
+graphify-out/

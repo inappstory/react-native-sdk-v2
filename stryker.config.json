@@ -1,0 +1,46 @@
+{
+  "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "packageManager": "yarn",
+  "testRunner": "jest",
+  "jest": {
+    "projectType": "custom",
+    "configFile": "package.json",
+    "enableFindRelatedTests": true
+  },
+  "coverageAnalysis": "perTest",
+  "ignorePatterns": [
+    "example",
+    "android",
+    "ios",
+    "cpp",
+    "lib",
+    ".yarn",
+    ".git",
+    "coverage",
+    "reports",
+    "**/*.md"
+  ],
+  "reporters": [
+    "html",
+    "clear-text",
+    "progress"
+  ],
+  "_comment": "Same scope as jest collectCoverageFrom: native specs, UI components and the two renderer-bound hooks are covered by the manual QA checklist in QA.md, not by unit tests. cardGeometry is pure math and is opted back in.",
+  "mutate": [
+    "src/**/*.{ts,tsx}",
+    "!src/__tests__/**",
+    "!src/specs/**",
+    "!src/types/**",
+    "!src/index.ts",
+    "!src/components/**",
+    "!src/hooks/useFeedLoader.ts",
+    "!src/hooks/useEventCallback.ts",
+    "src/components/StoriesList/cardGeometry.ts"
+  ],
+  "_thresholds_comment": "The surviving mutants are equivalent under unit tests: legacy NativeEventEmitter module-name strings (the new arch never reaches that branch), class field initializers the constructor always overwrites, zustand's replace flag, and the dependency array of useNativeFeedEvents. Raise `break` if that changes.",
+  "thresholds": {
+    "high": 95,
+    "low": 85,
+    "break": 92
+  }
+}

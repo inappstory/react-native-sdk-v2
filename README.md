@@ -14,56 +14,61 @@ or
 yarn add @inappstory/react-native-sdk
 ```
 
-## iOS Requirements
+## iOS Setup
 
-You need to install pods with static frameworks, use USE_FRAMEWORKS = 'static' or have this in your Podfile:
+Install CocoaPods dependencies:
 
-```js
-use_frameworks! :linkage => :static
+```sh
+cd ios && pod install
 ```
+
+> **Note on `use_frameworks!`:** The SDK works out of the box with standard CocoaPods setups. If your project explicitly requires static frameworks (`use_frameworks! :linkage => :static` or `USE_FRAMEWORKS=static`), that is also supported.
 
 ## Android Requirements
 
-Make sure you update your Android SDK versions in build.gradle
+Make sure you update your Android SDK versions in `build.gradle`:
 
-```
+```groovy
 minSdkVersion = 23
 compileSdkVersion = 34
 targetSdkVersion = 34
 ```
 
-Import InAppStory SDK in MainApplication
+Import InAppStory SDK in `MainApplication.kt` (or `MainApplication.java`):
 
-```java
-import com.inappstorysdk.InAppStory;
+```kotlin
+import com.inappstory.reactnativesdk.InAppStory
 ```
 
-Add following code to onCreate() function
+Add following code to `onCreate()` function:
 
-```java
-    InAppStory.initSDK(getApplicationContext())
+```kotlin
+InAppStory.initSDK(this)
 ```
+
+*(In Java: `InAppStory.Companion.initSDK(this);`)*
 
 ## Usage
 
-To use the library, create StoryService.ts, configure **storyManagerConfig** with your API key and adjust **appearanceManager** styles
+To use the library, create `StoryService.ts`, configure **storyManagerConfig** with your API key and adjust **appearanceManager** styles:
 
 ```ts
 import {
   AppearanceManager,
+  CoverQuality,
   StoriesListCardTitlePosition,
+  StoriesListCardTitleTextAlign,
   StoriesListCardViewVariant,
   StoryManager,
   StoryReaderCloseButtonPosition,
   StoryReaderSwipeStyle,
-  StoriesListCardTitleTextAlign,
-  type StoryManagerConfig, 
-  CoverQuality
+  type StoryManagerConfig,
+  type LogEntry,
 } from '@inappstory/react-native-sdk';
+import { Linking, Platform } from 'react-native';
 
-import { Linking } from 'react-native';
-const storyManagerConfig: StoryManagerConfig = {
-  apiKey: 'test-key',
+export const storyManagerConfig: StoryManagerConfig = {
+  apiKey: 'YOUR_API_KEY_HERE',
   userId: '1',
   tags: [],
   placeholders: {
@@ -71,56 +76,40 @@ const storyManagerConfig: StoryManagerConfig = {
   },
   lang: 'en',
   defaultMuted: true,
+  sendStatistics: true,
 };
 
-const createStoryManager = () => {
-  const storyManager = new StoryManager(storyManagerConfig);
-  storyManager.getGoodsCallback((skus: string[]) => {
-    //TODO: Fetch goods information
+export const createStoryManager = (config: StoryManagerConfig = storyManagerConfig) => {
+  const storyManager = new StoryManager(config);
+
+  // Enable and forward native SDK logs to JS console
+  storyManager.setLoggingEnabled(true);
+  storyManager.onLog((entry: LogEntry) => {
+    console.log(`[IAS ${entry.level}] ${entry.message ?? ''}`);
+  });
+
+  // Failure events: session / story / network / request errors
+  storyManager.onFailure((event: { withName: string; body: any }) => {
+    console.warn(`[IAS failure] ${event.withName}`, event.body);
+  });
+
+  // Goods for the goods widget
+  storyManager.getGoods((skus: string[]) => {
+    // TODO: Fetch goods information
     return skus.map((sku) => ({
-      sku: sku, //item sku
-      title: 'title of ' + sku, //item title for cell
-      subtitle: 'subtitle of ' + sku, //item subtitle for cell
-      imageURL: 'URL', //image url for cell
-      price: Number(Math.random() * 1000).toFixed(2), //price value for cell
+      sku: sku, // item sku
+      title: 'title of ' + sku, // item title for cell
+      subtitle: 'subtitle of ' + sku, // item subtitle for cell
+      imageURL: 'URL', // image url for cell
+      price: Number(Math.random() * 1000).toFixed(2), // price value for cell
       oldPrice: Number(Math.random() * 1000).toFixed(2),
     }));
   });
-  storyManager.on('clickOnStory', (payload: any) =>
-    console.log('clickOnStory', { payload })
-  );
-  storyManager.on('showStory', (payload: any) =>
-    console.log('showStory', { payload })
-  );
-  storyManager.on('closeStory', (payload: any) =>
-    console.log('closeStory', { payload })
-  );
-  storyManager.on('showSlide', (payload: any) =>
-    console.log('showSlide', { payload })
-  );
-  storyManager.on('clickOnButton', (payload: any) =>
-    console.log('clickOnButton', { payload })
-  );
-  storyManager.on('likeStory', (payload: any) =>
-    console.log('likeStory', { payload })
-  );
-  storyManager.on('dislikeStory', (payload: any) =>
-    console.log('dislikeStory', { payload })
-  );
-  storyManager.on('favoriteStory', (payload: any) =>
-    console.log('favoriteStory', { payload })
-  );
-  storyManager.on('shareStory', (payload: any) =>
-    console.log('shareStory', { payload })
-  );
-  storyManager.on('shareStoryWithPath', (payload: any) =>
-    console.log('shareStoryWithPath', { payload })
-  );
 
-  // btn handler
+  // Button / CTA link handler
   storyManager.storyLinkClickHandler = (payload: any) => {
-    console.log({ payload });
-    if (payload.data.url != null) {
+    console.log('CTA clicked', payload);
+    if (payload.data?.url != null) {
       Linking.openURL(payload.data.url);
     }
   };
@@ -128,7 +117,7 @@ const createStoryManager = () => {
   return storyManager;
 };
 
-const createAppearanceManager = () => {
+export const createAppearanceManager = () => {
   return new AppearanceManager()
     .setCommonOptions({
       hasLike: true,
@@ -142,23 +131,23 @@ const createAppearanceManager = () => {
       card: {
         title: {
           font: 'bold normal 14px/16px "InternalPrimaryFont"',
-          padding: '0px 0 0 0',
-          fontSize: 12,
+          padding: '10px 10 10 10',
+          fontSize: 14,
           fontWeight: 600,
-          fontFamily: Platform.OS == 'ios' ? 'Bradley Hand' : 'Comic Sans',
-          lineHeight: 13,
+          fontFamily: Platform.OS === 'ios' ? 'Bradley Hand' : 'Comic Sans',
+          lineHeight: 14,
           lineClamp: 3,
           textAlign: StoriesListCardTitleTextAlign.LEFT,
           position: StoriesListCardTitlePosition.CARD_INSIDE_BOTTOM,
         },
-        gap: 3,
+        gap: 12,
         height: 150,
         variant: StoriesListCardViewVariant.RECTANGLE,
         border: {
-          radius: 1,
-          color: 'black',
+          radius: 8,
+          color: '#2c60eaff',
           width: 2,
-          gap: 1,
+          gap: 4,
         },
         boxShadow: null,
         opacity: 1,
@@ -188,9 +177,9 @@ const createAppearanceManager = () => {
         height: 0,
         backgroundColor: 'transparent',
       },
-      sidePadding: 5,
-      topPadding: 5,
-      bottomPadding: 2,
+      sidePadding: 12,
+      topPadding: 12,
+      bottomPadding: 12,
       navigation: {
         showControls: false,
         controlsSize: 48,
@@ -202,173 +191,389 @@ const createAppearanceManager = () => {
       closeButtonPosition: StoryReaderCloseButtonPosition.RIGHT,
       scrollStyle: StoryReaderSwipeStyle.FLAT,
       slideBorderRadius: 5,
-    })
-    .setStoryFavoriteReaderOptions({
-      title: {
-        content: 'Favorite',
-        font: '1.6rem/1.4 InternalPrimaryFont',
-        color: 'white',
-      },
     });
 };
 
 export const storyManager = createStoryManager();
-
 export const appearanceManager = createAppearanceManager();
 ```
 
+> **Note on async initialization:** `new StoryManager(config)` starts native initialization in the background. Alternatively, `await StoryManager.create(config)` returns a Promise that rejects if native initialization fails.
+
 ## Story View
 
-To display feed, use StoriesList component. **storiesListViewModel** allows to reload the story feed using **storiesListViewModel.current.reload()**.
+To display the feed, use the `StoriesList` component. Pass a `ref` with `StoriesListRef` to imperatively reload the feed via `storiesListRef.current?.reload()`.
 
 ```tsx
-import { StoriesList } from '@inappstory/react-native-sdk';
+import React, { useEffect, useRef } from 'react';
+import { View, StyleSheet } from 'react-native';
 import {
-  type StoriesListViewModel,
+  StoriesList,
+  type StoriesListRef,
+  type ListLoadStatus,
 } from '@inappstory/react-native-sdk';
-...
-const storiesListViewModel = React.useRef<StoriesListViewModel>();
-const viewModelExporter = React.useCallback(
-  (viewModel: StoriesListViewModel) =>
-    (storiesListViewModel.current = viewModel),
-  []
-);
-...
+import { storyManager, appearanceManager } from './StoryService';
 
-<StoriesList
-  storyManager={storyManager}
-  appearanceManager={appearanceManager}
-  feed={feedId}
-  onLoadStart={onLoadStart}
-  onLoadEnd={onLoadEnd}
-  viewModelExporter={viewModelExporter}
-/>;
+export const FeedScreen = () => {
+  const storiesListRef = useRef<StoriesListRef>(null);
+
+  useEffect(() => {
+    // Subscribe to reader events
+    storyManager.onStoryReaderWillShow((event: any) => {
+      console.log('Story reader will show:', event);
+    });
+    storyManager.onShowStory((event: any) => {
+      console.log('Show story:', event);
+    });
+  }, []);
+
+  const onLoadStart = () => {
+    console.log('Feed load started');
+  };
+
+  const onLoadEnd = (status: ListLoadStatus) => {
+    console.log(`Feed loaded: ${status.defaultListLength} stories`);
+  };
+
+  return (
+    <View style={styles.container}>
+      <StoriesList
+        ref={storiesListRef}
+        storyManager={storyManager}
+        appearanceManager={appearanceManager}
+        feed="default"
+        showFavorites={true}
+        onLoadStart={onLoadStart}
+        onLoadEnd={onLoadEnd}
+      />
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});
 ```
 
 ## Favorites
 
-If you use favorites, use **onFavoriteCell** event that fires when user clicks on favorites cell
+If you use favorites, use the `onFavoriteCell` event that fires when the user clicks on the favorites cell:
 
 ```ts
-storyManager.on('onFavoriteCell', () => {
-  //Navigate to favorites screen
+storyManager.onFavoriteCell(() => {
+  // Navigate to favorites screen
 });
 ```
 
-To display favorite stories, pass **favoritesOnly** to <StoriesList>
+To display favorite stories only, pass `favoritesOnly={true}`:
 
 ```tsx
-<StoriesList favoritesOnly={true} />
+<StoriesList
+  storyManager={storyManager}
+  appearanceManager={appearanceManager}
+  feed="default"
+  favoritesOnly={true}
+  onLoadStart={onLoadStart}
+  onLoadEnd={onLoadEnd}
+/>
 ```
 
-## Vertical Stories list
-
-To display items vertically, use **vertical=true**
+To show the favorites cell inside the normal feed, pass `showFavorites={true}`:
 
 ```tsx
-<StoriesList vertical={true} />
+<StoriesList
+  storyManager={storyManager}
+  appearanceManager={appearanceManager}
+  feed="default"
+  showFavorites={true}
+  onLoadStart={onLoadStart}
+  onLoadEnd={onLoadEnd}
+/>
+```
+
+### Favorite Management Methods
+
+```ts
+// Get the number of favorite stories
+const count = await storyManager.favoritesCount();
+
+// Remove a specific story from favorites
+storyManager.removeFromFavorite(storyId);
+
+// Clear all favorites
+storyManager.removeAllFavorites();
+```
+
+## Vertical Stories List
+
+To display stories in a vertical layout, pass `vertical={true}`:
+
+```tsx
+<StoriesList
+  storyManager={storyManager}
+  appearanceManager={appearanceManager}
+  feed="default"
+  vertical={true}
+  onLoadStart={onLoadStart}
+  onLoadEnd={onLoadEnd}
+/>
 ```
 
 ## Custom Story Cell
 
-To render custom cells, add renderCell function to **StoriesList**
+To render custom cells, pass `renderCell` and/or `renderFavoriteCell` to `StoriesList`:
 
 ```tsx
 <StoriesList
-  ...props
-  renderCell={(story, {isFirstItem, isLastItem}) => {
+  storyManager={storyManager}
+  appearanceManager={appearanceManager}
+  feed="default"
+  onLoadStart={onLoadStart}
+  onLoadEnd={onLoadEnd}
+  renderCell={(story, { isFirstItem, isLastItem }) => {
     return <Text>{story.storyID}</Text>;
   }}
+  renderFavoriteCell={(stories) => {
+    return <Text>Favorites ({stories.length})</Text>;
+  }}
 />
+```
+
+## Single Story Opening & Onboardings
+
+```ts
+// Open a single story by ID (supports optional AbortSignal and AppearanceManager)
+await storyManager.showStory(storyId, abortSignal, appearanceManager);
+
+// Open a story once (will not open again if already marked as viewed)
+await storyManager.showStoryOnce(storyId, abortSignal);
+
+// Open onboarding stories
+await storyManager.showOnboardings('onboarding', 1000, ['tag1'], abortSignal);
+```
+
+## Banners
+
+To display native banner carousels, use the `BannerCarousel` component:
+
+```tsx
+import {
+  BannerCarousel,
+  type BannerViewRef,
+} from '@inappstory/react-native-sdk';
+import { useRef } from 'react';
+
+const bannerRef = useRef<BannerViewRef>(null);
+
+<BannerCarousel
+  ref={bannerRef}
+  placeId="main_banner"
+  height={150}
+  cornerRadius={16}
+  shouldLoop={true}
+  interItemSpacing={8}
+  sideInset={16}
+  onScroll={(index) => console.log('Banner scrolled to', index)}
+  onPlaceLoaded={(size, widgetHeight) =>
+    console.log(`Banner loaded: size=${size}, height=${widgetHeight}`)
+  }
+/>;
+```
+
+Preload banner data in advance:
+
+```ts
+await storyManager.preloadBannerPlace('main_banner', ['tag1']);
+```
+
+## In-App Messages (IAM)
+
+```ts
+// Preload In-App Messages
+await storyManager.preloadIAM(['iam_id_1'], ['tag1']);
+
+// Show IAM by ID
+await storyManager.showIAMById('iam_id_1', false, abortSignal);
+
+// Show IAM by event trigger
+await storyManager.showIAMByEvent('user_purchased', false, abortSignal);
+
+// Listen to IAM events (showInAppMessage, closeInAppMessage, inAppMessageWidgetEvent)
+storyManager.onIamEvent((event) => {
+  console.log('IAM event', event);
+});
 ```
 
 ## Games
 
 ```ts
-InAppStorySDK.showGame(gameID);
+// Preload games
+storyManager.preloadGames();
+
+// Open a game by ID
+await storyManager.showGame(gameID);
+
+// Listen to game events (startGame, closeGame, eventGame, gameFailure)
+storyManager.onGameEvent((event) => {
+  console.log('Game event', event);
+});
 ```
 
 ## Tags
 
 ```ts
-InAppStorySDK.setTags(['tag1']);
+// Replace tags
+storyManager.setTags(['tag1']);
+
+// Add tags to existing ones
+storyManager.addTags(['tag2']);
+
+// Remove specific tags
+storyManager.removeTags(['tag1']);
 ```
+
+A tag may contain only letters (any alphabet), digits, `_` and `-`, and the total
+list size must not exceed 4096 bytes in UTF-8 (tag + separator; a Cyrillic
+character counts as 2 bytes). If a rule is violated, the error is written to
+`console.error` and the call never reaches the native SDK — the tags are not
+applied, but the app does not crash.
 
 ## Placeholders
 
 ```ts
-InAppStorySDK.setPlaceholders({ username: 'John Doe' });
+storyManager.setPlaceholders({ username: 'John Doe' });
 ```
 
 ## Image Placeholders
 
 ```ts
-InAppStorySDK.setImagesPlaceholders({
+storyManager.setImagePlaceholders({
   image1: 'https://example.com/image.jpg',
 });
+```
+
+## User Session & Cache
+
+```ts
+// Update user ID and optional HMAC signature
+storyManager.setUserId('user-123', 'optional-signature');
+
+// Log out (clears user session on the native SDK)
+storyManager.logout();
+
+// Clear story and game cache
+storyManager.clearCache();
 ```
 
 ## Story Reader Appearance
 
 ```ts
-InAppStorySDK.setOverScrollToClose(value);
-InAppStorySDK.setSwipeToClose(value);
-InAppStorySDK.setTimerGradientEnable(value);
-InAppStorySDK.setCloseButtonPosition(value);
-InAppStorySDK.setScrollStyle(value);
-InAppStorySDK.setPresentationStyle(value);
-InAppStorySDK.setReaderBackgroundColor(value);
-InAppStorySDK.setReaderCornerRadius(value);
+appearanceManager.setOverScrollToClose(value);
+appearanceManager.setSwipeToClose(value);
+appearanceManager.setTimerGradientEnable(value);
+appearanceManager.setScrollStyle(value); // 'cover' | 'flat' | 'cube' | 'depth'
+appearanceManager.setPresentationStyle(value); // 'zoom' | 'modal' | 'fade'
+appearanceManager.setReaderBackgroundColor(value);
+appearanceManager.setReaderCornerRadius(value);
+appearanceManager.setCoverQuality(CoverQuality.MEDIUM);
+
+// the close button position is part of the reader options
+appearanceManager.setStoryReaderOptions({
+  closeButtonPosition: StoryReaderCloseButtonPosition.RIGHT,
+});
 ```
 
 ## Likes, Share, Favorites
 
 ```ts
-InAppStorySDK.setHasLike(value);
-InAppStorySDK.setHasShare(value);
-InAppStorySDK.setHasFavorites(value);
+appearanceManager.setCommonOptions({
+  hasLike: true,
+  hasLikeButton: value,
+  hasShare: value,
+  hasFavorite: value,
+});
 ```
 
 ## Sound
 
 ```ts
-//To change sound settings
-InAppStorySDK.changeSound(value);
-//Get sound status
-const soundEnabled = await InAppStorySDK.getSound();
+// To change sound settings
+storyManager.changeSound(value);
+
+// Get sound status
+const soundEnabled = storyManager.soundEnabled;
 ```
 
-### Goods
+## Goods & Product Cart
 
-To use goods widget, add a function that returns products to getGoodsObject
+### Goods Widget
+
+To use the goods widget, pass a function that returns products to `getGoods`:
 
 ```ts
-storyManager.getGoodsObject((skus) => {
-  //TODO: return array of Goods
+storyManager.getGoods((skus) => {
+  // TODO: return array of Goods
   return skus.map((sku) => ({
-    sku: sku, //item sku
-    title: 'title of ' + sku, //item title for cell
-    subtitle: 'subtitle of ' + sku, //item subtitle for cell
-    imageURL: '', //image url for cell
-    price: Number(Math.random() * 1000).toFixed(2), //price value for cell
+    sku: sku, // item sku
+    title: 'title of ' + sku, // item title for cell
+    subtitle: 'subtitle of ' + sku, // item subtitle for cell
+    imageURL: '', // image url for cell
+    price: Number(Math.random() * 1000).toFixed(2), // price value for cell
     oldPrice: Number(Math.random() * 1000).toFixed(2),
   }));
 });
 ```
 
-After goods item is selected,
+After a goods item is selected:
 
 ```ts
-storyManager.on('goodItemSelected', (payload: any) => {
-   // User selected payload.sku SKU
+storyManager.onGoodItemSelected((event: any) => {
+  // User selected event.body.sku SKU
+});
+```
+
+### Product Cart Handlers
+
+Configure interactive product cart handlers for stories:
+
+```ts
+import type {
+  ProductCart,
+  ProductCartOffer,
+  ProductCartHandlers,
+} from '@inappstory/react-native-sdk';
+
+storyManager.setProductCartHandlers({
+  onUpdate: async (offer: ProductCartOffer): Promise<ProductCart | null> => {
+    // Update cart state
+    return {
+      offers: [offer],
+      price: '99.99',
+      priceCurrency: 'USD',
+    };
+  },
+  getState: async (): Promise<ProductCart | null> => {
+    // Return current cart state
+    return {
+      offers: [],
+      price: '0.00',
+      priceCurrency: 'USD',
+    };
+  },
+});
+
+storyManager.onProductCartClicked((event: any) => {
+  console.log('Product cart icon clicked', event);
 });
 ```
 
 ### AppVersion override
-The app version is used by the platform to enable targeting of stories by app versions.\
-By default, IAS-SDK uses appVersion and appBundle from the native part of the application.\
-But you can override appVersion and appBundle via StoryManagerConfig.\
-This might be useful for CodePush users.
+
+The app version is used by the platform to enable targeting of stories by app versions.
+By default, IAS-SDK uses appVersion and appBundle from the native part of the application.
+You can override appVersion and appBundle via `StoryManagerConfig` or `setAppVersion` (useful for CodePush users):
 
 ```ts
 const storyManagerConfig: StoryManagerConfig = {
@@ -378,122 +583,153 @@ const storyManagerConfig: StoryManagerConfig = {
     build: 777,
   },
 };
-const storyManager = new StoryManager(storyManagerConfig);
+const storyManager = await StoryManager.create(storyManagerConfig);
 ```
-
 
 ### Events
 
-To subscribe to events, use **storyManager.on** or **storyManager.once**
+There is no generic `on(eventName, ...)`. Each event stream has its own method
+— `onShowStory`, `onCloseStory`, `onShowSlide`, `onClickOnButton`, `onLikeStory`,
+`onDislikeStory`, `onFavoriteStory`, `onShareStory`, `onStoryWidgetEvent`,
+`onStoryReaderWillShow`, `onStoryReaderDidClose`, `onGoodItemSelected`,
+`onProductCartClicked`, `onBannerWidgetEvent`, `onGameEvent`, `onIamEvent`,
+`onFailure`, `onLog`:
 
 ```js
-storyManager.on(eventName, (payload) => {
-  console.log(eventName, payload);
+storyManager.onShowStory((event) => {
+  console.log('showStory', event);
 });
 ```
 
-| Event Name        |                                                           |     |     |
-|-------------------|-----------------------------------------------------------|-----|-----|
-| storiesLoaded     |                                                           |     |     |
-| ugcStoriesLoaded  |                                                           |     |     |
-| clickOnStory      | {id: String, feed: String, index: Number}                 |     |     |
-| showStory         | {id: String, feed: String, action: String}                |     |     |
-| closeStory        | {id: String, feed: String, index: Number, action: String} |     |     |
-| clickOnButton     |                                                           |     |     |
-| showSlide         | {id: String, index: Number}                               |     |     |
-| likeStory         | {id: String, feed: String, value: Boolean}                |     |     |
-| dislikeStory      | {id: String, feed: String, value: Boolean}                |     |     |
-| favoriteStory     | {id: String, feed: String, value: Boolean}                |     |     |
-| clickOnShareStory |                                                           |     |     |
-| storyWidgetEvent  | {id: String, feed: String, name: String, data: String }   |     |     |
+### Replacing the manager
 
-## Feed Events
+Subscriptions live on the instance. When the config changes (a new `apiKey`,
+a user logging in or out) and you build a new manager, `destroy()` the old one
+first — otherwise both stay subscribed and one CTA click is handled twice:
 
-| Event                 | Payload                |     |     |
-|-----------------------|------------------------|-----|-----|
-| storyListUpdate       | {stories: [StoryData]} |     |     |
-| storyUpdate           | StoryData              |     |     |
-| favoritesUpdate       | {}                     |     |     |
-| favoriteCellDidSelect | {}                     |     |     |
-| editorCellDidSelect   | {}                     |     |     |
-| favoritesUpdate       | {}                     |     |     |
+```ts
+oldStoryManager.destroy();
+const storyManager = await StoryManager.create(newConfig);
+```
 
-## Reader events
+| Event Name        | Payload inside `event.body`                               |
+|-------------------|-----------------------------------------------------------|
+| showStory         | {id: Number, feed: String, action: String, slidesCount: Number} |
+| closeStory        | {id: Number, feed: String, index: Number, action: String} |
+| clickOnButton     | {id: Number, feed: String, index: Number, url: String}    |
+| showSlide         | {id: Number, index: Number}                               |
+| likeStory         | {id: Number, feed: String, index: Number, value: Boolean} |
+| dislikeStory      | {id: Number, feed: String, index: Number, value: Boolean} |
+| favoriteStory     | {id: Number, feed: String, index: Number, value: Boolean} |
+| clickOnShareStory | {id: Number, feed: String, index: Number, payload: String} |
+| storyWidgetEvent  | {id: Number, feed: String, name: String, data: Object}    |
 
-| Event               |                                        |     |     |
-|---------------------|----------------------------------------|-----|-----|
-| storyReaderWillShow | {type: String}                         |     |     |
-| storyReaderDidClose | {type: String}                         |     |     |
-| storiesDidUpdated   | {isContent: String, storyType: String} |     |     |
-| scrollUpdate        | {index: String}                        |     |     |
+## Reader Events
 
-## Failure events
+| Event               | Payload inside `event.body`            |
+|---------------------|----------------------------------------|
+| storyReaderWillShow | {feed: String, type: String}           |
+| storyReaderDidClose | {feed: String, type: String}           |
 
-| Event               |                                       |     |     |
-|---------------------|---------------------------------------|-----|-----|
-| sessionFailure      | {message: String}                     |     |     |
-| storyFailure        | {message: String}                     |     |     |
-| currentStoryFailure | {message: String}                     |     |     |
-| networkFailure      | {message: String}                     |     |     |
-| requestFailure      | {message: String, statusCode: String} |     |     |
+## Failure Events (`onFailure`)
 
-## Game Events
+Subscribe via `storyManager.onFailure((event) => ...)`:
 
-| Event              | Payload                                                     |     |     |
-|--------------------|-------------------------------------------------------------|-----|-----|
-| startGame          | {id: String, gameID: String}                                |
-| finishGame         | {id: String, gameID: String, result: String}                |     |     |
-| closeGame          | {id: String, gameID: String}                                |     |     |
-| eventGame          | {id: String, gameID: String, name: String, payload: Object} |     |     |
-| gameFailure        | {id: String, gameID: String, message: String}               |     |     |
-| gameReaderWillShow | {}                                                          |     |     |
-| gameReaderDidClose | {}                                                          |     |     |
-| gameComplete       | {data: Object, result: String, url: String}                 |     |     |
+| Event Name          | Payload inside `event.body`           |
+|---------------------|---------------------------------------|
+| sessionFailure      | {message: String}                     |
+| storyFailure        | {message: String}                     |
+| currentStoryFailure | {message: String}                     |
+| networkFailure      | {message: String}                     |
+| requestFailure      | {message: String, statusCode: String} |
 
-## Goods events
+## Logger
 
-| Event            | Payload       |     |     |
-|------------------|---------------|-----|-----|
-| goodItemSelected | {sku: String} |     |     |
+Forward the native SDK's internal logs (requests/responses, errors, technical
+messages) to JS. Disabled by default — enable it, then subscribe:
 
-## Share events
+```ts
+storyManager.setLoggingEnabled(true);
+storyManager.onLog((entry) => {
+  console.log(`[${entry.level}] ${entry.message ?? ''}`);
+});
+```
 
-| Event        |     |     |     |
-|--------------|-----|-----|-----|
-| customShare  |     |     |     |
-| onActionWith |     |     |     |
+`LogEntry` is `{ level: 'debug' | 'error'; message?: string }`.
+`setLoggingEnabled(false)` stops the stream. The payload is identical on both
+platforms — `level` is the severity (iOS derives it from the log's error field,
+Android from `showELog`/`showDLog`). iOS log categories (`network`, `reader`,
+`cache`, …) are not surfaced, as Android has no equivalent.
+
+## Game Events (`onGameEvent`)
+
+Subscribe via `storyManager.onGameEvent((event) => ...)`:
+
+| Event Name          | Payload inside `event.body`                                 | Description |
+|---------------------|-------------------------------------------------------------|-------------|
+| startGame          | {id: Number, gameID: String, feed: String}                  | Game reader opened |
+| closeGame          | {id: Number, gameID: String, feed: String}                  | Game reader closed |
+| eventGame          | {id: Number, gameID: String, feed: String, name: String, payload: String} | Custom in-game event |
+| gameFailure        | {id: Number, gameID: String, feed: String, message: String} | Game loading error |
+
+## Goods Events
+
+| Event Name          | Method / Payload                                           |
+|---------------------|------------------------------------------------------------|
+| goodItemSelected    | `storyManager.onGoodItemSelected((event) => ...)` (`{sku: String}`) |
+| productCartClicked  | `storyManager.onProductCartClicked((event) => ...)`        |
 
 ### Custom Icons
 
 1. Add images to your project assets
 
-2. Configure required InAppStorySDK icons before showing stories:
+2. Configure the required icons on the AppearanceManager before showing stories:
 
 ```js
-InAppStorySDK.setLikeImage(image, activeImage);
-InAppStorySDK.setDislikeImage(image, activeImage);
-InAppStorySDK.setFavoriteImage(image, activeImage);
-InAppStorySDK.setShareImage(image, activeImage);
-InAppStorySDK.setSoundImage(image, activeImage);
-InAppStorySDK.setCloseReaderImage(image);
-InAppStorySDK.setRefreshImage(image);
-InAppStorySDK.setRefreshGoodsImage(image);
-InAppStorySDK.setCloseGoodsImage(image);
+appearanceManager.setLikeImage(image, activeImage);
+appearanceManager.setDislikeImage(image, activeImage);
+appearanceManager.setFavoriteImage(image, activeImage);
+appearanceManager.setShareImage(image, activeImage);
+appearanceManager.setSoundImage(image, activeImage);
+appearanceManager.setCloseReaderImage(image);
+appearanceManager.setRefreshImage(image);
+appearanceManager.setRefreshGoodsImage(image);
+appearanceManager.setCloseGoodsImage(image);
 ```
 
-image and activeImage parameters are the names of the images in your assets folder.
+`image` and `activeImage` parameters are the names of the images in your assets folder:
 
 ```js
-InAppStorySDK.setLikeImage('like', 'likeSelected');
+appearanceManager.setLikeImage('like', 'likeSelected');
 ```
 
 ### Migrating from old version
 
 Breaking changes:
 
-1. Font settings are defined using separate variables (fontSize, fontWeight, fontFamily) instead of a string
-2. If you used svgMask in appearance manager, try to use custom cells to achieve same results.
+1. `StoriesList` uses standard React `ref` with `StoriesListRef` (`ref.current?.reload()`) instead of `StoriesListViewModel` / `viewModelExporter`.
+2. Font settings are defined using separate variables (`fontSize`, `fontWeight`, `fontFamily`) instead of a string.
+3. If you used `svgMask` in appearance manager, use custom cells to achieve the same result.
+4. `getGoodsCallback` is no longer a public field — use `storyManager.getGoods(fn)`.
+5. `StoryManager` now has `destroy()`. Call it on the old instance whenever you build a replacement, or its listeners keep firing alongside the new one's.
 
+## Running the Example App
+
+To run the example app in the repository:
+
+```sh
+# Install dependencies from project root
+yarn
+
+# Start Metro bundler
+yarn example start
+
+# Run iOS example
+yarn example ios
+
+# Run Android example
+yarn example android
+```
 ## Contributing
 
 See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.
