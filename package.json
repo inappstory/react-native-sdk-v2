@@ -1,6 +1,6 @@
 {
   "name": "@inappstory/react-native-sdk",
-  "version": "0.27.1",
+  "version": "1.0.0",
   "description": "Wrapper for InAppStory",
   "main": "./lib/module/index.js",
   "react-native": "./src/index.ts",
