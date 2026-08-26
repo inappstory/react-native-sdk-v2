@@ -1,0 +1,125 @@
+import type { CodegenTypes, TurboModule } from 'react-native';
+import { TurboModuleRegistry } from 'react-native';
+
+export type StoryDTO = {
+  storyID: number;
+  title: string;
+  coverImagePath: string;
+  coverVideoPath: string;
+  backgroundColor: string;
+  titleColor: string;
+  opened: boolean;
+  hasAudio: boolean;
+  list: string;
+  feed: string;
+  aspectRatio: number;
+  slidesCount: number;
+  statTitle: string;
+};
+
+export type StoryListDTO = {
+  stories: StoryDTO[];
+  feed: string;
+  list: string;
+};
+
+export interface Spec extends TurboModule {
+  initWith(
+    apiKey: string,
+    userId: string,
+    userIdSign: string | null,
+    sandbox: boolean,
+    sendStatistics: boolean,
+    cacheSize: string | null,
+    anonymous: boolean,
+    tags: Array<string>
+  ): Promise<void>;
+
+  setOptions(options: Object): void;
+
+  showStoryOnce(storyID: string, operationId: string): Promise<boolean>;
+
+  setUserID(userId: string, userIdSign: string | null): void;
+
+  setTags(tags: Array<string>): void;
+
+  addTags(tags: Array<string>): void;
+
+  removeTags(tags: Array<string>): void;
+
+  setPlaceholders(placeholders: Object): void;
+
+  setImagesPlaceholders(placeholders: Object): void;
+
+  setLang(lang: string): void;
+
+  changeSound(value: boolean): void;
+
+  setAppVersion(version: string, build: number): void;
+
+  createSubscriberList(feed: string, uniqueId: string): void;
+
+  getStories(feed: string, uniqueId: string): void;
+
+  getFavoriteStories(feed: string): void;
+
+  onFavoriteCell(): void;
+
+  setVisibleWith(storyIDs: Array<string>, uniqueId: string): void;
+
+  selectStoryCellWith(storyID: string, feed: string, uniqueId: string): void;
+
+  selectFavoriteStoryCellWith(storyID: string): void;
+
+  preloadBannerPlace(
+    placeId: string,
+    tags: Array<string> | null
+  ): Promise<boolean>;
+
+  showSingle(storyID: string, operationId: string): Promise<boolean>;
+
+  showOnboardings(
+    feed: string,
+    limit: number,
+    tags: Array<string> | null,
+    operationId: string
+  ): Promise<boolean>;
+
+  showGame(gameID: string): Promise<boolean>;
+
+  showIAMById(
+    iamID: string,
+    onlyPreloaded: boolean,
+    operationId: string
+  ): Promise<boolean>;
+
+  showIAMByEvent(
+    event: string,
+    onlyPreloaded: boolean,
+    operationId: string
+  ): Promise<boolean>;
+
+  preloadIAM(
+    ids: Array<string> | null,
+    tags: Array<string> | null
+  ): Promise<boolean>;
+
+  cancelOperation(operationId: string): void;
+
+  clearCache(): void;
+
+  preloadGames(): void;
+
+  removeFromFavorite(storyID: string): void;
+
+  removeAllFavorites(): void;
+
+  favoritesCount(): Promise<number>;
+
+  logout(): void;
+
+  readonly onStoryListUpdate: CodegenTypes.EventEmitter<StoryListDTO>;
+  readonly onStoryUpdate: CodegenTypes.EventEmitter<StoryDTO>;
+}
+
+export default TurboModuleRegistry.getEnforcing<Spec>('NativeStoryManager');

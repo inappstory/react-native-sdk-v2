@@ -34,6 +34,17 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
 
+      # Gates run before release-it, so a failure leaves no tag and no publish.
+      - name: Lint files
+        run: yarn lint
+
+      - name: Typecheck files
+        run: yarn typecheck
+
+      # Coverage thresholds live in package.json — see QA.md.
+      - name: Run unit tests
+        run: yarn test --maxWorkers=2 --coverage
+
       - name: Configure Git
         run: |
           git config --local user.email "action@github.com"
