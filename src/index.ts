@@ -28,6 +28,7 @@ export type {
 export { BannerCarousel } from './components/BannerCarousel/BannerCarousel';
 export type { BannerCarouselProps } from './components/BannerCarousel/BannerCarousel';
 export type { BannerViewRef } from './components/BannerCarousel/BannerNativeView';
+export type { BannerData } from './types/BannerData';
 
 export {
   StoryReaderSwipeStyle,

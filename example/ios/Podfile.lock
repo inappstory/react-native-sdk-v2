@@ -3,7 +3,7 @@ PODS:
   - hermes-engine (250829098.0.14):
     - hermes-engine/Pre-built (= 250829098.0.14)
   - hermes-engine/Pre-built (250829098.0.14)
-  - InAppStory (1.29.5)
+  - InAppStory (1.29.8)
   - RCTDeprecation (0.86.0)
   - RCTRequired (0.86.0)
   - RCTSwiftUI (0.86.0)
@@ -1496,9 +1496,9 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-sdk (0.27.1):
+  - react-native-sdk (1.0.0):
     - hermes-engine
-    - InAppStory (= 1.29.5)
+    - InAppStory (= 1.29.8)
     - RCTRequired
     - RCTTypeSafety
     - React-Core
@@ -2258,7 +2258,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   FBLazyVector: b3e7ad108f0d882e30445c5527d774e3fd432f3d
   hermes-engine: c887ae04dd2adbab25ef28abde28c7c3bb2d8f48
-  InAppStory: 1b50fbb0b81ee900c15a673a6e651f0771909fef
+  InAppStory: eb218ab4253be0f3118a8e8b983bd07bb8c7aef3
   RCTDeprecation: 2a74a2c57675e64419bd89078efde81f7c1de90b
   RCTRequired: 30451112e6fef4e6f31b4e7eee0845156e35e4b0
   RCTSwiftUI: 5aaf0b07e747ba749dc6acc94d8bd41eea4b570f
@@ -2297,7 +2297,7 @@ SPEC CHECKSUMS:
   React-microtasksnativemodule: 2eb3f49d0d8e77b5343455eccd057010b8d38b6b
   React-mutationobservernativemodule: f0a0d5ae9b51caf7becbeabf836d716cfedb6bf2
   react-native-safe-area-context: 8368d1052ccc8fe8725adfb6a83498c8bdb48250
-  react-native-sdk: c854d39e59586ed3d5b45b385081ae5120465f9e
+  react-native-sdk: bb09dc0c1d265983057caf321b123c717ef099fb
   react-native-video: db3a70efc9fa0c00f5499d7798283bf0585cbd37
   React-NativeModulesApple: a092d89b58f635ebfab88048b0eda9fb516819fd
   React-networking: 968bbbe73590149feb1e72b2af4f6a68e4796ece

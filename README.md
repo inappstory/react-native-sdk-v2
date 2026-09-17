@@ -388,6 +388,18 @@ Preload banner data in advance:
 await storyManager.preloadBannerPlace('main_banner', ['tag1']);
 ```
 
+### Banner Events
+
+Listen to banner widget events:
+
+```ts
+storyManager.onBannerWidgetEvent((event) => {
+  console.log('Widget event:', event.body.name, event.body.data);
+  console.log('Banner data:', event.body.bannerData);
+  // bannerData: BannerData { id, bannerPlace, payload, extraFields }
+});
+```
+
 ## In-App Messages (IAM)
 
 ```ts
@@ -435,8 +447,7 @@ storyManager.removeTags(['tag1']);
 ```
 
 A tag may contain only letters (any alphabet), digits, `_` and `-`, and the total
-list size must not exceed 4096 bytes in UTF-8 (tag + separator; a Cyrillic
-character counts as 2 bytes). If a rule is violated, the error is written to
+number of tags must not exceed 100. If a rule is violated, the error is written to
 `console.error` and the call never reaches the native SDK — the tags are not
 applied, but the app does not crash.
 

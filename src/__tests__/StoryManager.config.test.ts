@@ -339,43 +339,45 @@ describe('local state kept in sync for reinit', () => {
     error.mockRestore();
   });
 
-  it('setTags reports tags larger than 4096 bytes in total and skips native', () => {
+  it('setTags reports more than 100 tags in total and skips native', () => {
     const error = jest.spyOn(console, 'error').mockImplementation(() => {});
-    manager.setTags(['a'.repeat(4096)]);
+    const tags = Array.from({ length: 101 }, (_, i) => `tag${i}`);
+    manager.setTags(tags);
     expect(native.setTags).not.toHaveBeenCalled();
     expect(error).toHaveBeenCalledWith(
-      'InAppStory: tags must be at most 4096 bytes in total, got 4097'
+      'InAppStory: tags must be at most 100, got 101'
     );
     error.mockRestore();
   });
 
-  it('setTags accepts exactly 4096 bytes in total', () => {
+  it('setTags accepts exactly 100 tags', () => {
     const error = jest.spyOn(console, 'error').mockImplementation(() => {});
-    manager.setTags(['a'.repeat(4095)]);
-    expect(native.setTags).toHaveBeenCalledWith(['a'.repeat(4095)]);
+    const tags = Array.from({ length: 100 }, (_, i) => `tag${i}`);
+    manager.setTags(tags);
+    expect(native.setTags).toHaveBeenCalledWith(tags);
     expect(error).not.toHaveBeenCalled();
     error.mockRestore();
   });
 
-  it('setTags counts cyrillic tags as 2 UTF-8 bytes per character', () => {
+  it('setTags accepts long and cyrillic tags without byte budget limit', () => {
     const error = jest.spyOn(console, 'error').mockImplementation(() => {});
-    // 'я' x 2048 = 4096 bytes, plus the separator that overflows the budget.
-    manager.setTags(['я'.repeat(2048)]);
-    expect(native.setTags).not.toHaveBeenCalled();
-    expect(error).toHaveBeenCalledWith(
-      'InAppStory: tags must be at most 4096 bytes in total, got 4097'
-    );
+    const tags = ['я'.repeat(2048)];
+    manager.setTags(tags);
+    expect(native.setTags).toHaveBeenCalledWith(tags);
+    expect(error).not.toHaveBeenCalled();
     error.mockRestore();
   });
 
   it('addTags keeps the local tags when the merged list exceeds the limit', () => {
     const error = jest.spyOn(console, 'error').mockImplementation(() => {});
-    manager.setTags(['a'.repeat(4000)]);
-    manager.addTags(['b'.repeat(96)]);
+    const initialTags = Array.from({ length: 60 }, (_, i) => `tagA_${i}`);
+    const newTags = Array.from({ length: 50 }, (_, i) => `tagB_${i}`);
+    manager.setTags(initialTags);
+    manager.addTags(newTags);
     expect(native.addTags).not.toHaveBeenCalled();
-    expect(manager.tags).toEqual(['a'.repeat(4000)]);
+    expect(manager.tags).toEqual(initialTags);
     expect(error).toHaveBeenCalledWith(
-      'InAppStory: tags must be at most 4096 bytes in total, got 4098'
+      'InAppStory: tags must be at most 100, got 110'
     );
     error.mockRestore();
   });

@@ -33,7 +33,7 @@
     "!**/.*"
   ],
   "scripts": {
-    "example": "yarn workspace my-util-example",
+    "example": "yarn workspace InappstorySdkExample",
     "test": "jest",
     "test:coverage": "jest --coverage",
     "test:mutation": "stryker run",
@@ -85,7 +85,7 @@
     "@eslint/eslintrc": "^3.3.5",
     "@eslint/js": "^9.39.4",
     "@evilmartians/lefthook": "^2.1.9",
-    "@react-native-community/cli": "20.1.3",
+    "@react-native-community/cli": "20.2.0",
     "@react-native/babel-preset": "0.86.0",
     "@react-native/eslint-config": "^0.86.0",
     "@react-native/jest-preset": "0.86.0",

@@ -49,6 +49,9 @@ class BannerEventsModule(reactContext: ReactApplicationContext) :
           bannerData?.id()?.let { putInt("id", it) }
           putString("bannerPlace", bannerData?.bannerPlace())
           putString("payload", bannerData?.payload())
+          bannerData?.extraFields()?.let {
+            putMap("extraFields", Arguments.makeNativeMap(it as Map<String, Any>?))
+          } ?: putNull("extraFields")
         }
       )
     }
