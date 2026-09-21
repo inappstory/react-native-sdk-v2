@@ -396,7 +396,7 @@ Listen to banner widget events:
 storyManager.onBannerWidgetEvent((event) => {
   console.log('Widget event:', event.body.name, event.body.data);
   console.log('Banner data:', event.body.bannerData);
-  // bannerData: BannerData { id, bannerPlace, payload, extraFields }
+  // event: BannerWidgetEvent, bannerData: BannerData { id, bannerPlace, payload, extraFields }
 });
 ```
 
@@ -413,8 +413,14 @@ await storyManager.showIAMById('iam_id_1', false, abortSignal);
 await storyManager.showIAMByEvent('user_purchased', false, abortSignal);
 
 // Listen to IAM events (showInAppMessage, closeInAppMessage, inAppMessageWidgetEvent)
+// event: InAppMessageEvent, narrowed by event.withName
 storyManager.onIamEvent((event) => {
-  console.log('IAM event', event);
+  if (event.withName === 'inAppMessageWidgetEvent') {
+    console.log(event.body.name, event.body.inAppMessageData.extraFields);
+  } else {
+    // InAppMessageData { id, title, event, extraFields }
+    console.log(event.withName, event.body.extraFields);
+  }
 });
 ```
 
@@ -625,15 +631,18 @@ const storyManager = await StoryManager.create(newConfig);
 
 | Event Name        | Payload inside `event.body`                               |
 |-------------------|-----------------------------------------------------------|
-| showStory         | {id: Number, feed: String, action: String, slidesCount: Number} |
-| closeStory        | {id: Number, feed: String, index: Number, action: String} |
-| clickOnButton     | {id: Number, feed: String, index: Number, url: String}    |
-| showSlide         | {id: Number, index: Number}                               |
-| likeStory         | {id: Number, feed: String, index: Number, value: Boolean} |
-| dislikeStory      | {id: Number, feed: String, index: Number, value: Boolean} |
-| favoriteStory     | {id: Number, feed: String, index: Number, value: Boolean} |
-| clickOnShareStory | {id: Number, feed: String, index: Number, payload: String} |
-| storyWidgetEvent  | {id: Number, feed: String, name: String, data: Object}    |
+| showStory         | {id: Number, feed: String, action: String, slidesCount: Number, extraFields} |
+| closeStory        | {id: Number, feed: String, index: Number, action: String, extraFields} |
+| clickOnButton     | {id: Number, feed: String, index: Number, url: String, extraFields} |
+| showSlide         | {id: Number, index: Number, extraFields}                  |
+| likeStory         | {id: Number, feed: String, index: Number, value: Boolean, extraFields} |
+| dislikeStory      | {id: Number, feed: String, index: Number, value: Boolean, extraFields} |
+| favoriteStory     | {id: Number, feed: String, index: Number, value: Boolean, extraFields} |
+| clickOnShareStory | {id: Number, feed: String, index: Number, payload: String, extraFields} |
+| storyWidgetEvent  | {id: Number, feed: String, name: String, data: Object, extraFields} |
+
+Listeners receive `StoryEvent<name, extra>`: the story fields (`id`, `feed`,
+`slidesCount`, `extraFields`) come from the exported `StoryData` type; `extraFields` is `Record<string, string> | null`.
 
 ## Reader Events
 

@@ -15,6 +15,9 @@ public class NativeIamEventsImpl: NSObject {
   private func iamBody(_ iamData: InAppMessageData) -> [String: Any] {
     return [
       "id": Int(iamData.id ?? "0") ?? 0,
+      "title": iamData.campaign as Any,
+      "event": iamData.event as Any,
+      "extraFields": (iamData.extraFields as Any?) ?? NSNull(),
     ]
   }
 

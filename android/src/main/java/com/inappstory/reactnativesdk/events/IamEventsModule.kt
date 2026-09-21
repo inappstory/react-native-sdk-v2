@@ -44,13 +44,14 @@ class IamEventsModule(reactContext: ReactApplicationContext) :
     }
   }
 
-  // Body mirrors iOS NativeIamEventsImpl: {id, title, event}.
+  // Body mirrors iOS NativeIamEventsImpl: {id, title, event, extraFields}.
   private fun iamBody(data: InAppMessageData?): WritableMap =
     Arguments.createMap().apply {
       data?.let {
         putInt("id", it.id())
         putString("title", it.title())
         putString("event", it.event())
+        putMap("extraFields", it.extraFields()?.let { Arguments.makeNativeMap(it) })
       }
     }
 

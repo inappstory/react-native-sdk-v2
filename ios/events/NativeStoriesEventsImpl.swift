@@ -41,6 +41,7 @@ public class NativeStoriesEventsImpl: NSObject {
           "withName": "showStory",
           "body": [
             "id": storyIDForJS(storyData.id),
+            "extraFields": (storyData.extraFields as Any?) ?? NSNull(),
             "feed": storyData.feed,
             "action": actionString,
             "slidesCount": storyData.slidesCount,
@@ -64,6 +65,7 @@ public class NativeStoriesEventsImpl: NSObject {
           "withName": "closeStory",
           "body": [
             "id": storyIDForJS(slideData.storyData?.id),
+            "extraFields": (slideData.storyData?.extraFields as Any?) ?? NSNull(),
             "feed": slideData.storyData?.feed ?? "",
             "index": slideData.index,
             "action": actionString,
@@ -74,6 +76,7 @@ public class NativeStoriesEventsImpl: NSObject {
           "withName": "showSlide",
           "body": [
             "id": storyIDForJS(slideData.storyData?.id),
+            "extraFields": (slideData.storyData?.extraFields as Any?) ?? NSNull(),
             "index": slideData.index,
           ],
         ])
@@ -82,6 +85,7 @@ public class NativeStoriesEventsImpl: NSObject {
           "withName": "likeStory",
           "body": [
             "id": storyIDForJS(slideData.storyData?.id),
+            "extraFields": (slideData.storyData?.extraFields as Any?) ?? NSNull(),
             "feed": slideData.storyData?.feed ?? "",
             "index": slideData.index,
             "value": value,
@@ -92,6 +96,7 @@ public class NativeStoriesEventsImpl: NSObject {
           "withName": "dislikeStory",
           "body": [
             "id": storyIDForJS(slideData.storyData?.id),
+            "extraFields": (slideData.storyData?.extraFields as Any?) ?? NSNull(),
             "feed": slideData.storyData?.feed ?? "",
             "index": slideData.index,
             "value": value,
@@ -102,6 +107,7 @@ public class NativeStoriesEventsImpl: NSObject {
           "withName": "favoriteStory",
           "body": [
             "id": storyIDForJS(slideData.storyData?.id),
+            "extraFields": (slideData.storyData?.extraFields as Any?) ?? NSNull(),
             "feed": slideData.storyData?.feed ?? "",
             "index": slideData.index,
             "value": value,
@@ -112,6 +118,7 @@ public class NativeStoriesEventsImpl: NSObject {
           "withName": "clickOnShareStory",
           "body": [
             "id": storyIDForJS(slideData.storyData?.id),
+            "extraFields": (slideData.storyData?.extraFields as Any?) ?? NSNull(),
             "feed": slideData.storyData?.feed ?? "",
             "index": slideData.index,
             "payload": slideData.payload ?? "",
@@ -122,6 +129,7 @@ public class NativeStoriesEventsImpl: NSObject {
           "withName": "storyWidgetEvent",
           "body": [
             "id": storyIDForJS(slideData?.storyData?.id),
+            "extraFields": (slideData?.storyData?.extraFields as Any?) ?? NSNull(),
             "feed": slideData?.storyData?.feed ?? "",
             "name": name,
             "data": data ?? [:],
@@ -132,6 +140,7 @@ public class NativeStoriesEventsImpl: NSObject {
           "withName": "clickOnButton",
           "body": [
             "id": storyIDForJS(slideData.storyData?.id),
+            "extraFields": (slideData.storyData?.extraFields as Any?) ?? NSNull(),
             "feed": slideData.storyData?.feed ?? "",
             "index": slideData.index,
             "url": link,
