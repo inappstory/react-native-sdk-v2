@@ -109,8 +109,8 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
       ArrayList(tags.toArrayList().map { it.toString() }),
       this.api as InAppStoryAPI
     )
-    this.api.settings.sendStatistic(sendStatistics)
-    this.favoritesApi.settings.sendStatistic(sendStatistics)
+    (this.api as InAppStoryAPI).settings.sendStatistic(sendStatistics)
+    (this.favoritesApi as InAppStoryAPI).settings.sendStatistic(sendStatistics)
     // Main feed is subscribed per carousel via createSubscriberList(feed, uniqueId);
     if (isFirstInit) {
       this.subscribeLists(this.favoritesApi as InAppStoryAPI, "favorites")
