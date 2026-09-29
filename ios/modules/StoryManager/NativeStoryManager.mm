@@ -50,6 +50,10 @@ RCT_EXPORT_METHOD(setOptions:(nonnull NSDictionary *)options) {
   [[NativeStoryManagerImpl shared] setOptions:options];
 }
 
+RCT_EXPORT_METHOD(setSendStatistics:(BOOL)enabled) {
+  [[NativeStoryManagerImpl shared] setSendStatistics:enabled];
+}
+
 RCT_EXPORT_METHOD(showStoryOnce:(nonnull NSString *)storyID
                     operationId:(nonnull NSString *)operationId
                         resolve:(RCTPromiseResolveBlock)resolve

@@ -170,20 +170,12 @@ describe('reinit', () => {
     expect(native.setLang).toHaveBeenLastCalledWith('ru');
   });
 
-  it('setSendStatistics reinits with the new flag', async () => {
+  it('setSendStatistics updates native without reinitializing', async () => {
     const manager = await StoryManager.create({ apiKey: 'k', userId: 'u' });
+    native.initWith.mockClear();
     manager.setSendStatistics(false);
-    await flush();
-    expect(native.initWith).toHaveBeenLastCalledWith(
-      'k',
-      'u',
-      null,
-      false,
-      false,
-      null,
-      false,
-      []
-    );
+    expect(native.setSendStatistics).toHaveBeenCalledWith(false);
+    expect(native.initWith).not.toHaveBeenCalled();
   });
 
   it('logs instead of throwing when reinit fails', async () => {

@@ -289,7 +289,7 @@ export class StoryManager extends StoryEvents {
 
   setSendStatistics(sendStatistics: boolean): void {
     this.sendStatistics = sendStatistics;
-    this.reinit();
+    NativeStoryManager.setSendStatistics(sendStatistics);
   }
 
   setOptions(options: Record<string, string>): void {

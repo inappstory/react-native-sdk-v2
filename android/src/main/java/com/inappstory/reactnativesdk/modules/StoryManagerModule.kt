@@ -130,6 +130,11 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
     this.ias?.setTags(list)
   }
 
+  override fun setSendStatistics(enabled: Boolean) {
+    this.api?.settings?.sendStatistic(enabled)
+    this.favoritesApi?.settings?.sendStatistic(enabled)
+  }
+
   override fun addTags(tags: ReadableArray) {
     Log.d("InappstorySdkModule", "addTags")
     val list: ArrayList<String> = tags.toArrayList() as ArrayList<String>

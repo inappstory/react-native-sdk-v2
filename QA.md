@@ -124,8 +124,8 @@ yarn example ios      # and: yarn example android
 
 ### Lifecycle and state (the regressions that hurt)
 
-- [ ] `setApiKey` / `setSendStatistics` mid-session: the SDK reinitializes and
-      tags, lang, placeholders and sound are still applied afterwards.
+- [ ] `setApiKey` mid-session reinitializes with the current config;
+      `setSendStatistics` changes statistics at runtime without reinitializing.
 - [ ] `logout()` then a new `setUserID`: the feed reloads for the new user.
 - [ ] Background → foreground with the reader open: no crash, no duplicate
       events.

@@ -35,6 +35,8 @@ export interface Spec extends TurboModule {
     tags: Array<string>
   ): Promise<void>;
 
+  setSendStatistics(enabled: boolean): void;
+
   setOptions(options: Object): void;
 
   showStoryOnce(storyID: string, operationId: string): Promise<boolean>;
