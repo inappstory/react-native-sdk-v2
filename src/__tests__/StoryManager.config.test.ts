@@ -22,11 +22,11 @@ describe('StoryManager.create', () => {
       '42',
       'sig',
       false,
-      false,
       null,
       false,
       []
     );
+    expect(native.setSendStatistics).toHaveBeenCalledWith(false);
   });
 
   it('rejects a userId longer than 255 bytes, counting UTF-8 bytes', async () => {
@@ -54,11 +54,11 @@ describe('StoryManager.create', () => {
       'u',
       null,
       false,
-      true,
       'large',
       true,
       []
     );
+    expect(native.setSendStatistics).toHaveBeenCalledWith(true);
   });
 
   it('applies tags, placeholders, lang and appVersion from config', async () => {
@@ -75,11 +75,11 @@ describe('StoryManager.create', () => {
       'u',
       null,
       false,
-      true,
       null,
       false,
       ['a', 'b']
     );
+    expect(native.setSendStatistics).toHaveBeenCalledWith(true);
     expect(native.setTags).not.toHaveBeenCalled();
     expect(native.setPlaceholders).toHaveBeenCalledWith({ name: 'Alex' });
     expect(native.setLang).toHaveBeenCalledWith('ru-RU');
@@ -109,11 +109,11 @@ describe('StoryManager.create', () => {
       '',
       null,
       false,
-      true,
       null,
       false,
       []
     );
+    expect(native.setSendStatistics).toHaveBeenCalledWith(true);
   });
 
   it('starts with empty tags and sound on', async () => {
@@ -161,7 +161,6 @@ describe('reinit', () => {
       'u',
       null,
       false,
-      true,
       null,
       false,
       ['a']
@@ -225,7 +224,6 @@ describe('reinit', () => {
       'u',
       null,
       false,
-      true,
       null,
       false,
       []
@@ -289,7 +287,6 @@ describe('local state kept in sync for reinit', () => {
       expect.anything(),
       null,
       false,
-      true,
       null,
       false,
       []

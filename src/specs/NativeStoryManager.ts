@@ -29,7 +29,6 @@ export interface Spec extends TurboModule {
     userId: string,
     userIdSign: string | null,
     sandbox: boolean,
-    sendStatistics: boolean,
     cacheSize: string | null,
     anonymous: boolean,
     tags: Array<string>

@@ -87,7 +87,7 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
   private val cancellationTokenMap = mutableMapOf<String, CancellationToken?>()
 
   override fun initWith(
-    apiKey: String, userID: String, userIdSign: String?, sandbox: Boolean, sendStatistics: Boolean,
+    apiKey: String, userID: String, userIdSign: String?, sandbox: Boolean,
     cacheSize: String?, anonymous: Boolean, tags: ReadableArray, promise: Promise
   ) {
     Log.d("InappstorySdkModule", "initWith")
@@ -109,8 +109,6 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
       ArrayList(tags.toArrayList().map { it.toString() }),
       this.api as InAppStoryAPI
     )
-    (this.api as InAppStoryAPI).settings.sendStatistic(sendStatistics)
-    (this.favoritesApi as InAppStoryAPI).settings.sendStatistic(sendStatistics)
     // Main feed is subscribed per carousel via createSubscriberList(feed, uniqueId);
     if (isFirstInit) {
       this.subscribeLists(this.favoritesApi as InAppStoryAPI, "favorites")
@@ -131,8 +129,8 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
   }
 
   override fun setSendStatistics(enabled: Boolean) {
+    Log.d("InappstorySdkModule", "setSendStatistics")
     this.api?.settings?.sendStatistic(enabled)
-    this.favoritesApi?.settings?.sendStatistic(enabled)
   }
 
   override fun addTags(tags: ReadableArray) {

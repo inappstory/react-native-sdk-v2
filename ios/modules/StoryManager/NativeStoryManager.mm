@@ -28,7 +28,6 @@ RCT_EXPORT_METHOD(initWith:(nonnull NSString *)apiKey
                     userId:(nonnull NSString *)userId
                 userIdSign:(NSString *_Nullable)userIdSign
                    sandbox:(BOOL)sandbox
-            sendStatistics:(BOOL)sendStatistics
                  cacheSize:(NSString *_Nullable)cacheSize
                  anonymous:(BOOL)anonymous
                       tags:(nonnull NSArray *)tags
@@ -38,7 +37,6 @@ RCT_EXPORT_METHOD(initWith:(nonnull NSString *)apiKey
                                      userID:userId
                                  userIdSign:userIdSign
                                     sandbox:sandbox
-                                  sendStats:sendStatistics
                                   cacheSize:cacheSize
                                   anonymous:anonymous
                                        tags:tags

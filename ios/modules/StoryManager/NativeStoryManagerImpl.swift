@@ -27,7 +27,6 @@ public class NativeStoryManagerImpl: NSObject {
     userID: String,
     userIdSign: String?,
     sandbox: Bool,
-    sendStats: Bool,
     cacheSize: String?,
     anonymous: Bool,
     tags: [String],
@@ -51,7 +50,6 @@ public class NativeStoryManagerImpl: NSObject {
       InAppStoryAPI.shared.plaform = ExternalPlatforms.reactNative
 
       InAppStory.shared.sandBox = sandbox
-      InAppStory.shared.isStatisticDisabled = !sendStats
       self._userID = userID
       self._userIdSign = userIdSign
       InAppStory.shared.initWith(

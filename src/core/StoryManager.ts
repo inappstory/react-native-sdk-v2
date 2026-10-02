@@ -159,11 +159,12 @@ export class StoryManager extends StoryEvents {
       this.userId,
       this.userIdSign,
       this.sandbox,
-      this.sendStatistics,
       this.cacheSize,
       this.anonymous,
       this.tags
     );
+
+    NativeStoryManager.setSendStatistics(this.sendStatistics);
 
     if (this.placeholders) {
       NativeStoryManager.setPlaceholders(this.placeholders);
