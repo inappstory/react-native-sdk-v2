@@ -352,6 +352,9 @@ await storyManager.showStoryOnce(storyId, abortSignal);
 
 // Open onboarding stories
 await storyManager.showOnboardings('onboarding', 1000, ['tag1'], abortSignal);
+
+// Close any currently displayed reader (stories, onboarding, IAM)
+storyManager.closeReaders();
 ```
 
 ## Banners

@@ -103,7 +103,7 @@ yarn example ios      # and: yarn example android
 - [ ] `StoriesList` renders cards, scrolls, and reflects `AppearanceManager`
       card options (title position, corner radius, gap).
 - [ ] Tapping a card opens the reader; close returns to the list; the card is
-      marked as opened.
+      marked as opened. Calling `storyManager.closeReaders()` closes the open reader.
 - [ ] Reader controls follow `setCommonOptions`: like, dislike, favorite, share
       appear only when enabled.
 - [ ] Sound toggle: `defaultMuted: true` opens the reader muted;

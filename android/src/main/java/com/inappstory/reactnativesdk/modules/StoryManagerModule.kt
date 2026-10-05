@@ -422,6 +422,11 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
     this.ias?.userLogout()
   }
 
+  override fun closeReaders() {
+    Log.d(TAG, "closeReaders")
+    InAppStoryManager.closeStoryReader(true) {}
+  }
+
   override fun setOptions(options: ReadableMap) {
     Log.d(TAG, "setOptions")
     val nativeMap: ReadableNativeMap = options as ReadableNativeMap

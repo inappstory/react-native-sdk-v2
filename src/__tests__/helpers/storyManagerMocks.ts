@@ -67,6 +67,7 @@ jest.mock('../../specs/NativeStoryManager', () => ({
     removeAllFavorites: jest.fn(),
     favoritesCount: jest.fn().mockResolvedValue(2),
     logout: jest.fn(),
+    closeReaders: jest.fn(),
   },
 }));
 

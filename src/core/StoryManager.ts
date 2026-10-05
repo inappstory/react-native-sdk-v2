@@ -443,6 +443,10 @@ export class StoryManager extends StoryEvents {
     NativeStoryManager.logout();
   }
 
+  closeReaders(): void {
+    NativeStoryManager.closeReaders();
+  }
+
   private favoriteCellListener?: (...args: any[]) => void;
 
   onFavoriteCell(listener: any) {

@@ -258,6 +258,10 @@ RCT_EXPORT_METHOD(logout) {
   [[NativeStoryManagerImpl shared] logout];
 }
 
+RCT_EXPORT_METHOD(closeReaders) {
+  [[NativeStoryManagerImpl shared] closeReaders];
+}
+
 
 
 

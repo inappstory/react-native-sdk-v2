@@ -119,6 +119,8 @@ export interface Spec extends TurboModule {
 
   logout(): void;
 
+  closeReaders(): void;
+
   readonly onStoryListUpdate: CodegenTypes.EventEmitter<StoryListDTO>;
   readonly onStoryUpdate: CodegenTypes.EventEmitter<StoryDTO>;
 }
