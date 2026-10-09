@@ -92,38 +92,45 @@ public class NativeGoodsEventsImpl: NSObject {
   }
 
   @objc public func commitGoods() {
-    self.goodsComplete?(.success(self.goodsCache))
+    let callback = self.goodsComplete
+    let cache = self.goodsCache
     self.goodsCache = []
     self.goodsComplete = nil
+    DispatchQueue.main.async {
+      callback?(.success(cache))
+    }
   }
 
   @objc public func resolveProductCart(_ requestId: String, cart: [String: Any]?) {
-    guard let complete = cartCompletes.removeValue(forKey: requestId) else {
-      return
-    }
-    guard let cart else {
+    DispatchQueue.main.async { [weak self] in
+      guard let self else { return }
+      guard let complete = self.cartCompletes.removeValue(forKey: requestId) else {
+        return
+      }
+      guard let cart else {
+        complete(
+          .failure(
+            NSError(
+              domain: "InappstorySdk",
+              code: 0,
+              userInfo: [NSLocalizedDescriptionKey: "Product cart is empty or null"]
+            )
+          )
+        )
+        return
+      }
+      let offers = (cart["offers"] as? [[String: Any]] ?? []).map(self.offerFromMap)
       complete(
-        .failure(
-          NSError(
-            domain: "InappstorySdk",
-            code: 0,
-            userInfo: [NSLocalizedDescriptionKey: "Product cart is empty or null"]
+        .success(
+          InAppStorySDK.ProductCart(
+            offers: offers,
+            price: cart["price"] as? String ?? "",
+            oldPrice: cart["oldPrice"] as? String,
+            priceCurrency: cart["priceCurrency"] as? String ?? ""
           )
         )
       )
-      return
     }
-    let offers = (cart["offers"] as? [[String: Any]] ?? []).map(offerFromMap)
-    complete(
-      .success(
-        InAppStorySDK.ProductCart(
-          offers: offers,
-          price: cart["price"] as? String ?? "",
-          oldPrice: cart["oldPrice"] as? String,
-          priceCurrency: cart["priceCurrency"] as? String ?? ""
-        )
-      )
-    )
   }
 
   private func storeCartComplete(
