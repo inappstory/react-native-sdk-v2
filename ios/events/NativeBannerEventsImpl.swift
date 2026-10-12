@@ -31,9 +31,10 @@ public class NativeBannerEventsImpl: NSObject {
           "withName": "bannerWidgetEvent",
           "body": [
             "bannerData": [
-              "id": bannerData.id,
-              "bannerPlace": bannerData.placeID,
+              "id": bannerData.id as Any,
+              "bannerPlace": bannerData.placeID as Any,
               "payload": NSNull(),
+              "extraFields": (bannerData.extraFields as Any?) ?? NSNull(),
             ],
             "name": name,
             "data": data as Any,

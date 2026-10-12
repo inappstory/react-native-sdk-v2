@@ -1,5 +1,5 @@
 const USER_ID_MAX_BYTES = 255;
-const TAGS_MAX_BYTES = 4096;
+const TAGS_MAX_COUNT = 100;
 const TAG_PATTERN = /^[\p{L}\p{N}_-]+$/u;
 
 /** UTF-8 byte length without TextEncoder (not guaranteed on Hermes). */
@@ -19,12 +19,16 @@ export function assertUserIdLength(userId: string): string {
 
 /**
  * Logs a console error when a tag is not letters/digits in any script (plus `_`
- * and `-`) or when the list overflows the 4 KB budget, counted as UTF-8 bytes —
- * a Cyrillic char costs 2 bytes. Invalid tags are never sent to native.
+ * and `-`) or when the list exceeds 100 tags. Invalid tags are never sent to native.
  */
 export function tagsAreValid(tags: string[]): boolean {
   let valid = true;
-  let bytes = 0;
+  if (tags.length > TAGS_MAX_COUNT) {
+    console.error(
+      `InAppStory: tags must be at most ${TAGS_MAX_COUNT}, got ${tags.length}`
+    );
+    valid = false;
+  }
   for (const tag of tags) {
     if (!TAG_PATTERN.test(tag)) {
       console.error(
@@ -32,13 +36,6 @@ export function tagsAreValid(tags: string[]): boolean {
       );
       valid = false;
     }
-    bytes += byteLength(tag) + 1;
-  }
-  if (bytes > TAGS_MAX_BYTES) {
-    console.error(
-      `InAppStory: tags must be at most ${TAGS_MAX_BYTES} bytes in total, got ${bytes}`
-    );
-    valid = false;
   }
   return valid;
 }

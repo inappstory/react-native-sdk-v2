@@ -28,7 +28,6 @@ RCT_EXPORT_METHOD(initWith:(nonnull NSString *)apiKey
                     userId:(nonnull NSString *)userId
                 userIdSign:(NSString *_Nullable)userIdSign
                    sandbox:(BOOL)sandbox
-            sendStatistics:(BOOL)sendStatistics
                  cacheSize:(NSString *_Nullable)cacheSize
                  anonymous:(BOOL)anonymous
                       tags:(nonnull NSArray *)tags
@@ -38,7 +37,6 @@ RCT_EXPORT_METHOD(initWith:(nonnull NSString *)apiKey
                                      userID:userId
                                  userIdSign:userIdSign
                                     sandbox:sandbox
-                                  sendStats:sendStatistics
                                   cacheSize:cacheSize
                                   anonymous:anonymous
                                        tags:tags
@@ -48,6 +46,10 @@ RCT_EXPORT_METHOD(initWith:(nonnull NSString *)apiKey
 
 RCT_EXPORT_METHOD(setOptions:(nonnull NSDictionary *)options) {
   [[NativeStoryManagerImpl shared] setOptions:options];
+}
+
+RCT_EXPORT_METHOD(setSendStatistics:(BOOL)enabled) {
+  [[NativeStoryManagerImpl shared] setSendStatistics:enabled];
 }
 
 RCT_EXPORT_METHOD(showStoryOnce:(nonnull NSString *)storyID
@@ -254,6 +256,10 @@ RCT_EXPORT_METHOD(favoritesCount:(RCTPromiseResolveBlock)resolve
 
 RCT_EXPORT_METHOD(logout) {
   [[NativeStoryManagerImpl shared] logout];
+}
+
+RCT_EXPORT_METHOD(closeReaders) {
+  [[NativeStoryManagerImpl shared] closeReaders];
 }
 
 

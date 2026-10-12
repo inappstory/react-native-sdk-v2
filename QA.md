@@ -103,7 +103,7 @@ yarn example ios      # and: yarn example android
 - [ ] `StoriesList` renders cards, scrolls, and reflects `AppearanceManager`
       card options (title position, corner radius, gap).
 - [ ] Tapping a card opens the reader; close returns to the list; the card is
-      marked as opened.
+      marked as opened. Calling `storyManager.closeReaders()` closes the open reader.
 - [ ] Reader controls follow `setCommonOptions`: like, dislike, favorite, share
       appear only when enabled.
 - [ ] Sound toggle: `defaultMuted: true` opens the reader muted;
@@ -124,8 +124,8 @@ yarn example ios      # and: yarn example android
 
 ### Lifecycle and state (the regressions that hurt)
 
-- [ ] `setApiKey` / `setSendStatistics` mid-session: the SDK reinitializes and
-      tags, lang, placeholders and sound are still applied afterwards.
+- [ ] `setApiKey` mid-session reinitializes with the current config;
+      `setSendStatistics` changes statistics at runtime without reinitializing.
 - [ ] `logout()` then a new `setUserID`: the feed reloads for the new user.
 - [ ] Background → foreground with the reader open: no crash, no duplicate
       events.

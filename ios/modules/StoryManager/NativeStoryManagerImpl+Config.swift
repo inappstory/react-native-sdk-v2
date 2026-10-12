@@ -5,6 +5,12 @@ import React
 
 // User/session config: identity, tags, lang, placeholders, sound, options, cache.
 extension NativeStoryManagerImpl {
+  @objc public func setSendStatistics(_ enabled: Bool) {
+    DispatchQueue.main.async {
+      InAppStory.shared.isStatisticDisabled = !enabled
+    }
+  }
+
   @objc public func setUserID(
     _ _userID: String,
     userIdSign _userIdSign: String?

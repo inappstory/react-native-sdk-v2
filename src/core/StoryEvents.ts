@@ -8,8 +8,15 @@ import NativeIamEvents from '../specs/NativeIamEvents';
 import NativeStoriesEvents from '../specs/NativeStoriesEvents';
 import NativeSystemEvents from '../specs/NativeSystemEvents';
 import type { LogEntry } from '../types/StoryManager';
+import type { StoryEvent } from '../types/StoryData';
+import type { InAppMessageEvent } from '../types/InAppMessageData';
+import type { BannerWidgetEvent } from '../types/BannerData';
 
 type Listener = (event: any) => void;
+type StoryValueEvent<N extends string> = StoryEvent<
+  N,
+  { index: number; value: boolean }
+>;
 
 /**
  * The listener half of the manager: every `on*` method is a thin subscription
@@ -96,43 +103,66 @@ export abstract class StoryEvents {
     this.onFeed('storyReaderDidClose', listener);
   }
 
-  onStoryWidgetEvent(listener: any) {
+  onStoryWidgetEvent(
+    listener: (
+      event: StoryEvent<
+        'storyWidgetEvent',
+        { name: string; data: Record<string, string> }
+      >
+    ) => void
+  ) {
     this.onStories('storyWidgetEvent', listener);
   }
 
-  onBannerWidgetEvent(listener: any) {
+  onBannerWidgetEvent(listener: (event: BannerWidgetEvent) => void) {
     this.onBanner('bannerWidgetEvent', listener);
   }
 
-  onShowStory(listener: any) {
+  onShowStory(
+    listener: (event: StoryEvent<'showStory', { action: string }>) => void
+  ) {
     this.onStories('showStory', listener);
   }
 
-  onCloseStory(listener: any) {
+  onCloseStory(
+    listener: (
+      event: StoryEvent<'closeStory', { index: number; action: string }>
+    ) => void
+  ) {
     this.onStories('closeStory', listener);
   }
 
-  onShowSlide(listener: any) {
+  onShowSlide(
+    listener: (event: StoryEvent<'showSlide', { index: number }>) => void
+  ) {
     this.onStories('showSlide', listener);
   }
 
-  onClickOnButton(listener: any) {
+  onClickOnButton(
+    listener: (
+      event: StoryEvent<'clickOnButton', { index: number; url: string }>
+    ) => void
+  ) {
     this.onStories('clickOnButton', listener);
   }
 
-  onLikeStory(listener: any) {
+  onLikeStory(listener: (event: StoryValueEvent<'likeStory'>) => void) {
     this.onStories('likeStory', listener);
   }
 
-  onDislikeStory(listener: any) {
+  onDislikeStory(listener: (event: StoryValueEvent<'dislikeStory'>) => void) {
     this.onStories('dislikeStory', listener);
   }
 
-  onFavoriteStory(listener: any) {
+  onFavoriteStory(listener: (event: StoryValueEvent<'favoriteStory'>) => void) {
     this.onStories('favoriteStory', listener);
   }
 
-  onShareStory(listener: any) {
+  onShareStory(
+    listener: (
+      event: StoryEvent<'clickOnShareStory', { index: number; payload: string }>
+    ) => void
+  ) {
     this.onStories('clickOnShareStory', listener);
   }
 
@@ -142,7 +172,7 @@ export abstract class StoryEvents {
     }
   }
 
-  onIamEvent(listener: any) {
+  onIamEvent(listener: (event: InAppMessageEvent) => void) {
     for (const name of [
       'showInAppMessage',
       'closeInAppMessage',

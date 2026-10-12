@@ -34,6 +34,7 @@ jest.mock('../../specs/NativeStoryManager', () => ({
   __esModule: true,
   default: {
     initWith: jest.fn().mockResolvedValue(undefined),
+    setSendStatistics: jest.fn(),
     setUserID: jest.fn(),
     setTags: jest.fn(),
     addTags: jest.fn(),
@@ -66,6 +67,7 @@ jest.mock('../../specs/NativeStoryManager', () => ({
     removeAllFavorites: jest.fn(),
     favoritesCount: jest.fn().mockResolvedValue(2),
     logout: jest.fn(),
+    closeReaders: jest.fn(),
   },
 }));
 

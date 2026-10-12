@@ -14,6 +14,7 @@ describe('runtime setters', () => {
     ['setAppVersion', ['2.0', 10]],
     ['removeAllFavorites', []],
     ['logout', []],
+    ['closeReaders', []],
     ['clearCache', []],
     ['preloadGames', []],
   ] as const)('%s calls through to native', (method, args) => {

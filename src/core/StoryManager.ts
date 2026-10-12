@@ -159,11 +159,12 @@ export class StoryManager extends StoryEvents {
       this.userId,
       this.userIdSign,
       this.sandbox,
-      this.sendStatistics,
       this.cacheSize,
       this.anonymous,
       this.tags
     );
+
+    NativeStoryManager.setSendStatistics(this.sendStatistics);
 
     if (this.placeholders) {
       NativeStoryManager.setPlaceholders(this.placeholders);
@@ -289,7 +290,7 @@ export class StoryManager extends StoryEvents {
 
   setSendStatistics(sendStatistics: boolean): void {
     this.sendStatistics = sendStatistics;
-    this.reinit();
+    NativeStoryManager.setSendStatistics(sendStatistics);
   }
 
   setOptions(options: Record<string, string>): void {
@@ -440,6 +441,10 @@ export class StoryManager extends StoryEvents {
   /** Log out the current user (clears user session on the native SDK). */
   logout(): void {
     NativeStoryManager.logout();
+  }
+
+  closeReaders(): void {
+    NativeStoryManager.closeReaders();
   }
 
   private favoriteCellListener?: (...args: any[]) => void;

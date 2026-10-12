@@ -81,6 +81,7 @@ class StoriesEventsModule(reactContext: ReactApplicationContext) :
       putString("feed", slide?.story()?.feed() ?: "")
       putInt("index", slide?.index() ?: -1)
       putString("url", url)
+      putMap("extraFields", slide?.story()?.extraFields()?.let { Arguments.makeNativeMap(it) })
     })
   }
 
@@ -88,6 +89,7 @@ class StoriesEventsModule(reactContext: ReactApplicationContext) :
     putInt("id", slide.story().id())
     putString("feed", slide.story().feed())
     putInt("index", slide.index())
+    putMap("extraFields", slide.story().extraFields()?.let { Arguments.makeNativeMap(it) })
   }
 
   override fun setupStoriesEvents() {
@@ -108,6 +110,7 @@ class StoriesEventsModule(reactContext: ReactApplicationContext) :
             else -> "unknown"
           })
           putInt("slidesCount", storyData.slidesCount())
+          putMap("extraFields", storyData.extraFields()?.let { Arguments.makeNativeMap(it) })
         })
       }
     })
@@ -131,6 +134,7 @@ class StoriesEventsModule(reactContext: ReactApplicationContext) :
         emit("showSlide", Arguments.createMap().apply {
           putInt("id", slideData.story().id())
           putInt("index", slideData.index())
+          putMap("extraFields", slideData.story().extraFields()?.let { Arguments.makeNativeMap(it) })
         })
       }
     })
@@ -171,6 +175,7 @@ class StoriesEventsModule(reactContext: ReactApplicationContext) :
           putString("feed", slideData.story().feed())
           putString("name", widgetEventName)
           putMap("data", Arguments.makeNativeMap(widgetData as Map<String, Any>))
+          putMap("extraFields", slideData.story().extraFields()?.let { Arguments.makeNativeMap(it) })
         })
       }
     })

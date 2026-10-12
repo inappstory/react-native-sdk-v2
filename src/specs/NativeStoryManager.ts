@@ -29,11 +29,12 @@ export interface Spec extends TurboModule {
     userId: string,
     userIdSign: string | null,
     sandbox: boolean,
-    sendStatistics: boolean,
     cacheSize: string | null,
     anonymous: boolean,
     tags: Array<string>
   ): Promise<void>;
+
+  setSendStatistics(enabled: boolean): void;
 
   setOptions(options: Object): void;
 
@@ -117,6 +118,8 @@ export interface Spec extends TurboModule {
   favoritesCount(): Promise<number>;
 
   logout(): void;
+
+  closeReaders(): void;
 
   readonly onStoryListUpdate: CodegenTypes.EventEmitter<StoryListDTO>;
   readonly onStoryUpdate: CodegenTypes.EventEmitter<StoryDTO>;

@@ -35,6 +35,12 @@ extension NativeStoryManagerImpl {
       InAppStory.shared.logOut {}
     }
   }
+
+  @objc public func closeReaders() {
+    DispatchQueue.main.async {
+      InAppStory.shared.closeReader {}
+    }
+  }
   @objc public func showStoryOnce(
     _ storyID: String,
     operationId: String,
