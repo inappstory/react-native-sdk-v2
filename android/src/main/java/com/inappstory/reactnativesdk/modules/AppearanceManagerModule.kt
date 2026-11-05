@@ -10,7 +10,13 @@ import com.facebook.react.module.annotations.ReactModule
 import com.inappstory.sdk.AppearanceManager;
 import com.inappstory.sdk.core.network.content.models.Image.QUALITY_HIGH
 import com.inappstory.sdk.core.network.content.models.Image.QUALITY_MEDIUM
+import com.inappstory.reactnativesdk.appearance.LoadingPlaceholderOptions
+import com.inappstory.sdk.stories.ui.views.IStoryReaderLoaderView
+import android.content.Context
+import android.graphics.Color
+import android.view.View
 import android.util.Log
+import com.facebook.react.bridge.ReadableMap
 
 @ReactModule(name = AppearanceManagerModule.NAME)
 class AppearanceManagerModule(private val reactContext: ReactApplicationContext) :
@@ -150,6 +156,40 @@ class AppearanceManagerModule(private val reactContext: ReactApplicationContext)
   override fun setCloseGoodsImage(image: String) {
     AppearanceManagerImpl.goodsCloseIconResId = getImageID(image)
   }
+
+  override fun setLoadingPlaceholders(options: ReadableMap) {
+    val readerPlaceholder = readLoadingPlaceholder(options, "storyReader")
+    val iamPlaceholder = readLoadingPlaceholder(options, "iam")
+    val bannerPlaceholder = readLoadingPlaceholder(options, "banners")
+    val manager = appearanceManager ?: return
+
+    manager.csStoryLoaderView(
+      readerPlaceholder?.let { placeholder ->
+        object : IStoryReaderLoaderView {
+          override fun getView(context: Context): View =
+            placeholder.createView(context)
+        }
+      }
+    )
+    AppearanceManagerImpl.iamLoadingPlaceholder = iamPlaceholder
+    AppearanceManagerImpl.bannerLoadingPlaceholder = bannerPlaceholder
+  }
+
+  private fun readLoadingPlaceholder(
+    options: ReadableMap,
+    surface: String
+  ): LoadingPlaceholderOptions? {
+    if (!options.hasKey(surface) || options.isNull(surface)) return null
+    val colors = options.getMap(surface) ?: return null
+    return LoadingPlaceholderOptions(
+      backgroundColor = readColor(colors, "backgroundColor"),
+      indicatorColor = readColor(colors, "indicatorColor")
+    )
+  }
+
+  private fun readColor(options: ReadableMap, key: String): Int? =
+    if (!options.hasKey(key) || options.isNull(key)) null
+    else Color.parseColor(options.getString(key))
 
   private fun getImageID(imgName: String): Int {
     return reactContext.resources

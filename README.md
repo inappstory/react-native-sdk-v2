@@ -347,6 +347,15 @@ To render custom cells, pass `renderCell` and/or `renderFavoriteCell` to `Storie
 // Open a single story by ID (supports optional AbortSignal and AppearanceManager)
 await storyManager.showStory(storyId, abortSignal, appearanceManager);
 
+// Request a single story with server-side targeting; null/undefined uses the
+// SDK's current tags, [] sends no tags, and an array overrides tags for this request.
+await storyManager.showStoryWithTargeting(
+  storyId,
+  ['promo'],
+  abortSignal,
+  appearanceManager
+);
+
 // Open a story once (will not open again if already marked as viewed)
 await storyManager.showStoryOnce(storyId, abortSignal);
 
@@ -391,6 +400,32 @@ Preload banner data in advance:
 await storyManager.preloadBannerPlace('main_banner', ['tag1']);
 ```
 
+Use `BannerGrid` to display banners in a non-scrolling grid (two columns).
+If `height` is omitted, the component adjusts its height to fit the loaded banners.
+On Android, `onPlaceLoaded` reports the full measured content height in dp,
+including all rows and gaps, after native layout. It fires again when that
+height changes, but not for unchanged layouts. Empty results report `(0, 0)`.
+Updating only the host height/style does not reload the Android grid; use
+`gridRef.current?.refresh()` to request a reload. Wrap the grid in an outer
+scroll view if its full height exceeds the screen.
+
+```tsx
+import { BannerGrid, type BannerGridRef } from '@inappstory/react-native-sdk';
+import { useRef } from 'react';
+
+const gridRef = useRef<BannerGridRef>(null);
+
+<BannerGrid
+  ref={gridRef}
+  placeId="main_banner"
+  columnSpacing={8}
+  rowSpacing={12}
+  onPlaceLoaded={(size, widgetHeight) =>
+    console.log(`Grid loaded: size=${size}, height=${widgetHeight}`)
+  }
+/>;
+```
+
 ### Banner Events
 
 Listen to banner widget events:
@@ -412,6 +447,14 @@ await storyManager.preloadIAM(['iam_id_1'], ['tag1']);
 // Show IAM by ID
 await storyManager.showIAMById('iam_id_1', false, abortSignal);
 
+// Request an IAM by ID with server-side targeting
+await storyManager.showIAMByIdWithTargeting(
+  'iam_id_1',
+  false,
+  ['promo'],
+  abortSignal
+);
+
 // Show IAM by event trigger
 await storyManager.showIAMByEvent('user_purchased', false, abortSignal);
 
@@ -424,6 +467,24 @@ storyManager.onIamEvent((event) => {
     // InAppMessageData { id, title, event, extraFields }
     console.log(event.withName, event.body.extraFields);
   }
+});
+```
+
+Input fields embedded in IAM content (text, email, or telephone) use the
+native SDK's platform input dialog. Configure those fields in the IAM content;
+no React Native `TextInput` wrapper is needed.
+
+### Loading placeholders
+
+Set separate loader colors for the story reader, IAM, and banners. Colors use
+`#RRGGBB`; passing `null` for a surface restores the SDK default or its native
+fallback to the story-reader placeholder.
+
+```ts
+appearanceManager.setLoadingPlaceholders({
+  storyReader: { backgroundColor: '#ffffff', indicatorColor: '#2c60ea' },
+  iam: { backgroundColor: '#ffffff', indicatorColor: '#e65c9c' },
+  banners: { backgroundColor: '#f4f4f4', indicatorColor: '#2c60ea' },
 });
 ```
 

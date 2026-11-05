@@ -1,8 +1,9 @@
 # QA
 
-How this SDK is verified before a release. Automated checks cover the JS layer;
-the native bridges and the UI components are covered by the manual checklist —
-they need a device and a real API key, so a unit test cannot speak for them.
+How this SDK is verified before a release. Automated checks cover the JS layer
+and deterministic Android grid measurement. Live native SDK content and UI
+integration are covered by the manual checklist — they need a device and a
+real API key, so synthetic tests cannot speak for them.
 
 ## Quality gates
 
@@ -88,6 +89,23 @@ If a *new* mutant survives, treat it as a missing assertion, not as noise.
 
 ## Manual QA — native and UI
 
+### Android grid measurement regression
+
+Run on a connected Android device/emulator (no API key or network required):
+
+```sh
+cd example/android
+./gradlew :inappstory_react-native-sdk:connectedDebugAndroidTest \
+  -Pandroid.testInstrumentationRunnerArguments.class=com.inappstory.reactnativesdk.view.BannerGridLayoutTest
+```
+
+These native tests exercise full-row measurement under a zero/constrained host
+height, deferred loading until width is measured, size-event deduplication,
+empty results, reload/reset/disposal, and height-only prop updates. They use
+synthetic rows inside the real SDK grid, not live banner content.
+
+### Example app
+
 Run against the example app on **both** platforms; a JS-only change still needs
 one platform pass because the whole SDK is a bridge.
 
@@ -108,11 +126,27 @@ yarn example ios      # and: yarn example android
       appear only when enabled.
 - [ ] Sound toggle: `defaultMuted: true` opens the reader muted;
       `changeSound(true)` unmutes at runtime.
-- [ ] `BannerCarousel` renders and its widget events arrive in JS.
+- [ ] `BannerCarousel` and `BannerGrid` render; grid height follows
+      `widgetHeight`, refresh works, and banner events arrive in JS.
+- [ ] Android grid: all rows and gaps are visible from a zero/loading host height;
+      warm-cache loading and explicit refresh report a positive measured height.
+      Empty places report `(0, 0)` rather than SDK layout constants (`-1`/`-2`).
+- [ ] Android grid: updating only height/style does not reload content; changing
+      width or insets recomputes row sizes, unchanged layouts do not repeat
+      `onPlaceLoaded`, and leaving/changing the place during loading causes no
+      stale height updates. iOS grid and both carousels remain unchanged.
+- [ ] Targeted single-story and IAM calls honor server targeting; `undefined`
+      tags use SDK settings and `[]` sends an empty tag list.
+- [ ] Story-reader, IAM, and banner loaders use their configured colors;
+      omitted/reset surfaces fall back to the SDK placeholder.
 - [ ] Favorites: favorite a story → it appears in the favorites feed →
       `removeAllFavorites()` empties it.
 - [ ] Games: `preloadGames()` then `showGame(id)` opens and closes cleanly.
 - [ ] In-app messages: `showIAMById` and `showIAMByEvent` display and close.
+- [ ] IAM with a text input: focus the field, type and submit; the keyboard must
+      not cover it on Android API 35, and closing the IAM restores the host
+      window's original soft-input mode. On iOS, verify the default input
+      presenter keeps the field visible above the keyboard and respects safe area.
 - [ ] Onboarding: `showOnboardings()` shows unseen stories only.
 - [ ] Goods / product cart: the widget calls back into `getGoods`, the cart
       handlers answer, and the reader shows the returned items.

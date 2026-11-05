@@ -57,6 +57,20 @@ export const createAppearanceManager = () => {
       hasFavorite: true,
       hasShare: true,
     })
+    .setLoadingPlaceholders({
+      storyReader: {
+        backgroundColor: '#ffffff',
+        indicatorColor: '#2c60ea',
+      },
+      iam: {
+        backgroundColor: '#ffffff',
+        indicatorColor: '#e65c9c',
+      },
+      banners: {
+        backgroundColor: '#f4f4f4',
+        indicatorColor: '#2c60ea',
+      },
+    })
     .setStoriesListOptions({
       card: {
         title: {

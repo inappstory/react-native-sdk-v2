@@ -87,6 +87,53 @@ describe('setCommonOptions', () => {
   });
 });
 
+describe('setLoadingPlaceholders', () => {
+  it('passes separate placeholder options to native and is chainable', () => {
+    const manager = new AppearanceManager();
+    const options = {
+      storyReader: { backgroundColor: '#112233' },
+      iam: { indicatorColor: '#abcdef' },
+      banners: null,
+    };
+
+    expect(manager.setLoadingPlaceholders(options)).toBe(manager);
+    expect(native.setLoadingPlaceholders).toHaveBeenCalledWith(options);
+  });
+
+  it('merges surfaces and lets null restore one surface default', () => {
+    const manager = new AppearanceManager();
+    manager.setLoadingPlaceholders({
+      storyReader: { backgroundColor: '#112233' },
+      banners: { indicatorColor: '#abcdef' },
+    });
+    manager.setLoadingPlaceholders({
+      storyReader: { indicatorColor: '#445566' },
+      iam: { backgroundColor: '#ffffff' },
+    });
+    manager.setLoadingPlaceholders({ iam: null });
+
+    expect(native.setLoadingPlaceholders).toHaveBeenLastCalledWith({
+      storyReader: {
+        backgroundColor: '#112233',
+        indicatorColor: '#445566',
+      },
+      iam: null,
+      banners: { indicatorColor: '#abcdef' },
+    });
+  });
+
+  it('rejects colors that native loaders cannot parse', () => {
+    const manager = new AppearanceManager();
+
+    expect(() =>
+      manager.setLoadingPlaceholders({
+        iam: { indicatorColor: 'not-a-color' },
+      })
+    ).toThrow('iam.indicatorColor must be a #RRGGBB color');
+    expect(native.setLoadingPlaceholders).not.toHaveBeenCalled();
+  });
+});
+
 describe('setStoryReaderOptions', () => {
   it('applies native defaults when options are empty', () => {
     new AppearanceManager().setStoryReaderOptions({});

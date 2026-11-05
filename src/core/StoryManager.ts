@@ -347,19 +347,58 @@ export class StoryManager extends StoryEvents {
     });
   }
 
-  showStory(
-    storyId: string | number,
-    signal?: Option<AbortSignal>,
-    appearanceManager?: AppearanceManager
-  ): Promise<{ loaded: boolean }> {
+  /**
+   * Pushes the reader button visibility from an AppearanceManager down to
+   * native before a single-story open. Shared by `showStory` and
+   * `showStoryWithTargeting` so both honour the same override rules.
+   */
+  private applyReaderAppearance(appearanceManager?: AppearanceManager): void {
     const commonOptions = appearanceManager?.commonOptions;
     if (commonOptions?.hasLike) {
       NativeAppearanceManager.setHasLike(commonOptions.hasLikeButton);
       NativeAppearanceManager.setHasFavorites(commonOptions.hasFavorite);
       NativeAppearanceManager.setHasShare(commonOptions.hasShare);
     }
+  }
+
+  showStory(
+    storyId: string | number,
+    signal?: Option<AbortSignal>,
+    appearanceManager?: AppearanceManager
+  ): Promise<{ loaded: boolean }> {
+    this.applyReaderAppearance(appearanceManager);
     return this.runCancelable(signal, { loaded: false }, (operationId) =>
       NativeStoryManager.showSingle(String(storyId), operationId)
+    ).then(() => ({ loaded: true }));
+  }
+
+  /**
+   * Shows a single story by id with server-side targeting checks (native SDK
+   * iOS >= 1.29.9 / Android >= 1.26.0). Unlike {@link showStory}, the request
+   * is only shown if it passes targeting.
+   *
+   * `tags`:
+   *  - `undefined`/`null` — use the tags from the current SDK settings;
+   *  - `[]` — send an empty tag list;
+   *  - a non-empty array — override tags for this request only, without
+   *    mutating the global SDK settings.
+   */
+  showStoryWithTargeting(
+    storyId: string | number,
+    tags?: Option<string[]>,
+    signal?: Option<AbortSignal>,
+    appearanceManager?: AppearanceManager
+  ): Promise<{ loaded: boolean }> {
+    if (tags != null && !tagsAreValid(tags)) {
+      return Promise.reject({ loaded: false });
+    }
+    this.applyReaderAppearance(appearanceManager);
+    return this.runCancelable(signal, { loaded: false }, (operationId) =>
+      NativeStoryManager.showSingleWithTargeting(
+        String(storyId),
+        tags ?? null,
+        operationId
+      )
     ).then(() => ({ loaded: true }));
   }
 
@@ -395,6 +434,32 @@ export class StoryManager extends StoryEvents {
   ): Promise<boolean> {
     return this.runCancelable(signal, false, (operationId) =>
       NativeStoryManager.showIAMById(id, onlyPreloaded, operationId)
+    );
+  }
+
+  /**
+   * Shows an In-App Message by id with server-side targeting checks (native SDK
+   * iOS >= 1.29.9 / Android >= 1.26.0). Targeting is checked on the server even
+   * when the message is already cached.
+   *
+   * `tags` follows the same rules as {@link showStoryWithTargeting}:
+   * `undefined`/`null` uses the current SDK settings' tags, `[]` sends an empty
+   * list, and a non-empty array overrides tags for this request only.
+   */
+  showIAMByIdWithTargeting(
+    id: string,
+    onlyPreloaded: boolean = false,
+    tags?: Option<string[]>,
+    signal?: Option<AbortSignal>
+  ): Promise<boolean> {
+    if (tags != null && !tagsAreValid(tags)) return Promise.reject(false);
+    return this.runCancelable(signal, false, (operationId) =>
+      NativeStoryManager.showIAMByIdWithTargeting(
+        id,
+        onlyPreloaded,
+        tags ?? null,
+        operationId
+      )
     );
   }
 

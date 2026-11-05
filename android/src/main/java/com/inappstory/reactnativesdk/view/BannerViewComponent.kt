@@ -6,20 +6,13 @@ import com.inappstory.sdk.banners.BannerCarouselNavigationCallback
 import com.inappstory.sdk.banners.BannerData
 import com.inappstory.sdk.banners.BannerPlaceLoadCallback
 import com.inappstory.sdk.banners.ui.carousel.BannerCarousel
-import android.util.TypedValue
-
 import android.annotation.SuppressLint
-import android.widget.LinearLayout
 import com.facebook.react.bridge.Arguments
-import com.facebook.react.bridge.WritableMap
 import com.facebook.react.uimanager.ThemedReactContext
-import com.facebook.react.uimanager.events.RCTEventEmitter
 import kotlin.math.roundToInt
 
 @SuppressLint("ViewConstructor")
-class BannerViewComponent(context: ThemedReactContext) : LinearLayout(context) {
-    private var rContext: ThemedReactContext = context
-
+class BannerViewComponent(context: ThemedReactContext) : BannerPlaceComponent(context) {
     private val bannerCarousel: BannerCarousel = BannerCarousel(rContext)
 
     // Props received from React. Stored as-is and turned into appearance in
@@ -41,23 +34,6 @@ class BannerViewComponent(context: ThemedReactContext) : LinearLayout(context) {
         registerCallbacks()
     }
 
-    // RN/Yoga lays out this view but never re-measures/lays out the native
-    // children we add, so the BannerCarousel stays 0x0 (empty banner + an
-    // autoscroll NPE because no banner views are bound). Force a measure/layout
-    // pass on every requestLayout — the standard RN fix for embedded native views.
-    private val measureAndLayout = Runnable {
-        measure(
-            MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
-            MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY)
-        )
-        layout(left, top, right, bottom)
-    }
-
-    override fun requestLayout() {
-        super.requestLayout()
-        post(measureAndLayout)
-    }
-
     // Bridge the carousel's native callbacks to React direct events. Mirrors the
     // iOS BannerView (onScroll / onPlaceLoaded). onActionWith is not wired yet —
     // the Android SDK only exposes it as a global callback.
@@ -72,9 +48,8 @@ class BannerViewComponent(context: ThemedReactContext) : LinearLayout(context) {
             }
 
             override fun onPageSelected(position: Int, total: Int) {
-                val payload = Arguments.createMap()
-                payload.putInt("index", position)
-                emitEvent("onScroll", payload)
+                val payload = Arguments.createMap().apply { putInt("index", position) }
+                emitEvent(id, "onScroll", payload)
             }
         })
 
@@ -84,10 +59,7 @@ class BannerViewComponent(context: ThemedReactContext) : LinearLayout(context) {
                 bannerData: MutableList<BannerData>,
                 widgetHeight: Int
             ) {
-                val payload = Arguments.createMap()
-                payload.putInt("size", size)
-                payload.putDouble("widgetHeight", toDp(widgetHeight).toDouble())
-                emitEvent("onPlaceLoaded", payload)
+                emitPlaceLoaded(id, size, widgetHeight)
             }
 
             override fun loadError() {}
@@ -96,23 +68,6 @@ class BannerViewComponent(context: ThemedReactContext) : LinearLayout(context) {
 
             override fun bannerLoadError(bannerId: Int, isFirst: Boolean) {}
         })
-    }
-
-    // SDK callbacks may fire on a background thread (e.g. bannerPlaceLoaded from
-    // the load thread). RCTEventEmitter must be invoked on the UI thread, so
-    // marshal there — otherwise the event is silently dropped. Mirrors iOS, which
-    // wraps these callbacks in DispatchQueue.main.async.
-    private fun emitEvent(eventName: String, payload: WritableMap) {
-        post {
-            rContext.getJSModule(RCTEventEmitter::class.java)
-                .receiveEvent(id, eventName, payload)
-        }
-    }
-
-    private fun toDp(px: Int): Float {
-        return TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_PX, px.toFloat(), resources.displayMetrics
-        ) / resources.displayMetrics.density
     }
 
     // Called once from the view manager's onAfterUpdateTransaction, after the
@@ -141,7 +96,7 @@ class BannerViewComponent(context: ThemedReactContext) : LinearLayout(context) {
         }
     }
 
-    fun refresh() {
+    override fun refresh() {
         bannerCarousel.loadBanners(true)
     }
     

@@ -79,6 +79,12 @@ export interface Spec extends TurboModule {
 
   showSingle(storyID: string, operationId: string): Promise<boolean>;
 
+  showSingleWithTargeting(
+    storyID: string,
+    tags: Array<string> | null,
+    operationId: string
+  ): Promise<boolean>;
+
   showOnboardings(
     feed: string,
     limit: number,
@@ -91,6 +97,13 @@ export interface Spec extends TurboModule {
   showIAMById(
     iamID: string,
     onlyPreloaded: boolean,
+    operationId: string
+  ): Promise<boolean>;
+
+  showIAMByIdWithTargeting(
+    iamID: string,
+    onlyPreloaded: boolean,
+    tags: Array<string> | null,
     operationId: string
   ): Promise<boolean>;
 

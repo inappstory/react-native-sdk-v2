@@ -151,6 +151,17 @@ export interface AppearanceManagerCommonOptions {
   coverQuality?: CoverQuality;
 }
 
+export type LoadingPlaceholderOptions = Partial<{
+  backgroundColor: string;
+  indicatorColor: string;
+}> | null;
+
+export type LoadingPlaceholders = Partial<{
+  storyReader: LoadingPlaceholderOptions;
+  iam: LoadingPlaceholderOptions;
+  banners: LoadingPlaceholderOptions;
+}>;
+
 export class AppearanceManager {
   hasLike = true;
   hasDislike = true;
@@ -166,6 +177,7 @@ export class AppearanceManager {
     hasDislikeButton: false,
     hasShare: false,
   };
+  loadingPlaceholders: LoadingPlaceholders = {};
   //TODO: Migrate the APIs from JS to Native
 
   setCommonOptions(options: AppearanceManagerCommonOptions) {
@@ -178,6 +190,32 @@ export class AppearanceManager {
     }
     return this;
   }
+
+  setLoadingPlaceholders(options: LoadingPlaceholders) {
+    const surfaces = [
+      ['storyReader', options.storyReader],
+      ['iam', options.iam],
+      ['banners', options.banners],
+    ] as const;
+    for (const [surface, placeholder] of surfaces) {
+      if (placeholder == null) continue;
+      for (const [key, color] of Object.entries(placeholder)) {
+        if (typeof color !== 'string' || !/^#[\da-f]{6}$/i.test(color)) {
+          throw new TypeError(`${surface}.${key} must be a #RRGGBB color`);
+        }
+      }
+    }
+    for (const [surface, placeholder] of surfaces) {
+      if (placeholder === undefined) continue;
+      this.loadingPlaceholders[surface] =
+        placeholder === null
+          ? null
+          : { ...this.loadingPlaceholders[surface], ...placeholder };
+    }
+    NativeAppearanceManager.setLoadingPlaceholders(this.loadingPlaceholders);
+    return this;
+  }
+
   setStoryFavoriteReaderOptions(
     options: Partial<{
       title: Partial<{ content: string; font: string; color: string }>;

@@ -2,6 +2,7 @@ import Foundation
 @_spi(QAApp) import InAppStorySDK
 @_spi(IAS_API) import InAppStorySDK
 import React
+import UIKit
 
 @objc(NativeAppearanceManagerImpl)
 public class NativeAppearanceManagerImpl: NSObject {
@@ -15,6 +16,39 @@ public class NativeAppearanceManagerImpl: NSObject {
 
   override init() {
     super.init()
+  }
+
+  private final class NativeLoadingPlaceholder: UIView, PlaceholderProtocol {
+    private let indicator: UIActivityIndicatorView
+
+    var isAnimate: Bool { indicator.isAnimating }
+
+    init(backgroundColor: UIColor, indicatorColor: UIColor?) {
+      indicator = UIActivityIndicatorView(style: .large)
+      super.init(frame: .zero)
+      self.backgroundColor = backgroundColor
+      if let indicatorColor {
+        indicator.color = indicatorColor
+      }
+      indicator.translatesAutoresizingMaskIntoConstraints = false
+      addSubview(indicator)
+      NSLayoutConstraint.activate([
+        indicator.centerXAnchor.constraint(equalTo: centerXAnchor),
+        indicator.centerYAnchor.constraint(equalTo: centerYAnchor),
+      ])
+    }
+
+    required init?(coder: NSCoder) {
+      fatalError("init(coder:) has not been implemented")
+    }
+
+    func start() {
+      indicator.startAnimating()
+    }
+
+    func stop() {
+      indicator.stopAnimating()
+    }
   }
 
   public var panelSettings: PanelSettings {
@@ -253,6 +287,38 @@ public class NativeAppearanceManagerImpl: NSObject {
 
    @objc public func setCloseGoodsImage(_ image: String) {
      InAppStory.shared.goodsCloseImage = UIImage(named: image)!
+   }
+
+   @objc public func setLoadingPlaceholders(_ options: NSDictionary) {
+     DispatchQueue.main.async {
+       InAppStory.shared.placeholderView = self.makeLoadingPlaceholder(options["storyReader"])
+       InAppStory.shared.placeholderIAMView = self.makeLoadingPlaceholder(options["iam"])
+       InAppStory.shared.placeholderBannerView = self.makeLoadingPlaceholder(options["banners"])
+     }
+   }
+
+   private func makeLoadingPlaceholder(_ value: Any?) -> (any PlaceholderProtocol)? {
+     guard let options = value as? NSDictionary else { return nil }
+     return NativeLoadingPlaceholder(
+       backgroundColor: placeholderColor(options["backgroundColor"]) ?? .clear,
+       indicatorColor: placeholderColor(options["indicatorColor"])
+     )
+   }
+
+   private func placeholderColor(_ value: Any?) -> UIColor? {
+     guard let value = value as? String,
+       value.range(of: "^#[\\da-fA-F]{6}$", options: .regularExpression) != nil
+     else {
+       return nil
+     }
+     let hex = String(value.dropFirst())
+     guard let color = UInt32(hex, radix: 16) else { return nil }
+     return UIColor(
+       red: CGFloat((color >> 16) & 0xFF) / 255,
+       green: CGFloat((color >> 8) & 0xFF) / 255,
+       blue: CGFloat(color & 0xFF) / 255,
+       alpha: 1
+     )
    }
 
   // @objc

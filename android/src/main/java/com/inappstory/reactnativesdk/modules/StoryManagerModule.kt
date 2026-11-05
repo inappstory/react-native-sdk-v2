@@ -248,6 +248,42 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
     }
   }
 
+  override fun showSingleWithTargeting(
+    storyID: String,
+    tags: ReadableArray?,
+    operationId: String,
+    promise: Promise
+  ) {
+    Log.d(TAG, "showSingleWithTargeting")
+    reactContext.runOnUiQueueThread {
+      try {
+        // tags == null keeps the current SDK settings' tags; an empty or
+        // non-empty list overrides tags for this request only. Targeting is
+        // enabled by calling showStoryWithTargeting regardless of tags.
+        val tagsList = tags?.toArrayList()?.map { it.toString() }
+        cancellationTokenMap[operationId] = this.ias?.showStoryWithTargeting(
+          storyID,
+          tagsList,
+          reactContext.currentActivity,
+          this.appearanceManager,
+          object : IShowStoryCallback {
+            override fun onShow() {
+              cancellationTokenMap.remove(operationId)
+              promise.resolve(true)
+            }
+
+            override fun onError() {
+              cancellationTokenMap.remove(operationId)
+              promise.resolve(false)
+            }
+          }
+        )
+      } catch (e: Throwable) {
+        promise.reject("showSingleWithTargeting error", e)
+      }
+    }
+  }
+
   override fun showOnboardings(
     feed: String,
     limit: Double,
@@ -302,6 +338,47 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
           .commit()
       } catch (e: Throwable) {
         promise.reject("showIAMById error", e)
+      }
+    }
+  }
+
+  override fun showIAMByIdWithTargeting(
+    iamID: String,
+    onlyPreloaded: Boolean,
+    tags: ReadableArray?,
+    operationId: String,
+    promise: Promise
+  ) {
+    Log.d(TAG, "showIAMByIdWithTargeting")
+    reactContext.runOnUiQueueThread {
+      try {
+        // useTargeting() enables server-side targeting for "by id" requests
+        // even when no tag override is passed (tags == null keeps the current
+        // SDK settings' tags). A non-null list overrides tags for this request.
+        var settings =
+          InAppMessageOpenSettings().id(iamID.toInt()).showOnlyIfLoaded(onlyPreloaded)
+            .useTargeting()
+        if (tags != null) {
+          settings = settings.tags(tags.toArrayList().map { it.toString() })
+        }
+
+        val fragment = NativeOverlayFragment(
+          ias = this.ias,
+          settings = settings,
+          onReaderIsClosed = { cancellationTokenMap.remove(operationId) },
+          onReaderIsOpen = { cancellationToken ->
+            cancellationTokenMap[operationId] = cancellationToken
+            promise.resolve(true)
+          },
+        )
+
+        (reactContext.currentActivity as FragmentActivity).supportFragmentManager
+          .beginTransaction()
+          .add(android.R.id.content, fragment, "overlay_fragment")
+          .addToBackStack("overlay_fragment")
+          .commit()
+      } catch (e: Throwable) {
+        promise.reject("showIAMByIdWithTargeting error", e)
       }
     }
   }

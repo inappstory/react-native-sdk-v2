@@ -25,6 +25,7 @@ class BannerView: UIView {
   private var _bannersView: IASBannersView?
 
   private var bannersAppearance: IASBannersAppearance?
+  private let layoutType: IASBannersAppearance.LayoutType
 
   @objc var onScroll: RCTDirectEventBlock?
   @objc var onPlaceLoaded: RCTDirectEventBlock?
@@ -71,13 +72,29 @@ class BannerView: UIView {
     }
   }
 
-  override init(frame: CGRect) {
-    super.init(frame: frame)
-    //    createBannerView()
+  @objc var columnSpacing: CGFloat = 8.0 {
+    didSet {
+      updateComponent()
+    }
+  }
 
+  @objc var rowSpacing: CGFloat = 8.0 {
+    didSet {
+      updateComponent()
+    }
+  }
+
+  convenience override init(frame: CGRect) {
+    self.init(frame: frame, layoutType: .horizontalCenterend)
+  }
+
+  init(frame: CGRect = .zero, layoutType: IASBannersAppearance.LayoutType) {
+    self.layoutType = layoutType
+    super.init(frame: frame)
   }
 
   required init?(coder: NSCoder) {
+    self.layoutType = .horizontalCenterend
     super.init(coder: coder)
   }
 
@@ -97,12 +114,15 @@ class BannerView: UIView {
 
   func updateComponent() {
     self.bannersAppearance = IASBannersAppearance(
+      layoutType: self.layoutType,
       shouldLoop: self.shouldLoop,
       sideInset: self.sideInset,
       leadingInset: self.leadingInset,
       trailingInset: self.trailingInset,
       interItemSpacing: self.interItemSpacing,
-      cornerRadius: self.cornerRadius
+      cornerRadius: self.cornerRadius,
+      columnSpacing: self.columnSpacing,
+      rowSpacing: self.rowSpacing
     )
     createBannerView()
     //    guard let bannersView = _bannersView else { return }
