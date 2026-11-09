@@ -32,7 +32,7 @@ class CustomBannerViewAppearance(
         return loop ?: super.loop()
     }
 
-    override fun loadingPlaceholder(context: Context): View =
+    override fun loadingPlaceholder(context: Context): View? =
         AppearanceManagerImpl.bannerLoadingPlaceholder?.createView(context)
             ?: super.loadingPlaceholder(context)
 }

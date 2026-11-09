@@ -5,7 +5,6 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import com.facebook.react.uimanager.ThemedReactContext
-import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -21,7 +20,6 @@ class BannerGridViewComponent(context: ThemedReactContext) : BannerPlaceComponen
     private val bannerGrid = BannerGrid(context)
     private val gridContainer = BannerGridContentLayout(context)
     private val callbackHandler = Handler(Looper.getMainLooper())
-    private var loadingPlaceholder: View? = null
     private var configuration: GridConfiguration? = null
     private var boundPlaceId: String? = null
     @Volatile private var disposed = false
@@ -56,7 +54,6 @@ class BannerGridViewComponent(context: ThemedReactContext) : BannerPlaceComponen
         )
         addView(gridContainer, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT))
         gridContainer.onContentLoaded = { size, height ->
-            loadingPlaceholder?.visibility = View.GONE
             val radiusPx = cornerRadius * resources.displayMetrics.density
             applyCornerRadiusToDescendants(bannerGrid, radiusPx)
             emitPlaceLoaded(id, size, height)
@@ -117,7 +114,6 @@ class BannerGridViewComponent(context: ThemedReactContext) : BannerPlaceComponen
                 callbackHandler.post {
                     if (!disposed && generation == currentGeneration) {
                         gridContainer.reset()
-                        loadingPlaceholder?.visibility = View.GONE
                         Log.e("BannerGridView", "Failed to load banner place: $placeId")
                     }
                 }
@@ -198,8 +194,6 @@ class BannerGridViewComponent(context: ThemedReactContext) : BannerPlaceComponen
         callbackHandler.removeCallbacksAndMessages(null)
         gridContainer.reset()
         registerLoadCallback()
-        updateLoadingPlaceholder()
-        loadingPlaceholder?.visibility = View.VISIBLE
     }
 
     fun dispose() {
@@ -208,22 +202,6 @@ class BannerGridViewComponent(context: ThemedReactContext) : BannerPlaceComponen
         gridContainer.dispose()
         bannerGrid.setPlaceId(null)
         bannerGrid.pauseBanners()
-    }
-
-    private fun updateLoadingPlaceholder() {
-        loadingPlaceholder?.let(gridContainer::removeView)
-        loadingPlaceholder = AppearanceManagerImpl.bannerLoadingPlaceholder
-            ?.createView(context)
-        loadingPlaceholder?.let { placeholder ->
-            gridContainer.addView(
-                placeholder,
-                FrameLayout.LayoutParams(
-                    FrameLayout.LayoutParams.MATCH_PARENT,
-                    FrameLayout.LayoutParams.WRAP_CONTENT,
-                    Gravity.CENTER
-                )
-            )
-        }
     }
 
     override fun onAttachedToWindow() {

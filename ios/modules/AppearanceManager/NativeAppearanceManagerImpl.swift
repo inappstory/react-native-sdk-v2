@@ -20,6 +20,7 @@ public class NativeAppearanceManagerImpl: NSObject {
 
   private final class NativeLoadingPlaceholder: UIView, PlaceholderProtocol {
     private let indicator: UIActivityIndicatorView
+    private var containerConstraints: [NSLayoutConstraint] = []
 
     var isAnimate: Bool { indicator.isAnimating }
 
@@ -40,6 +41,32 @@ public class NativeAppearanceManagerImpl: NSObject {
 
     required init?(coder: NSCoder) {
       fatalError("init(coder:) has not been implemented")
+    }
+
+    override func didMoveToSuperview() {
+      super.didMoveToSuperview()
+      NSLayoutConstraint.deactivate(containerConstraints)
+      containerConstraints = []
+      guard let superview else { return }
+      frame = superview.bounds
+      translatesAutoresizingMaskIntoConstraints = false
+      containerConstraints = [
+        leadingAnchor.constraint(equalTo: superview.leadingAnchor),
+        trailingAnchor.constraint(equalTo: superview.trailingAnchor),
+        topAnchor.constraint(equalTo: superview.topAnchor),
+        bottomAnchor.constraint(equalTo: superview.bottomAnchor),
+      ]
+      NSLayoutConstraint.activate(containerConstraints)
+      setNeedsUpdateConstraints()
+    }
+
+    override func updateConstraints() {
+      // CSPlaceholderView captures the initial zero frame before attachment.
+      NSLayoutConstraint.deactivate(constraints.filter {
+        $0.firstItem === self && $0.secondItem == nil
+          && ($0.firstAttribute == .width || $0.firstAttribute == .height)
+      })
+      super.updateConstraints()
     }
 
     func start() {

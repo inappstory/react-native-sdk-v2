@@ -21,7 +21,17 @@ data class LoadingPlaceholderOptions(
       indicatorColor?.let { indeterminateTintList = ColorStateList.valueOf(it) }
     }
 
-    return FrameLayout(context).apply {
+    return object : FrameLayout(context) {
+      override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        super.onMeasure(fillAvailableSpace(widthMeasureSpec), fillAvailableSpace(heightMeasureSpec))
+      }
+
+      // The SDK replaces reader loader layout params with WRAP_CONTENT.
+      private fun fillAvailableSpace(spec: Int): Int =
+        if (View.MeasureSpec.getMode(spec) == View.MeasureSpec.AT_MOST) {
+          View.MeasureSpec.makeMeasureSpec(View.MeasureSpec.getSize(spec), View.MeasureSpec.EXACTLY)
+        } else spec
+    }.apply {
       minimumHeight = size
       setBackgroundColor(backgroundColor ?: Color.TRANSPARENT)
       addView(
