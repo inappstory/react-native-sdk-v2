@@ -19,32 +19,66 @@ import androidx.core.view.doOnLayout
 import com.inappstory.reactnativesdk.appearance.AppearanceManagerImpl
 
 class NativeOverlayFragment(
-  private val ias: InAppStoryManager?,
-  private val settings: InAppMessageOpenSettings,
+  private val ias: InAppStoryManager? = null,
+  private val settings: InAppMessageOpenSettings? = null,
   private val onReaderIsClosed: (() -> Unit)? = null,
-  private val onReaderIsOpen: ((CancellationToken?) -> Unit)? = null
+  private val onCancellationTokenAvailable: ((CancellationToken?) -> Unit)? = null,
+  private val onReaderIsOpened: (() -> Unit)? = null,
+  private val onReaderOpenError: (() -> Unit)? = null
 ) : Fragment() {
 
-  private val contentId = View.generateViewId()
+  private var contentId = View.generateViewId()
+  private var readerOpened = false
   private var previousSoftInputMode: Int? = null
   private var loadingPlaceholder: View? = null
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    contentId = savedInstanceState?.getInt(CONTENT_ID) ?: contentId
+    readerOpened = savedInstanceState?.getBoolean(READER_OPENED) ?: false
+  }
+
+  override fun onSaveInstanceState(outState: Bundle) {
+    outState.putInt(CONTENT_ID, contentId)
+    outState.putBoolean(READER_OPENED, readerOpened)
+    super.onSaveInstanceState(outState)
+  }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     enableImeSupport(view)
     view.doOnLayout {
-        val cancellationToken = ias?.showInAppMessage(
-            settings,
+        if (savedInstanceState != null) {
+          if (readerOpened) {
+            loadingPlaceholder?.visibility = View.GONE
+          } else {
+            parentFragmentManager.popBackStack()
+          }
+          return@doOnLayout
+        }
+        val manager = ias
+        val openSettings = settings
+        if (manager == null || openSettings == null) {
+          Log.e("InappstorySdkModule", "Cannot restore IAM fragment without its request")
+          onReaderOpenError?.invoke()
+          parentFragmentManager.popBackStack()
+          return@doOnLayout
+        }
+        val cancellationToken = manager.showInAppMessage(
+            openSettings,
             childFragmentManager,
             contentId,
             object : InAppMessageScreenActions {
                 override fun readerIsOpened() {
                     Log.d("InappstorySdkModule", "IAM reader opened")
+                    readerOpened = true
+                    onReaderIsOpened?.invoke()
                     view?.post { loadingPlaceholder?.visibility = View.GONE }
                 }
                 override fun readerOpenError(p0: String?) {
                     Log.d("InappstorySdkModule", "IAM reader open error: $p0")
                     loadingPlaceholder?.visibility = View.GONE
+                    onReaderOpenError?.invoke()
                     onReaderIsClosed?.invoke()
                     parentFragmentManager.popBackStack()
                 }
@@ -56,7 +90,7 @@ class NativeOverlayFragment(
                 }
             }
         )
-        onReaderIsOpen?.invoke(cancellationToken)
+        onCancellationTokenAvailable?.invoke(cancellationToken)
     }
   }
 
@@ -135,5 +169,10 @@ class NativeOverlayFragment(
       activity?.window?.setSoftInputMode(mode)
       previousSoftInputMode = null
     }
+  }
+
+  companion object {
+    private const val CONTENT_ID = "contentId"
+    private const val READER_OPENED = "readerOpened"
   }
 }

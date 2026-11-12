@@ -1,6 +1,7 @@
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 import type { BannerCommonProps } from './types';
+import { useEventCallback } from '../../hooks/useEventCallback';
 
 export function useBannerViewProps(
   props: BannerCommonProps & { height?: number }
@@ -16,10 +17,9 @@ export function useBannerViewProps(
       ] as StyleProp<ViewStyle>,
     [height, style]
   );
-  const handlePlaceLoaded = useCallback(
+  const handlePlaceLoaded = useEventCallback(
     (event: { nativeEvent: { size: number; widgetHeight: number } }) =>
-      onPlaceLoaded?.(event.nativeEvent.size, event.nativeEvent.widgetHeight),
-    [onPlaceLoaded]
+      onPlaceLoaded?.(event.nativeEvent.size, event.nativeEvent.widgetHeight)
   );
 
   return { viewStyle, handlePlaceLoaded };

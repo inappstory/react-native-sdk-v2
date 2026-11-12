@@ -24,6 +24,6 @@ export default defineConfig([
     },
   },
   {
-    ignores: ['node_modules/', 'lib/', 'coverage/', 'reports/'],
+    ignores: ['node_modules/', 'lib/', 'coverage/', 'reports/', 'android/build/'],
   },
 ]);

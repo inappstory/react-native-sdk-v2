@@ -161,7 +161,10 @@ class AppearanceManagerModule(private val reactContext: ReactApplicationContext)
     val readerPlaceholder = readLoadingPlaceholder(options, "storyReader")
     val iamPlaceholder = readLoadingPlaceholder(options, "iam")
     val bannerPlaceholder = readLoadingPlaceholder(options, "banners")
-    val manager = appearanceManager ?: return
+    val manager =
+      appearanceManager ?: AppearanceManagerImpl.getAppearanceManager().also {
+        appearanceManager = it
+      }
 
     manager.csStoryLoaderView(
       readerPlaceholder?.let { placeholder ->
@@ -187,9 +190,15 @@ class AppearanceManagerModule(private val reactContext: ReactApplicationContext)
     )
   }
 
-  private fun readColor(options: ReadableMap, key: String): Int? =
-    if (!options.hasKey(key) || options.isNull(key)) null
-    else Color.parseColor(options.getString(key))
+  private fun readColor(options: ReadableMap, key: String): Int? {
+    if (!options.hasKey(key) || options.isNull(key)) return null
+    return try {
+      Color.parseColor(options.getString(key))
+    } catch (e: IllegalArgumentException) {
+      Log.e("AppearanceManagerModule", "Invalid color value for $key", e)
+      null
+    }
+  }
 
   private fun getImageID(imgName: String): Int {
     return reactContext.resources

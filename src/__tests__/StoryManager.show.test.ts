@@ -39,6 +39,17 @@ describe('cancelable operations', () => {
     expect(native.cancelOperation).not.toHaveBeenCalled();
   });
 
+  it('rejects native errors and removes the abort listener', async () => {
+    const manager = await StoryManager.create({ apiKey: 'k', userId: 'u' });
+    const controller = new AbortController();
+    const error = new Error('native failure');
+    const removeListener = jest.spyOn(controller.signal, 'removeEventListener');
+    native.showSingle.mockRejectedValueOnce(error);
+
+    await expect(manager.showStory(1, controller.signal)).rejects.toBe(error);
+    expect(removeListener).toHaveBeenCalledWith('abort', expect.any(Function));
+  });
+
   it('showStoryOnce resolves native result and stringifies id', async () => {
     const manager = await StoryManager.create({ apiKey: 'k', userId: 'u' });
     await expect(manager.showStoryOnce(9)).resolves.toBe(true);

@@ -14,6 +14,7 @@ import com.facebook.react.bridge.JavaOnlyMap
 import com.inappstory.reactnativesdk.modules.AppearanceManagerModule
 import com.inappstory.reactnativesdk.view.CustomBannerViewAppearance
 import com.inappstory.reactnativesdk.view.CustomBannerGridAppearance
+import com.inappstory.reactnativesdk.view.CustomBannerListAppearance
 import com.inappstory.sdk.AppearanceManager
 import com.inappstory.sdk.banners.ui.banner.BannerView
 import org.junit.Assert.assertEquals
@@ -30,9 +31,11 @@ class LoadingPlaceholderTest {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val carousel = CustomBannerViewAppearance(null, null, null, null, null)
         val grid = CustomBannerGridAppearance(8, 8)
+        val list = CustomBannerListAppearance(8, 16)
         val factories = listOf<(Context) -> View?>(
             carousel::loadingPlaceholder,
-            grid::loadingPlaceholder
+            grid::loadingPlaceholder,
+            list::loadingPlaceholder
         )
         AppearanceManagerImpl.bannerLoadingPlaceholder = LoadingPlaceholderOptions(Color.BLUE, Color.YELLOW)
         try {

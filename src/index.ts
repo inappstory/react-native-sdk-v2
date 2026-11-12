@@ -37,6 +37,11 @@ export type {
   BannerGridProps,
   BannerGridRef,
 } from './components/BannerGrid/BannerGrid';
+export { BannerList } from './components/BannerList/BannerList';
+export type {
+  BannerListProps,
+  BannerListRef,
+} from './components/BannerList/BannerList';
 export type { BannerData, BannerWidgetEvent } from './types/BannerData';
 export type { StoryData, StoryEvent } from './types/StoryData';
 export type {

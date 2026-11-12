@@ -52,6 +52,7 @@ import com.inappstory.sdk.CancellationToken
 import com.inappstory.sdk.inappmessage.InAppMessageOpenSettings
 import com.inappstory.sdk.inappmessage.InAppMessagePreloadSettings
 import com.inappstory.sdk.inappmessage.InAppMessageLoadCallback
+import java.util.concurrent.ConcurrentHashMap
 
 @ReactModule(name = StoryManagerModule.NAME)
 class StoryManagerModule(var reactContext: ReactApplicationContext) :
@@ -84,7 +85,7 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
 
   private val pendingFavoritesCount = mutableListOf<Promise>()
 
-  private val cancellationTokenMap = mutableMapOf<String, CancellationToken?>()
+  private val cancellationTokenMap = ConcurrentHashMap<String, CancellationToken>()
 
   override fun initWith(
     apiKey: String, userID: String, userIdSign: String?, sandbox: Boolean,
@@ -226,7 +227,11 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
     Log.d(TAG, "showSingle")
     reactContext.runOnUiQueueThread {
       try {
-        cancellationTokenMap[operationId] = this.ias?.showStory(
+        val ias = this.ias ?: run {
+          promise.resolve(false)
+          return@runOnUiQueueThread
+        }
+        ias.showStory(
           storyID,
           reactContext.currentActivity,
           this.appearanceManager,
@@ -241,7 +246,7 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
               promise.resolve(false)
             }
           }
-        )
+        )?.let { cancellationTokenMap[operationId] = it }
       } catch (e: Throwable) {
         promise.reject("showSingle error", e)
       }
@@ -261,7 +266,11 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
         // non-empty list overrides tags for this request only. Targeting is
         // enabled by calling showStoryWithTargeting regardless of tags.
         val tagsList = tags?.toArrayList()?.map { it.toString() }
-        cancellationTokenMap[operationId] = this.ias?.showStoryWithTargeting(
+        val ias = this.ias ?: run {
+          promise.resolve(false)
+          return@runOnUiQueueThread
+        }
+        ias.showStoryWithTargeting(
           storyID,
           tagsList,
           reactContext.currentActivity,
@@ -277,7 +286,7 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
               promise.resolve(false)
             }
           }
-        )
+        )?.let { cancellationTokenMap[operationId] = it }
       } catch (e: Throwable) {
         promise.reject("showSingleWithTargeting error", e)
       }
@@ -295,13 +304,13 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
     reactContext.runOnUiQueueThread {
       try {
         val tagsList = tags?.toArrayList()?.map { it.toString() }
-        cancellationTokenMap[operationId] = this.ias?.showOnboardingStories(
+        this.ias?.showOnboardingStories(
           limit.toInt(),
           feed,
           tagsList,
           reactContext.currentActivity as Context,
           this.appearanceManager
-        )
+        )?.let { cancellationTokenMap[operationId] = it }
         promise.resolve(true)
       } catch (e: Throwable) {
         promise.reject("showOnboardings error", e)
@@ -318,24 +327,25 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
     Log.d(TAG, "showIAMById")
     reactContext.runOnUiQueueThread {
       try {
+        val id = iamID.toIntOrNull() ?: run {
+          promise.resolve(false)
+          return@runOnUiQueueThread
+        }
         val settings =
-          InAppMessageOpenSettings().id(iamID.toInt()).showOnlyIfLoaded(onlyPreloaded)
+          InAppMessageOpenSettings().id(id).showOnlyIfLoaded(onlyPreloaded)
 
         val fragment = NativeOverlayFragment(
           ias = this.ias,
           settings = settings,
           onReaderIsClosed = { cancellationTokenMap.remove(operationId) },
-          onReaderIsOpen = { cancellationToken ->
-            cancellationTokenMap[operationId] = cancellationToken
-            promise.resolve(true)
+          onCancellationTokenAvailable = { token ->
+            token?.let { cancellationTokenMap[operationId] = it }
           },
+          onReaderIsOpened = { promise.resolve(true) },
+          onReaderOpenError = { promise.resolve(false) },
         )
 
-        (reactContext.currentActivity as FragmentActivity).supportFragmentManager
-          .beginTransaction()
-          .add(android.R.id.content, fragment, "overlay_fragment")
-          .addToBackStack("overlay_fragment")
-          .commit()
+        presentOverlay(fragment, promise)
       } catch (e: Throwable) {
         promise.reject("showIAMById error", e)
       }
@@ -355,8 +365,12 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
         // useTargeting() enables server-side targeting for "by id" requests
         // even when no tag override is passed (tags == null keeps the current
         // SDK settings' tags). A non-null list overrides tags for this request.
+        val id = iamID.toIntOrNull() ?: run {
+          promise.resolve(false)
+          return@runOnUiQueueThread
+        }
         var settings =
-          InAppMessageOpenSettings().id(iamID.toInt()).showOnlyIfLoaded(onlyPreloaded)
+          InAppMessageOpenSettings().id(id).showOnlyIfLoaded(onlyPreloaded)
             .useTargeting()
         if (tags != null) {
           settings = settings.tags(tags.toArrayList().map { it.toString() })
@@ -366,17 +380,14 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
           ias = this.ias,
           settings = settings,
           onReaderIsClosed = { cancellationTokenMap.remove(operationId) },
-          onReaderIsOpen = { cancellationToken ->
-            cancellationTokenMap[operationId] = cancellationToken
-            promise.resolve(true)
+          onCancellationTokenAvailable = { token ->
+            token?.let { cancellationTokenMap[operationId] = it }
           },
+          onReaderIsOpened = { promise.resolve(true) },
+          onReaderOpenError = { promise.resolve(false) },
         )
 
-        (reactContext.currentActivity as FragmentActivity).supportFragmentManager
-          .beginTransaction()
-          .add(android.R.id.content, fragment, "overlay_fragment")
-          .addToBackStack("overlay_fragment")
-          .commit()
+        presentOverlay(fragment, promise)
       } catch (e: Throwable) {
         promise.reject("showIAMByIdWithTargeting error", e)
       }
@@ -399,21 +410,31 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
           ias = this.ias,
           settings = settings,
           onReaderIsClosed = { cancellationTokenMap.remove(operationId) },
-          onReaderIsOpen = { cancellationToken ->
-            cancellationTokenMap[operationId] = cancellationToken
-            promise.resolve(true)
+          onCancellationTokenAvailable = { token ->
+            token?.let { cancellationTokenMap[operationId] = it }
           },
+          onReaderIsOpened = { promise.resolve(true) },
+          onReaderOpenError = { promise.resolve(false) },
         )
 
-        (reactContext.currentActivity as FragmentActivity).supportFragmentManager
-          .beginTransaction()
-          .add(android.R.id.content, fragment, "overlay_fragment")
-          .addToBackStack("overlay_fragment")
-          .commit()
+        presentOverlay(fragment, promise)
       } catch (e: Throwable) {
         promise.reject("showIAMByEvent error", e)
       }
     }
+  }
+
+  private fun presentOverlay(fragment: NativeOverlayFragment, promise: Promise) {
+    val fragmentManager =
+      (reactContext.currentActivity as? FragmentActivity)?.supportFragmentManager
+    if (fragmentManager == null || fragmentManager.isStateSaved) {
+      promise.resolve(false)
+      return
+    }
+    fragmentManager.beginTransaction()
+      .add(android.R.id.content, fragment, "overlay_fragment")
+      .addToBackStack("overlay_fragment")
+      .commit()
   }
 
   override fun preloadIAM(ids: ReadableArray?, tags: ReadableArray?, promise: Promise) {
@@ -515,7 +536,11 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
     Log.d(TAG, "showStoryOnce")
     reactContext.runOnUiQueueThread {
       try {
-        cancellationTokenMap[operationId] = this.ias?.showStoryOnce(
+        val ias = this.ias ?: run {
+          promise.resolve(false)
+          return@runOnUiQueueThread
+        }
+        ias.showStoryOnce(
           storyID,
           reactContext.currentActivity as Context,
           this.appearanceManager,
@@ -535,7 +560,7 @@ class StoryManagerModule(var reactContext: ReactApplicationContext) :
               promise.resolve(false)
             }
           }
-        )
+        )?.let { cancellationTokenMap[operationId] = it }
       } catch (e: Throwable) {
         promise.reject("showStoryOnce error", e)
       }

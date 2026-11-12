@@ -17,37 +17,37 @@ class BannerGridViewComponentViewManager : SimpleViewManager<BannerGridViewCompo
         view.placeId = value
     }
 
-    @ReactProp(name = "columnSpacing")
+    @ReactProp(name = "columnSpacing", defaultFloat = 8f)
     fun setColumnSpacing(view: BannerGridViewComponent, value: Float) {
         view.columnSpacing = value
     }
 
-    @ReactProp(name = "rowSpacing")
+    @ReactProp(name = "rowSpacing", defaultFloat = 8f)
     fun setRowSpacing(view: BannerGridViewComponent, value: Float) {
         view.rowSpacing = value
     }
 
-    @ReactProp(name = "sideInset")
+    @ReactProp(name = "sideInset", defaultFloat = 16f)
     fun setSideInset(view: BannerGridViewComponent, value: Float) {
         view.sideInset = value
     }
 
-    @ReactProp(name = "leadingInset")
+    @ReactProp(name = "leadingInset", defaultFloat = 16f)
     fun setLeadingInset(view: BannerGridViewComponent, value: Float) {
         view.leadingInset = value
     }
 
-    @ReactProp(name = "trailingInset")
+    @ReactProp(name = "trailingInset", defaultFloat = 16f)
     fun setTrailingInset(view: BannerGridViewComponent, value: Float) {
         view.trailingInset = value
     }
 
-    @ReactProp(name = "interItemSpacing")
+    @ReactProp(name = "interItemSpacing", defaultFloat = 8f)
     fun setInterItemSpacing(view: BannerGridViewComponent, value: Float) {
         view.interItemSpacing = value
     }
 
-    @ReactProp(name = "cornerRadius")
+    @ReactProp(name = "cornerRadius", defaultFloat = 16f)
     fun setCornerRadius(view: BannerGridViewComponent, value: Float) {
         view.cornerRadius = value
     }

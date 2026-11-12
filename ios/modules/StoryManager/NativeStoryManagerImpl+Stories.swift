@@ -57,8 +57,12 @@ extension NativeStoryManagerImpl {
   }
 
   @objc public func cancelOperation(_ operationId: String) {
-    cancellationTokenMap[operationId]?.cancel()
-    cancellationTokenMap.removeValue(forKey: operationId)
+    DispatchQueue.main.async { [weak self] in
+      guard let self else { return }
+      if let token = self.cancellationTokenMap.removeValue(forKey: operationId) {
+        token.cancel()
+      }
+    }
   }
 
   @objc public func showSingle(

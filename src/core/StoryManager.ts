@@ -331,19 +331,31 @@ export class StoryManager extends StoryEvents {
         return reject(rejectValue);
       }
       const operationId = generateId();
+      const cleanup = () => signal?.removeEventListener('abort', onAbort);
       const onAbort = () => {
+        cleanup();
         NativeStoryManager.cancelOperation(operationId);
         reject(rejectValue);
       };
       signal?.addEventListener('abort', onAbort);
-      run(operationId).then((success) => {
-        signal?.removeEventListener('abort', onAbort);
-        if (success) {
-          resolve(success);
-        } else {
-          reject(rejectValue);
-        }
-      });
+      try {
+        run(operationId)
+          .then((success) => {
+            cleanup();
+            if (success) {
+              resolve(success);
+            } else {
+              reject(rejectValue);
+            }
+          })
+          .catch((error: unknown) => {
+            cleanup();
+            reject(error ?? rejectValue);
+          });
+      } catch (error) {
+        cleanup();
+        reject(error);
+      }
     });
   }
 

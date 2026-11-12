@@ -13,6 +13,7 @@ import com.inappstory.sdk.banners.BannerData
 import com.inappstory.sdk.banners.BannerPlaceLoadCallback
 import com.inappstory.sdk.banners.ui.banner.BannerView
 import com.inappstory.sdk.banners.ui.grid.BannerGrid
+import java.util.UUID
 import kotlin.math.roundToInt
 
 @SuppressLint("ViewConstructor")
@@ -147,7 +148,7 @@ class BannerGridViewComponent(context: ThemedReactContext) : BannerPlaceComponen
 
     private fun loadBanners(config: GridConfiguration, refresh: Boolean) {
         if (boundPlaceId != config.placeId) {
-            bannerGrid.setPlaceId(null)
+            unbindPlace()
             boundPlaceId = config.placeId
         }
         applyGridAppearance(config)
@@ -196,11 +197,18 @@ class BannerGridViewComponent(context: ThemedReactContext) : BannerPlaceComponen
         registerLoadCallback()
     }
 
+    private fun unbindPlace() {
+        // SDK teardown nulls a retained model's placeId; retire its pending request identity first.
+        bannerGrid.uniqueId(UUID.randomUUID().toString())
+        bannerGrid.setPlaceId(null)
+    }
+
     fun dispose() {
         disposed = true
         callbackHandler.removeCallbacksAndMessages(null)
+        bannerGrid.setOnHierarchyChangeListener(null)
         gridContainer.dispose()
-        bannerGrid.setPlaceId(null)
+        unbindPlace()
         bannerGrid.pauseBanners()
     }
 

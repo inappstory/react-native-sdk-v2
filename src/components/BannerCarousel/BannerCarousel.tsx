@@ -1,4 +1,4 @@
-import { forwardRef, useCallback } from 'react';
+import { forwardRef } from 'react';
 
 import BannerNativeView, { type BannerViewRef } from './BannerNativeView';
 import {
@@ -8,6 +8,7 @@ import {
   type BannerCommonProps,
 } from '../Banner/types';
 import { useBannerViewProps } from '../Banner/hooks';
+import { useEventCallback } from '../../hooks/useEventCallback';
 
 export type BannerCarouselProps = BannerCommonProps & {
   shouldLoop?: boolean;
@@ -21,8 +22,8 @@ export const BannerCarousel = forwardRef<BannerViewRef, BannerCarouselProps>(
       placeId = 'default',
       shouldLoop = true,
       sideInset = DEFAULT_BANNER_SIDE_INSET,
-      leadingInset = DEFAULT_BANNER_SIDE_INSET,
-      trailingInset = DEFAULT_BANNER_SIDE_INSET,
+      leadingInset,
+      trailingInset,
       interItemSpacing = DEFAULT_BANNER_INTER_ITEM_SPACING,
       cornerRadius = DEFAULT_BANNER_CORNER_RADIUS,
       height = 150,
@@ -37,10 +38,8 @@ export const BannerCarousel = forwardRef<BannerViewRef, BannerCarouselProps>(
       style,
       onPlaceLoaded,
     });
-    const handleScroll = useCallback(
-      (e: { nativeEvent: { index: number } }) =>
-        onScroll?.(e.nativeEvent.index),
-      [onScroll]
+    const handleScroll = useEventCallback(
+      (e: { nativeEvent: { index: number } }) => onScroll?.(e.nativeEvent.index)
     );
 
     return (
@@ -49,8 +48,8 @@ export const BannerCarousel = forwardRef<BannerViewRef, BannerCarouselProps>(
         placeId={placeId}
         shouldLoop={shouldLoop}
         sideInset={sideInset}
-        leadingInset={leadingInset}
-        trailingInset={trailingInset}
+        leadingInset={leadingInset ?? sideInset}
+        trailingInset={trailingInset ?? sideInset}
         interItemSpacing={interItemSpacing}
         cornerRadius={cornerRadius}
         style={viewStyle}

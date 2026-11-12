@@ -426,6 +426,64 @@ const gridRef = useRef<BannerGridRef>(null);
 />;
 ```
 
+### Vertical banner list
+
+Use `BannerList` for a native, one-column, vertically scrolling list. It fills
+the space allocated by its parent; the parent must have a bounded height.
+Unlike `BannerGrid`, it never expands to its content height. Each banner keeps
+its own aspect ratio, and all available banners are included (no 20-item limit).
+
+```tsx
+import { BannerList, type BannerListRef } from '@inappstory/react-native-sdk';
+import { useRef } from 'react';
+import { View } from 'react-native';
+
+const listRef = useRef<BannerListRef>(null);
+
+<View style={{ flex: 1 }}>
+  <BannerList
+    ref={listRef}
+    placeId="main_banner"
+    style={{ flex: 1 }}
+    sideInset={16}
+    interItemSpacing={12}
+    cornerRadius={16}
+    onPlaceLoaded={(size, widgetHeight) =>
+      console.log(`List loaded: ${size}, content height: ${widgetHeight}dp`)
+    }
+  />
+</View>;
+
+// Alternatively, use height={400} or style={{ height: 400 }}.
+// Preloading uses the same storyManager.preloadBannerPlace(...) API.
+listRef.current?.refresh();
+listRef.current?.pause();
+listRef.current?.resume();
+```
+
+| Prop | Default | Description |
+| --- | --- | --- |
+| `placeId` | `'default'` | Banner place identifier. |
+| `height` | unset | Fixed viewport height in dp. Otherwise uses `style.height` or fills available space with flex. |
+| `style` | full width | React Native view style; takes precedence over default layout and `height`. |
+| `sideInset` | `16` | Horizontal padding on both sides, in dp. |
+| `leadingInset`, `trailingInset` | `sideInset` | Override the respective horizontal padding; `0` removes it. |
+| `interItemSpacing` | `8` | Vertical space between banners, in dp. |
+| `cornerRadius` | `16` | Corner radius of each banner, in dp. |
+| `onPlaceLoaded` | unset | `(size: number, widgetHeight: number) => void`. |
+
+`onPlaceLoaded` retains the Flutter SDK convention: on Android, `widgetHeight`
+is `0` because the native list does not expose its full content height; on iOS,
+it is the full content height, **not** the viewport height. Empty results report
+`(0, 0)`. Do not resize the list using this callback.
+
+The ref exposes `refresh()` (reload content), `pause()` and `resume()` (banner
+playback, not scrolling or taps). An explicit pause persists until resume,
+including across appearance updates. There is no carousel looping or automatic
+scrolling. Loading placeholders configured through `AppearanceManager` and
+global banner events work for the list too. Native Android retains its default
+4 dp padding before the first and after the last item.
+
 ### Banner Events
 
 Listen to banner widget events:
