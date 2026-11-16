@@ -22,6 +22,11 @@ class BannerGridViewComponentViewManager : SimpleViewManager<BannerGridViewCompo
         view.columnSpacing = value
     }
 
+    @ReactProp(name = "columnCount", defaultInt = 2)
+    fun setColumnCount(view: BannerGridViewComponent, value: Int) {
+        view.columnCount = value
+    }
+
     @ReactProp(name = "rowSpacing", defaultFloat = 8f)
     fun setRowSpacing(view: BannerGridViewComponent, value: Float) {
         view.rowSpacing = value

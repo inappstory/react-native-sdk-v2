@@ -11,6 +11,8 @@ import BannerGridNativeView from './BannerGridNativeView';
 import { useEventCallback } from '../../hooks/useEventCallback';
 
 export type BannerGridProps = BannerCommonProps & {
+  /** Number of grid columns. Must be a positive 32-bit integer. Defaults to 2. */
+  columnCount?: number;
   /** Horizontal space between grid columns (dp). Defaults to `interItemSpacing`. */
   columnSpacing?: number;
   /** Vertical space between grid rows (dp). Defaults to `interItemSpacing`. */
@@ -28,6 +30,7 @@ export const BannerGrid = forwardRef<BannerGridRef, BannerGridProps>(
   (
     {
       placeId = 'default',
+      columnCount = 2,
       columnSpacing,
       rowSpacing,
       sideInset = DEFAULT_BANNER_SIDE_INSET,
@@ -41,6 +44,15 @@ export const BannerGrid = forwardRef<BannerGridRef, BannerGridProps>(
     },
     ref
   ) => {
+    if (
+      !Number.isInteger(columnCount) ||
+      columnCount < 1 ||
+      columnCount > 2147483647
+    ) {
+      throw new RangeError(
+        'BannerGrid columnCount must be a positive 32-bit integer'
+      );
+    }
     const [loadedHeight, setLoadedHeight] = useState<{
       placeId: string;
       height: number;
@@ -72,6 +84,7 @@ export const BannerGrid = forwardRef<BannerGridRef, BannerGridProps>(
       <BannerGridNativeView
         ref={ref}
         placeId={placeId}
+        columnCount={columnCount}
         columnSpacing={columnSpacing ?? interItemSpacing}
         rowSpacing={rowSpacing ?? interItemSpacing}
         sideInset={sideInset}

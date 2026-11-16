@@ -39,6 +39,7 @@ class BannerView: UIView {
     let trailingInset: CGFloat
     let interItemSpacing: CGFloat
     let cornerRadius: CGFloat
+    let columnCount: Int
     let columnSpacing: CGFloat
     let rowSpacing: CGFloat
   }
@@ -89,6 +90,12 @@ class BannerView: UIView {
   }
 
   @objc var columnSpacing: CGFloat = 8.0 {
+    didSet {
+      updateComponent()
+    }
+  }
+
+  @objc var columnCount: Int = 2 {
     didSet {
       updateComponent()
     }
@@ -157,6 +164,7 @@ class BannerView: UIView {
       trailingInset: trailingInset,
       interItemSpacing: interItemSpacing,
       cornerRadius: cornerRadius,
+      columnCount: columnCount,
       columnSpacing: columnSpacing,
       rowSpacing: rowSpacing
     )
@@ -172,7 +180,8 @@ class BannerView: UIView {
       cornerRadius: self.cornerRadius,
       maxBannersCount: self.layoutType == .verticalList ? nil : 20,
       columnSpacing: self.columnSpacing,
-      rowSpacing: self.rowSpacing
+      rowSpacing: self.rowSpacing,
+      columnCount: self.columnCount
     )
     createBannerView()
     //    guard let bannersView = _bannersView else { return }

@@ -3,6 +3,7 @@
 
 @interface RCT_EXTERN_MODULE (BannerGridViewManager, RCTViewManager)
 RCT_EXPORT_VIEW_PROPERTY(placeId, NSString)
+RCT_EXPORT_VIEW_PROPERTY(columnCount, NSInteger)
 RCT_EXPORT_VIEW_PROPERTY(columnSpacing, CGFloat)
 RCT_EXPORT_VIEW_PROPERTY(rowSpacing, CGFloat)
 RCT_EXPORT_VIEW_PROPERTY(sideInset, CGFloat)

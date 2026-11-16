@@ -144,6 +144,11 @@ yarn example ios      # and: yarn example android
       `changeSound(true)` unmutes at runtime.
 - [ ] `BannerCarousel` and `BannerGrid` render; grid height follows
       `widgetHeight`, refresh works, and banner events arrive in JS.
+- [ ] `BannerGrid` defaults to two columns; `columnCount={1}` and
+      `columnCount={3}` change the layout on both platforms. Changing the prop
+      at runtime recalculates auto-height, including an incomplete final row.
+      Zero, negative, fractional, non-finite and out-of-32-bit-range values
+      throw a clear `RangeError` before reaching native.
 - [ ] `BannerList` uses internal vertical scrolling within its RN viewport:
       check `height`, `style.height`, flex, resizing/rotation and empty content.
       The viewport never follows `onPlaceLoaded` content height. Scroll through
@@ -216,6 +221,12 @@ yarn example ios      # and: yarn example android
 
 Bugs the suite uncovered and now guards. Each has a test that fails if the old
 behaviour comes back:
+
+Tag initialization and runtime setters are covered in
+[StoryManager.config.test.ts](src/__tests__/StoryManager.config.test.ts):
+invalid tags must not discard valid neighbors, and filtering must happen before
+keeping the first 100 tags. `addTags` counts the merged unique list and preserves
+existing tags first.
 
 1. `StoryManager.fetchGoods` used to throw when the app never called
    `getGoods()`, leaving native waiting for a `commitGoods` that never came.

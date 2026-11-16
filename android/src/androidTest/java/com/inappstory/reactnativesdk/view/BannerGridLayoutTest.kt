@@ -178,6 +178,22 @@ class BannerGridLayoutTest {
     }
 
     @Test
+    fun appliesColumnCountAndUpdatesItAfterPropsChange() {
+        withGrid { host, _, _ ->
+            host.columnCount = 3
+            host.applyAppearanceAndLoad()
+            measureAndLayout(host, 0)
+            val manager = AppearanceManagerImpl.getAppearanceManager()
+            assertEquals(3, manager.csBannerGridInterface().columnCount())
+
+            host.columnCount = 1
+            host.applyAppearanceAndLoad()
+            measureAndLayout(host, 0)
+            assertEquals(1, manager.csBannerGridInterface().columnCount())
+        }
+    }
+
+    @Test
     fun appliesCornerRadiusToBannerCardViewsInHierarchy() {
         withGrid { host, _, grid ->
             val context = grid.context

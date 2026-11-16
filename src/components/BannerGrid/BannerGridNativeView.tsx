@@ -15,6 +15,7 @@ import type { BannerBaseRef } from '../Banner/types';
 
 type Props = {
   placeId: string;
+  columnCount: number;
   columnSpacing: number;
   rowSpacing: number;
   sideInset: number;

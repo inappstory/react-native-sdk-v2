@@ -12,7 +12,11 @@ import NativeStoriesEvents from '../specs/NativeStoriesEvents';
 import NativeSystemEvents from '../specs/NativeSystemEvents';
 import { CTAHandler } from './CTAHandler';
 import { StoryEvents } from './StoryEvents';
-import { assertUserIdLength, tagsAreValid } from '../utils/validation';
+import {
+  assertUserIdLength,
+  sanitizeTags,
+  tagsAreValid,
+} from '../utils/validation';
 import type { Option } from '../types/common';
 import type { ProductCart, ProductCartHandlers } from '../types/ProductCart';
 import type { StoryManagerConfig } from '../types/StoryManager';
@@ -52,8 +56,8 @@ export class StoryManager extends StoryEvents {
     this.userId = userId;
     this.userIdSign = userIdSign;
 
-    if (config.tags && tagsAreValid(config.tags)) {
-      this.tags = config.tags;
+    if (config.tags) {
+      this.tags = sanitizeTags(config.tags);
     }
 
     if (config.placeholders) {
@@ -151,9 +155,7 @@ export class StoryManager extends StoryEvents {
   }
 
   private async applyNativeConfig(): Promise<void> {
-    if (!tagsAreValid(this.tags)) {
-      this.tags = [];
-    }
+    this.tags = sanitizeTags(this.tags);
     await NativeStoryManager.initWith(
       this.apiKey,
       this.userId,
@@ -237,16 +239,15 @@ export class StoryManager extends StoryEvents {
   }
 
   setTags(tags: string[]) {
-    if (!tagsAreValid(tags)) return;
-    this.tags = tags;
-    NativeStoryManager.setTags(tags);
+    this.tags = sanitizeTags(tags);
+    NativeStoryManager.setTags(this.tags);
   }
 
   addTags(tags: string[]) {
-    const merged = [...new Set([...this.tags, ...tags])];
-    if (!tagsAreValid(merged)) return;
-    this.tags = merged;
-    NativeStoryManager.addTags(tags);
+    this.tags = sanitizeTags([...new Set([...this.tags, ...tags])]);
+    NativeStoryManager.addTags(
+      [...new Set(tags)].filter((tag) => this.tags.includes(tag))
+    );
   }
 
   removeTags(tags: string[]) {

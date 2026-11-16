@@ -400,7 +400,10 @@ Preload banner data in advance:
 await storyManager.preloadBannerPlace('main_banner', ['tag1']);
 ```
 
-Use `BannerGrid` to display banners in a non-scrolling grid (two columns).
+Use `BannerGrid` to display banners in a non-scrolling grid (two columns by default).
+Set `columnCount` to a positive 32-bit integer to change the number of columns.
+Changing it at runtime rebuilds the grid and recalculates its content height.
+On iOS, this requires InAppStory 1.29.10 or later.
 If `height` is omitted, the component adjusts its height to fit the loaded banners.
 On Android, `onPlaceLoaded` reports the full measured content height in dp,
 including all rows and gaps, after native layout. It fires again when that
@@ -418,6 +421,7 @@ const gridRef = useRef<BannerGridRef>(null);
 <BannerGrid
   ref={gridRef}
   placeId="main_banner"
+  columnCount={3}
   columnSpacing={8}
   rowSpacing={12}
   onPlaceLoaded={(size, widgetHeight) =>
@@ -574,10 +578,12 @@ storyManager.addTags(['tag2']);
 storyManager.removeTags(['tag1']);
 ```
 
-A tag may contain only letters (any alphabet), digits, `_` and `-`, and the total
-number of tags must not exceed 100. If a rule is violated, the error is written to
-`console.error` and the call never reaches the native SDK — the tags are not
-applied, but the app does not crash.
+A tag must start with a letter (any alphabet) or digit and may contain only
+letters, digits, `_` and `-`. Initialization, `setTags` and `addTags` discard
+invalid tags and keep the first 100 valid tags in order, logging discarded input
+to `console.error`. `addTags` keeps existing tags first and removes duplicates.
+Request-specific tag overrides still reject the entire request if any tag is
+invalid or the list exceeds 100.
 
 ## Placeholders
 

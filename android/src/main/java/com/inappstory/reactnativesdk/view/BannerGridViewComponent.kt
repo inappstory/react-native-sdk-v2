@@ -28,6 +28,7 @@ class BannerGridViewComponent(context: ThemedReactContext) : BannerPlaceComponen
 
     private data class GridConfiguration(
         val placeId: String?,
+        val columnCount: Int,
         val columnSpacing: Int,
         val rowSpacing: Int,
         val leftInset: Int,
@@ -37,6 +38,7 @@ class BannerGridViewComponent(context: ThemedReactContext) : BannerPlaceComponen
     )
 
     var placeId: String? = null
+    var columnCount: Int = 2
     var columnSpacing: Float = 8f
     var rowSpacing: Float = 8f
     var sideInset: Float = 0f
@@ -129,6 +131,7 @@ class BannerGridViewComponent(context: ThemedReactContext) : BannerPlaceComponen
         val density = resources.displayMetrics.density
         val next = GridConfiguration(
             placeId,
+            columnCount,
             columnSpacing.roundToInt().coerceAtLeast(0),
             rowSpacing.roundToInt().coerceAtLeast(0),
             ((leadingInset ?: sideInset) * density).toInt(),
@@ -160,7 +163,8 @@ class BannerGridViewComponent(context: ThemedReactContext) : BannerPlaceComponen
         val appearance = CustomBannerGridAppearance(
             config.columnSpacing,
             config.rowSpacing,
-            config.cornerRadius.roundToInt()
+            config.cornerRadius.roundToInt(),
+            config.columnCount
         )
         val manager = AppearanceManagerImpl.getAppearanceManager()
         manager.csBannerGridInterface(appearance)

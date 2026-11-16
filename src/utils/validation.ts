@@ -1,6 +1,6 @@
 const USER_ID_MAX_BYTES = 255;
 const TAGS_MAX_COUNT = 100;
-const TAG_PATTERN = /^[\p{L}\p{N}_-]+$/u;
+const TAG_PATTERN = /^[\p{L}\p{N}][\p{L}\p{N}_-]*$/u;
 
 /** UTF-8 byte length without TextEncoder (not guaranteed on Hermes). */
 export function byteLength(value: string): number {
@@ -17,25 +17,24 @@ export function assertUserIdLength(userId: string): string {
   return userId;
 }
 
-/**
- * Logs a console error when a tag is not letters/digits in any script (plus `_`
- * and `-`) or when the list exceeds 100 tags. Invalid tags are never sent to native.
- */
-export function tagsAreValid(tags: string[]): boolean {
-  let valid = true;
-  if (tags.length > TAGS_MAX_COUNT) {
+/** Keeps the first 100 valid tags and logs discarded input. */
+export function sanitizeTags(tags: string[]): string[] {
+  const validTags = tags.filter((tag) => {
+    if (TAG_PATTERN.test(tag)) return true;
     console.error(
-      `InAppStory: tags must be at most ${TAGS_MAX_COUNT}, got ${tags.length}`
+      `InAppStory: tag "${tag}" is invalid, only letters, digits, underscores and dashes are allowed`
     );
-    valid = false;
+    return false;
+  });
+  if (validTags.length > TAGS_MAX_COUNT) {
+    console.error(
+      `InAppStory: tags must be at most ${TAGS_MAX_COUNT}, got ${validTags.length}`
+    );
   }
-  for (const tag of tags) {
-    if (!TAG_PATTERN.test(tag)) {
-      console.error(
-        `InAppStory: tag "${tag}" is invalid, only letters, digits, underscores and dashes are allowed`
-      );
-      valid = false;
-    }
-  }
-  return valid;
+  return validTags.slice(0, TAGS_MAX_COUNT);
+}
+
+/** Request-specific tag overrides still reject invalid input as a whole. */
+export function tagsAreValid(tags: string[]): boolean {
+  return sanitizeTags(tags).length === tags.length;
 }
