@@ -8,6 +8,7 @@ public class NativeStoryManagerImpl: NSObject {
   @objc var _userID: String = ""
   @objc var _userIdSign: String? = nil
   @objc var _lang: String = ""
+  var _anonymous: Bool = false
   @objc private var goodsCache: [GoodObject] = []
 
   var storiesAPIs: [String: StoryListAPI] = [:]
@@ -52,6 +53,7 @@ public class NativeStoryManagerImpl: NSObject {
       InAppStory.shared.sandBox = sandbox
       self._userID = userID
       self._userIdSign = userIdSign
+      self._anonymous = anonymous
       InAppStory.shared.initWith(
         serviceKey: apiKey,
         settings: Settings(
