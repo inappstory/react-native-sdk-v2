@@ -53,8 +53,8 @@ class BannerListViewComponent(
     }
 
     init {
-        addView(bannerList, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
-        bannerList.addOnChildAttachStateChangeListener(childListener)
+        addView(this.bannerList, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
+        this.bannerList.addOnChildAttachStateChangeListener(childListener)
     }
 
     internal fun applyBannerRadius(item: View) {
