@@ -5,8 +5,6 @@ import android.widget.LinearLayout
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.inappstory.sdk.banners.ui.banner.BannerView
 import androidx.test.platform.app.InstrumentationRegistry
-import com.facebook.react.bridge.BridgeReactContext
-import com.facebook.react.uimanager.ThemedReactContext
 import com.inappstory.reactnativesdk.appearance.AppearanceManagerImpl
 import com.inappstory.sdk.banners.ui.grid.BannerGrid
 import org.junit.Assert.assertEquals
@@ -256,7 +254,7 @@ class BannerGridLayoutTest {
     ) {
         InstrumentationRegistry.getInstrumentation().runOnMainSync {
             val context = InstrumentationRegistry.getInstrumentation().targetContext
-            val reactContext = ThemedReactContext(BridgeReactContext(context), context, null, -1)
+            val reactContext = bannerTestReactContext(context)
             val host = BannerGridViewComponent(reactContext)
             val container = host.getChildAt(0) as BannerGridContentLayout
             val grid = container.getChildAt(0) as BannerGrid

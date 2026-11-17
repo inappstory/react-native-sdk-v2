@@ -21,8 +21,9 @@ import kotlin.math.roundToInt
 @SuppressLint("ViewConstructor")
 class BannerListViewComponent(
     context: ThemedReactContext,
-    private val bannerList: BannerList = BannerList(context)
+    bannerList: BannerList? = null
 ) : BannerPlaceComponent(context) {
+    private val bannerList = bannerList ?: BannerList(activityContext)
     private val callbackHandler = Handler(Looper.getMainLooper())
     private var configuration: ListConfiguration? = null
     private var pendingLoad = false

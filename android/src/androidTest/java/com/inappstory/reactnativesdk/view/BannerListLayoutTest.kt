@@ -5,8 +5,6 @@ import android.widget.FrameLayout
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.facebook.react.bridge.BridgeReactContext
-import com.facebook.react.uimanager.ThemedReactContext
 import com.inappstory.reactnativesdk.appearance.AppearanceManagerImpl
 import com.inappstory.sdk.banners.ui.banner.BannerView
 import com.inappstory.sdk.banners.ui.list.BannerList
@@ -23,8 +21,8 @@ class BannerListLayoutTest {
         val operations = mutableListOf<String>()
         InstrumentationRegistry.getInstrumentation().runOnMainSync {
             val context = InstrumentationRegistry.getInstrumentation().targetContext
-            val reactContext = ThemedReactContext(BridgeReactContext(context), context, null, -1)
-            val list = object : BannerList(reactContext) {
+            val reactContext = bannerTestReactContext(context)
+            val list = object : BannerList(checkNotNull(reactContext.currentActivity)) {
                 override fun uniqueId(uniqueId: String) {
                     operations.add("retire")
                 }
@@ -156,7 +154,7 @@ class BannerListLayoutTest {
     private fun withList(test: (BannerListViewComponent, BannerList) -> Unit) {
         InstrumentationRegistry.getInstrumentation().runOnMainSync {
             val context = InstrumentationRegistry.getInstrumentation().targetContext
-            val reactContext = ThemedReactContext(BridgeReactContext(context), context, null, -1)
+            val reactContext = bannerTestReactContext(context)
             val host = BannerListViewComponent(reactContext)
             try {
                 test(host, host.getChildAt(0) as BannerList)

@@ -13,7 +13,7 @@ import kotlin.math.roundToInt
 
 @SuppressLint("ViewConstructor")
 class BannerViewComponent(context: ThemedReactContext) : BannerPlaceComponent(context) {
-    private val bannerCarousel: BannerCarousel = BannerCarousel(rContext)
+    private val bannerCarousel: BannerCarousel = BannerCarousel(activityContext)
 
     // Props received from React. Stored as-is and turned into appearance in
     // applyAppearanceAndLoad(), which runs once per update transaction.

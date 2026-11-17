@@ -18,7 +18,7 @@ import kotlin.math.roundToInt
 
 @SuppressLint("ViewConstructor")
 class BannerGridViewComponent(context: ThemedReactContext) : BannerPlaceComponent(context) {
-    private val bannerGrid = BannerGrid(context)
+    private val bannerGrid = BannerGrid(activityContext)
     private val gridContainer = BannerGridContentLayout(context)
     private val callbackHandler = Handler(Looper.getMainLooper())
     private var configuration: GridConfiguration? = null

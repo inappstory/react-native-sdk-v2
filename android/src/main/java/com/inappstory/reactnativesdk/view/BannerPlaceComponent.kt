@@ -9,6 +9,9 @@ import com.facebook.react.uimanager.events.RCTEventEmitter
 
 abstract class BannerPlaceComponent(context: ThemedReactContext) : LinearLayout(context) {
     protected val rContext: ThemedReactContext = context
+    protected val activityContext = checkNotNull(context.currentActivity) {
+        "An Activity is required to create a banner view"
+    }
 
     // RN/Yoga does not remeasure native children automatically after the outer
     // host view is laid out, so explicitly measure the SDK widget.
