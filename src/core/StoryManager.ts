@@ -12,7 +12,11 @@ import NativeStoriesEvents from '../specs/NativeStoriesEvents';
 import NativeSystemEvents from '../specs/NativeSystemEvents';
 import { CTAHandler } from './CTAHandler';
 import { StoryEvents } from './StoryEvents';
-import { assertUserIdLength, tagsAreValid } from '../utils/validation';
+import {
+  assertUserIdLength,
+  sanitizeTags,
+  tagsAreValid,
+} from '../utils/validation';
 import type { Option } from '../types/common';
 import type { ProductCart, ProductCartHandlers } from '../types/ProductCart';
 import type { StoryManagerConfig } from '../types/StoryManager';
@@ -52,8 +56,8 @@ export class StoryManager extends StoryEvents {
     this.userId = userId;
     this.userIdSign = userIdSign;
 
-    if (config.tags && tagsAreValid(config.tags)) {
-      this.tags = config.tags;
+    if (config.tags) {
+      this.tags = sanitizeTags(config.tags);
     }
 
     if (config.placeholders) {
@@ -151,9 +155,7 @@ export class StoryManager extends StoryEvents {
   }
 
   private async applyNativeConfig(): Promise<void> {
-    if (!tagsAreValid(this.tags)) {
-      this.tags = [];
-    }
+    this.tags = sanitizeTags(this.tags);
     await NativeStoryManager.initWith(
       this.apiKey,
       this.userId,
@@ -237,16 +239,15 @@ export class StoryManager extends StoryEvents {
   }
 
   setTags(tags: string[]) {
-    if (!tagsAreValid(tags)) return;
-    this.tags = tags;
-    NativeStoryManager.setTags(tags);
+    this.tags = sanitizeTags(tags);
+    NativeStoryManager.setTags(this.tags);
   }
 
   addTags(tags: string[]) {
-    const merged = [...new Set([...this.tags, ...tags])];
-    if (!tagsAreValid(merged)) return;
-    this.tags = merged;
-    NativeStoryManager.addTags(tags);
+    this.tags = sanitizeTags([...new Set([...this.tags, ...tags])]);
+    NativeStoryManager.addTags(
+      [...new Set(tags)].filter((tag) => this.tags.includes(tag))
+    );
   }
 
   removeTags(tags: string[]) {
@@ -331,20 +332,46 @@ export class StoryManager extends StoryEvents {
         return reject(rejectValue);
       }
       const operationId = generateId();
+      const cleanup = () => signal?.removeEventListener('abort', onAbort);
       const onAbort = () => {
+        cleanup();
         NativeStoryManager.cancelOperation(operationId);
         reject(rejectValue);
       };
       signal?.addEventListener('abort', onAbort);
-      run(operationId).then((success) => {
-        signal?.removeEventListener('abort', onAbort);
-        if (success) {
-          resolve(success);
-        } else {
-          reject(rejectValue);
-        }
-      });
+      try {
+        run(operationId)
+          .then((success) => {
+            cleanup();
+            if (success) {
+              resolve(success);
+            } else {
+              reject(rejectValue);
+            }
+          })
+          .catch((error: unknown) => {
+            cleanup();
+            reject(error ?? rejectValue);
+          });
+      } catch (error) {
+        cleanup();
+        reject(error);
+      }
     });
+  }
+
+  /**
+   * Pushes the reader button visibility from an AppearanceManager down to
+   * native before a single-story open. Shared by `showStory` and
+   * `showStoryWithTargeting` so both honour the same override rules.
+   */
+  private applyReaderAppearance(appearanceManager?: AppearanceManager): void {
+    const commonOptions = appearanceManager?.commonOptions;
+    if (commonOptions?.hasLike) {
+      NativeAppearanceManager.setHasLike(commonOptions.hasLikeButton);
+      NativeAppearanceManager.setHasFavorites(commonOptions.hasFavorite);
+      NativeAppearanceManager.setHasShare(commonOptions.hasShare);
+    }
   }
 
   showStory(
@@ -352,14 +379,39 @@ export class StoryManager extends StoryEvents {
     signal?: Option<AbortSignal>,
     appearanceManager?: AppearanceManager
   ): Promise<{ loaded: boolean }> {
-    const commonOptions = appearanceManager?.commonOptions;
-    if (commonOptions?.hasLike) {
-      NativeAppearanceManager.setHasLike(commonOptions.hasLikeButton);
-      NativeAppearanceManager.setHasFavorites(commonOptions.hasFavorite);
-      NativeAppearanceManager.setHasShare(commonOptions.hasShare);
-    }
+    this.applyReaderAppearance(appearanceManager);
     return this.runCancelable(signal, { loaded: false }, (operationId) =>
       NativeStoryManager.showSingle(String(storyId), operationId)
+    ).then(() => ({ loaded: true }));
+  }
+
+  /**
+   * Shows a single story by id with server-side targeting checks (native SDK
+   * iOS >= 1.29.9 / Android >= 1.26.0). Unlike {@link showStory}, the request
+   * is only shown if it passes targeting.
+   *
+   * `tags`:
+   *  - `undefined`/`null` — use the tags from the current SDK settings;
+   *  - `[]` — send an empty tag list;
+   *  - a non-empty array — override tags for this request only, without
+   *    mutating the global SDK settings.
+   */
+  showStoryWithTargeting(
+    storyId: string | number,
+    tags?: Option<string[]>,
+    signal?: Option<AbortSignal>,
+    appearanceManager?: AppearanceManager
+  ): Promise<{ loaded: boolean }> {
+    if (tags != null && !tagsAreValid(tags)) {
+      return Promise.reject({ loaded: false });
+    }
+    this.applyReaderAppearance(appearanceManager);
+    return this.runCancelable(signal, { loaded: false }, (operationId) =>
+      NativeStoryManager.showSingleWithTargeting(
+        String(storyId),
+        tags ?? null,
+        operationId
+      )
     ).then(() => ({ loaded: true }));
   }
 
@@ -395,6 +447,32 @@ export class StoryManager extends StoryEvents {
   ): Promise<boolean> {
     return this.runCancelable(signal, false, (operationId) =>
       NativeStoryManager.showIAMById(id, onlyPreloaded, operationId)
+    );
+  }
+
+  /**
+   * Shows an In-App Message by id with server-side targeting checks (native SDK
+   * iOS >= 1.29.9 / Android >= 1.26.0). Targeting is checked on the server even
+   * when the message is already cached.
+   *
+   * `tags` follows the same rules as {@link showStoryWithTargeting}:
+   * `undefined`/`null` uses the current SDK settings' tags, `[]` sends an empty
+   * list, and a non-empty array overrides tags for this request only.
+   */
+  showIAMByIdWithTargeting(
+    id: string,
+    onlyPreloaded: boolean = false,
+    tags?: Option<string[]>,
+    signal?: Option<AbortSignal>
+  ): Promise<boolean> {
+    if (tags != null && !tagsAreValid(tags)) return Promise.reject(false);
+    return this.runCancelable(signal, false, (operationId) =>
+      NativeStoryManager.showIAMByIdWithTargeting(
+        id,
+        onlyPreloaded,
+        tags ?? null,
+        operationId
+      )
     );
   }
 

@@ -22,6 +22,28 @@ extension NativeStoryManagerImpl {
     }
   }
 
+  @objc public func showIAMByIdWithTargeting(
+    _ iamID: String,
+    onlyPreloaded: Bool,
+    tags: [String]?,
+    operationId: String,
+    resolve: @escaping RCTPromiseResolveBlock,
+    rejecter reject: @escaping RCTPromiseRejectBlock
+  ) {
+    // Unlike showIAMById, targeting is checked on the server even when the IAM
+    // is already cached. tags: nil uses SDK settings' tags; [] is an empty
+    // list; a non-empty array overrides tags for this request only.
+    showIAM(operationId: operationId, resolve: resolve) { container, completion in
+      InAppStory.shared.showInAppMessageWithTargeting(
+        id: iamID,
+        targetView: container,
+        onlyPreloaded: onlyPreloaded,
+        tags: tags,
+        completion: completion
+      )
+    }
+  }
+
   @objc public func showIAMByEvent(
     _ event: String,
     onlyPreloaded: Bool,

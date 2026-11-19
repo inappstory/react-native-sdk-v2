@@ -1,5 +1,8 @@
 package com.inappstory.reactnativesdk.view
 
+import android.content.Context
+import android.view.View
+import com.inappstory.reactnativesdk.appearance.AppearanceManagerImpl
 import com.inappstory.sdk.banners.ui.carousel.DefaultBannerCarouselAppearance
 
 class CustomBannerViewAppearance(
@@ -28,4 +31,8 @@ class CustomBannerViewAppearance(
     override fun loop(): Boolean {
         return loop ?: super.loop()
     }
+
+    override fun loadingPlaceholder(context: Context): View? =
+        AppearanceManagerImpl.bannerLoadingPlaceholder?.createView(context)
+            ?: super.loadingPlaceholder(context)
 }

@@ -173,6 +173,18 @@ RCT_EXPORT_METHOD(showSingle:(nonnull NSString *)storyID
                                      rejecter:reject];
 }
 
+RCT_EXPORT_METHOD(showSingleWithTargeting:(nonnull NSString *)storyID
+                                     tags:(NSArray *_Nullable)tags
+                              operationId:(nonnull NSString *)operationId
+                                  resolve:(RCTPromiseResolveBlock)resolve
+                                   reject:(RCTPromiseRejectBlock)reject) {
+  [[NativeStoryManagerImpl shared] showSingleWithTargeting:storyID
+                                                      tags:tags
+                                               operationId:operationId
+                                                   resolve:resolve
+                                                  rejecter:reject];
+}
+
 RCT_EXPORT_METHOD(showGame:(nonnull NSString *)gameID
                    resolve:(RCTPromiseResolveBlock)resolve
                     reject:(RCTPromiseRejectBlock)reject) {
@@ -205,6 +217,20 @@ RCT_EXPORT_METHOD(showIAMById:(nonnull NSString *)iamID
                                    operationId:operationId
                                        resolve:resolve
                                       rejecter:reject];
+}
+
+RCT_EXPORT_METHOD(showIAMByIdWithTargeting:(nonnull NSString *)iamID
+                             onlyPreloaded:(BOOL)onlyPreloaded
+                                      tags:(NSArray *_Nullable)tags
+                               operationId:(nonnull NSString *)operationId
+                                   resolve:(RCTPromiseResolveBlock)resolve
+                                    reject:(RCTPromiseRejectBlock)reject) {
+  [[NativeStoryManagerImpl shared] showIAMByIdWithTargeting:iamID
+                                              onlyPreloaded:onlyPreloaded
+                                                       tags:tags
+                                                operationId:operationId
+                                                    resolve:resolve
+                                                   rejecter:reject];
 }
 
 RCT_EXPORT_METHOD(showIAMByEvent:(nonnull NSString *)event

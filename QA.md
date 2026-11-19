@@ -1,8 +1,9 @@
 # QA
 
-How this SDK is verified before a release. Automated checks cover the JS layer;
-the native bridges and the UI components are covered by the manual checklist —
-they need a device and a real API key, so a unit test cannot speak for them.
+How this SDK is verified before a release. Automated checks cover the JS layer
+and deterministic Android banner layout/lifecycle. Live native SDK content and UI
+integration are covered by the manual checklist — they need a device and a
+real API key, so synthetic tests cannot speak for them.
 
 ## Quality gates
 
@@ -88,6 +89,39 @@ If a *new* mutant survives, treat it as a missing assertion, not as noise.
 
 ## Manual QA — native and UI
 
+### Android grid measurement regression
+
+Run on a connected Android device/emulator (no API key or network required):
+
+```sh
+cd example/android
+./gradlew :inappstory_react-native-sdk:connectedDebugAndroidTest \
+  -Pandroid.testInstrumentationRunnerArguments.class=com.inappstory.reactnativesdk.view.BannerGridLayoutTest
+```
+
+These native tests exercise full-row measurement under a zero/constrained host
+height, deferred loading until width is measured, size-event deduplication,
+empty results, reload/reset/disposal, and height-only prop updates. They use
+synthetic rows inside the real SDK grid, not live banner content.
+
+### Banner list viewport regression
+
+Run on a connected Android device/emulator (no API key or network required):
+
+```sh
+cd example/android
+./gradlew :inappstory_react-native-sdk:connectedDebugAndroidTest \
+  -Pandroid.testInstrumentationRunnerArguments.class=com.inappstory.reactnativesdk.view.BannerListLayoutTest
+```
+
+These tests cover the constrained viewport (including zero height), one vertical
+column, configuration after width becomes available, size-only updates, asymmetric
+dp padding, the recycled-card radius workaround, pending-load disposal, and
+retiring SDK request identities before reloading or clearing the place binding.
+The shared loading-placeholder tests also cover the list factory.
+
+### Example app
+
 Run against the example app on **both** platforms; a JS-only change still needs
 one platform pass because the whole SDK is a bridge.
 
@@ -108,11 +142,52 @@ yarn example ios      # and: yarn example android
       appear only when enabled.
 - [ ] Sound toggle: `defaultMuted: true` opens the reader muted;
       `changeSound(true)` unmutes at runtime.
-- [ ] `BannerCarousel` renders and its widget events arrive in JS.
+- [ ] `BannerCarousel` and `BannerGrid` render; grid height follows
+      `widgetHeight`, refresh works, and banner events arrive in JS.
+- [ ] `BannerGrid` defaults to two columns; `columnCount={1}` and
+      `columnCount={3}` change the layout on both platforms. Changing the prop
+      at runtime recalculates auto-height, including an incomplete final row.
+      Zero, negative, fractional, non-finite and out-of-32-bit-range values
+      throw a clear `RangeError` before reaching native.
+- [ ] `BannerList` uses internal vertical scrolling within its RN viewport:
+      check `height`, `style.height`, flex, resizing/rotation and empty content.
+      The viewport never follows `onPlaceLoaded` content height. Scroll through
+      mixed-ratio banners and a place with more than 20 available banners.
+- [ ] List appearance: side/leading/trailing insets (including explicit zero),
+      spacing, radius on newly attached and recycled cards, and configured loader.
+      Two lists with different settings must remain independent.
+- [ ] List commands: refresh, pause/resume, appearance/place changes, detach/remount
+      and app background/foreground. Manual pause persists; scrolling and taps
+      still work while paused. No stale events after a place change or unmount.
+      Refresh and switch list/grid while loading, then wait for a delayed load
+      failure: neither the active nor the disposed widget may crash the app.
+- [ ] List loaded callback: Android reports height `0`, iOS reports full content
+      height, empty results report `(0, 0)`. Load failures are logged/reported,
+      not presented as a successful empty result. Banner widget events and actions
+      reach the existing JS subscriptions. Recheck grid and carousel afterward.
+- [ ] Android grid: all rows and gaps are visible from a zero/loading host height;
+      warm-cache loading and explicit refresh report a positive measured height.
+      Empty places report `(0, 0)` rather than SDK layout constants (`-1`/`-2`).
+- [ ] Android grid: updating only height/style does not reload content; changing
+      width or insets recomputes row sizes, unchanged layouts do not repeat
+      `onPlaceLoaded`, and leaving/changing the place during loading causes no
+      stale height updates. On iOS, grid and carousel prop updates do not reload
+      unchanged configurations; detached views pause and stale callbacks stop.
+- [ ] Targeted single-story and IAM calls honor server targeting; `undefined`
+      tags use SDK settings and `[]` sends an empty tag list.
+- [ ] Story-reader, IAM, and banner loaders use their configured colors;
+      omitted/reset surfaces fall back to the SDK placeholder. Invalid colors
+      are logged and ignored without crashing Android.
 - [ ] Favorites: favorite a story → it appears in the favorites feed →
       `removeAllFavorites()` empties it.
 - [ ] Games: `preloadGames()` then `showGame(id)` opens and closes cleanly.
 - [ ] In-app messages: `showIAMById` and `showIAMByEvent` display and close.
+      A targeted IAM that fails to open resolves false; invalid string IDs
+      resolve false on Android, and Activity recreation does not crash.
+- [ ] IAM with a text input: focus the field, type and submit; the keyboard must
+      not cover it on Android API 35, and closing the IAM restores the host
+      window's original soft-input mode. On iOS, verify the default input
+      presenter keeps the field visible above the keyboard and respects safe area.
 - [ ] Onboarding: `showOnboardings()` shows unseen stories only.
 - [ ] Goods / product cart: the widget calls back into `getGoods`, the cart
       handlers answer, and the reader shows the returned items.
@@ -146,6 +221,12 @@ yarn example ios      # and: yarn example android
 
 Bugs the suite uncovered and now guards. Each has a test that fails if the old
 behaviour comes back:
+
+Tag initialization and runtime setters are covered in
+[StoryManager.config.test.ts](src/__tests__/StoryManager.config.test.ts):
+invalid tags must not discard valid neighbors, and filtering must happen before
+keeping the first 100 tags. `addTags` counts the merged unique list and preserves
+existing tags first.
 
 1. `StoryManager.fetchGoods` used to throw when the app never called
    `getGoods()`, leaving native waiting for a `commitGoods` that never came.

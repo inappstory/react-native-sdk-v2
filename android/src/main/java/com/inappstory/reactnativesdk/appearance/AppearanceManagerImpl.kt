@@ -6,6 +6,8 @@ object AppearanceManagerImpl {
   private var appearanceManager: AppearanceManager? = null
 
   var goodsCloseIconResId: Int = 0
+  @Volatile var iamLoadingPlaceholder: LoadingPlaceholderOptions? = null
+  @Volatile var bannerLoadingPlaceholder: LoadingPlaceholderOptions? = null
 
   @Synchronized
   fun getAppearanceManager(): AppearanceManager {
