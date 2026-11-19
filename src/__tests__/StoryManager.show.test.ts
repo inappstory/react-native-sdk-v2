@@ -39,6 +39,17 @@ describe('cancelable operations', () => {
     expect(native.cancelOperation).not.toHaveBeenCalled();
   });
 
+  it('rejects native errors and removes the abort listener', async () => {
+    const manager = await StoryManager.create({ apiKey: 'k', userId: 'u' });
+    const controller = new AbortController();
+    const error = new Error('native failure');
+    const removeListener = jest.spyOn(controller.signal, 'removeEventListener');
+    native.showSingle.mockRejectedValueOnce(error);
+
+    await expect(manager.showStory(1, controller.signal)).rejects.toBe(error);
+    expect(removeListener).toHaveBeenCalledWith('abort', expect.any(Function));
+  });
+
   it('showStoryOnce resolves native result and stringifies id', async () => {
     const manager = await StoryManager.create({ apiKey: 'k', userId: 'u' });
     await expect(manager.showStoryOnce(9)).resolves.toBe(true);
@@ -185,5 +196,116 @@ describe('story reader appearance overrides', () => {
     const manager = await StoryManager.create({ apiKey: 'k', userId: 'u' });
     await manager.showStory(1);
     expect(NativeAppearanceManager.setHasLike).not.toHaveBeenCalled();
+  });
+});
+
+describe('targeted show methods', () => {
+  let manager: StoryManager;
+  beforeEach(async () => {
+    manager = await StoryManager.create({ apiKey: 'k', userId: 'u' });
+  });
+
+  it('showStoryWithTargeting passes null tags when none are given', async () => {
+    await expect(manager.showStoryWithTargeting(7)).resolves.toEqual({
+      loaded: true,
+    });
+    expect(native.showSingleWithTargeting).toHaveBeenCalledWith(
+      '7',
+      null,
+      expect.any(String)
+    );
+  });
+
+  it('showStoryWithTargeting forwards an explicit tag override', async () => {
+    await manager.showStoryWithTargeting('s1', ['promo']);
+    expect(native.showSingleWithTargeting).toHaveBeenCalledWith(
+      's1',
+      ['promo'],
+      expect.any(String)
+    );
+  });
+
+  it('showStoryWithTargeting forwards an empty tag list unchanged', async () => {
+    await manager.showStoryWithTargeting('s1', []);
+    expect(native.showSingleWithTargeting).toHaveBeenCalledWith(
+      's1',
+      [],
+      expect.any(String)
+    );
+  });
+
+  it('showStoryWithTargeting rejects invalid tags without calling native', async () => {
+    const tooMany = Array.from({ length: 101 }, (_, i) => `t${i}`);
+    await expect(manager.showStoryWithTargeting('s1', tooMany)).rejects.toEqual(
+      { loaded: false }
+    );
+    expect(native.showSingleWithTargeting).not.toHaveBeenCalled();
+  });
+
+  it('showStoryWithTargeting rejects with loaded=false on native failure', async () => {
+    native.showSingleWithTargeting.mockResolvedValueOnce(false);
+    await expect(manager.showStoryWithTargeting('s1')).rejects.toEqual({
+      loaded: false,
+    });
+  });
+
+  it('showStoryWithTargeting can be aborted via the signal', async () => {
+    native.showSingleWithTargeting.mockReturnValueOnce(new Promise(() => {}));
+    const controller = new AbortController();
+    const promise = manager.showStoryWithTargeting(
+      's1',
+      null,
+      controller.signal
+    );
+    controller.abort();
+    await expect(promise).rejects.toEqual({ loaded: false });
+    const operationId = native.showSingleWithTargeting.mock.calls[0]![2];
+    expect(native.cancelOperation).toHaveBeenCalledWith(operationId);
+  });
+
+  it('showStoryWithTargeting applies reader appearance overrides', async () => {
+    await manager.showStoryWithTargeting('s1', null, null, {
+      commonOptions: {
+        hasLike: true,
+        hasLikeButton: true,
+        hasFavorite: true,
+        hasShare: false,
+      },
+    } as any);
+    expect(NativeAppearanceManager.setHasLike).toHaveBeenCalledWith(true);
+    expect(NativeAppearanceManager.setHasShare).toHaveBeenCalledWith(false);
+  });
+
+  it('showIAMByIdWithTargeting defaults onlyPreloaded to false and tags to null', async () => {
+    await expect(manager.showIAMByIdWithTargeting('iam1')).resolves.toBe(true);
+    expect(native.showIAMByIdWithTargeting).toHaveBeenCalledWith(
+      'iam1',
+      false,
+      null,
+      expect.any(String)
+    );
+  });
+
+  it('showIAMByIdWithTargeting forwards onlyPreloaded and tag override', async () => {
+    await manager.showIAMByIdWithTargeting('iam1', true, ['vip']);
+    expect(native.showIAMByIdWithTargeting).toHaveBeenCalledWith(
+      'iam1',
+      true,
+      ['vip'],
+      expect.any(String)
+    );
+  });
+
+  it('showIAMByIdWithTargeting rejects invalid tags without calling native', async () => {
+    const tooMany = Array.from({ length: 101 }, (_, i) => `t${i}`);
+    await expect(
+      manager.showIAMByIdWithTargeting('iam1', false, tooMany)
+    ).rejects.toBe(false);
+    expect(native.showIAMByIdWithTargeting).not.toHaveBeenCalled();
+  });
+
+  it('showIAMByIdWithTargeting rejects with false on native failure', async () => {
+    native.showIAMByIdWithTargeting.mockResolvedValueOnce(false);
+    await expect(manager.showIAMByIdWithTargeting('iam1')).rejects.toBe(false);
   });
 });

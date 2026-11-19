@@ -32,6 +32,7 @@ extension NativeStoryManagerImpl {
       InAppStory.shared.settings = Settings(
         userID: current?.userID ?? self._userID,
         sign: current?.sign,
+        anonymous: self._anonymous,
         tags: current?.tags ?? [],
         lang: lang
       )

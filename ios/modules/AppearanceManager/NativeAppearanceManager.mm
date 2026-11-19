@@ -97,6 +97,10 @@ RCT_EXPORT_METHOD(setCloseGoodsImage:(NSString *)image) {
   [[NativeAppearanceManagerImpl shared] setCloseGoodsImage:image];
 }
 
+RCT_EXPORT_METHOD(setLoadingPlaceholders:(NSDictionary *)options) {
+  [[NativeAppearanceManagerImpl shared] setLoadingPlaceholders:options];
+}
+
 
 
 

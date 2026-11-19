@@ -1,11 +1,21 @@
 import { type HostComponent } from 'react-native';
 
-export const cacheNativeView = (value: HostComponent<any>) => {
+type NativeComponentRegistry = Record<string, HostComponent<any>>;
+
+const getRegistry = (): NativeComponentRegistry => {
   /* @ts-ignore */
-  global.NativeComponent = value;
+  return (global.__IASNativeComponents ??= {});
 };
 
-export const getCachedNativeView = (): HostComponent<any> | undefined => {
-  /* @ts-ignore */
-  return global.NativeComponent;
+export const cacheNativeView = (
+  value: HostComponent<any>,
+  name = 'BannerView'
+) => {
+  getRegistry()[name] = value;
+};
+
+export const getCachedNativeView = (
+  name = 'BannerView'
+): HostComponent<any> | undefined => {
+  return getRegistry()[name];
 };

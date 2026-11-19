@@ -39,6 +39,7 @@ android {
   defaultConfig {
     minSdkVersion getExtOrIntegerDefault("minSdkVersion")
     targetSdkVersion getExtOrIntegerDefault("targetSdkVersion")
+    testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
   }
 
@@ -85,5 +86,7 @@ dependencies {
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
   implementation 'androidx.recyclerview:recyclerview:1.2.1'
   implementation 'androidx.webkit:webkit:1.4.0'
-  implementation 'com.github.inappstory:android-sdk:1.25.6'
+  implementation 'com.github.inappstory:android-sdk:1.26.0'
+  androidTestImplementation 'androidx.test:runner:1.6.2'
+  androidTestImplementation 'androidx.test.ext:junit:1.2.1'
 }

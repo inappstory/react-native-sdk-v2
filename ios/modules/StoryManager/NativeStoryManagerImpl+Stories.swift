@@ -57,8 +57,12 @@ extension NativeStoryManagerImpl {
   }
 
   @objc public func cancelOperation(_ operationId: String) {
-    cancellationTokenMap[operationId]?.cancel()
-    cancellationTokenMap.removeValue(forKey: operationId)
+    DispatchQueue.main.async { [weak self] in
+      guard let self else { return }
+      if let token = self.cancellationTokenMap.removeValue(forKey: operationId) {
+        token.cancel()
+      }
+    }
   }
 
   @objc public func showSingle(
@@ -76,6 +80,33 @@ extension NativeStoryManagerImpl {
       cancellationTokenMap[operationId] = InAppStory.shared.showStory(
         with: storyID,
         from: vc
+      ) { opened in
+        resolve(opened)
+        self.cancellationTokenMap.removeValue(forKey: operationId)
+      }
+    }
+  }
+
+  @objc public func showSingleWithTargeting(
+    _ storyID: String,
+    tags: [String]?,
+    operationId: String,
+    resolve: @escaping RCTPromiseResolveBlock,
+    rejecter reject: @escaping RCTPromiseRejectBlock
+  ) {
+    DispatchQueue.main.async { [self] in
+      guard let vc = UIApplication.shared.firstKeyWindow?.rootViewController
+      else {
+        resolve(false)
+        return
+      }
+      // tags: nil keeps the SDK settings' tags; [] sends an empty list; a
+      // non-empty array overrides tags for this request only. Targeting is
+      // enabled by using this method regardless of the tags value.
+      cancellationTokenMap[operationId] = InAppStory.shared.showStoryWithTargeting(
+        with: storyID,
+        from: vc,
+        tags: tags
       ) { opened in
         resolve(opened)
         self.cancellationTokenMap.removeValue(forKey: operationId)

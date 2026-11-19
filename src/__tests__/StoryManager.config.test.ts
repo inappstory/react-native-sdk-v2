@@ -276,7 +276,7 @@ describe('local state kept in sync for reinit', () => {
     expect(native.setUserID).toHaveBeenCalledWith('u2', 'sign');
   });
 
-  it('initWith drops tags assigned directly on the instance when invalid', async () => {
+  it('initWith keeps valid tags assigned directly on the instance', async () => {
     const error = jest.spyOn(console, 'error').mockImplementation(() => {});
     manager.tags = ['ok', 'bad tag'];
     native.initWith.mockClear();
@@ -289,7 +289,7 @@ describe('local state kept in sync for reinit', () => {
       false,
       null,
       false,
-      []
+      ['ok']
     );
     expect(error).toHaveBeenCalledWith(
       'InAppStory: tag "bad tag" is invalid, only letters, digits, underscores and dashes are allowed'
@@ -297,15 +297,26 @@ describe('local state kept in sync for reinit', () => {
     error.mockRestore();
   });
 
-  it('setTags reports a tag with characters outside letters, digits, _ and - and skips native', () => {
+  it('setTags drops tags with characters outside letters, digits, _ and -', () => {
     const error = jest.spyOn(console, 'error').mockImplementation(() => {});
     manager.setTags(['ok']);
     native.setTags.mockClear();
     manager.setTags(['ok', 'bad tag']);
-    expect(native.setTags).not.toHaveBeenCalled();
+    expect(native.setTags).toHaveBeenCalledWith(['ok']);
     expect(manager.tags).toEqual(['ok']);
     expect(error).toHaveBeenCalledWith(
       'InAppStory: tag "bad tag" is invalid, only letters, digits, underscores and dashes are allowed'
+    );
+    error.mockRestore();
+  });
+
+  it.each(['_tag', '-tag'])('setTags drops tags starting with %s', (tag) => {
+    const error = jest.spyOn(console, 'error').mockImplementation(() => {});
+    manager.setTags([tag, 'tag-1']);
+    expect(native.setTags).toHaveBeenLastCalledWith(['tag-1']);
+    expect(manager.tags).toEqual(['tag-1']);
+    expect(error).toHaveBeenCalledWith(
+      `InAppStory: tag "${tag}" is invalid, only letters, digits, underscores and dashes are allowed`
     );
     error.mockRestore();
   });
@@ -318,21 +329,22 @@ describe('local state kept in sync for reinit', () => {
     error.mockRestore();
   });
 
-  it('setTags rejects an emoji tag', () => {
+  it('setTags drops an emoji tag', () => {
     const error = jest.spyOn(console, 'error').mockImplementation(() => {});
-    manager.setTags(['🔥']);
-    expect(native.setTags).not.toHaveBeenCalled();
+    manager.setTags(['🔥', 'valid']);
+    expect(native.setTags).toHaveBeenLastCalledWith(['valid']);
     expect(error).toHaveBeenCalledWith(
       'InAppStory: tag "🔥" is invalid, only letters, digits, underscores and dashes are allowed'
     );
     error.mockRestore();
   });
 
-  it('setTags reports more than 100 tags in total and skips native', () => {
+  it('setTags sends only the first 100 valid tags', () => {
     const error = jest.spyOn(console, 'error').mockImplementation(() => {});
     const tags = Array.from({ length: 101 }, (_, i) => `tag${i}`);
     manager.setTags(tags);
-    expect(native.setTags).not.toHaveBeenCalled();
+    expect(native.setTags).toHaveBeenLastCalledWith(tags.slice(0, 100));
+    expect(manager.tags).toEqual(tags.slice(0, 100));
     expect(error).toHaveBeenCalledWith(
       'InAppStory: tags must be at most 100, got 101'
     );
@@ -348,6 +360,24 @@ describe('local state kept in sync for reinit', () => {
     error.mockRestore();
   });
 
+  it('setTags does not count invalid tags toward the limit', () => {
+    const error = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const tags = Array.from({ length: 100 }, (_, i) => `tag${i}`);
+    manager.setTags(['', 'bad tag', ...tags]);
+    expect(native.setTags).toHaveBeenLastCalledWith(tags);
+    expect(manager.tags).toEqual(tags);
+    expect(error).toHaveBeenCalledTimes(2);
+    error.mockRestore();
+  });
+
+  it('setTags clears existing tags when all input tags are invalid', () => {
+    const error = jest.spyOn(console, 'error').mockImplementation(() => {});
+    manager.setTags(['', 'bad tag']);
+    expect(native.setTags).toHaveBeenLastCalledWith([]);
+    expect(manager.tags).toEqual([]);
+    error.mockRestore();
+  });
+
   it('setTags accepts long and cyrillic tags without byte budget limit', () => {
     const error = jest.spyOn(console, 'error').mockImplementation(() => {});
     const tags = ['я'.repeat(2048)];
@@ -357,16 +387,62 @@ describe('local state kept in sync for reinit', () => {
     error.mockRestore();
   });
 
-  it('addTags keeps the local tags when the merged list exceeds the limit', () => {
+  it('addTags keeps the first 100 unique tags when the merged list exceeds the limit', () => {
     const error = jest.spyOn(console, 'error').mockImplementation(() => {});
     const initialTags = Array.from({ length: 60 }, (_, i) => `tagA_${i}`);
     const newTags = Array.from({ length: 50 }, (_, i) => `tagB_${i}`);
     manager.setTags(initialTags);
     manager.addTags(newTags);
-    expect(native.addTags).not.toHaveBeenCalled();
-    expect(manager.tags).toEqual(initialTags);
+    expect(native.addTags).toHaveBeenCalledWith(newTags.slice(0, 40));
+    expect(manager.tags).toEqual([...initialTags, ...newTags.slice(0, 40)]);
     expect(error).toHaveBeenCalledWith(
       'InAppStory: tags must be at most 100, got 110'
+    );
+    error.mockRestore();
+  });
+
+  it('addTags discards invalid and excess tags without counting duplicates', () => {
+    const error = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const initialTags = Array.from({ length: 99 }, (_, i) => `tag${i}`);
+    manager.setTags(initialTags);
+    manager.addTags(['tag0', 'bad tag', 'new', 'new', 'excess']);
+    expect(manager.tags).toEqual([...initialTags, 'new']);
+    expect(native.addTags).toHaveBeenCalledWith(['tag0', 'new']);
+    expect(error).toHaveBeenCalledWith(
+      'InAppStory: tags must be at most 100, got 101'
+    );
+    error.mockRestore();
+  });
+
+  it('addTags sends repeated valid input only once to native', () => {
+    manager.addTags(Array.from({ length: 101 }, () => 'new'));
+    expect(native.addTags).toHaveBeenCalledWith(['new']);
+    expect(manager.tags).toEqual(['a', 'b', 'new']);
+  });
+
+  it('initialization drops invalid tags and limits the list to 100', async () => {
+    const error = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const tags = [
+      'bad tag',
+      ...Array.from({ length: 101 }, (_, i) => `tag${i}`),
+    ];
+    const configured = await StoryManager.create({
+      apiKey: 'key',
+      userId: 'u',
+      tags,
+    });
+    expect(native.initWith).toHaveBeenLastCalledWith(
+      'key',
+      'u',
+      null,
+      false,
+      null,
+      false,
+      tags.slice(1, 101)
+    );
+    expect(configured.tags).toEqual(tags.slice(1, 101));
+    expect(error).toHaveBeenCalledWith(
+      'InAppStory: tags must be at most 100, got 101'
     );
     error.mockRestore();
   });

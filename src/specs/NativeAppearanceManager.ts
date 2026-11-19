@@ -43,6 +43,8 @@ export interface Spec extends TurboModule {
   setRefreshGoodsImage(image: string): void;
 
   setCloseGoodsImage(image: string): void;
+
+  setLoadingPlaceholders(options: Object): void;
 }
 
 export default TurboModuleRegistry.getEnforcing<Spec>(

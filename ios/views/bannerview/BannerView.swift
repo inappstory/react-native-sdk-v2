@@ -25,6 +25,24 @@ class BannerView: UIView {
   private var _bannersView: IASBannersView?
 
   private var bannersAppearance: IASBannersAppearance?
+  private let layoutType: IASBannersAppearance.LayoutType
+  private var needsAppearanceUpdate = false
+  private var manuallyPaused = false
+  private var generation = 0
+  private var configuration: BannerConfiguration?
+
+  private struct BannerConfiguration: Equatable {
+    let placeId: String
+    let shouldLoop: Bool
+    let sideInset: CGFloat
+    let leadingInset: CGFloat
+    let trailingInset: CGFloat
+    let interItemSpacing: CGFloat
+    let cornerRadius: CGFloat
+    let columnCount: Int
+    let columnSpacing: CGFloat
+    let rowSpacing: CGFloat
+  }
 
   @objc var onScroll: RCTDirectEventBlock?
   @objc var onPlaceLoaded: RCTDirectEventBlock?
@@ -71,18 +89,45 @@ class BannerView: UIView {
     }
   }
 
-  override init(frame: CGRect) {
-    super.init(frame: frame)
-    //    createBannerView()
+  @objc var columnSpacing: CGFloat = 8.0 {
+    didSet {
+      updateComponent()
+    }
+  }
 
+  @objc var columnCount: Int = 2 {
+    didSet {
+      updateComponent()
+    }
+  }
+
+  @objc var rowSpacing: CGFloat = 8.0 {
+    didSet {
+      updateComponent()
+    }
+  }
+
+  convenience override init(frame: CGRect) {
+    self.init(frame: frame, layoutType: .horizontalCenterend)
+  }
+
+  init(frame: CGRect = .zero, layoutType: IASBannersAppearance.LayoutType) {
+    self.layoutType = layoutType
+    super.init(frame: frame)
   }
 
   required init?(coder: NSCoder) {
+    self.layoutType = .horizontalCenterend
     super.init(coder: coder)
   }
 
   override func didMoveToWindow() {
     super.didMoveToWindow()
+    if window == nil || manuallyPaused {
+      _bannersView?.pause()
+    } else {
+      _bannersView?.resume()
+    }
     // reactTag is assigned at creation time, so it is available here.
     guard window != nil, let tag = reactTag?.intValue else { return }
     registeredTag = tag
@@ -90,19 +135,53 @@ class BannerView: UIView {
   }
 
   deinit {
+    _bannersView?.bannersDidUpdated = nil
+    _bannersView?.bannersDidScroll = nil
+    _bannersView?.pause()
     if let tag = registeredTag {
       BannerView.registry.removeValue(forKey: tag)
     }
   }
 
   func updateComponent() {
+    needsAppearanceUpdate = true
+  }
+
+  override func didSetProps(_ changedProps: [String]!) {
+    super.didSetProps(changedProps)
+    if needsAppearanceUpdate {
+      needsAppearanceUpdate = false
+      applyAppearance()
+    }
+  }
+
+  private func applyAppearance() {
+    let next = BannerConfiguration(
+      placeId: placeId as String,
+      shouldLoop: shouldLoop,
+      sideInset: sideInset,
+      leadingInset: leadingInset,
+      trailingInset: trailingInset,
+      interItemSpacing: interItemSpacing,
+      cornerRadius: cornerRadius,
+      columnCount: columnCount,
+      columnSpacing: columnSpacing,
+      rowSpacing: rowSpacing
+    )
+    guard next != configuration else { return }
+    configuration = next
     self.bannersAppearance = IASBannersAppearance(
+      layoutType: self.layoutType,
       shouldLoop: self.shouldLoop,
       sideInset: self.sideInset,
       leadingInset: self.leadingInset,
       trailingInset: self.trailingInset,
       interItemSpacing: self.interItemSpacing,
-      cornerRadius: self.cornerRadius
+      cornerRadius: self.cornerRadius,
+      maxBannersCount: self.layoutType == .verticalList ? nil : 20,
+      columnSpacing: self.columnSpacing,
+      rowSpacing: self.rowSpacing,
+      columnCount: self.columnCount
     )
     createBannerView()
     //    guard let bannersView = _bannersView else { return }
@@ -121,7 +200,12 @@ class BannerView: UIView {
   }
 
   func createBannerView() {
+    generation += 1
+    let currentGeneration = generation
     if self._bannersView != nil {
+      self._bannersView?.bannersDidUpdated = nil
+      self._bannersView?.bannersDidScroll = nil
+      self._bannersView?.pause()
       self._bannersView?.removeFromSuperview()
       self._bannersView = nil
     }
@@ -146,8 +230,10 @@ class BannerView: UIView {
       guard let self else { return }
       DispatchQueue.main.async { [weak self] in
         guard let self else { return }
+        guard generation == currentGeneration else { return }
         if onPlaceLoaded != nil {
-          onPlaceLoaded!(["size": count, "widgetHeight": listHeight])
+          let emptyList = layoutType == .verticalList && (!isContent || count <= 0)
+          onPlaceLoaded!(["size": emptyList ? 0 : count, "widgetHeight": emptyList ? 0 : listHeight])
         }
       }
     }
@@ -156,6 +242,7 @@ class BannerView: UIView {
       guard let self else { return }
       DispatchQueue.main.async { [weak self] in
         guard let self else { return }
+        guard generation == currentGeneration else { return }
         if onScroll != nil {
           onScroll!(["index": index])
         }
@@ -181,13 +268,19 @@ class BannerView: UIView {
     NSLayoutConstraint.activate(allConstraints)
 
     _bannersView?.create()
+    if manuallyPaused || window == nil {
+      _bannersView?.pause()
+    }
   }
 
   @objc func pause() {
+    manuallyPaused = true
     _bannersView?.pause()
   }
 
   @objc func resume() {
+    manuallyPaused = false
+    guard window != nil else { return }
     _bannersView?.resume()
   }
 

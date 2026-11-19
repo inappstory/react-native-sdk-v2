@@ -16,6 +16,8 @@ import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.module.model.ReactModuleInfo
 import com.facebook.react.module.model.ReactModuleInfoProvider
 import com.facebook.react.uimanager.ViewManager
+import com.inappstory.reactnativesdk.view.BannerGridViewComponentViewManager
+import com.inappstory.reactnativesdk.view.BannerListViewComponentViewManager
 import com.inappstory.reactnativesdk.view.BannerViewComponentViewManager
 import java.util.HashMap
 
@@ -23,7 +25,11 @@ class InappstorySdkPackage : BaseReactPackage() {
 
   override fun createViewManagers(
     reactContext: ReactApplicationContext
-  ): MutableList<ViewManager<*, *>> = mutableListOf(BannerViewComponentViewManager())
+  ): MutableList<ViewManager<*, *>> = mutableListOf(
+    BannerViewComponentViewManager(),
+    BannerGridViewComponentViewManager(),
+    BannerListViewComponentViewManager()
+  )
 
  override fun getModule(name: String, reactContext: ReactApplicationContext): NativeModule? {
   return when {

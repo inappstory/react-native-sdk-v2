@@ -347,6 +347,15 @@ To render custom cells, pass `renderCell` and/or `renderFavoriteCell` to `Storie
 // Open a single story by ID (supports optional AbortSignal and AppearanceManager)
 await storyManager.showStory(storyId, abortSignal, appearanceManager);
 
+// Request a single story with server-side targeting; null/undefined uses the
+// SDK's current tags, [] sends no tags, and an array overrides tags for this request.
+await storyManager.showStoryWithTargeting(
+  storyId,
+  ['promo'],
+  abortSignal,
+  appearanceManager
+);
+
 // Open a story once (will not open again if already marked as viewed)
 await storyManager.showStoryOnce(storyId, abortSignal);
 
@@ -391,6 +400,94 @@ Preload banner data in advance:
 await storyManager.preloadBannerPlace('main_banner', ['tag1']);
 ```
 
+Use `BannerGrid` to display banners in a non-scrolling grid (two columns by default).
+Set `columnCount` to a positive 32-bit integer to change the number of columns.
+Changing it at runtime rebuilds the grid and recalculates its content height.
+On iOS, this requires InAppStory 1.29.10 or later.
+If `height` is omitted, the component adjusts its height to fit the loaded banners.
+On Android, `onPlaceLoaded` reports the full measured content height in dp,
+including all rows and gaps, after native layout. It fires again when that
+height changes, but not for unchanged layouts. Empty results report `(0, 0)`.
+Updating only the host height/style does not reload the Android grid; use
+`gridRef.current?.refresh()` to request a reload. Wrap the grid in an outer
+scroll view if its full height exceeds the screen.
+
+```tsx
+import { BannerGrid, type BannerGridRef } from '@inappstory/react-native-sdk';
+import { useRef } from 'react';
+
+const gridRef = useRef<BannerGridRef>(null);
+
+<BannerGrid
+  ref={gridRef}
+  placeId="main_banner"
+  columnCount={3}
+  columnSpacing={8}
+  rowSpacing={12}
+  onPlaceLoaded={(size, widgetHeight) =>
+    console.log(`Grid loaded: size=${size}, height=${widgetHeight}`)
+  }
+/>;
+```
+
+### Vertical banner list
+
+Use `BannerList` for a native, one-column, vertically scrolling list. It fills
+the space allocated by its parent; the parent must have a bounded height.
+Unlike `BannerGrid`, it never expands to its content height. Each banner keeps
+its own aspect ratio, and all available banners are included (no 20-item limit).
+
+```tsx
+import { BannerList, type BannerListRef } from '@inappstory/react-native-sdk';
+import { useRef } from 'react';
+import { View } from 'react-native';
+
+const listRef = useRef<BannerListRef>(null);
+
+<View style={{ flex: 1 }}>
+  <BannerList
+    ref={listRef}
+    placeId="main_banner"
+    style={{ flex: 1 }}
+    sideInset={16}
+    interItemSpacing={12}
+    cornerRadius={16}
+    onPlaceLoaded={(size, widgetHeight) =>
+      console.log(`List loaded: ${size}, content height: ${widgetHeight}dp`)
+    }
+  />
+</View>;
+
+// Alternatively, use height={400} or style={{ height: 400 }}.
+// Preloading uses the same storyManager.preloadBannerPlace(...) API.
+listRef.current?.refresh();
+listRef.current?.pause();
+listRef.current?.resume();
+```
+
+| Prop | Default | Description |
+| --- | --- | --- |
+| `placeId` | `'default'` | Banner place identifier. |
+| `height` | unset | Fixed viewport height in dp. Otherwise uses `style.height` or fills available space with flex. |
+| `style` | full width | React Native view style; takes precedence over default layout and `height`. |
+| `sideInset` | `16` | Horizontal padding on both sides, in dp. |
+| `leadingInset`, `trailingInset` | `sideInset` | Override the respective horizontal padding; `0` removes it. |
+| `interItemSpacing` | `8` | Vertical space between banners, in dp. |
+| `cornerRadius` | `16` | Corner radius of each banner, in dp. |
+| `onPlaceLoaded` | unset | `(size: number, widgetHeight: number) => void`. |
+
+`onPlaceLoaded` retains the Flutter SDK convention: on Android, `widgetHeight`
+is `0` because the native list does not expose its full content height; on iOS,
+it is the full content height, **not** the viewport height. Empty results report
+`(0, 0)`. Do not resize the list using this callback.
+
+The ref exposes `refresh()` (reload content), `pause()` and `resume()` (banner
+playback, not scrolling or taps). An explicit pause persists until resume,
+including across appearance updates. There is no carousel looping or automatic
+scrolling. Loading placeholders configured through `AppearanceManager` and
+global banner events work for the list too. Native Android retains its default
+4 dp padding before the first and after the last item.
+
 ### Banner Events
 
 Listen to banner widget events:
@@ -412,6 +509,14 @@ await storyManager.preloadIAM(['iam_id_1'], ['tag1']);
 // Show IAM by ID
 await storyManager.showIAMById('iam_id_1', false, abortSignal);
 
+// Request an IAM by ID with server-side targeting
+await storyManager.showIAMByIdWithTargeting(
+  'iam_id_1',
+  false,
+  ['promo'],
+  abortSignal
+);
+
 // Show IAM by event trigger
 await storyManager.showIAMByEvent('user_purchased', false, abortSignal);
 
@@ -424,6 +529,24 @@ storyManager.onIamEvent((event) => {
     // InAppMessageData { id, title, event, extraFields }
     console.log(event.withName, event.body.extraFields);
   }
+});
+```
+
+Input fields embedded in IAM content (text, email, or telephone) use the
+native SDK's platform input dialog. Configure those fields in the IAM content;
+no React Native `TextInput` wrapper is needed.
+
+### Loading placeholders
+
+Set separate loader colors for the story reader, IAM, and banners. Colors use
+`#RRGGBB`; passing `null` for a surface restores the SDK default or its native
+fallback to the story-reader placeholder.
+
+```ts
+appearanceManager.setLoadingPlaceholders({
+  storyReader: { backgroundColor: '#ffffff', indicatorColor: '#2c60ea' },
+  iam: { backgroundColor: '#ffffff', indicatorColor: '#e65c9c' },
+  banners: { backgroundColor: '#f4f4f4', indicatorColor: '#2c60ea' },
 });
 ```
 
@@ -455,10 +578,12 @@ storyManager.addTags(['tag2']);
 storyManager.removeTags(['tag1']);
 ```
 
-A tag may contain only letters (any alphabet), digits, `_` and `-`, and the total
-number of tags must not exceed 100. If a rule is violated, the error is written to
-`console.error` and the call never reaches the native SDK — the tags are not
-applied, but the app does not crash.
+A tag must start with a letter (any alphabet) or digit and may contain only
+letters, digits, `_` and `-`. Initialization, `setTags` and `addTags` discard
+invalid tags and keep the first 100 valid tags in order, logging discarded input
+to `console.error`. `addTags` keeps existing tags first and removes duplicates.
+Request-specific tag overrides still reject the entire request if any tag is
+invalid or the list exceeds 100.
 
 ## Placeholders
 

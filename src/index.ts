@@ -3,7 +3,11 @@ import { StoryManager } from './core/StoryManager';
 
 export { StoryManager, AppearanceManager };
 
-export type { StoriesListCardOptions } from './core/AppearanceManager';
+export type {
+  LoadingPlaceholderOptions,
+  LoadingPlaceholders,
+  StoriesListCardOptions,
+} from './core/AppearanceManager';
 
 export type { StoryManagerConfig, LogEntry } from './types/StoryManager';
 export type {
@@ -28,6 +32,16 @@ export type {
 export { BannerCarousel } from './components/BannerCarousel/BannerCarousel';
 export type { BannerCarouselProps } from './components/BannerCarousel/BannerCarousel';
 export type { BannerViewRef } from './components/BannerCarousel/BannerNativeView';
+export { BannerGrid } from './components/BannerGrid/BannerGrid';
+export type {
+  BannerGridProps,
+  BannerGridRef,
+} from './components/BannerGrid/BannerGrid';
+export { BannerList } from './components/BannerList/BannerList';
+export type {
+  BannerListProps,
+  BannerListRef,
+} from './components/BannerList/BannerList';
 export type { BannerData, BannerWidgetEvent } from './types/BannerData';
 export type { StoryData, StoryEvent } from './types/StoryData';
 export type {
